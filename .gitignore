@@ -3,6 +3,7 @@ tmp/
 export.sh
 export-*.sh
 exports/*.sh
+secrets/*.sh
 .DS_Store
 *.swp
 *.pyc

@@ -14,7 +14,7 @@
 - Vim & Tmux (optional, VSCode works too) as an IDE
 
 
-### [Exports](exports/): Environment File(s)
+### [Secrets](secrets/): Environment File(s)
 
 The exports files set your local environment variables for local development and deployments.
 
@@ -22,7 +22,7 @@ Right now everything is in `export-kytrade.sh.SAMPLE`. Copy it, remove the `.SAM
 and fill it in. Then set all your env vars by sourcing the file.
 
 ```
-source exports/export-kytrade.sh
+source secrets/export-kytrade.sh
 ```
 
 
@@ -68,6 +68,8 @@ Shared infrastructure used by my projects
 ## [Kytrade](kytrade/)
 My personal trading tools and hobby project. This project is more about the proccess of building it
 than the actual end result.
+
+Installed to K8s with [helm](kytrade/helm/)
 
 
 # [Blog](blog/)
