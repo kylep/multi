@@ -10,7 +10,21 @@
 - [pre-commit](https://pre-commit.com/)
 - [PyEnv](https://github.com/pyenv/pyenv)
 - [Poetry](https://python-poetry.org/)
-- Vim & Tmux (optional, VSCode works too)
+- [Terraform](https://www.terraform.io/)
+- Vim & Tmux (optional, VSCode works too) as an IDE
+
+
+### [Exports](exports/): Environment File(s)
+
+The exports files set your local environment variables for local development and deployments.
+
+Right now everything is in `export-kytrade.sh.SAMPLE`. Copy it, remove the `.SAMPLE` suffix,
+and fill it in. Then set all your env vars by sourcing the file.
+
+```
+source exports/export-kytrade.sh
+```
+
 
 
 ### Setting up the precommit hooks
