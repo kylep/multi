@@ -1,0 +1,12 @@
+old/
+tmp/
+export.sh
+export-*.sh
+exports/*.sh
+.DS_Store
+*.swp
+*.pyc
+__pycache__/
+node_modules/
+postgres-data/
+**/values-*.yaml

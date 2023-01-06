@@ -1,0 +1,14 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /app/client;
+        index index.html;
+        server_name _;
+        location / {
+                try_files $uri $uri/ =404;
+        }
+        location ^~/v1/ {
+                rewrite ^/v1/(.*)$ /$1 break;
+                proxy_pass {{API_FQDN}};
+        }
+}

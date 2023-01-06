@@ -1,0 +1,10 @@
+apiVersion: v2
+name: kytrade-client
+description: Frontend client for Kytrade
+type: application
+version: 2.0.0
+appVersion: "latest"
+dependencies:
+- name: kytrade-lib
+  version: 0.1.04
+  repository: file://../kytrade-lib

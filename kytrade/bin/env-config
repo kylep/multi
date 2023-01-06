@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""Apply environment variables to static config files"""
+
+import json
+import os
+from jinja2 import Template
+
+def apply_template(jinja2_file, output_file, replacements):
+    """Replace the replacements values in jinja2_file, write to output_file"""
+    print(f"Rendering {jinja2_file} to {output_file}")
+    with open(jinja2_file, "r") as j2_file:
+        j2_text = j2_file.read()
+    template = Template(j2_text)
+    replaced_text = template.render(**replacements)
+    with open(output_file, "w+") as write_file:
+        write_file.write(replaced_text)
+
+# /etc/nginx/nginx.conf
+apply_template(
+    jinja2_file="image-files/etc/nginx/sites-available/default.j2",
+    output_file="/etc/nginx/sites-enabled/default",
+    replacements={
+        "API_FQDN": os.environ["API_FQDN"],
+    },
+)

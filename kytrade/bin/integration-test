@@ -1,0 +1,9 @@
+#!/bin/bash
+if [[ ! -d bin/ ]]; then
+  echo "ERROR: Run from base dir"
+  exit 1
+fi
+
+echo "Running integration tests"
+coverage run -m pytest tests/integration
+coverage html -d coverage/integration

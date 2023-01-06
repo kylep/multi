@@ -1,0 +1,13 @@
+image:
+  name: docker/compose:latest
+
+stages:
+  # - build
+
+build-image:
+  stage: build
+  only:
+    - main
+    - merge_requests
+  script:
+    - bin/build-and-push

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+workers=2
+dev_opts=""
+if [[ "$ENV" == "dev" ]]; then
+  workers=1
+  dev_opts="--reload"
+  poetry install
+fi
+
+gunicorn $dev_opts \
+  --workers=$workers \
+  --bind 0.0.0.0:5000 \
+  --access-logfile=- \
+  kytrade.api.app:app

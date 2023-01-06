@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+bin/env-config
+echo "NGINX CONFIG:"
+echo
+cat /etc/nginx/sites-enabled/default
+
+cd client
+npm start

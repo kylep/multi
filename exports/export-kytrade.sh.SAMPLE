@@ -1,0 +1,42 @@
+# For local development
+# To use: Copy to export.sh, populate, and run source export.sh
+
+# Amazon - Used for builds & tf
+export AWS_ECR_PREFIX="883546544043.dkr.ecr.ca-central-1.amazonaws.com"
+export AWS_ACCESS_KEY_ID=""
+export AWS_SECRET_ACCESS_KEY=""
+
+# Postgres
+export POSTGRES_HOST=""
+export POSTGRES_USER=""
+export POSTGRESG_PASSWORD=""
+export DATABASE_NAME="kytrade"
+
+# App config
+export IMAGE_PREFIX=$AWS_ECR_PREFIX
+export BUILD_IMAGE="true"  # GitLab runners that can build are expensive
+export API_FQDN=""
+
+###############################
+
+# Reddit App - CLI features only (so far)
+export SIGNING_SECRET=""
+export REDDIT_APP_ID=""
+export REDDIT_APP_SECRET=""
+export REDDIT_USERNAME=""
+export REDDIT_PASSWORD=""
+
+# Slack - CLI features only (so far)
+export SLACK_TOKEN=""
+
+###############################
+
+# Docker Hub - Not using this right now
+export DOCKER_HUB_PAT=""
+export DOCKER_HUB_PREFIX="kpericak"
+
+# Redis - Not used yet
+export REDIS_HOST=""
+export REDIS_USER=""
+export REDIS_PASSWORD=""
+

@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+if [[ "$DOCKER_HUB_PAT" == "" ]]; then
+  echo 'ERROR: Required env var DOCKER_HUB_PAT is empty'
+  exit 1
+fi
+
+if [[ "$BUILD_IMAGE" == "true" ]]; then
+  docker login --username="kpericak" --password="$DOCKER_HUB_PAT"
+  docker-compose build
+else
+  echo "WARNING: Skipping image build and push because \$BUILD_IMAGE != \"true\""
+fi

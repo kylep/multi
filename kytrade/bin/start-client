@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -e
+
+bin/env-config
+echo "NGINX CONFIG:"
+echo
+cat /etc/nginx/sites-enabled/default
+
+cd client
+npm run watch &
+
+nginx -g "daemon off;error_log /dev/stdout info;"
