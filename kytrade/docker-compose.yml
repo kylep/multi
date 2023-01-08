@@ -4,7 +4,7 @@ services:
   kytrade-api:
     build:
       context: .
-    image: kpericak/kytrade:${RELEASE}
+    image: kpericak/kytrade:${KYTRADE_RELEASE}
     ports:
       - "5000:5000"
     expose:
@@ -18,7 +18,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?err}
 
   kytrade-client:
-    image: kpericak/kytrade
+    image: kpericak/kytrade:${KYTRADE_RELEASE}
     ports:
       - "8000:8000"
     expose:

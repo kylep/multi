@@ -1,17 +1,10 @@
-# Kyle's Monorepo (formerly kytrade2)
-
-## kytrade2
+# kytrade
 
 - My personal trading tools and automation.
 - Open source, but I'd advise against using any of this without talking to me.
 - Kytrade 1, or just Kytrade, is an extant trading CLI that I wrote a while ago.
 - Eventually I'll merge the old CLI into this and rename kytrade2 to kytrade
 
-## Links
-
-- [GitLab Source](https://gitlab.com/kylep3/kytrade2/)
-- [GitHub Copy](https://github.com/kylep/kytrade2)
-- [Trello Board](https://trello.com/b/O9YyyHmo/kytrade2)
 
 ## Dev
 

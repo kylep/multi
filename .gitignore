@@ -1,3 +1,4 @@
+.env
 old/
 tmp/
 export.sh

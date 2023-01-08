@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Apply environment variables to values.yaml files"""
+
+import json
+import os
+import sys
+import argparse
+from jinja2 import Template
+
+from rich import print
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('out_dir')
+args = parser.parse_args()
+OUT_DIR = args.out_dir
+
+API_VALUES_J2_PATH = "kytrade/helm/kytrade-api/values.yaml.j2"
+API_VALUES_OUT_PATH = f"{OUT_DIR}/values-kytrade-api.yaml"
+API_REPLACEMENTS = {
+    'POSTGRES_HOST': os.getenv('POSTGRES_HOST'),
+    'POSTGRES_USER': os.getenv('POSTGRES_USER'),
+    'POSTGRES_PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+    'DATABASE_NAME': os.getenv('DATABASE_NAME'),
+}
+
+CLIENT_VALUES_J2_PATH = "kytrade/helm/kytrade-api/values.yaml.j2"
+CLIENT_VALUES_OUT_PATH = f"{OUT_DIR}/values-kytrade-api.yaml"
+CLIENT_REPLACEMENTS = {}
+
+
+
+
+def apply_template(jinja2_file, output_file, replacements):
+    """Replace the replacements values in jinja2_file, write to output_file"""
+    print(f"Rendering {jinja2_file} to {output_file}")
+    with open(jinja2_file, "r") as j2_file:
+        j2_text = j2_file.read()
+    template = Template(j2_text)
+    replaced_text = template.render(**replacements)
+    with open(output_file, "w+") as write_file:
+        write_file.write(replaced_text)
+
+
+for path in [OUT_DIR, API_VALUES_J2_PATH, CLIENT_VALUES_J2_PATH]:
+    if not os.path.exists(path):
+        print(f"[red]Error: {path} not found[/red]")
+        sys.exit(1)
+
+apply_template(API_VALUES_J2_PATH, API_VALUES_OUT_PATH, API_REPLACEMENTS)
+apply_template(CLIENT_VALUES_J2_PATH, CLIENT_VALUES_OUT_PATH, CLIENT_REPLACEMENTS)
