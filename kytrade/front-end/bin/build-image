@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-if [[ ! -d bin || ! -d kytrade ]]; then
+if [[ ! -d bin || ! -d src ]]; then
   echo "ERROR: Need to run this from api/"
   exit 1
 fi
@@ -11,9 +11,9 @@ fi
 
 if [[ "$BUILD_IMAGE" == "true" ]]; then
   docker login --username="$DOCKER_HUB_PREFIX" --password="$DOCKER_HUB_PAT"
-  RELEASE=$(cat kytrade/const.py | grep "VERSION =" | awk '{print $3}' | tr -d '"')
-  echo cdocker build -t $DOCKER_HUB_PREFIX/kytrade-api:$RELEASE .
-  docker build -t $DOCKER_HUB_PREFIX/kytrade-api:$RELEASE .
+  RELEASE=$(cat RELEASE)
+  echo docker build -t $DOCKER_HUB_PREFIX/kytrade-front-end:$RELEASE .
+  docker build -t $DOCKER_HUB_PREFIX/kytrade-front-end:$RELEASE .
 else
   echo "WARNING: Skipping image build and push because \$BUILD_IMAGE != \"true\""
 fi

@@ -24,6 +24,17 @@ k get nodes
 ```
 
 ## To Do:
+
+*2023-03-19*
+Need to fix the OIDC connector so I can make PVs and Ingress's.
+
+
+
+
+----
+
+# Older Todo
+
 Implement the ALB/LNB controller so the ingress actually creates an ALB
 
 ## Fix the config map
@@ -49,6 +60,13 @@ mapUsers: |
 ```
 
 
+## Fix up the CSI components
+Amazon EBS CSI plugin IAM role
+https://docs.aws.amazon.com/eks/latest/userguide/csi-iam-role.html
+```
+aws eks describe-cluster --name=kytrade2-EKS-Cluster --query "cluster.identity.oidc.issuer" --output text | 2>&1
+
+```
 
 # Imperative Helm Stuff
 
@@ -75,7 +93,6 @@ Make sure you've set your env vars
 ```
 bin/make-export-values.sh
 cd helm/kytrade-api
-
 ```
 
 

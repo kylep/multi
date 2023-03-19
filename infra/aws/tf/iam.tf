@@ -1,5 +1,5 @@
-resource "aws_iam_role" "kytrade2-EKS-Cluster-Role" {
-  name = "kytrade2-EKS-Cluster-Role"
+resource "aws_iam_role" "cluster_role" {
+  name = "${var.env}_cluster_role"
   path = "/"
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
@@ -20,13 +20,12 @@ resource "aws_iam_role" "kytrade2-EKS-Cluster-Role" {
     }
   )
   tags = {
-    Name = "kytrade2-EKS-Cluster-Role"
-    app = "kytrade2"
+    Name = "${var.env}_cluster_role"
   }
 }
 
-resource "aws_iam_role" "kytrade2-EKS-Node-Role" {
-  name = "kytrade2-EKS-Node-Role"
+resource "aws_iam_role" "node_role" {
+  name = "${var.env}_node_role"
   path = "/"
   description = "Role for EKS Nodes"
   managed_policy_arns = [
@@ -49,36 +48,50 @@ resource "aws_iam_role" "kytrade2-EKS-Node-Role" {
     }
   )
   tags = {
-    Name = "kytrade2-EKS-Node-Role"
-    app = "kytrade2"
+    Name = "${var.env}_node_role"
   }
 }
 
-resource "aws_iam_policy" "kytrade2-EKS-ALB-Controller-Policy" {
-  name = "kytrade2-EKS-ALB-Controller-Policy"
+resource "aws_iam_policy" "alb_policy" {
+  name = "${var.env}_alb_policy"
   path = "/"
   description = "Policy allowing ALB ingress and NLB services on EKS"
   policy = file("${path.module}/eks-alb-nlb-controller-policy.json")
   tags = {
-    Name = "kytrade2-EKS-ALB-Controller-Policy"
-    app = "kytrade2"
+    Name = "${var.env}_alb_policy"
   }
 }
 
-resource "aws_iam_role_policy_attachment" "kytrade2-EKS-Node-Role-ALB-Policy-Attachment" {
-  role = aws_iam_role.kytrade2-EKS-Node-Role.name
-  policy_arn = aws_iam_policy.kytrade2-EKS-ALB-Controller-Policy.arn
+resource "aws_iam_role_policy_attachment" "alb_policy_attachment" {
+  role = aws_iam_role.node_role.name
+  policy_arn = aws_iam_policy.alb_policy.arn
 }
 
-resource "aws_eks_identity_provider_config" "kytrade2-EKS-OIDC" {
-  cluster_name = aws_eks_cluster.kytrade2-EKS-Cluster.name
+
+# NOTE: I don't think this one's actually doing anything / required
+resource "aws_eks_identity_provider_config" "identity_provider_config" {
+  cluster_name = aws_eks_cluster.cluster.name
   oidc {
     client_id                     = "sts.amazonaws.com"
-    identity_provider_config_name = "kytrade2-EKS-OIDC"
-    issuer_url                    = aws_eks_cluster.kytrade2-EKS-Cluster.identity[0].oidc[0].issuer
+    identity_provider_config_name = var.env
+    issuer_url                    = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   }
   tags = {
-    Name = "kytrade2-EKS-OIDC"
-    app = "kytrade2"
+    Name = "${var.env}_identity_provider_config"
   }
+}
+
+# Getthing the thumbprint is a nuisance, we need to get it from the region's certificate using
+# a bash script thumbprint.sh
+
+data "aws_region" "current" {}
+
+data "external" "thumbprint" {
+  program = ["./thumbprint.sh", data.aws_region.current.name]
+}
+
+resource "aws_iam_openid_connect_provider" "openid_connect_provider" {
+  url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+  client_id_list = ["sts.amazonaws.com"]
+  thumbprint_list = [data.external.thumbprint.result.thumbprint]
 }

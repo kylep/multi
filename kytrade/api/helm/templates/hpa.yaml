@@ -1,17 +1,15 @@
-{{- define "kytrade-lib.hpa" }}
----
 {{- if .Values.autoscaling.enabled }}
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "kytrade-lib.fullname" . }}
+  name: {{ include "kytrade-api.fullname" . }}
   labels:
-    {{- include "kytrade-lib.labels" . | nindent 4 }}
+    {{- include "kytrade-api.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "kytrade-lib.fullname" . }}
+    name: {{ include "kytrade-api.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
@@ -27,5 +25,4 @@ spec:
         name: memory
         targetAverageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
-{{- end }}
 {{- end }}

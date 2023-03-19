@@ -1,32 +1,31 @@
-resource "aws_eks_cluster" "kytrade2-EKS-Cluster" {
-  name     = "kytrade2-EKS-Cluster"
-  role_arn = aws_iam_role.kytrade2-EKS-Cluster-Role.arn
+resource "aws_eks_cluster" "cluster"  {
+  name = "${var.env}_cluster"
+  role_arn = aws_iam_role.cluster_role.arn
   vpc_config {
     subnet_ids = [
-      aws_subnet.kytrade2-Subnet-Public-1.id,
-      aws_subnet.kytrade2-Subnet-Public-2.id,
+      aws_subnet.public_subnet_1.id,
+      aws_subnet.public_subnet_2.id,
     ]
   }
   tags = {
-    Name = "kytrade2-EKS-Cluster"
-    app = "kytrade2"
+    Name = "${var.env}_cluster"
   }
 }
 
 
-resource "aws_eks_node_group" "kytrade2-EKS-Node-Group" {
-  cluster_name = aws_eks_cluster.kytrade2-EKS-Cluster.name
-  node_group_name = "kytrade2-EKS-Node-Group"
-  node_role_arn = aws_iam_role.kytrade2-EKS-Node-Role.arn
-  instance_types = ["t3.small"]
+resource "aws_eks_node_group" "node_group" {
+  cluster_name = aws_eks_cluster.cluster.name
+  node_group_name = "${var.env}_node_group"
+  node_role_arn = aws_iam_role.node_role.arn
+  instance_types = var.instance_types
   remote_access {
-    ec2_ssh_key = "Kyle"
-    source_security_group_ids = [aws_security_group.kytrade2-Security-Group.id]
+    ec2_ssh_key = var.ec2_ssh_key
+    source_security_group_ids = [aws_security_group.security_group.id]
   }
   capacity_type = "SPOT"
   subnet_ids = [
-      aws_subnet.kytrade2-Subnet-Public-1.id,
-      aws_subnet.kytrade2-Subnet-Public-2.id,
+      aws_subnet.public_subnet_1.id,
+      aws_subnet.public_subnet_2.id,
   ]
   scaling_config {
     desired_size = 1
@@ -34,7 +33,6 @@ resource "aws_eks_node_group" "kytrade2-EKS-Node-Group" {
     min_size     = 1
   }
   tags = {
-    Name = "kytrade2-EKS-Node-Group"
-    app = "kytrade2"
+    Name = "${var.env}_node_group"
   }
 }

@@ -18,6 +18,7 @@ OUT_DIR = args.out_dir
 API_VALUES_J2_PATH = "kytrade/helm/kytrade-api/values.yaml.j2"
 API_VALUES_OUT_PATH = f"{OUT_DIR}/values-kytrade-api.yaml"
 API_REPLACEMENTS = {
+    'ENV': os.getenv('ENV')
     'POSTGRES_HOST': os.getenv('POSTGRES_HOST'),
     'POSTGRES_USER': os.getenv('POSTGRES_USER'),
     'POSTGRES_PASSWORD': os.getenv('POSTGRES_PASSWORD'),

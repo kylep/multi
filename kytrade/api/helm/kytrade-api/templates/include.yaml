@@ -1,9 +1,0 @@
-{{- include "kytrade-lib.serviceaccount" . }}
----
-{{- include "kytrade-lib.deployment" . }}
----
-{{- include "kytrade-lib.hpa" . }}
----
-{{- include "kytrade-lib.service" . }}
----
-{{- include "kytrade-lib.ingress" . }}

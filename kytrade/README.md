@@ -21,44 +21,14 @@ docker exec -it kytrade2-postgres-1 psql -U kytrade
 
 ## Prod
 
-### Creating the K8s cluster
-
-The EKS cluster to run Kytrade is defined with Terraform
-
-```
-source export.sh
-cd tf/aws
-
-# terraform init  # required for brand new cluster
-
-tf apply
-
-# verify the EKS cluster and its details look ok
-aws eks list-clusters
-aws eks list-nodegroups --cluster-name kytrade2-EKS-Cluster
-aws eks describe-nodegroup --cluster-name kytrade2-EKS-Cluster --nodegroup-name kytrade2-EKS-Node-Group
-
-# Get kubeconfig file
-rm -rf ~/.kube
-aws eks update-kubeconfig --region ca-central-1 --name kytrade2-EKS-Cluster
-
-# Verify cluster - note with EKS you don't need to add a CNI, Amazon VPC CNI is installed
-k get nodes
-```
-
-### Verify infra
-
-```
-k create deployment nginx -replicas 1 --image nginx
-kubectl expose deployment nginx --name nginx --port 8080 --target-port 80 --type ClusterIP
-
-```
-
-
+Check the `multi/infra` dir to set up a K8s cluster.
 
 ### Deploying the app to K8s
+
+Make sure you have helmfile and helm-diff installed.
+
 ```
-# ...helmfile example
+helmfile apply
 ```
 
 

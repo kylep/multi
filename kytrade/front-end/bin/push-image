@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+if [[ ! -d bin ]]; then
+  echo "ERROR: Need to run this from front-end/"
+  exit 1
+fi
+
+if [[ "$DOCKER_HUB_PAT" == "" ]]; then
+  echo 'ERROR: Required env var DOCKER_HUB_PAT is empty'
+  exit 1
+fi
+
+RELEASE=$(cat RELEASE)
+echo docker push $DOCKER_HUB_PREFIX/kytrade-front-end:$RELEASE
+docker push $DOCKER_HUB_PREFIX/kytrade-front-end:$RELEASE
+
+
+

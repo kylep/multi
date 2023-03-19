@@ -1,17 +1,9 @@
-FROM kpericak/
+FROM kpericak/base:1.0.0
 
 ADD ./ /app
 WORKDIR /app
 
-# Inject the image's filesystem files
-COPY image-files /
-
-# Build the client
-RUN cd /app/client \
- && npm install \
- && npm run build
-
-# Build the API, client, CLI
+# Build the API/CLI image
 # purposefully omitting poetry's --no-dev option, this image is sometimes the dev env
 RUN poetry config virtualenvs.create false \
  && poetry install

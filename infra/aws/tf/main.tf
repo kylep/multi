@@ -10,5 +10,8 @@ terraform {
 }
 
 provider "aws" {
-  region = "ca-central-1"
+  region = var.aws_region
+  default_tags {
+    tags = var.default_tags
+  }
 }

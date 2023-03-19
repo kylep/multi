@@ -11,6 +11,8 @@
 - [PyEnv](https://github.com/pyenv/pyenv)
 - [Poetry](https://python-poetry.org/)
 - [Terraform](https://www.terraform.io/)
+- [Helmfile](https://github.com/helmfile/helmfile)
+- [Helm-diff](https://github.com/databus23/helm-diff)
 - Vim & Tmux (optional, VSCode works too) as an IDE
 
 

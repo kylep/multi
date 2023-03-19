@@ -1,24 +1,27 @@
-# Installing Kytrade with Helm
+# Installation Steps
 
-From `multi/`, source the environment variables
-TODO: Implement python-dotenv to replace these with .env files
+## On AWS
+from `multi/`:
+from `multi/`:
 
+Set the `ENV` environment variable
 ```
-source secrets/export-kytrade.sh
-```
-
-Generate the values files for your given environment
-
-```
-kytrade/bin/generate-values secrets/
+export ENV=aws
 ```
 
-Deploy Kytrade-API
-
-TODO: Consolidate these two into a helmfile
+create `secrets/helm-values/aws/api-values.yaml`. Example:
 
 ```
-```
+cat << EOH > secrets/helm-values/aws/api-values.yaml
+image:
+  tag: "2.0.0"
+
+EOH
 
 ```
+
+Now use Helm to install the API.
+
+```
+helm install kytrade-api kytrade/api/helm --values secrets/helm-values/aws/api-values.yaml
 ```

@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+if [[ ! -d bin || ! -d kytrade ]]; then
+  echo "ERROR: Need to run this from api/"
+  exit 1
+fi
+
+if [[ "$DOCKER_HUB_PAT" == "" ]]; then
+  echo 'ERROR: Required env var DOCKER_HUB_PAT is empty'
+  exit 1
+fi
+
+RELEASE=$(cat kytrade/const.py | grep "VERSION =" | awk '{print $3}' | tr -d '"')
+echo docker push $DOCKER_HUB_PREFIX/kytrade-api:$RELEASE
+docker push $DOCKER_HUB_PREFIX/kytrade-api:$RELEASE
+
+
+

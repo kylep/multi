@@ -1,6 +1,0 @@
-apiVersion: v2
-name: kytrade-lib
-description: Base helm chart library for kytrade
-type: application
-version: 0.1.04
-appVersion: "latest"
