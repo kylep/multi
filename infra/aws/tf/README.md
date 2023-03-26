@@ -8,15 +8,15 @@ tf apply
 
 ## verify
 aws eks list-clusters
-aws eks list-nodegroups --cluster-name kytrade2-EKS-Cluster
-aws eks describe-nodegroup --cluster-name kytrade2-EKS-Cluster --nodegroup-name kytrade2-EKS-Node-Group
+aws eks list-nodegroups --cluster-name staging_cluster
+aws eks describe-nodegroup --cluster-name staging_cluster --nodegroup-name kytrade2-EKS-Node-Group
 
 # Delete AWS infra
 tf destroy
 
 # Get kubeconfig file
 rm -rf ~/.kube
-aws eks update-kubeconfig --region ca-central-1 --name kytrade2-EKS-Cluster
+aws eks update-kubeconfig --region ca-central-1 --name staging_cluster
 
 # Verify cluster
 k get nodes
@@ -28,7 +28,7 @@ k get nodes
 *2023-03-19*
 Need to fix the OIDC connector so I can make PVs and Ingress's.
 
-
+### To verify the OIDC setup
 
 
 ----

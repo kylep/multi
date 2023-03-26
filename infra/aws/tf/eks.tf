@@ -36,3 +36,15 @@ resource "aws_eks_node_group" "node_group" {
     Name = "${var.env}_node_group"
   }
 }
+
+
+# EBS Addon
+
+
+
+resource "aws_eks_addon" "aws_ebs_csi_driver" {
+  cluster_name      = aws_eks_cluster.cluster.name
+  addon_name        = "aws-ebs-csi-driver"
+  # addon_version     = "latest"  # I don't really care
+  service_account_role_arn = aws_iam_role.eks_csi_driver.arn
+}

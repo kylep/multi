@@ -4,6 +4,7 @@ resource "aws_iam_role" "cluster_role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
     "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController",
+    "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy",
   ]
   assume_role_policy = jsonencode(
     {
@@ -32,6 +33,7 @@ resource "aws_iam_role" "node_role" {
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   ]
   assume_role_policy = jsonencode(
     {
@@ -81,7 +83,7 @@ resource "aws_eks_identity_provider_config" "identity_provider_config" {
   }
 }
 
-# Getthing the thumbprint is a nuisance, we need to get it from the region's certificate using
+# Getting the thumbprint is a nuisance, we need to get it from the region's certificate using
 # a bash script thumbprint.sh
 
 data "aws_region" "current" {}
@@ -94,4 +96,55 @@ resource "aws_iam_openid_connect_provider" "openid_connect_provider" {
   url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   client_id_list = ["sts.amazonaws.com"]
   thumbprint_list = [data.external.thumbprint.result.thumbprint]
+}
+
+
+# Role for EBS
+
+data "aws_caller_identity" "current" {}
+
+
+
+
+data "aws_iam_policy_document" "test_oidc_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.openid_connect_provider.url, "https://", "")}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.openid_connect_provider.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
+    }
+    principals {
+      identifiers = [aws_iam_openid_connect_provider.openid_connect_provider.arn]
+      type        = "Federated"
+    }
+  }
+}
+
+resource "aws_iam_role" "eks_csi_driver" {
+  name = "eks_csi_driver"
+  assume_role_policy = data.aws_iam_policy_document.test_oidc_assume_role_policy.json
+  # ${var.aws_region}
+}
+
+resource "aws_iam_policy" "ebs_policy" {
+  name = "${var.env}_ebs_policy"
+  path = "/"
+  description = "Policy allowing EBS plugin for EKS"
+  # https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/docs/example-iam-policy.json
+  policy = file("${path.module}/ebs-iam-policy.json")
+  tags = {
+    Name = "${var.env}_eks_policy"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_policy_attachment" {
+  role = aws_iam_role.eks_csi_driver.name
+  policy_arn = aws_iam_policy.ebs_policy.arn
 }
