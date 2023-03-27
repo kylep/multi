@@ -20,6 +20,7 @@ resource "aws_subnet" "public_subnet_1" {
     Name = "${var.env}_public_subnet_1"
     "kubernetes.io/role/elb" = 1
     "kubernetes.io/cluster/cluster" = "owned"
+    "kubernetes.io/cluster/${var.env}_cluster" = "shared"
   }
 }
 
@@ -32,6 +33,7 @@ resource "aws_subnet" "public_subnet_2" {
     Name = "${var.env}_public_subnet_2"
     "kubernetes.io/role/elb" = 1
     "kubernetes.io/cluster/cluster" = "owned"
+    "kubernetes.io/cluster/${var.env}_cluster" = "shared"
   }
 }
 

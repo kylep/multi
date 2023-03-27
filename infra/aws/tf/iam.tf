@@ -1,3 +1,21 @@
+resource "aws_iam_policy" "elb_policy" {
+  name        = "${var.env}_elb_policy"
+  description = "Policy to allow managing ELBs for EKS Nodes"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "elasticloadbalancing:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "cluster_role" {
   name = "${var.env}_cluster_role"
   path = "/"
@@ -5,6 +23,7 @@ resource "aws_iam_role" "cluster_role" {
     "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
     "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController",
     "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy",
+    aws_iam_policy.elb_policy.arn,
   ]
   assume_role_policy = jsonencode(
     {
@@ -33,7 +52,8 @@ resource "aws_iam_role" "node_role" {
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-    "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+    "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy",
+    aws_iam_policy.elb_policy.arn,
   ]
   assume_role_policy = jsonencode(
     {
