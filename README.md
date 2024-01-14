@@ -1,4 +1,5 @@
 # Kyle's projects
+Monorepo setup for my stuff.
 
 ## Dev Env
 
