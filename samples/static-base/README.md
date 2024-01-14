@@ -116,6 +116,30 @@ It's located at `/render` because the file in `pages/` is called `render.js`.
 name. If you want to rename the file, the dev server will break and you'll need to exit
 the dev server and run `npm run build` first to fix it.
 
+
 # Build it to be distributable
 
+## Configure Next.js for Static Export
 
+You used to be able to use `next export` for a step like this but they've deprecated it
+so now it's a bit harder. 
+
+Update `next.config.js` and add `output: 'export'` to the `nextConfig`:
+
+`vi next.config.js`
+```js
+/** @type {import('next').NextConfig} */
+const nextConfig = {output: 'export',}
+module.exports = nextConfig
+```
+
+Setting the value of `output` to `export` modifies the build job to produce an `out`
+directory.
+
+```bash
+npm run build
+ls out/
+```
+
+The rendered example can be found in `out/render.html` and the directory can now be
+uploaded to a hosting provider of your choice as a bare-minimum static site!
