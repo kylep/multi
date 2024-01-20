@@ -8,6 +8,7 @@ import html from 'remark-html';
 const MARKDOWN_FILE_PATH = 'markdown/sample.md';
 
 // getStaticProps is a Next.js function that fetches data at build time
+// https://nextjs.org/docs/pages/building-your-application/data-fetching/get-static-props
 export async function getStaticProps() {
   // Load the markdown file for parsing
   const markdownFilePath = path.join(process.cwd(), MARKDOWN_FILE_PATH)

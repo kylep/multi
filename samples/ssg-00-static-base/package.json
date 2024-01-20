@@ -1,5 +1,5 @@
 {
-  "name": "static-base",
+  "name": "ssg-00-static-base",
   "version": "0.1.0",
   "private": true,
   "scripts": {

@@ -1,5 +1,17 @@
 # Static-Base: A NextJS Minimal Static Site Generator (SSG)
 
+## SSG-00
+
+This is the first iteration in a series of projects that build upon eachother. In trying
+to find a unified guide on how to do this, everyone always showed the finished project
+with a whole bunch of libraries at play and concepts that I found didn't get enough
+attention.
+
+__Scope__: SSG-0 goes from having nothing but an empty git repo to having a Next.js
+app that can read in a Markdown file and export it as an HTML file that could be loaded
+into a remote server. It will also demonstrate launching a simple dev server to have a
+nice fast cycle of testing changes.
+
 ## Project Setup
 
 
