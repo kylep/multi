@@ -10,5 +10,6 @@ purpose.
 - *ssg-01-multi-page-site*: Go from rendering one file to having a navigable site that
   combines multiple markdown files and has a dynamically generated index page.
 - *ssg-02-metadata-and-style*: Parsing front matter with the gray-matter library to
-  permit custom metadata to be stored in the mardown, and adding a common header with
-  basic CSS.
+  permit custom metadata to be stored in the mardown, and adding a common minimal header
+  with basic CSS.
+- *ssg-03-mui-in-ssg*: MUI being Material UI, a really convenient way to style a site.
