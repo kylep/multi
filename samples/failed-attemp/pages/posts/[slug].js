@@ -3,7 +3,8 @@ import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
-import SiteLayout from '../../components/SiteLayout';
+
+import PageLayout from '../../components/PageLayout'; // Adjust the path as necessary
 
 
 // https://nextjs.org/docs/pages/building-your-application/data-fetching/get-static-paths
@@ -39,9 +40,9 @@ export async function getStaticProps({ params: { slug } }) {
 
 function MarkdownPage({ contentHtml, metaData }) {
   return (
-    <SiteLayout>
+    <PageLayout>
       <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
-    </SiteLayout>
+    </PageLayout>
   );
 }
 

@@ -1,8 +1,17 @@
 import React from 'react';
+import Typography from '@mui/material/Typography';
+import PaddedRow from './PaddedRow';
 
 function SiteFooter() {
   return (
-    <div></div>
+    <PaddedRow sx={{ 
+        width: '100%', 
+        backgroundColor: (theme) => theme.palette.grey.main,
+      }}>
+      <Typography variant="body1">
+        Last updated 2024-02-05 by Kyle Pericak
+      </Typography>
+    </PaddedRow>
   );
 }
 

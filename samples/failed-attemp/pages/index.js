@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import Link from 'next/link';
-import SiteLayout from '../components/SiteLayout';
 
 export async function getStaticProps() {
   const files = fs.readdirSync(path.join('markdown','posts'));
@@ -14,7 +13,6 @@ export async function getStaticProps() {
 
 function IndexPage({ markdownFiles }) {
   return (
-	<SiteLayout>
 		<div>
 			<h1>Pages</h1>
 			<ul>
@@ -25,7 +23,6 @@ function IndexPage({ markdownFiles }) {
 				))}
 			</ul>
 		</div>
-	</SiteLayout>
   );
 }
 

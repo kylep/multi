@@ -162,12 +162,14 @@ export default MyComponent;
 The page layout will be defined in `src/app/layout.tsx` and have the following major components:
 
 ```jsx
-<SiteNavHeader />
-<SiteTitle />
-<PageContent>
-  {content}
-</PageContent>
-<SiteFooter>
+<SiteLayout>
+  <SiteNavHeader />
+  <SiteTitle />
+  <PageContent>
+    {content}
+  </PageContent>
+  <SiteFooter>
+</SiteLayout>
 ```
 
 Then the `pages/[slug].js` files will be fed into content, having something like this:
@@ -175,7 +177,7 @@ Then the `pages/[slug].js` files will be fed into content, having something like
 ```jsx
 <BlogPostRow>
   <BlogPostContent>
-    {content}
+    <MarkdownPage />
   </BlogPostContent>
   <BlogSidebar />
 </BlogPostRow>
@@ -183,3 +185,4 @@ Then the `pages/[slug].js` files will be fed into content, having something like
 
 # Defining the template
 
+`vi src/app/layout.tsx`

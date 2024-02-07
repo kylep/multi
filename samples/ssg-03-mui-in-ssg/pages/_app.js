@@ -1,5 +1,20 @@
-import '../src/app/globals.css';
+import '../styles/globals.css';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const theme = createTheme({
+  palette: {
+    grey: {
+      main: '#EEEEEE',
+    },
+  },
+});
 
 export default function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  return (
+    <ThemeProvider theme={theme}>
+    <CssBaseline /> {/* resets browser default styles (like margins, font sizes, and line heights)  */}
+      <Component {...pageProps} />
+    </ThemeProvider>
+  );
 }
