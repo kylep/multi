@@ -8,7 +8,7 @@ import PaddedRow from './PaddedRow';
 
 function NavLink({ href, children }) {
   return (
-    <Link href={href} color="inherit" underline="none" variant="body1" sx={{mr: 2}}>
+    <Link href={href} color="inherit" underline="none" variant="body1" sx={{ml: 2, alignItems: 'center'}}>
       {children}  
     </Link>
   );
@@ -16,12 +16,12 @@ function NavLink({ href, children }) {
 
 function SiteNavHeader() {
   return (
-    <AppBar position="static">
-      <Toolbar disableGutters>
-        <PaddedRow>
-          <NavLink href="/"><HomeIcon /></NavLink>
-          <NavLink href="/archibe">Archive</NavLink>
-          <NavLink href="/about">About</NavLink>
+    <AppBar position="static" data-testid="Nav-AppBar">
+      <Toolbar disableGutters variant="dense" data-testid="Nav-Toolbar" >
+        <PaddedRow data-testid="Nav-PaddedRow">
+          <NavLink href="/" data-testid="Nav-Link-Home"><HomeIcon /></NavLink>
+          <NavLink href="/archive" data-testid="Nav-Link-Archive">Archive</NavLink>
+          <NavLink href="/about" data-testid="Nav-Link-About">About</NavLink>
         </PaddedRow>
       </Toolbar>
     </AppBar>

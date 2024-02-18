@@ -1,8 +1,15 @@
+import { Box } from '@mui/material';
 import React from 'react';
 
 function BlogSidebar() {
   return (
-    <div></div>
+    <Box sx={{
+      width: 200,
+      borderLeft: '1px solid black',
+      padding: '20px'
+    }}>
+
+    </Box>
   );
 }
 

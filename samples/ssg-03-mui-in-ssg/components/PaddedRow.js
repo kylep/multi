@@ -4,6 +4,7 @@ import React from 'react';
 function PaddedRow({ children }) {
   return (
     <Box sx={{ 
+      display: 'flex',
       pl: '2%',
       pr: '2%' ,
       '@media (min-width:600px)': { pl: '3%', pr: '3%' },
