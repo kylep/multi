@@ -6,7 +6,7 @@ function BlogPostRow({ children, sx }) {
     <Box sx={{
       width: 'calc(100% - 200px)',
       padding: '20px',
-      border: '1px solid black',
+      border: '1px solid blue',
       ...sx
     }}>
       {children}

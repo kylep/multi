@@ -41,7 +41,7 @@ While styling the site, let's review some files that matter
 
 - `pages/_app.js`:  allows you to import global CSS files that affect all pages and it's where theme settings get applied.
   Analytics can go in here too.
-- `pages/_document.js`: Customizes the HTML document. Useful for server-side rendering and for adding HTML tags that are common across all pages like custom fonts or a <head>.
+- `pages/_document.js`: Customizes the HTML document. Useful for server-side rendering and for adding HTML tags that are common across all pages like custom fonts or a `<head>` .
 - `pages/_error.js``: Custom error handling. Create a custom error page that will be displayed in case of a 404 or 500 error.
 - `pages/_middleware.js`: Not really being used in this SSG setup
 - `next.config.js`: Used to configure nextjs for ssg export mode.

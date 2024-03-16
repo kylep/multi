@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import Link from 'next/link';
 import SiteLayout from '../components/SiteLayout';
+import BlogPostIndexSummary from '../components/BlogPostIndexSummary';
+import { Typography } from '@mui/material';
 
 export async function getStaticProps() {
   const files = fs.readdirSync(path.join('markdown','posts'));
@@ -15,16 +16,9 @@ export async function getStaticProps() {
 function IndexPage({ markdownFiles }) {
   return (
 	<SiteLayout>
-		<div>
-			<h1>Pages</h1>
-			<ul>
-				{markdownFiles.map(file => (
-					<li key={file.slug}>
-						<Link href={`/posts/${file.slug}`}>{file.title}</Link>
-					</li>
-				))}
-			</ul>
-		</div>
+		{markdownFiles.map(file => (
+			<BlogPostIndexSummary key={file.slug} file={file} />
+		))}
 	</SiteLayout>
   );
 }
