@@ -21,7 +21,7 @@ function SiteTitle() {
       <Typography variant="h3" component="h3" sx={{ 
         width: '100%',
       }}>
-      &quot;It works on my environment&quot;
+      &quot;It works in my environment&quot;
       </Typography>
     </PaddedRow>
   );

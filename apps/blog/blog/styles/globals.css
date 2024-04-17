@@ -3,12 +3,3 @@ body {
   padding: 0;
 }
 
-
-/* underline=none and sx={{textDecoration: 'none'}} are not working  in <Link> elements*/
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
