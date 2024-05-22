@@ -1,45 +1,14 @@
 import { Box } from '@mui/material';
-import React from 'react';
+import React, { useContext } from 'react';
 import { List, ListItem,  ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import { GlobalContext } from '../utils/GlobalContext';
 
-
-const categories = [
-  'cloud',
-  'development',
-  'gaming',
-  'projects',
-  'reference pages',
-  'systems administration',
-];
-
-
-function SidebarListItem(children, sx) {
-  return (
-    <ListItem sx={{
-        margin: 0, 
-        padding: 0,
-        ...sx
-    }}> 
-      {children}  
-    </ListItem>
-  )
-}
-
-function SidebarListItemButton(children, sx, key) {
-  return (
-    <ListItemButton key={text} sx={{
-        margin: 0, 
-        padding: 0,
-        ...sx
-    }}> 
-      {children}  
-    </ListItemButton>
-  )
-}
 
 function CategoryList() {
+  const  globalData  = useContext(GlobalContext);
+
   return (
     <List>
       <ListItem sx={{padding: 0}}> 
@@ -52,18 +21,19 @@ function CategoryList() {
         />
       </ListItem>
       
-      {categories.map((text) => (
-        <ListItemButton key={text} sx={{padding: 0, marginLeft: "10px"}}> 
-          <ListItemIcon sx={{minWidth: "32px"}}>
-            <InsertDriveFileIcon />
-          </ListItemIcon>
-          <ListItemText primary={text} />
-        </ListItemButton>
-      ))}
+      {
+          Object.entries(globalData.data.categories).map(([category, count]) => ( 
+          <ListItemButton key={category} sx={{padding: 0, marginLeft: "10px"}}> 
+            <ListItemIcon sx={{minWidth: "32px"}}>
+              <InsertDriveFileIcon />
+            </ListItemIcon>
+            <ListItemText primary={`${category} (${count})`} />
+          </ListItemButton>
+        ))
+      }    
     </List>
   );
 }
-
 
 function BlogSidebar(sx) {
   return (

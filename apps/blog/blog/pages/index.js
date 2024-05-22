@@ -1,20 +1,29 @@
 import SiteLayout from '../components/SiteLayout';
 import BlogPostIndexSummary from '../components/BlogPostIndexSummary';
-import markdownService from '../utils/MarkdownService';
+import { getMarkdownService } from '../utils/MarkdownService';
+import { GlobalContextProvider } from '../utils/GlobalContext';
+
 
 
 export async function getStaticProps() {
-	const markdownFiles = markdownService.markdownFiles;
-	return { props: { markdownFiles }, };
+	const markdownService = getMarkdownService();
+	return { 
+		props: { 
+			markdownFiles: markdownService.markdownFiles, 
+			categories: markdownService.categories,
+		}, 
+	};
 }
 
-function IndexPage({ markdownFiles }) {
+function IndexPage({ markdownFiles, categories }) {
 	return (
-		<SiteLayout>
-			{markdownFiles.map((file) => (
-				<BlogPostIndexSummary key={file.slug} file={file} />
-			))}
-		</SiteLayout>
+		<GlobalContextProvider globalData={{ categories }}>
+			<SiteLayout>
+				{markdownFiles.map((file) => (
+					<BlogPostIndexSummary key={file.slug} file={file} />
+				))}
+			</SiteLayout>
+		</GlobalContextProvider>
 	);
 }
 

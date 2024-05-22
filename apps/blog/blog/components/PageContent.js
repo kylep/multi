@@ -9,7 +9,7 @@ function PageContent({ children, sx }) {
       <BlogPostRow>
         {children}
       </BlogPostRow>
-      <BlogSidebar />
+      <BlogSidebar/>
     </PaddedRow>
   );
 }
