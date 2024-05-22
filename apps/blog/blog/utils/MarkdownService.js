@@ -8,14 +8,18 @@ import fs from 'fs';
 // Singleton, only want to compute everything once in the build
 class MarkdownService {
 	constructor() {
-	  if (!MarkdownService.instance) {
+		if (MarkdownService.instance) {
+			return MarkdownService.instance;
+		}
+		this.markdownDirectory = path.join('markdown', 'posts');
 		this.markdownFiles = this.#loadMarkdownFiles();
+		// if this ever gets slow, can refactor to do it all in one pass
 		this.markdownFilesBySlug = this.#indexMarkdownFilesBySlug(this.markdownFiles);
+		this.categories = this.#countcategories(this.markdownFiles);
 		MarkdownService.instance = this;
-	  }
 	}
 
-	static #serializeDates(obj){
+	static #serializeDates(obj) {
 		// matter turns dates into Date objects, want them as YYYY-MM-DD strings
 		// todo fix - not a fan of how this pattern mutates props
 		for (const key in obj) {
@@ -40,11 +44,19 @@ class MarkdownService {
 	 };
   
 	#loadMarkdownFiles() {
-	  const markdownDirectory = path.join('markdown', 'posts');
+	  /*
+	  {
+		slug: 'my-first-post',
+		title: 'My First Post',
+		date: '2021-01-01',
+		category: 'general',
+		content: 'This is my first post',
+	  }
+	  */
 	  // filters out .swp so vim doesn't break dev env
-	  const files = fs.readdirSync(markdownDirectory).filter(filename => !filename.endsWith('.swp'));
+	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => !filename.endsWith('.swp'));
 	  const markdownFiles = files.map(filename => {
-		const fullPath = path.join(markdownDirectory, filename);
+		const fullPath = path.join(this.markdownDirectory, filename);
 		const rawMarkdown = fs.readFileSync(fullPath, 'utf8');
 		const props = MarkdownService.getRenderedMarkdownAndProps(rawMarkdown);
 		props.props.metaData.slug = filename.replace('.md', '');
@@ -61,6 +73,21 @@ class MarkdownService {
 		  return acc;
 		}, {});
 	}
+
+	#countcategories(markdownFiles) {
+		// return an object counting the posts per category, 
+		// like { category1: 3, category2: 1}
+		return markdownFiles.reduce((acc, file) => {
+		  if (file.category) {
+			if (acc[file.category]) {
+			  acc[file.category] += 1;
+			} else {
+			  acc[file.category] = 1;
+			}
+		  }
+		  return acc;
+		}, {});
+	}
   
 	static getInstance() {
 	  if (!MarkdownService.instance) {
@@ -70,7 +97,9 @@ class MarkdownService {
 	}
   }
   
-  const instance = MarkdownService.getInstance();
-  Object.freeze(instance);
-  
-  export default instance;
+  export function getMarkdownService() {
+	if (!MarkdownService.instance) {
+	  new MarkdownService();
+	}
+	return MarkdownService.instance;
+  }
