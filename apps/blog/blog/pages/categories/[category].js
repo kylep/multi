@@ -12,7 +12,6 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params: { category } }) {
 	const markdownService = getMarkdownService();
 	const markdownFiles = markdownService.markdownFilesByCategory[category];
-	console.log(markdownFiles);
 	return {
 		props: {
 			markdownFiles: markdownFiles,
@@ -22,12 +21,11 @@ export async function getStaticProps({ params: { category } }) {
 }
 
 function IndexPage({ markdownFiles, categories }) {
-	console.log(markdownFiles);
 	return (
 		<GlobalContextProvider globalData={{ categories }}>
 			<SiteLayout>
 			{markdownFiles.map((file) => (
-					<BlogPostIndexSummary key={file.slug} file={file} />
+					<BlogPostIndexSummary key={file.metaData.slug} file={file.metaData} />
 			))}
 			</SiteLayout>
 		</GlobalContextProvider>

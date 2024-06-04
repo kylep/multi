@@ -15,7 +15,7 @@ class MarkdownService {
 		this.markdownFiles = this.#loadMarkdownFiles();
 		// if this ever gets slow, can refactor to do it all in one pass
 		this.markdownFilesBySlug = this.#indexMarkdownFilesBySlug(this.markdownFiles);
-		this.categories = this.#countcategories(this.markdownFiles);
+		this.categories = this.#getCountedCategories(this.markdownFiles);
 		this.markdownFilesByCategory = this.#indexMarkdownFilesByCategory(this.markdownFiles);
 		MarkdownService.instance = this;
 	}
@@ -62,7 +62,7 @@ class MarkdownService {
 		const props = MarkdownService.getRenderedMarkdownAndProps(rawMarkdown);
 		props.props.metaData.slug = filename.replace('.md', '');
 		// TODO: I need to not return metadata here, and instead return the promise too that gives the content
-		return props.props.metaData;
+		return {metaData: props.props.metaData, contentHtml: props.props.contentHtml};
 	  });
 	  // sorting by date is mostly for the index page
 	  markdownFiles.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -78,26 +78,28 @@ class MarkdownService {
 
 	#indexMarkdownFilesByCategory(markdownFiles) {
 		return markdownFiles.reduce((acc, file) => {
-		  if (file.category) {
-			if (acc[file.category]) {
-			  acc[file.category].push(file);
+		  const category = file.metaData.category;
+		  if (category) {
+			if (acc[category]) {
+			  acc[category].push(file);
 			} else {
-			  acc[file.category] = [file];
+			  acc[category] = [file];
 			}
 		  }
 		  return acc;
 		}, {});
 	}
 
-	#countcategories(markdownFiles) {
+	#getCountedCategories(markdownFiles) {
 		// return an object counting the posts per category, 
 		// like { category1: 3, category2: 1}
 		return markdownFiles.reduce((acc, file) => {
-		  if (file.category) {
-			if (acc[file.category]) {
-			  acc[file.category] += 1;
+		  const category = file.metaData.category;
+		  if (category) {
+			if (acc[category]) {
+			  acc[category] += 1;
 			} else {
-			  acc[file.category] = 1;
+			  acc[category] = 1;
 			}
 		  }
 		  return acc;

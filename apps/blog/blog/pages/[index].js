@@ -45,7 +45,7 @@ function IndexPage({ markdownFiles, categories, currentPageIndexNumber, pageCoun
 		<GlobalContextProvider globalData={{ categories }}>
 			<SiteLayout>
 				{markdownFiles.map((file) => (
-					<BlogPostIndexSummary key={file.slug} file={file} />
+					<BlogPostIndexSummary key={file.metaData.slug} file={file.metaData} />
 				))}
 				<Pagination 
 					page={currentPageIndexNumber} 

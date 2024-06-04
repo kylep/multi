@@ -24,6 +24,9 @@ export async function getStaticProps({ params: { slug } }) {
 
 
 function MarkdownPage({ contentHtml, metaData, markdownFiles, categories }) {  
+  console.log("contentHtml", contentHtml);
+  console.log("metaData", metaData);
+  console.log("markdownFiles", markdownFiles);
   return (
     <GlobalContextProvider globalData={{ categories }}>
       <SiteLayout>

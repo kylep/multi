@@ -95,7 +95,7 @@ function BlogPostIndexSummary({ file, sx }) {
     <IndexRowContainer>
         <ImageBox thumbnail={file.thumbnail} />
         <IndexPostTextContainer>
-          <Link underline="hover" href={`/posts/${file.slug}`}>
+          <Link underline="hover" href={`/posts/${file.slug}.html`}>
             <IndexPostTitle>{file.title}</IndexPostTitle>
           </Link>
           <DateStamp>Created: {file.date}, Modified: {file.modified}</DateStamp>

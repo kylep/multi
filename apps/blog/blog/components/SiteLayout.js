@@ -6,14 +6,14 @@ import SiteFooter from '../components/SiteFooter';
 
 function SiteLayout({ children }) {
   return (
-    <>
+    <box suppressHydrationWarning>
       <SiteNavHeader />
       <SiteTitle />
       <PageContent>
         {children}
       </PageContent>
       <SiteFooter></SiteFooter>
-    </>
+    </box>
   );
 }
 
