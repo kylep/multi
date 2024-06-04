@@ -8,7 +8,7 @@ function SiteFooter() {
         width: '100%', 
         backgroundColor: (theme) => theme.palette.grey.main,
       }}>
-      <Typography variant="body1">
+      <Typography variant="body1" sx={{marginLeft: "20px"}}>
         Last updated 2024-02-05 by Kyle Pericak
       </Typography>
     </PaddedRow>

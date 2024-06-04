@@ -1,5 +1,6 @@
 import SiteLayout from '../../components/SiteLayout';
 import { getMarkdownService } from '../../utils/MarkdownService';
+import { GlobalContextProvider } from '../../utils/GlobalContext';
 
 
 export async function getStaticPaths() {
@@ -10,24 +11,25 @@ export async function getStaticPaths() {
 
 
 export async function getStaticProps({ params: { slug } }) {
-  // `slug` gets deconstructed from the params object
   const markdownService = getMarkdownService();
   return {
     props: {
       contentHtml: "",
-      metaData: getMarkdownService().markdownFilesBySlug[slug],
+      metaData: markdownService.markdownFilesBySlug[slug],
+      markdownFiles: markdownService.markdownFiles, 
+			categories: markdownService.categories,
     },
   }
 }
 
 
-function MarkdownPage({ contentHtml, metaData }) {
-  console.log('metaData', metaData);
-  //console.log('contentHtml', contentHtml);
+function MarkdownPage({ contentHtml, metaData, markdownFiles, categories }) {  
   return (
-    <SiteLayout>
-      <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
-    </SiteLayout>
+    <GlobalContextProvider globalData={{ categories }}>
+      <SiteLayout>
+        <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+      </SiteLayout>
+    </GlobalContextProvider>
   );
 }
 

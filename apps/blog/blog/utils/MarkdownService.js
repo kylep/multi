@@ -16,6 +16,7 @@ class MarkdownService {
 		// if this ever gets slow, can refactor to do it all in one pass
 		this.markdownFilesBySlug = this.#indexMarkdownFilesBySlug(this.markdownFiles);
 		this.categories = this.#countcategories(this.markdownFiles);
+		this.markdownFilesByCategory = this.#indexMarkdownFilesByCategory(this.markdownFiles);
 		MarkdownService.instance = this;
 	}
 
@@ -60,6 +61,7 @@ class MarkdownService {
 		const rawMarkdown = fs.readFileSync(fullPath, 'utf8');
 		const props = MarkdownService.getRenderedMarkdownAndProps(rawMarkdown);
 		props.props.metaData.slug = filename.replace('.md', '');
+		// TODO: I need to not return metadata here, and instead return the promise too that gives the content
 		return props.props.metaData;
 	  });
 	  // sorting by date is mostly for the index page
@@ -70,6 +72,19 @@ class MarkdownService {
 	#indexMarkdownFilesBySlug(markdownFiles) {
 		return markdownFiles.reduce((acc, file) => {
 		  acc[file.slug] = file; // Use slug as key
+		  return acc;
+		}, {});
+	}
+
+	#indexMarkdownFilesByCategory(markdownFiles) {
+		return markdownFiles.reduce((acc, file) => {
+		  if (file.category) {
+			if (acc[file.category]) {
+			  acc[file.category].push(file);
+			} else {
+			  acc[file.category] = [file];
+			}
+		  }
 		  return acc;
 		}, {});
 	}

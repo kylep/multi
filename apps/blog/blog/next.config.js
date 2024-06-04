@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 
 module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/:path*.html',
+        destination: '/:path*',
+      },
+    ]
+  },
   output: 'export',
   images: {unoptimized: true},
   webpack: (config, { isServer }) => {
@@ -11,8 +19,9 @@ module.exports = {
         fs: false,
       };
     }
-
     return config;
   },
-
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };

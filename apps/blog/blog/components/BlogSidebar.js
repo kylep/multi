@@ -8,7 +8,6 @@ import { GlobalContext } from '../utils/GlobalContext';
 
 function CategoryList() {
   const  globalData  = useContext(GlobalContext);
-
   return (
     <List>
       <ListItem sx={{padding: 0}}> 
@@ -23,12 +22,14 @@ function CategoryList() {
       
       {
           Object.entries(globalData.data.categories).map(([category, count]) => ( 
-          <ListItemButton key={category} sx={{padding: 0, marginLeft: "10px"}}> 
-            <ListItemIcon sx={{minWidth: "32px"}}>
-              <InsertDriveFileIcon />
-            </ListItemIcon>
-            <ListItemText primary={`${category} (${count})`} />
-          </ListItemButton>
+          <a href={`/categories/${category}.html`} key={category}>
+            <ListItemButton  sx={{padding: 0, marginLeft: "10px"}}> 
+              <ListItemIcon sx={{minWidth: "32px"}}>
+                <InsertDriveFileIcon />
+              </ListItemIcon>
+              <ListItemText primary={`${category} (${count})`} />
+            </ListItemButton>
+          </a>
         ))
       }    
     </List>

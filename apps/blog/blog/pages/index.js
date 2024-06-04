@@ -1,31 +1,17 @@
-import SiteLayout from '../components/SiteLayout';
-import BlogPostIndexSummary from '../components/BlogPostIndexSummary';
-import { getMarkdownService } from '../utils/MarkdownService';
-import { GlobalContextProvider } from '../utils/GlobalContext';
+import { useEffect } from 'react';
 
-
-
-export async function getStaticProps() {
-	const markdownService = getMarkdownService();
-	return { 
-		props: { 
-			markdownFiles: markdownService.markdownFiles, 
-			categories: markdownService.categories,
-		}, 
-	};
+export default function Home() {
+  useEffect(() => {
+    //window.location.replace('/index1.html');
+  }, []);
+  return (
+  <html>
+    <head>
+      <meta httpEquiv="refresh" content="0; url=/index1.html" />
+    </head>
+    <div>
+      Redirecting to <a href="/index1.html">/index1.html</a>
+    </div>
+  </html>
+  );
 }
-
-function IndexPage({ markdownFiles, categories }) {
-	return (
-		<GlobalContextProvider globalData={{ categories }}>
-			<SiteLayout>
-				{markdownFiles.map((file) => (
-					<BlogPostIndexSummary key={file.slug} file={file} />
-				))}
-			</SiteLayout>
-		</GlobalContextProvider>
-	);
-}
-
-export default IndexPage;
-
