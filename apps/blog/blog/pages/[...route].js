@@ -1,6 +1,6 @@
 import SiteLayout from '../components/SiteLayout';
-import BlogPostContentPage from '../components/BlogPostContentPage';
 import IndexPage from '../components/IndexPage';
+import BlogPostContentPage from '../components/BlogPostContentPage';
 import { getMarkdownService, pageSize } from '../utils/MarkdownService';
 import { GlobalContextProvider } from '../utils/GlobalContext';
 
@@ -91,14 +91,14 @@ function BaseSiteComponent({ route, markdownFiles, categories, currentPageIndexN
 	*/
 	if (route == "undefined") { route = ['index']; }
 	console.log("route: ", route);
-	let pageContent;
+	let pageContent = <></>;
 	if (route[0].startsWith('index') || route[0] == 'category' || route[0] == "/") {
 		if (route == '/') {
 			route = 'index';
 		}
 		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} />;
 	} else {
-		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData} markdownFiles={markdownFiles} categories={categories} />;
+		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
 	}
 	return (
 		<GlobalContextProvider globalData={{ categories }}>

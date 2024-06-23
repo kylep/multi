@@ -2,18 +2,13 @@
 module.exports = {
 
   async rewrites() {
+
     return [
-      {
-        source: '/',
-        destination: '/index1.html',
-      },
-      /*
-      // strip .html from URLs for matching dev and staging
-      {
-        source: '/:path*.html',
-        destination: '/:path*',
-      },
-      */
+      // make dev work like stage/prod's post-build index file overwite
+      {source: '/',destination: '/index1.html',},
+
+      // strip .html from URLs for matching dev and staging... Maybe.
+      // { source: '/:path*.html', destination: '/:path*',},
     ]
   },
   output: 'export',
@@ -26,7 +21,6 @@ module.exports = {
         fs: false,
       };
     }
-    // turn minify off when debugging the build
     config.optimization.minimize = false;
     return config;
   },

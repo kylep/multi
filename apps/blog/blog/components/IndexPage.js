@@ -22,7 +22,7 @@ function IndexRowContainer({ children, sx }) {
 }
 
 function ImageBox({ thumbnail, sx }) {
-  const imagePath = thumbnail ? ('images/'+thumbnail) : '/images/gear-thumb.png';
+  const imagePath = thumbnail ? ('/images/'+thumbnail) : '/images/gear-thumb.png';
   return (
     <Box sx={{
       width: '75px',

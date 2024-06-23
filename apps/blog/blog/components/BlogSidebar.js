@@ -22,7 +22,7 @@ function CategoryList() {
       
       {
           Object.entries(globalData.data.categories).map(([category, count]) => ( 
-          <a href={`/categories/${category}.html`} key={category}>
+          <a href={`/category/${category}.html`} key={category}>
             <ListItemButton  sx={{padding: 0, marginLeft: "10px"}}> 
               <ListItemIcon sx={{minWidth: "32px"}}>
                 <InsertDriveFileIcon />

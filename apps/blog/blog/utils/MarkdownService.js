@@ -81,7 +81,7 @@ class MarkdownService {
 
 	#indexMarkdownFilesBySlug(markdownFiles) {
 		return markdownFiles.reduce((acc, file) => {
-		  acc[file.slug] = file; // Use slug as key
+		  acc[file.metaData.slug] = file; // Use slug as key
 		  return acc;
 		}, {});
 	}
