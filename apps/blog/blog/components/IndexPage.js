@@ -1,6 +1,7 @@
 import { Box, Typography, Link } from '@mui/material';
 import React from 'react';
 import Image from 'next/image';
+import Pagination from '../components/Pagination';
 
 
 function IndexRowContainer({ children, sx }) {
@@ -105,4 +106,25 @@ function BlogPostIndexSummary({ file, sx }) {
   );
 }
 
-export default BlogPostIndexSummary;
+const handlePageChange = (_, page) => {
+    window.location.href = `/index${page}.html`;
+};
+
+export function IndexPage({ markdownFiles, currentPageIndexNumber, pageCount }) {
+	return (
+		<>
+			{markdownFiles.map((file) => (
+				<BlogPostIndexSummary key={file.metaData.slug} file={file.metaData} />
+			))}
+			<Pagination 
+				page={currentPageIndexNumber} 
+				count={pageCount} 
+				shape="rounded"
+				onChange={handlePageChange}
+				sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+			/>
+		</>
+	);
+}
+
+export default IndexPage;

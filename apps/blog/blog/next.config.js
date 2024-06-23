@@ -1,12 +1,19 @@
 /** @type {import('next').NextConfig} */
-
 module.exports = {
+
   async rewrites() {
     return [
+      {
+        source: '/',
+        destination: '/index1.html',
+      },
+      /*
+      // strip .html from URLs for matching dev and staging
       {
         source: '/:path*.html',
         destination: '/:path*',
       },
+      */
     ]
   },
   output: 'export',
@@ -19,6 +26,8 @@ module.exports = {
         fs: false,
       };
     }
+    // turn minify off when debugging the build
+    config.optimization.minimize = false;
     return config;
   },
   eslint: {

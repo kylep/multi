@@ -4,6 +4,15 @@ import html from 'remark-html';
 import { remark } from 'remark';
 import fs from 'fs';
 
+// used in markdownFilesByPage
+export const pageSize = 15;
+
+function paginate(array, pageSize) {
+	return Array.from({ length: Math.ceil(array.length / pageSize) }, (_, i) =>
+	  array.slice(i * pageSize, i * pageSize + pageSize)
+	);
+  }
+  
 
 // Singleton, only want to compute everything once in the build
 class MarkdownService {
@@ -17,6 +26,7 @@ class MarkdownService {
 		this.markdownFilesBySlug = this.#indexMarkdownFilesBySlug(this.markdownFiles);
 		this.categories = this.#getCountedCategories(this.markdownFiles);
 		this.markdownFilesByCategory = this.#indexMarkdownFilesByCategory(this.markdownFiles);
+		this.markdownFilesByPage = paginate(this.markdownFiles, pageSize);
 		MarkdownService.instance = this;
 	}
 

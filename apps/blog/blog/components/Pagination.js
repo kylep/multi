@@ -17,9 +17,9 @@ const PageNavButon = ({ children, isDisabled, isActive, onClick }) => (
       {children}
     </button>
   );
-
   
-  const Pagination = ({ currentPage, totalPages }) => {
+  
+  const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
       pageNumbers.push(i);
@@ -29,7 +29,7 @@ const PageNavButon = ({ children, isDisabled, isActive, onClick }) => (
       <div>
         <PageNavButon
           isDisabled={currentPage === 1}
-          onClick={() => onPageChange(currentPage - 1)}
+          onClick={() => onPageChange(`index${currentPage - 1}.html`)}
         >
           Previous
         </PageNavButon>
@@ -37,14 +37,14 @@ const PageNavButon = ({ children, isDisabled, isActive, onClick }) => (
           <PageNavButon
             key={number}
             isActive={currentPage === number}
-            onClick={() => onPageChange(number)}
+            onClick={() => onPageChange(`index${number}.html`)}
           >
             {number}
           </PageNavButon>
         ))}
         <PageNavButon
           isDisabled={currentPage === totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
+          onClick={() => onPageChange(`index${currentPage + 1}.html`)}
         >
           Next
         </PageNavButon>
