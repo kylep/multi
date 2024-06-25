@@ -2,6 +2,8 @@
 > blog@0.1.0 build
 > next build
 
+ ⚠ Specified "rewrites" will not automatically work with "output: export". See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
+ ⚠ Specified "rewrites" will not automatically work with "output: export". See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
    ▲ Next.js 14.1.0
 
    Skipping linting
@@ -26,107 +28,108 @@ route:  [ 'category', 'openstack' ]
 route:  [ 'automated-emails' ]
 route:  [ 'aws-api-gateway-iam' ]
 route:  [ 'aws-codepipeline-ecr' ]
-route:  [ 'index5' ]
-route:  [ 'index4' ]
 route:  [ 'aws-ec2-python' ]
 route:  [ 'aws-ecr' ]
+route:  [ 'index4' ]
 route:  [ 'aws-ecs-custom-domain-https' ]
+route:  [ 'index5' ]
 route:  [ 'aws-fargate' ]
-route:  [ 'aws-lambda-iam' ]
 route:  [ 'aws-labmda-codecommit' ]
+route:  [ 'aws-lambda-iam' ]
 route:  [ 'aws-lambda' ]
-   Generating static pages (24/96) 
 route:  [ 'aws-s3-python' ]
 route:  [ 'aws' ]
-route:  [ 'index' ]
+   Generating static pages (24/96) 
+route:  [ 'ceph-reference' ]
+route:  [ 'blog-website' ]
+route:  [ 'certbot' ]
+route:  [ 'index3' ]
 route:  [ 'index2' ]
 route:  [ 'index1' ]
-route:  [ 'index3' ]
-route:  [ 'blog-website' ]
+route:  [ 'index' ]
 route:  [ 'cloudflare-https-frontend' ]
-route:  [ 'certbot' ]
 route:  [ 'dial-home-device' ]
-route:  [ 'ceph-reference' ]
-route:  [ 'docker-pelican-image' ]
 route:  [ 'dns-xfer-godaddy-cloudflare' ]
+route:  [ 'docker-pelican-image' ]
 route:  [ 'docker-shared-memory' ]
-route:  [ 'emails-postfix-ubuntu' ]
-route:  [ 'emails-dkim' ]
-route:  [ 'firebase-circleci-cd' ]
 route:  [ 'email-spf' ]
-route:  [ 'errors' ]
 route:  [ 'emails-bash-cron' ]
-route:  [ 'firebase-hello-world' ]
-route:  [ 'gcp-firestore-python' ]
+route:  [ 'emails-dkim' ]
+route:  [ 'emails-postfix-ubuntu' ]
 route:  [ 'firestore-blog-comments' ]
+route:  [ 'errors' ]
 route:  [ 'gaming-minecraft-feedthebeast' ]
-route:  [ 'gcp' ]
-route:  [ 'gcp-datastore-from-functions' ]
+route:  [ 'firebase-circleci-cd' ]
+route:  [ 'firebase-hello-world' ]
 route:  [ 'gcp-api-cloud-endpoints' ]
 route:  [ 'gcp-cloud-functions' ]
    Generating static pages (48/96) 
-route:  [ 'getting-started-kubernetes' ]
+route:  [ 'gcp-datastore-from-functions' ]
+route:  [ 'gcp-firestore-python' ]
 route:  [ 'git-reference' ]
-route:  [ 'google-cloud-storage-website' ]
-route:  [ 'github-pages' ]
+route:  [ 'getting-started-kubernetes' ]
+route:  [ 'gcp' ]
 route:  [ 'google-cloud-build' ]
-route:  [ 'google-container-registry' ]
+route:  [ 'github-pages' ]
 route:  [ 'k8s-1-install-kubeadm' ]
+route:  [ 'google-cloud-storage-website' ]
+route:  [ 'google-container-registry' ]
 route:  [ 'mac-fix-usb-drive' ]
 route:  [ 'mac-vlan-thunderbolt' ]
 route:  [ 'nodejs-ansible' ]
 route:  [ 'open-source-cli-project' ]
 route:  [ 'openssl-csr-san' ]
-route:  [ 'openstack-glance-use-cinder' ]
-route:  [ 'openstack-aio-ka-vm' ]
 route:  [ 'openstack-aio-ka-metal' ]
-route:  [ 'openstack-fix-cli' ]
+route:  [ 'openstack-aio-ka-vm' ]
 route:  [ 'openstack-ansible' ]
+route:  [ 'openstack-fix-cli' ]
+route:  [ 'openstack-glance-use-cinder' ]
 route:  [ 'openstack-cloudinit-powershell' ]
 route:  [ 'openstack-magnum' ]
 route:  [ 'openstack-kolla-custom-plugin' ]
-route:  [ 'openstack' ]
-route:  [ 'openstack-octavia' ]
-route:  [ 'ops-cheatsheet' ]
-route:  [ 'packet-tracing-reference' ]
 route:  [ 'pelican-dev-environment' ]
+route:  [ 'openstack-octavia' ]
+route:  [ 'openstack' ]
+route:  [ 'packet-tracing-reference' ]
+route:  [ 'ops-cheatsheet' ]
    Generating static pages (72/96) 
-route:  [ 'python-ceph' ]
-route:  [ 'python-http-transfer' ]
-route:  [ 'python-sql-json' ]
 route:  [ 'python-cheat-sheet' ]
+route:  [ 'python-ceph' ]
 route:  [ 'python-pypi' ]
+route:  [ 'python-http-transfer' ]
 route:  [ 'ssh-tunnel' ]
 route:  [ 'rhel-virtio-initrd' ]
-route:  [ 'ubuntu-nfs-server' ]
+route:  [ 'python-sql-json' ]
 route:  [ 'ubuntu-bionic-wifi' ]
+route:  [ 'ubuntu-trust-corporate-ca' ]
 route:  [ 'ubuntu-wifi-to-wired-router' ]
 route:  [ 'windows-kvm-drivers' ]
-route:  [ 'vim-spellcheck' ]
 route:  [ 'windows-kvm-command-line' ]
-route:  [ 'ubuntu-trust-corporate-ca' ]
+route:  [ 'ubuntu-nfs-server' ]
+route:  [ 'vim-spellcheck' ]
 route:  [ 'windows10-tuning' ]
 route:  [ 'writing-pelican-content' ]
 route:  [ 'x11-forwarding-ubuntu18' ]
  ✓ Generating static pages (96/96) 
    Finalizing page optimization ...
    Collecting build traces ...
+ ⚠ rewrites, redirects, and headers are not applied when exporting your application, detected (rewrites). See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
 
 Route (pages)                              Size     First Load JS
-┌   /_app                                  0 B             157 kB
-├ ● /[...route] (8989 ms)                  45.5 kB         203 kB
-├   ├ /index2.html (1288 ms)
-├   ├ /index.html (1273 ms)
-├   ├ /index1.html (1268 ms)
-├   ├ /index3.html (1261 ms)
-├   ├ /index4.html (1150 ms)
-├   ├ /index5.html (1114 ms)
-├   ├ /index6.html
+┌   /_app                                  0 B             166 kB
+├ ● /[...route] (8567 ms)                  45.5 kB         211 kB
+├   ├ /index (1263 ms)
+├   ├ /index3 (1226 ms)
+├   ├ /index1 (1224 ms)
+├   ├ /index2 (1208 ms)
+├   ├ /index5 (1085 ms)
+├   ├ /index4 (1051 ms)
+├   ├ /index6
 ├   └ [+87 more paths]
-└ ○ /404                                   338 B           157 kB
-+ First Load JS shared by all              157 kB
+└ ○ /404                                   338 B           166 kB
++ First Load JS shared by all              166 kB
   ├ chunks/framework-2e2e0bfa8bda2099.js   46.8 kB
-  ├ chunks/main-af7de985405d276a.js        63.8 kB
+  ├ chunks/main-077aabacc71fa55b.js        72.3 kB
   ├ chunks/pages/_app-4c84dd5bcb64eba2.js  44.4 kB
   └ other shared chunks (total)            2.21 kB
 

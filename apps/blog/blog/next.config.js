@@ -5,10 +5,10 @@ module.exports = {
 
     return [
       // make dev work like stage/prod's post-build index file overwite
-      {source: '/',destination: '/index1.html',},
+      {source: '/', destination: '/index1.html',},
 
       // strip .html from URLs for matching dev and staging... Maybe.
-      // { source: '/:path*.html', destination: '/:path*',},
+      { source: '/:path*.html', destination: '/:path*',},
     ]
   },
   output: 'export',

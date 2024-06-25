@@ -5,9 +5,6 @@ import { getMarkdownService, pageSize } from '../utils/MarkdownService';
 import { GlobalContextProvider } from '../utils/GlobalContext';
 
 
-
-const suffix = '.html'; // Using .html makes this work across npx dev, nginx staging, & gcp prod
-
 export async function getStaticPaths() {
 	/* 
 	NextJS function to determine the paths to be pre-rendered at build time...
@@ -24,26 +21,26 @@ export async function getStaticPaths() {
 	const paths = [];
 
 	// Load all the markdown content so we can define the routes from it
-	const markdownService = getMarkdownService();
+	const markdownService = await getMarkdownService();
 	const markdownFiles = markdownService.markdownFiles;
 	
 	// Index pages are paginated, I want a route for each like index1.html, index2.html, etc
-	paths.push({ params: { route: [`index${suffix}`] } }); // default index page
+	paths.push({ params: { route: ['index'] } }); // default index page
 	const indexPageCount = Math.ceil(markdownFiles.length / pageSize); 
 	const indexPagePaths = Array.from({ length: indexPageCount }, (_, i) => ({
-	  params: { route: [`index${i + 1}${suffix}`]},
+	  params: { route: [`index${i + 1}`]},
 	}));
 	paths.push(...indexPagePaths);
 	
 
 	// Routes for each category, ex category/development.html
 	const categories = Object.keys(markdownService.categories);
-	const categoryPaths = categories.map(category => ({params: { route: ['category', (category + suffix)] }}));
+	const categoryPaths = categories.map(category => ({params: { route: ['category', (category)] }}));
 	paths.push(...categoryPaths);
 
 	// Routes for each post
 	const slugs = Object.keys(markdownService.markdownFilesBySlug);
-	const postPaths = slugs.map(slug => ({ params: { route: [slug + suffix] } }));
+	const postPaths = slugs.map(slug => ({ params: { route: [slug] } }));
 	paths.push(...postPaths);
 
 	return { paths, fallback: false };
@@ -52,9 +49,9 @@ export async function getStaticPaths() {
 export async function getStaticProps({params}) {
 	/* Define the data that the pages will be pre-rendered with */
 
-	const markdownService = getMarkdownService();
+	const markdownService = await getMarkdownService();
 	let route = params.route;
-	route[route.length - 1] = route[route.length - 1].replace(suffix, '');
+	route[route.length - 1] = route[route.length - 1];
 	let markdownFiles = [];
 	let postContent = {}; 
 	let pageNumber = 0; // varies by filtered size of markdownFiles
@@ -65,7 +62,7 @@ export async function getStaticProps({params}) {
 		pageNumber = parseInt(route[0].replace('index', ''));
 		markdownFiles = markdownService.markdownFilesByPage[pageNumber - 1];
 	} else if  (route[0] == 'category') { // category/<category>.html
-		const category = route[1].replace(suffix, '');
+		const category = route[1]; // [1] is the <category> in /category/<category>
 		markdownFiles = markdownService.markdownFilesByCategory[category];
 	}
 	else { // /<slug>.html
@@ -90,7 +87,6 @@ function BaseSiteComponent({ route, markdownFiles, categories, currentPageIndexN
 		Each route has a different set of props that it needs to render.
 	*/
 	if (route == "undefined") { route = ['index']; }
-	console.log("route: ", route);
 	let pageContent = <></>;
 	if (route[0].startsWith('index') || route[0] == 'category' || route[0] == "/") {
 		if (route == '/') {

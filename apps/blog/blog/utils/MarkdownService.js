@@ -20,15 +20,26 @@ class MarkdownService {
 		if (MarkdownService.instance) {
 			return MarkdownService.instance;
 		}
-		this.markdownDirectory = path.join('markdown', 'posts');
-		this.markdownFiles = this.#loadMarkdownFiles();
-		// if this ever gets slow, can refactor to do it all in one pass
-		this.markdownFilesBySlug = this.#indexMarkdownFilesBySlug(this.markdownFiles);
-		this.categories = this.#getCountedCategories(this.markdownFiles);
-		this.markdownFilesByCategory = this.#indexMarkdownFilesByCategory(this.markdownFiles);
-		this.markdownFilesByPage = paginate(this.markdownFiles, pageSize);
+		// constuctor cant be async / can't await
+		this.markdownFilesLoaded = false;
+		this.init().then(() => {this.markdownFilesLoaded = true;}); 
 		MarkdownService.instance = this;
 	}
+
+	async init(){
+		this.markdownDirectory = path.join('markdown', 'posts');
+		this.markdownFiles = await this.#loadMarkdownFiles();
+		this.markdownFilesBySlug = this.#indexMarkdownFilesBySlug(this.markdownFiles);
+		this.categories = await this.#getCountedCategories(this.markdownFiles);
+		this.markdownFilesByCategory = await this.#indexMarkdownFilesByCategory(this.markdownFiles);
+		this.markdownFilesByPage = paginate(this.markdownFiles, pageSize);
+	}
+
+	async waitForReady() {
+		while (!this.markdownFilesLoaded) {
+		  await new Promise(resolve => setTimeout(resolve, 100));
+		}
+	  }
 
 	static #serializeDates(obj) {
 		// matter turns dates into Date objects, want them as YYYY-MM-DD strings
@@ -46,15 +57,17 @@ class MarkdownService {
 		}
 	};
 
-	static getRenderedMarkdownAndProps(rawMarkdown){
+	static async getRenderedMarkdownAndProps(rawMarkdown){
 		// contentHtml is the rendered markdown, metaData is the front matter as a flat object
 		const { data: metaData, content: markdown } = matter(rawMarkdown);
 		MarkdownService.#serializeDates(metaData); 
-		const contentHtml = remark().use(html).process(markdown).toString();
-		return {props: {contentHtml, metaData},};
+		const result = await remark().use(html).process(markdown);
+		const contentHtml = result.toString();
+		const props = {props: {contentHtml, metaData},};
+		return props;
 	 };
   
-	#loadMarkdownFiles() {
+	async #loadMarkdownFiles() {
 	  /*
 	  {
 		slug: 'my-first-post',
@@ -66,14 +79,14 @@ class MarkdownService {
 	  */
 	  // filters out .swp so vim doesn't break dev env
 	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => !filename.endsWith('.swp'));
-	  const markdownFiles = files.map(filename => {
+	  const markdownFiles = await Promise.all(files.map( async filename => {
 		const fullPath = path.join(this.markdownDirectory, filename);
 		const rawMarkdown = fs.readFileSync(fullPath, 'utf8');
-		const props = MarkdownService.getRenderedMarkdownAndProps(rawMarkdown);
+		const props = await MarkdownService.getRenderedMarkdownAndProps(rawMarkdown);
 		props.props.metaData.slug = filename.replace('.md', '');
 		// TODO: I need to not return metadata here, and instead return the promise too that gives the content
 		return {metaData: props.props.metaData, contentHtml: props.props.contentHtml};
-	  });
+	  }));
 	  // sorting by date is mostly for the index page
 	  markdownFiles.sort((a, b) => new Date(b.date) - new Date(a.date));
 	  return markdownFiles;
@@ -116,7 +129,7 @@ class MarkdownService {
 		}, {});
 	}
   
-	static getInstance() {
+	static async getInstance() {
 	  if (!MarkdownService.instance) {
 		new MarkdownService();
 	  }
@@ -124,9 +137,10 @@ class MarkdownService {
 	}
   }
   
-  export function getMarkdownService() {
+  export async function getMarkdownService() {
 	if (!MarkdownService.instance) {
 	  new MarkdownService();
 	}
+	await MarkdownService.instance.waitForReady(); // Wait for all the markdown files to load...
 	return MarkdownService.instance;
   }
