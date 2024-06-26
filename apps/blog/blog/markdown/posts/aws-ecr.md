@@ -24,7 +24,7 @@ service account users in the AWS AIM tool
 
 ---
 
-[TOC]
+### Table of contents
 
 ---
 

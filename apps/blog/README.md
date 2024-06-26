@@ -53,11 +53,13 @@ When rendering the static site, it works to create a .html file for each element
 `paths` array in `getStaticPaths`.
 
 
-## Styling
+## Styling & Content Paths
 
-Have tried to keep the styles as close to the code as possible. Look for css primarily in the react
-`sx` properties in the page components themselves, specifically in `blog/components` files and the common
-page component in `blog/pages/[..route.js]`. 
-
-Components have been organized in a "1 export per file" structure.
+- I've tried to keep the styles as close to the code as possible.  Primarily in react's `sx` props on page components
+- Components are defined in `blog/components`. 
+  - The common/base page component is `blog/pages/[..route.js]`. It handles routes and page structure.
+  - Components have been organized to have 1 export per file.
+- Theme styles and `<head>` are in `pages/_app.js`. 
+  - Theme CSS is used mainly for component elements that can use `<Typography>` blocks
+- Global styles, and specifically styles for blog post content that gets rendered to HTML by `remark`, are in `styles/globals.css` since they can't easily use `<Typography>`
 

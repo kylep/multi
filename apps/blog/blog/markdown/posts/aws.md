@@ -17,21 +17,18 @@ orderly fashion. I'll also be writing high-level notes and opinions in the
 project page itself.
 
 
-In this project I'll be trying out each of AWS's services. I'll be updating it
-pretty regularly.
+In this project I'll be trying many of AWS's services. 
 
 ---
 
-[TOC]
+#### Table of contents
 
 ---
 
 
 # Project Posts & Progress
 
-This project includes, or will include, the following posts.
-If any aren't finished, check back later! I'll also certainly be adding more
-as time goes on.
+This project includes, or might include, the following posts.
 
 <table class="project-table">
   <tr>
@@ -115,3 +112,4 @@ as time goes on.
 </table>
 
 
+This content here is not in the table

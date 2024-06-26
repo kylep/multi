@@ -19,6 +19,7 @@
     "react-dom": "^18",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
+    "remark-toc": "^9.0.0",
     "styled-components": "^6.1.8"
   },
   "devDependencies": {

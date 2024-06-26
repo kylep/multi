@@ -1,8 +1,11 @@
 import path from 'path';
 import matter from 'gray-matter';
-import html from 'remark-html';
 import { remark } from 'remark';
 import fs from 'fs';
+import remarkHtml from 'remark-html'
+import remarkToc from 'remark-toc';
+
+
 
 // used in markdownFilesByPage
 export const pageSize = 15;
@@ -61,7 +64,10 @@ class MarkdownService {
 		// contentHtml is the rendered markdown, metaData is the front matter as a flat object
 		const { data: metaData, content: markdown } = matter(rawMarkdown);
 		MarkdownService.#serializeDates(metaData); 
-		const result = await remark().use(html).process(markdown);
+		const result = await remark()
+			.use(remarkToc, {heading: 'Table of contents'})
+			.use(remarkHtml)
+			.process(markdown);
 		const contentHtml = result.toString();
 		const props = {props: {contentHtml, metaData},};
 		return props;

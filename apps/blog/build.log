@@ -13,103 +13,11 @@
  ✓ Compiled successfully
    Collecting page data ...
    Generating static pages (0/96) ...
-route:  [ 'index6' ]
-route:  [ 'category', 'projects' ]
-route:  [ 'category', 'cloud' ]
-route:  [ 'category', 'aws' ]
-route:  [ 'category', 'reference pages' ]
-route:  [ 'category', 'systems administration' ]
-route:  [ 'category', 'development' ]
-route:  [ 'category', 'guides' ]
-route:  [ 'category', 'gaming' ]
-route:  [ 'category', 'gcp' ]
-route:  [ 'category', 'kubernetes' ]
-route:  [ 'category', 'openstack' ]
-route:  [ 'automated-emails' ]
-route:  [ 'aws-api-gateway-iam' ]
-route:  [ 'aws-codepipeline-ecr' ]
-route:  [ 'aws-ec2-python' ]
-route:  [ 'aws-ecr' ]
-route:  [ 'index4' ]
-route:  [ 'aws-ecs-custom-domain-https' ]
-route:  [ 'index5' ]
-route:  [ 'aws-fargate' ]
-route:  [ 'aws-labmda-codecommit' ]
-route:  [ 'aws-lambda-iam' ]
-route:  [ 'aws-lambda' ]
-route:  [ 'aws-s3-python' ]
-route:  [ 'aws' ]
+Warning: data for page "/[...route]" (path "/category/cloud") is 144 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
+See more info here: https://nextjs.org/docs/messages/large-page-data
    Generating static pages (24/96) 
-route:  [ 'ceph-reference' ]
-route:  [ 'blog-website' ]
-route:  [ 'certbot' ]
-route:  [ 'index3' ]
-route:  [ 'index2' ]
-route:  [ 'index1' ]
-route:  [ 'index' ]
-route:  [ 'cloudflare-https-frontend' ]
-route:  [ 'dial-home-device' ]
-route:  [ 'dns-xfer-godaddy-cloudflare' ]
-route:  [ 'docker-pelican-image' ]
-route:  [ 'docker-shared-memory' ]
-route:  [ 'email-spf' ]
-route:  [ 'emails-bash-cron' ]
-route:  [ 'emails-dkim' ]
-route:  [ 'emails-postfix-ubuntu' ]
-route:  [ 'firestore-blog-comments' ]
-route:  [ 'errors' ]
-route:  [ 'gaming-minecraft-feedthebeast' ]
-route:  [ 'firebase-circleci-cd' ]
-route:  [ 'firebase-hello-world' ]
-route:  [ 'gcp-api-cloud-endpoints' ]
-route:  [ 'gcp-cloud-functions' ]
    Generating static pages (48/96) 
-route:  [ 'gcp-datastore-from-functions' ]
-route:  [ 'gcp-firestore-python' ]
-route:  [ 'git-reference' ]
-route:  [ 'getting-started-kubernetes' ]
-route:  [ 'gcp' ]
-route:  [ 'google-cloud-build' ]
-route:  [ 'github-pages' ]
-route:  [ 'k8s-1-install-kubeadm' ]
-route:  [ 'google-cloud-storage-website' ]
-route:  [ 'google-container-registry' ]
-route:  [ 'mac-fix-usb-drive' ]
-route:  [ 'mac-vlan-thunderbolt' ]
-route:  [ 'nodejs-ansible' ]
-route:  [ 'open-source-cli-project' ]
-route:  [ 'openssl-csr-san' ]
-route:  [ 'openstack-aio-ka-metal' ]
-route:  [ 'openstack-aio-ka-vm' ]
-route:  [ 'openstack-ansible' ]
-route:  [ 'openstack-fix-cli' ]
-route:  [ 'openstack-glance-use-cinder' ]
-route:  [ 'openstack-cloudinit-powershell' ]
-route:  [ 'openstack-magnum' ]
-route:  [ 'openstack-kolla-custom-plugin' ]
-route:  [ 'pelican-dev-environment' ]
-route:  [ 'openstack-octavia' ]
-route:  [ 'openstack' ]
-route:  [ 'packet-tracing-reference' ]
-route:  [ 'ops-cheatsheet' ]
    Generating static pages (72/96) 
-route:  [ 'python-cheat-sheet' ]
-route:  [ 'python-ceph' ]
-route:  [ 'python-pypi' ]
-route:  [ 'python-http-transfer' ]
-route:  [ 'ssh-tunnel' ]
-route:  [ 'rhel-virtio-initrd' ]
-route:  [ 'python-sql-json' ]
-route:  [ 'ubuntu-bionic-wifi' ]
-route:  [ 'ubuntu-trust-corporate-ca' ]
-route:  [ 'ubuntu-wifi-to-wired-router' ]
-route:  [ 'windows-kvm-drivers' ]
-route:  [ 'windows-kvm-command-line' ]
-route:  [ 'ubuntu-nfs-server' ]
-route:  [ 'vim-spellcheck' ]
-route:  [ 'windows10-tuning' ]
-route:  [ 'writing-pelican-content' ]
-route:  [ 'x11-forwarding-ubuntu18' ]
  ✓ Generating static pages (96/96) 
    Finalizing page optimization ...
    Collecting build traces ...
@@ -117,13 +25,13 @@ route:  [ 'x11-forwarding-ubuntu18' ]
 
 Route (pages)                              Size     First Load JS
 ┌   /_app                                  0 B             166 kB
-├ ● /[...route] (8567 ms)                  45.5 kB         211 kB
-├   ├ /index (1263 ms)
-├   ├ /index3 (1226 ms)
-├   ├ /index1 (1224 ms)
-├   ├ /index2 (1208 ms)
-├   ├ /index5 (1085 ms)
-├   ├ /index4 (1051 ms)
+├ ● /[...route] (9071 ms)                  45.5 kB         211 kB
+├   ├ /index (1350 ms)
+├   ├ /index1 (1337 ms)
+├   ├ /index3 (1325 ms)
+├   ├ /index2 (1287 ms)
+├   ├ /index4 (1085 ms)
+├   ├ /index5 (1044 ms)
 ├   ├ /index6
 ├   └ [+87 more paths]
 └ ○ /404                                   338 B           166 kB

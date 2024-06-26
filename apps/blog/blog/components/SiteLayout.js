@@ -36,13 +36,13 @@ function SiteTitle() {
       height: "200px",
       backgroundColor: "#EEEEEE",
     }}>
-      <Typography variant="h1" component="h1" sx={{
+      <Typography variant="titleHeaderH1" component="h1" sx={{
           width: '100%', 
           paddingTop: '50px',
         }}> 
         Kyle Pericak
       </Typography>
-      <Typography variant="h3" component="h3" sx={{ 
+      <Typography variant="titleHeaderH3" component="h3" sx={{ 
         width: '100%',
       }}>
       &quot;It works in my environment&quot;

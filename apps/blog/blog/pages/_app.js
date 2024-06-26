@@ -17,12 +17,12 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    h1: {
+    titleHeaderH1: {
       fontWeight: 500,
       fontSize: '63px',
       color: customColors.headerBlue,
     },
-    h3: {
+    titleHeaderH3: {
       fontWeight: 250,
       fontSize: '21px',
       color: customColors.textGrey,
