@@ -16,100 +16,24 @@ as much about the subject as time allows and assembling the posts in some
 orderly fashion. I'll also be writing high-level notes and opinions in the
 project page itself.
 
-
 In this project I'll be trying many of AWS's services. 
-
----
-
-#### Table of contents
-
----
 
 
 # Project Posts & Progress
 
-This project includes, or might include, the following posts.
+This project includes the following posts.
 
-<table class="project-table">
-  <tr>
-    <th>Status</th>
-    <th>Article</th>
-  </tr>
-	<tr>
-		<td>-</td>
-    <th>Running Servers on AWS</th>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td><a href="/aws-ec2-python.html">Create & Terminate EC2 Instances from Python</a></td>
-  </tr>
-	<tr>
-		<td>-</td>
-    <th>Running Containers on AWS</th>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/aws-ecr.html">
-        Save a Docker image to Elastic Container Registry (ECR)
-      </a>
-    </td>
-  </tr>
-  <tr>
-		<td>Done</td>
-		<td>
-      <a href="/aws-fargate.html">
-        Run a Docker container Using AWS Fargate
-      </a>
-    </td>
-	</tr>
-  <tr>
-    <td>Done</td>
-    <td><a href="/aws-codepipeline-ecr.html">CodePipeline: Continuous Delivery to AWS ECR</a></td>
-  </tr>
-  <tr>
-    <td>Not Started</td>
-    <td>Running Kubernetes on AWS</td>
-  <tr>
-    <td>-</td>
-    <th>Virtual Desktop Infrastructure (VDI)</th>
-  </tr>
-  <tr>
-    <td>WIP - Paused</td>
-    <td>Amazon Workspaces: Basics</td>
-  </tr>
-  <tr>
-    <td>-</td>
-    <th>Cloud Storage</th>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/aws-s3-python.html">
-      Using AWS S3 from Python
-    </td>
-  <tr>
-  <tr>
-    <td>-</td>
-    <th>Serverless Applications</th>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td><a href="/aws-lambda.html">Lambda basics</a></td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td><a href="/aws-lambda-iam.html">IAM for Lambda</a></td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td><a href="/aws-api-gateway-iam.html">IAM Authentication using API Gateway</a></td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td><a href="/aws-labmda-cicd.html">CodeBuild CICD: Deploy to Lambda</a></td>
-  </tr>
-</table>
-
-
-This content here is not in the table
+| Date        | Article |
+| :-          | :-  |
+|             | **Running Servers on AWS** |
+| 2020-01-09  | [Create & Terminate EC2 Instances from Python](/aws-ec2-python.html) |
+|             | **Running Containers on AWS** |
+| 2019-08-26  | [Save a Docker image to Elastic Container Registry (ECR)](/aws-ecr.html) |
+| 2019-09-10  | [Run a Docker container Using AWS Fargate](/aws-fargate.html) |
+| 2020-01-15  | [CodePipeline: Continuous Delivery to AWS ECR](/aws-codepipeline-ecr.html) |
+|             | **Cloud Storage** |
+| 2019-09-26  | [Using AWS S3 from Python](/aws-s3-python.html) |
+|             | **Serverless Applications** |
+| 2020-01-08  | [Lambda basics](/aws-lambda.html) |
+| 2020-01-09  | [IAM for Lambda](/aws-lambda-iam.html) |
+| 2020-01-21  | [IAM Authentication using API Gateway](/aws-api-gateway-iam.html) |

@@ -63,3 +63,9 @@ When rendering the static site, it works to create a .html file for each element
   - Theme CSS is used mainly for component elements that can use `<Typography>` blocks
 - Global styles, and specifically styles for blog post content that gets rendered to HTML by `remark`, are in `styles/globals.css` since they can't easily use `<Typography>`
 
+
+## Content Formatting
+
+- Using `remark` to format Markdown into HTML
+- Using `remark-toc` to format text headers to table of contents, like `#### Table of contents`
+- Using `remark-gfm` to allow support for tables and such, see [Github Flavoured Markdown](https://github.github.com/gfm/)

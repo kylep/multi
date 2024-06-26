@@ -1,6 +1,7 @@
 body {
   margin: 0;
   padding: 0;
+  font-size: 14px;
 }
 
 h3 {
@@ -18,4 +19,20 @@ hr {
 .project-table {
   border: 1px solid black;
   width: 80%;
+}
+
+/* currently ALL tables are from remark-gfm, 
+can use visit later to add a class to them if needed */
+table {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th {
+  background-color: #EEEEEE;
+  border: 1px solid black;
+  padding: 5px;
+}
+td {
+  border: 1px solid black;
+  padding: 5px;
 }

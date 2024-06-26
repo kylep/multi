@@ -4,6 +4,7 @@ import { remark } from 'remark';
 import fs from 'fs';
 import remarkHtml from 'remark-html'
 import remarkToc from 'remark-toc';
+import remarkGfm from 'remark-gfm';
 
 
 
@@ -65,6 +66,7 @@ class MarkdownService {
 		const { data: metaData, content: markdown } = matter(rawMarkdown);
 		MarkdownService.#serializeDates(metaData); 
 		const result = await remark()
+			.use(remarkGfm)
 			.use(remarkToc, {heading: 'Table of contents'})
 			.use(remarkHtml)
 			.process(markdown);
