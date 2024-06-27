@@ -34,74 +34,16 @@ satisfying the following requirements:
 
 This project includes, or will include, the following posts.
 If any aren't finished, check back later!
+| Date        | Article                                                                |
+| :-----------| :--------------------------------------------------------------------- |
+| 2019-08-01  | [Building a Pelican Docker image](/docker-pelican-image.html)          |
+| 2019-08-03  | [Writing blog content for Pelican](/writing-pelican-content.html)      |
+| 2019-08-04  | [A simple Pelican development environment](/pelican-dev-environment.html) |
+| 2019-08-05  | [Saving Docker images in Google's Container Registry](/google-container-registry.html) |
+| 2019-08-06  | [Google Cloud Build with GitHub Trigger](/google-cloud-build.html)     |
+| 2019-08-09  | [Hosting a website using Google Cloud Storage](/google-cloud-storage-website.html) |
+| 2019-12-02  | [Using Cloudflare to provide HTTPS](/cloudflare-https.html)            |
 
-<table class="project-table">
-  <tr>
-    <th>Status</th>
-    <th>Article</th>
-  </tr>
-  <tr>
-    <td>Not Started</td>
-    <td>Writing a custom Pelican Theme</td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/docker-pelican-image.html">
-        Building a Pelican Docker image
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/writing-pelican-content.html">
-        Writing blog content for Pelican
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/pelican-dev-environment.html">
-        A simple Pelican development environment
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/google-container-registry.html">
-        Saving Docker images in Google's Container Registry
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/google-cloud-build.html">
-        Google Cloud Build with GitHub Trigger
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/google-cloud-storage-website.html">
-        Hosting a website using Google Cloud Storage
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/cloudflare-https.html">
-        Using Cloudflare to provide HTTPS
-      </a>
-    </td>
-  </tr>
-
-</table>
 
 
 ---

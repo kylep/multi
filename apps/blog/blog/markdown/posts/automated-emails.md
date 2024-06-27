@@ -30,63 +30,12 @@ permits.
 # Project Posts & Progress
 
 This project includes, or will include, the following posts.
-If any aren't finished, check back later!
 
-<table class="project-table">
-  <tr>
-    <th>Status</th>
-    <th>Article</th>
-  </tr>
-  <tr>
-		<td>
-			Done
-		</td>
-		<td>
-      <a href="/emails-postfix-ubuntu.html">
-        Postfix Send-Only Mail Service: Basic emails from a dedicated VM
-      </a>
-		</td>
-	</tr>
-  <tr>
-    <td>
-      Done
-    </td>
-    <td>
-      <a href="/emails-bash-cron.html">
-        Sending cron-scheduled ping failure alerts using a bash script
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/email-spf.html">
-        Using SPF to ensure emails are trusted
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>WIP - Paused</td>
-    <td>
-      Using DKIM to ensure emails are trusted
-    </td>
-  </tr>
-  <tr>
-    <td>Not Started</td>
-    <td>
-      Using DMARK to ensure emails are trusted
-    </td>
-  </tr>
-  <tr>
-    <td>Not Started</td>
-    <td>Sending emails from Python</td>
-  </tr>
-  <tr>
-    <td>Not Started</td>
-    <td>Sending emails using the AWS SES API</td>
-  </tr>
-  <tr>
-    <td>Not Started</td>
-    <td>Sending Emails using the Google Cloud Mail API</td>
-  </tr>
-</table>
+
+| Date       | Article                                                                      |
+| :----------- | :--------------------------------------------------------------------------- |
+| 2019-08-15  | [Postfix Send-Only Mail Service: Basic emails from a dedicated VM](/emails-postfix-ubuntu.html) |
+| 2019-08-18  | [Sending cron-scheduled ping failure alerts using a bash script](/emails-bash-cron.html) |
+| 2019-08-20  | [Using SPF to ensure emails are trusted](/email-spf.html)                   |
+
+

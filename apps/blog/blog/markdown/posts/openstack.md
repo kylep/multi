@@ -18,9 +18,7 @@ orderly fashion. I'll also be writing high-level notes and opinions in the
 project page itself.
 
 
----
-
-[TOC]
+#### Table of contents
 
 ---
 
@@ -43,93 +41,16 @@ orchestrate against KVM, VMWare, HyperV, and Xen.
 
 # Project Posts & Progress
 
-This project includes, or will include, the following posts.
-If any aren't finished, check back later! I'll also certainly be adding more
-as time goes on.
+This project includes the following posts.
 
-<table class="project-table">
-  <tr>
-    <th>Status</th>
-    <th>Article</th>
-  </tr>
-  <tr>
-    <td>-</td>
-    <th>
-      Installing Openstack
-    </th>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/openstack-aio-ka-metal.html">
-        Install OpenStack on Metal - Intel NUC
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/openstack-aio-ka-vm.html">
-        Install OpenStack inside a VM
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/openstack-kolla-custom-plugin.html">
-        Modifying OpenStack Kolla Docker Images
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>-</td>
-    <th>Kubernetes on OpenStack</th>
-  </tr>
-  <tr>
-    <td>WIP - Paused</td>
-    <td>Installing OpenStack Magnum for Kubernetes-as-a-service</td>
-  </tr>
-  <tr>
-    <td>-</td>
-    <th>Operating Openstack Clouds</th>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/openstack-ansible.html">
-        Operating OpenStack from Ansible
-      </a>
-    </td>
-  <tr>
-    <td>Not Started</td>
-    <td>OpenStack Command-Line Cheat-Sheet</td>
-  </tr>
-  <tr>
-    <td>Not Started</td>
-    <td>Using Heat: IAC for OpenStack</td>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="/openstack-cloudinit-powershell.html">
-        OpenStack Cloud-Init Powershell Example
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td>-</td>
-    <th>OpenStack Images</th>
-  </tr>
-  <tr>
-    <td>Done</td>
-    <td>
-      <a href="windows-kvm-drivers">
-        Injecting KVM Drivers into Windows
-      </a>
-    </td>
-  </tr>
-</table>
+| Date        | Article                                                                      |
+| :---------- | :--------------------------------------------------------------------------- |
+| 2019-08-13  | [Install OpenStack on Metal - Intel NUC](/openstack-aio-ka-metal.html)       |
+| 2019-08-11  | [Install OpenStack inside a VM](/openstack-aio-ka-vm.html)                   |
+| 2019-08-26  | [Modifying OpenStack Kolla Docker Images](/openstack-kolla-custom-plugin.html) |
+| 2019-12-03  | [Operating OpenStack from Ansible](/openstack-ansible.html)                  |
+| 2020-01-25  | [OpenStack Cloud-Init Powershell Example](/openstack-cloudinit-powershell.html) |
+| 2019-12-17  | [Injecting KVM Drivers into Windows](windows-kvm-drivers)                    |
 
 ---
 
