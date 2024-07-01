@@ -7,6 +7,7 @@ const customColors = {
   headerGrey: '#EEEEEE',
   headerBlue: '#337ab7',
   textGrey: '#333333',
+  blogPostGrey: "#888888",
 };
 
 const theme = createTheme({
@@ -27,7 +28,16 @@ const theme = createTheme({
       fontSize: '21px',
       color: customColors.textGrey,
       lineHeight: '1.5',
-    }
+    },
+    BlogPostTitleHeader: {
+      fontWeight: 550,
+      fontSize: '35px',
+      color: customColors.headerBlue,
+    },
+    blogPostGreySubtitle: {
+      fontSize: '14px',
+      color: customColors.blogPostGrey,
+    },
   },
 });
 

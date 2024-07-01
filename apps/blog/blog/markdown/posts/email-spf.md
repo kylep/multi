@@ -3,6 +3,7 @@ title: SPF for Trusted Emails
 summary: Configuring which hosts are trusted to send emails for any domain using SPF.
 slug: email-spf
 category: systems administration
+tags: email
 date: 2019-08-20
 modified: 2019-08-20
 status: published

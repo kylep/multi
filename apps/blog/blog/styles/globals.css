@@ -11,6 +11,9 @@ hr {
   border-top: 1px solid #eee;
 }
 
+a {
+  color: #337ab7;
+}
 /* project-table: For multi-post projects like in /aws.html  */
 .project-table {
   border: 1px solid black;

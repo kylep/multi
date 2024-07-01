@@ -3,6 +3,7 @@ title: Scheduled Availability Email Alerts
 summary: Sending cron-scheduled ping failure alerts using a bash script
 slug: emails-bash-cron
 category: systems administration
+tags: email, bash
 date: 2019-08-18
 modified: 2019-08-18
 status: published

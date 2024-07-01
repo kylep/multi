@@ -4,6 +4,7 @@ summary: How I moved my main domain from GoDaddy to Cloudflare, making life easi
 slug: dns-xfer-godaddy-cloudflare
 category: systems administration
 date: 2019-08-8
+tags: dns
 modified: 2019-08-8
 status: published
 image: Cloudflare.png

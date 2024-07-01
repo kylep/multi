@@ -3,6 +3,7 @@ title: SPF for Trusted Emails
 summary: Configuring which hosts are trusted to send emails for any domain using SPF.
 slug: email-dkim
 category: guides
+tags: email
 date: 2019-08-21
 modified: 2019-08-21
 status: draft

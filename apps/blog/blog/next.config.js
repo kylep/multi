@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
 
+  productionBrowserSourceMaps: true,
+
   async rewrites() {
 
     return [

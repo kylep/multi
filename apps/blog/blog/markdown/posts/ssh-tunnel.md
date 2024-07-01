@@ -2,9 +2,10 @@
 title: Port Forwarding through SSH Tunnels
 slug: ssh-tunnels
 category: guides
+tags: ssh
 date: 2019-08-18
 modified: 2019-08-18
-Status: draft
+status: published
 ---
 
 ---

@@ -8,6 +8,8 @@ import remarkGfm from 'remark-gfm';
 
 
 
+const includeDrafts = false
+
 // used in markdownFilesByPage
 export const pageSize = 15;
 
@@ -35,7 +37,9 @@ class MarkdownService {
 		this.markdownFiles = await this.#loadMarkdownFiles();
 		this.markdownFilesBySlug = this.#indexMarkdownFilesBySlug(this.markdownFiles);
 		this.categories = await this.#getCountedCategories(this.markdownFiles);
+		this.tags = await this.#getCountedTags(this.markdownFiles);
 		this.markdownFilesByCategory = await this.#indexMarkdownFilesByCategory(this.markdownFiles);
+		this.markdownFilesByTag = await this.#indexMarkdownFilesByTag(this.markdownFiles);
 		this.markdownFilesByPage = paginate(this.markdownFiles, pageSize);
 	}
 
@@ -82,12 +86,14 @@ class MarkdownService {
 		title: 'My First Post',
 		date: '2021-01-01',
 		category: 'general',
+		tags: foo, bar, baz
 		content: 'This is my first post',
+		status: draft | published
 	  }
 	  */
 	  // filters out .swp so vim doesn't break dev env
 	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => !filename.endsWith('.swp'));
-	  const markdownFiles = await Promise.all(files.map( async filename => {
+	  let markdownFiles = await Promise.all(files.map( async filename => {
 		const fullPath = path.join(this.markdownDirectory, filename);
 		const rawMarkdown = fs.readFileSync(fullPath, 'utf8');
 		const props = await MarkdownService.getRenderedMarkdownAndProps(rawMarkdown);
@@ -95,6 +101,10 @@ class MarkdownService {
 		// TODO: I need to not return metadata here, and instead return the promise too that gives the content
 		return {metaData: props.props.metaData, contentHtml: props.props.contentHtml};
 	  }));
+	  // remove drafts
+	  if (!includeDrafts) {
+		markdownFiles = markdownFiles.filter(file => file.metaData.status !== 'draft');
+	  }
 	  // sorting by date is mostly for the index page
 	  markdownFiles.sort((a, b) => new Date(b.date) - new Date(a.date));
 	  return markdownFiles;
@@ -121,17 +131,54 @@ class MarkdownService {
 		}, {});
 	}
 
+	#indexMarkdownFilesByTag(markdownFiles) {
+		// get the tags from front matter, trim the white spaces from them
+		return markdownFiles.reduce((acc, file) => {
+		  const tags = file.metaData.tags;
+		  if (tags) {
+			tags.split(',').forEach(rawTag => {
+			  const tag = rawTag.trim().toLowerCase();
+			  if (acc[tag]) {
+				acc[tag].push(file);
+			  } else {
+				acc[tag] = [file];
+			  }
+			});
+		  }
+		  return acc;
+		}, {});
+	}
+	  
+
 	#getCountedCategories(markdownFiles) {
 		// return an object counting the posts per category, 
 		// like { category1: 3, category2: 1}
 		return markdownFiles.reduce((acc, file) => {
-		  const category = file.metaData.category;
+		  const category = file.metaData.category.toLowerCase();
 		  if (category) {
 			if (acc[category]) {
 			  acc[category] += 1;
 			} else {
 			  acc[category] = 1;
 			}
+		  }
+		  return acc;
+		}, {});
+	}
+
+	#getCountedTags(markdownFiles) {
+		// return an object counting the posts per tag, 
+		// like { tag1: 3, tag2: 1}
+		return markdownFiles.reduce((acc, file) => {
+		  const tags = file.metaData.tags;
+		  if (tags) {
+			tags.split(',').forEach(tag => {
+			  if (acc[tag]) {
+				acc[tag] += 1;
+			  } else {
+				acc[tag] = 1;
+			  }
+			});
 		  }
 		  return acc;
 		}, {});

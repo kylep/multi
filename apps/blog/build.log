@@ -12,34 +12,92 @@
  ⚠ Production code optimization has been disabled in your project. Read more: https://nextjs.org/docs/messages/minification-disabled
  ✓ Compiled successfully
    Collecting page data ...
-   Generating static pages (0/96) ...
-Warning: data for page "/[...route]" (path "/category/cloud") is 144 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
+   Generating static pages (0/124) ...
+Route0: category Route1: projects
+Route0: category Route1: cloud
+Warning: data for page "/[...route]" (path "/category/cloud") is 135 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
 See more info here: https://nextjs.org/docs/messages/large-page-data
-   Generating static pages (24/96) 
-   Generating static pages (48/96) 
-   Generating static pages (72/96) 
- ✓ Generating static pages (96/96) 
+Route0: category Route1: reference pages
+Route0: category Route1: systems administration
+Route0: category Route1: development
+Route0: category Route1: gaming
+Route0: category Route1: guides
+Route0: tag Route1: email
+Route0: tag Route1: aws
+Route0: tag Route1: api gateway
+Route0: tag Route1: python
+Route0: tag Route1: docker
+Route0: tag Route1: cicd
+Route0: tag Route1: codepipeline
+Route0: tag Route1: codecommit
+Route0: tag Route1: codebuild
+Route0: tag Route1: ec2
+Route0: tag Route1: lambda
+Route0: index5 Route1: undefined
+Route0: tag Route1: s3
+Route0: tag Route1: pelican
+Route0: index4 Route1: undefined
+Route0: tag Route1: gcp
+Route0: tag Route1: ceph
+Route0: tag Route1: https
+Route0: tag Route1: cloudflare
+Route0: tag Route1: remote access
+Route0: tag Route1: ubuntu
+Route0: index2 Route1: undefined
+Route0: index3 Route1: undefined
+Route0: index1 Route1: undefined
+Route0: index Route1: undefined
+   Generating static pages (31/124) 
+Route0: tag Route1: dns
+Route0: tag Route1: postfix
+Route0: tag Route1: pure storage
+Route0: tag Route1: bash
+Route0: tag Route1: mac os
+Route0: tag Route1: firebase
+Route0: tag Route1: minecraft
+Route0: tag Route1: api
+Route0: tag Route1: openssl
+Route0: tag Route1: node.js
+Route0: tag Route1: ansible
+Route0: tag Route1: git
+Route0: tag Route1: ci/cd
+Route0: tag Route1: openstack
+Route0: tag Route1: powershell
+Route0: tag Route1: vim
+Route0: tag Route1: pypi
+Route0: tag Route1: tcpdump
+Route0: tag Route1: tshark
+Route0: tag Route1: windows
+Route0: tag Route1: http
+Route0: tag Route1: kvm
+Route0: tag Route1: chrome
+Route0: tag Route1: wifi
+Route0: tag Route1: ssh
+Route0: tag Route1: nfs
+   Generating static pages (62/124) 
+   Generating static pages (93/124) 
+ ✓ Generating static pages (124/124) 
    Finalizing page optimization ...
    Collecting build traces ...
  ⚠ rewrites, redirects, and headers are not applied when exporting your application, detected (rewrites). See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
 
 Route (pages)                              Size     First Load JS
 ┌   /_app                                  0 B             166 kB
-├ ● /[...route] (9071 ms)                  45.5 kB         211 kB
-├   ├ /index (1350 ms)
-├   ├ /index1 (1337 ms)
-├   ├ /index3 (1325 ms)
-├   ├ /index2 (1287 ms)
-├   ├ /index4 (1085 ms)
-├   ├ /index5 (1044 ms)
-├   ├ /index6
-├   └ [+87 more paths]
-└ ○ /404                                   338 B           166 kB
+├ ● /[...route] (10778 ms)                 46.2 kB         212 kB
+├   ├ /index3 (1535 ms)
+├   ├ /index1 (1510 ms)
+├   ├ /index (1496 ms)
+├   ├ /index2 (1494 ms)
+├   ├ /index4 (1373 ms)
+├   ├ /index5 (1160 ms)
+├   ├ /category/projects
+├   └ [+115 more paths]
+└ ○ /404                                   379 B           166 kB
 + First Load JS shared by all              166 kB
-  ├ chunks/framework-2e2e0bfa8bda2099.js   46.8 kB
-  ├ chunks/main-077aabacc71fa55b.js        72.3 kB
-  ├ chunks/pages/_app-4c84dd5bcb64eba2.js  44.4 kB
-  └ other shared chunks (total)            2.21 kB
+  ├ chunks/framework-11004818aa805a6b.js   46.8 kB
+  ├ chunks/main-3df64238c1a66ec7.js        72.3 kB
+  ├ chunks/pages/_app-bc9da95d5a679b1d.js  44.5 kB
+  └ other shared chunks (total)            2.56 kB
 
 ○  (Static)  prerendered as static content
 ●  (SSG)     prerendered as static HTML (uses getStaticProps)

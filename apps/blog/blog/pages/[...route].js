@@ -35,8 +35,13 @@ export async function getStaticPaths() {
 
 	// Routes for each category, ex category/development.html
 	const categories = Object.keys(markdownService.categories);
-	const categoryPaths = categories.map(category => ({params: { route: ['category', (category)] }}));
+	const categoryPaths = categories.map(category => ({params: { route: ['category', (category.toLowerCase())] }}));
 	paths.push(...categoryPaths);
+
+	// Routes for each tag
+	const tags = Object.keys(markdownService.tags);
+	const tagPaths = tags.map(tag => ({ params: { route: ['tag', (tag.trim().toLowerCase())] } }));
+	paths.push(...tagPaths);
 
 	// Routes for each post
 	const slugs = Object.keys(markdownService.markdownFilesBySlug);
@@ -53,7 +58,7 @@ export async function getStaticProps({params}) {
 	let route = params.route;
 	route[route.length - 1] = route[route.length - 1];
 	let markdownFiles = [];
-	let postContent = {}; 
+	let postContent = {};
 	let pageNumber = 0; // varies by filtered size of markdownFiles
 
 	if (route[0] == 'index') { // default index page, treat like index1
@@ -64,8 +69,10 @@ export async function getStaticProps({params}) {
 	} else if  (route[0] == 'category') { // category/<category>.html
 		const category = route[1]; // [1] is the <category> in /category/<category>
 		markdownFiles = markdownService.markdownFilesByCategory[category];
-	}
-	else { // /<slug>.html
+	} else if (route[0] == 'tag') { // tag/<tag>.html
+		const tag = route[1]; // [1] is the <tag> in /tag/<tag>
+		markdownFiles = markdownService.markdownFilesByTag[tag];
+	} else { // /<slug>.html
 		postContent = markdownService.markdownFilesBySlug[route[0]];
 	}
 
@@ -86,12 +93,14 @@ function BaseSiteComponent({ route, markdownFiles, categories, currentPageIndexN
 		Decide which component to render based on the route.
 		Each route has a different set of props that it needs to render.
 	*/
-	if (route == "undefined") { route = ['index']; }
+	// "unefined" was a product of bad markdown processing
+	//if (route == "undefined") { route = ['index']; }
 	let pageContent = <></>;
-	if (route[0].startsWith('index') || route[0] == 'category' || route[0] == "/") {
+	if (route[0].startsWith('index') || route[0] == 'category' || route[0] == 'tag' || route[0] == "/") {
 		if (route == '/') {
 			route = 'index';
 		}
+		console.log("Route0: " + route[0]+ " Route1: " + route[1]);
 		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} />;
 	} else {
 		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
