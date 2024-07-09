@@ -38,7 +38,7 @@ function SiteTitle() {
     }}>
       <Typography variant="titleHeaderH1" component="h1" sx={{
           width: '100%', 
-          paddingTop: '50px',
+          paddingTop: '30px',
         }}> 
         Kyle Pericak
       </Typography>

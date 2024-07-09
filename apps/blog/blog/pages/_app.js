@@ -38,6 +38,17 @@ const theme = createTheme({
       fontSize: '14px',
       color: customColors.blogPostGrey,
     },
+    sidebarLink: {
+      color: customColors.headerBlue,
+      textDecoration: 'none',
+      fontWeight: 500,
+      fontSize: "small"
+    },
+    sidebarText: {
+      color: customColors.textGrey,
+      fontWeight: 500,
+      fontSize: "small"
+    },
   },
 });
 

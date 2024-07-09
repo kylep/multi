@@ -1,7 +1,7 @@
 import SiteLayout from '../components/SiteLayout';
 import IndexPage from '../components/IndexPage';
 import BlogPostContentPage from '../components/BlogPostContentPage';
-import { getMarkdownService, pageSize } from '../utils/MarkdownService';
+import { getMarkdownService, pageSize, paginate } from '../utils/MarkdownService';
 import { GlobalContextProvider } from '../utils/GlobalContext';
 
 
@@ -52,43 +52,50 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({params}) {
-	/* Define the data that the pages will be pre-rendered with */
+	/* Define the data that the pages will be pre-rendered with 
+	   Pagination is only supported on index page for now.
+	*/
 
 	const markdownService = await getMarkdownService();
 	let route = params.route;
 	route[route.length - 1] = route[route.length - 1];
+	const markdownFilesBeforePagination = markdownService.markdownFiles;
+	const paginatedMarkdownFiles = paginate(markdownFilesBeforePagination, pageSize);
+	let indexPageCount = Math.ceil(markdownFilesBeforePagination.length / pageSize); 
 	let markdownFiles = [];
 	let postContent = {};
 	let pageNumber = 0; // varies by filtered size of markdownFiles
-
 	if (route[0] == 'index') { // default index page, treat like index1
-		markdownFiles = markdownService.markdownFilesByPage[0];
+		markdownFiles = paginatedMarkdownFiles[0];
 	} else if (route[0].startsWith('index')) { // index1.html, index2.html, etc
 		pageNumber = parseInt(route[0].replace('index', ''));
-		markdownFiles = markdownService.markdownFilesByPage[pageNumber - 1];
+		markdownFiles = paginatedMarkdownFiles[pageNumber - 1];
 	} else if  (route[0] == 'category') { // category/<category>.html
 		const category = route[1]; // [1] is the <category> in /category/<category>
 		markdownFiles = markdownService.markdownFilesByCategory[category];
+		indexPageCount = 1; // hack to hide pagination, temporary
 	} else if (route[0] == 'tag') { // tag/<tag>.html
 		const tag = route[1]; // [1] is the <tag> in /tag/<tag>
 		markdownFiles = markdownService.markdownFilesByTag[tag];
+		indexPageCount = 1; // hack to hide pagination, temporary
 	} else { // /<slug>.html
 		postContent = markdownService.markdownFilesBySlug[route[0]];
 	}
-
+	console.log("Route: " + route + " PageNumber: " + pageNumber + " PageCount: " + indexPageCount);
 	return {
 		props: {
 			route: route,
 			markdownFiles: markdownFiles,
 			categories: markdownService.categories,
+			tags: markdownService.tags,
 			currentPageIndexNumber: pageNumber,
-			pageCount: Math.ceil(markdownFiles.length / pageSize),
+			pageCount: indexPageCount,
 			postContent: postContent,
 		},
 	};
 }
 
-function BaseSiteComponent({ route, markdownFiles, categories, currentPageIndexNumber, pageCount, postContent }) {
+function BaseSiteComponent({ route, markdownFiles, categories, tags, currentPageIndexNumber, pageCount, postContent }) {
 	/* 
 		Decide which component to render based on the route.
 		Each route has a different set of props that it needs to render.
@@ -106,7 +113,7 @@ function BaseSiteComponent({ route, markdownFiles, categories, currentPageIndexN
 		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
 	}
 	return (
-		<GlobalContextProvider globalData={{ categories }}>
+		<GlobalContextProvider globalData={{ categories, tags }}>
 			<SiteLayout>
 				{pageContent}
 			</SiteLayout>

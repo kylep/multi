@@ -106,7 +106,7 @@ function BlogPostIndexSummary({ file, sx }) {
   );
 }
 
-const handlePageChange = (_, page) => {
+const handlePageChange = (page) => {
     window.location.href = `/index${page}.html`;
 };
 
@@ -116,13 +116,15 @@ export function IndexPage({ markdownFiles, currentPageIndexNumber, pageCount }) 
 			{markdownFiles.map((file) => (
 				<BlogPostIndexSummary key={file.metaData.slug} file={file.metaData} />
 			))}
-			<Pagination 
-				page={currentPageIndexNumber} 
-				count={pageCount} 
-				shape="rounded"
-				onChange={handlePageChange}
-				sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
-			/>
+			{pageCount > 1 && (
+				<Pagination 
+          currentPage={currentPageIndexNumber} 
+					totalPages={pageCount} 
+					//shape="rounded"
+					onPageChange={handlePageChange}
+					sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+				/>
+			)}
 		</>
 	);
 }

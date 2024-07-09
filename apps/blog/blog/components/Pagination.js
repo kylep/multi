@@ -1,54 +1,62 @@
-import React from 'react';
-
+import { Box } from '@mui/material';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
 
 const PageNavButon = ({ children, isDisabled, isActive, onClick }) => (
-    <button
+    <Box
       sx={{
         width: '30px',
         height: '30px',
         margin: '0 5px',
+        paddingTop: '3px',
         backgroundColor: isDisabled ? '#ddd' : isActive ? '#007bff' : 'transparent',
         color: isActive ? 'white' : 'black',
-        cursor: isDisabled ? 'not-allowed' : 'pointer'
+        cursor: isDisabled ? 'not-allowed' : 'pointer',
+        display: 'flex',
+        justifyContent: 'center',
       }}
-      disabled={isDisabled}
-      onClick={onClick}
+      onClick={isDisabled ? null : onClick}
     >
       {children}
-    </button>
+    </Box>
   );
   
   
   const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    console.log("Current Page: " + currentPage + " Total Pages: " + totalPages);
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
       pageNumbers.push(i);
     }
   
     return (
-      <div>
+      <Box sx={{
+          marginTop: "8px",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+          }}>
         <PageNavButon
           isDisabled={currentPage === 1}
-          onClick={() => onPageChange(`index${currentPage - 1}.html`)}
+          onClick={() => onPageChange(currentPage - 1)}
         >
-          Previous
+          <ArrowBack />
         </PageNavButon>
-        {pageNumbers.map(number => (
+        {pageNumbers.map(page => (
           <PageNavButon
-            key={number}
-            isActive={currentPage === number}
-            onClick={() => onPageChange(`index${number}.html`)}
+            key={page}
+            isActive={currentPage === page}
+            onClick={() => onPageChange(page)}
           >
-            {number}
+            {page}
           </PageNavButon>
         ))}
         <PageNavButon
           isDisabled={currentPage === totalPages}
-          onClick={() => onPageChange(`index${currentPage + 1}.html`)}
+          onClick={() => onPageChange(currentPage + 1)}
         >
-          Next
+          <ArrowForward />
         </PageNavButon>
-      </div>
+      </Box>
     );
   };
   

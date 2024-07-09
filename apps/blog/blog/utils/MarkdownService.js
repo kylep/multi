@@ -13,7 +13,7 @@ const includeDrafts = false
 // used in markdownFilesByPage
 export const pageSize = 15;
 
-function paginate(array, pageSize) {
+export function paginate(array, pageSize) {
 	return Array.from({ length: Math.ceil(array.length / pageSize) }, (_, i) =>
 	  array.slice(i * pageSize, i * pageSize + pageSize)
 	);
@@ -106,7 +106,7 @@ class MarkdownService {
 		markdownFiles = markdownFiles.filter(file => file.metaData.status !== 'draft');
 	  }
 	  // sorting by date is mostly for the index page
-	  markdownFiles.sort((a, b) => new Date(b.date) - new Date(a.date));
+	  markdownFiles.sort((a, b) => new Date(b.metaData.date) - new Date(a.metaData.date));
 	  return markdownFiles;
 	}
 
@@ -172,13 +172,16 @@ class MarkdownService {
 		return markdownFiles.reduce((acc, file) => {
 		  const tags = file.metaData.tags;
 		  if (tags) {
-			tags.split(',').forEach(tag => {
+			tags.split(',').forEach(rawTag => {
+			  const tag = rawTag.trim().toLowerCase();
 			  if (acc[tag]) {
 				acc[tag] += 1;
 			  } else {
 				acc[tag] = 1;
 			  }
 			});
+		  } else {
+			return [];
 		  }
 		  return acc;
 		}, {});
