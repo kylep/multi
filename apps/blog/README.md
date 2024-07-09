@@ -6,6 +6,19 @@ This blog was previously powered by [Python Pelican](https://getpelican.com/), a
 nothing wrong with that, but I wanted to learn something new and modern. Plus I'd gone a few years without
 writing to my blog so I figured a new framework might help motivate me.
 
+## Set up the build environment
+
+Install next and the dependencies
+```bash
+cd blog
+npm install
+```
+
+Then from the base directory (with this README), verify the build
+```bash
+bin/build.sh
+```
+
 ## Building the static files
 
 Renders all the markdown files using the templating defined in this project,

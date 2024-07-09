@@ -13,69 +13,197 @@
  ✓ Compiled successfully
    Collecting page data ...
    Generating static pages (0/124) ...
-Route0: category Route1: projects
+Route: category,cloud PageNumber: 0 PageCount: 1
 Route0: category Route1: cloud
-Warning: data for page "/[...route]" (path "/category/cloud") is 135 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
+Warning: data for page "/[...route]" (path "/category/cloud") is 136 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
 See more info here: https://nextjs.org/docs/messages/large-page-data
-Route0: category Route1: reference pages
+Route: category,systems administration PageNumber: 0 PageCount: 1
 Route0: category Route1: systems administration
+Route: category,reference pages PageNumber: 0 PageCount: 1
+Route0: category Route1: reference pages
+Route: category,development PageNumber: 0 PageCount: 1
 Route0: category Route1: development
+Route: category,projects PageNumber: 0 PageCount: 1
+Route0: category Route1: projects
+Route: category,gaming PageNumber: 0 PageCount: 1
 Route0: category Route1: gaming
+Route: category,guides PageNumber: 0 PageCount: 1
 Route0: category Route1: guides
-Route0: tag Route1: email
-Route0: tag Route1: aws
-Route0: tag Route1: api gateway
-Route0: tag Route1: python
-Route0: tag Route1: docker
-Route0: tag Route1: cicd
-Route0: tag Route1: codepipeline
-Route0: tag Route1: codecommit
-Route0: tag Route1: codebuild
-Route0: tag Route1: ec2
-Route0: tag Route1: lambda
-Route0: index5 Route1: undefined
-Route0: tag Route1: s3
-Route0: tag Route1: pelican
-Route0: index4 Route1: undefined
-Route0: tag Route1: gcp
-Route0: tag Route1: ceph
-Route0: tag Route1: https
-Route0: tag Route1: cloudflare
-Route0: tag Route1: remote access
-Route0: tag Route1: ubuntu
-Route0: index2 Route1: undefined
-Route0: index3 Route1: undefined
-Route0: index1 Route1: undefined
-Route0: index Route1: undefined
-   Generating static pages (31/124) 
-Route0: tag Route1: dns
-Route0: tag Route1: postfix
-Route0: tag Route1: pure storage
-Route0: tag Route1: bash
-Route0: tag Route1: mac os
-Route0: tag Route1: firebase
-Route0: tag Route1: minecraft
-Route0: tag Route1: api
-Route0: tag Route1: openssl
-Route0: tag Route1: node.js
-Route0: tag Route1: ansible
-Route0: tag Route1: git
-Route0: tag Route1: ci/cd
+Route: tag,openstack PageNumber: 0 PageCount: 1
 Route0: tag Route1: openstack
-Route0: tag Route1: powershell
-Route0: tag Route1: vim
-Route0: tag Route1: pypi
-Route0: tag Route1: tcpdump
-Route0: tag Route1: tshark
-Route0: tag Route1: windows
-Route0: tag Route1: http
+Route: tag,https PageNumber: 0 PageCount: 1
+Route0: tag Route1: https
+Route: tag,openssl PageNumber: 0 PageCount: 1
+Route0: tag Route1: openssl
+Route: tag,mac os PageNumber: 0 PageCount: 1
+Route0: tag Route1: mac os
+Route: tag,ubuntu PageNumber: 0 PageCount: 1
+Route0: tag Route1: ubuntu
+Route: tag,kvm PageNumber: 0 PageCount: 1
 Route0: tag Route1: kvm
-Route0: tag Route1: chrome
-Route0: tag Route1: wifi
-Route0: tag Route1: ssh
+Route: tag,http PageNumber: 0 PageCount: 1
+Route0: tag Route1: http
+Route: index5 PageNumber: 5 PageCount: 5
+Route0: index5 Route1: undefined
+Current Page: 5 Total Pages: 5
+Route: index4 PageNumber: 4 PageCount: 5
+Route0: index4 Route1: undefined
+Current Page: 4 Total Pages: 5
+Route: tag,api PageNumber: 0 PageCount: 1
+Route0: tag Route1: api
+Route: tag,tshark PageNumber: 0 PageCount: 1
+Route0: tag Route1: tshark
+Route: tag,tcpdump PageNumber: 0 PageCount: 1
+Route0: tag Route1: tcpdump
+Route: tag,nfs PageNumber: 0 PageCount: 1
 Route0: tag Route1: nfs
+Route: index1 PageNumber: 1 PageCount: 5
+Route0: index1 Route1: undefined
+Current Page: 1 Total Pages: 5
+Route: index3 PageNumber: 3 PageCount: 5
+Route0: index3 Route1: undefined
+Current Page: 3 Total Pages: 5
+Route: index PageNumber: 0 PageCount: 5
+Route0: index Route1: undefined
+Current Page: 0 Total Pages: 5
+Route: index2 PageNumber: 2 PageCount: 5
+Route0: index2 Route1: undefined
+Current Page: 2 Total Pages: 5
+Route: tag,git PageNumber: 0 PageCount: 1
+Route0: tag Route1: git
+Route: tag,ceph PageNumber: 0 PageCount: 1
+Route0: tag Route1: ceph
+Route: tag,python PageNumber: 0 PageCount: 1
+Route0: tag Route1: python
+Route: tag,aws PageNumber: 0 PageCount: 1
+Route0: tag Route1: aws
+Route: tag,codebuild PageNumber: 0 PageCount: 1
+Route0: tag Route1: codebuild
+Route: tag,lambda PageNumber: 0 PageCount: 1
+Route0: tag Route1: lambda
+Route: tag,windows PageNumber: 0 PageCount: 1
+Route0: tag Route1: windows
+   Generating static pages (31/124) 
+Route: tag,powershell PageNumber: 0 PageCount: 1
+Route0: tag Route1: powershell
+Route: tag,codecommit PageNumber: 0 PageCount: 1
+Route0: tag Route1: codecommit
+Route: tag,firebase PageNumber: 0 PageCount: 1
+Route0: tag Route1: firebase
+Route: tag,docker PageNumber: 0 PageCount: 1
+Route0: tag Route1: docker
+Route: tag,codepipeline PageNumber: 0 PageCount: 1
+Route0: tag Route1: codepipeline
+Route: tag,api gateway PageNumber: 0 PageCount: 1
+Route0: tag Route1: api gateway
+Route: tag,cicd PageNumber: 0 PageCount: 1
+Route0: tag Route1: cicd
+Route: tag,ec2 PageNumber: 0 PageCount: 1
+Route0: tag Route1: ec2
+Route: tag,node.js PageNumber: 0 PageCount: 1
+Route0: tag Route1: node.js
+Route: tag,ansible PageNumber: 0 PageCount: 1
+Route0: tag Route1: ansible
+Route: tag,cloudflare PageNumber: 0 PageCount: 1
+Route0: tag Route1: cloudflare
+Route: tag,gcp PageNumber: 0 PageCount: 1
+Route0: tag Route1: gcp
+Route: tag,vim PageNumber: 0 PageCount: 1
+Route0: tag Route1: vim
+Route: tag,s3 PageNumber: 0 PageCount: 1
+Route0: tag Route1: s3
+Route: tag,pure storage PageNumber: 0 PageCount: 1
+Route0: tag Route1: pure storage
+Route: tag,remote access PageNumber: 0 PageCount: 1
+Route0: tag Route1: remote access
+Route: tag,pypi PageNumber: 0 PageCount: 1
+Route0: tag Route1: pypi
+Route: tag,bash PageNumber: 0 PageCount: 1
+Route0: tag Route1: bash
+Route: tag,minecraft PageNumber: 0 PageCount: 1
+Route0: tag Route1: minecraft
+Route: tag,email PageNumber: 0 PageCount: 1
+Route0: tag Route1: email
+Route: tag,chrome PageNumber: 0 PageCount: 1
+Route0: tag Route1: chrome
+Route: tag,wifi PageNumber: 0 PageCount: 1
+Route0: tag Route1: wifi
+Route: tag,dns PageNumber: 0 PageCount: 1
+Route0: tag Route1: dns
+Route: tag,ssh PageNumber: 0 PageCount: 1
+Route0: tag Route1: ssh
+Route: tag,postfix PageNumber: 0 PageCount: 1
+Route0: tag Route1: postfix
+Route: tag,ci/cd PageNumber: 0 PageCount: 1
+Route0: tag Route1: ci/cd
+Route: tag,pelican PageNumber: 0 PageCount: 1
+Route0: tag Route1: pelican
+Route: rhel-virtio-initrd PageNumber: 0 PageCount: 5
+Route: mac-vlan-thunderbolt PageNumber: 0 PageCount: 5
+Route: openssl-csr-san PageNumber: 0 PageCount: 5
+Route: windows-kvm-command-line PageNumber: 0 PageCount: 5
+Route: openstack-fix-cli PageNumber: 0 PageCount: 5
+Route: packet-tracing-reference PageNumber: 0 PageCount: 5
    Generating static pages (62/124) 
+Route: ubuntu-nfs-server PageNumber: 0 PageCount: 5
+Route: python-http-transfer PageNumber: 0 PageCount: 5
+Route: github-pages PageNumber: 0 PageCount: 5
+Route: python-ceph PageNumber: 0 PageCount: 5
+Route: ceph-reference PageNumber: 0 PageCount: 5
+Route: aws-labmda-codecommit PageNumber: 0 PageCount: 5
+Route: openstack-cloudinit-powershell PageNumber: 0 PageCount: 5
+Route: aws-api-gateway-iam PageNumber: 0 PageCount: 5
+Route: firebase-circleci-cd PageNumber: 0 PageCount: 5
+Route: certbot PageNumber: 0 PageCount: 5
+Route: aws-codepipeline-ecr PageNumber: 0 PageCount: 5
+Route: firebase-hello-world PageNumber: 0 PageCount: 5
+Route: aws-ec2-python PageNumber: 0 PageCount: 5
+Route: aws-lambda-iam PageNumber: 0 PageCount: 5
+Route: mac-fix-usb-drive PageNumber: 0 PageCount: 5
+Route: ubuntu-trust-corporate-ca PageNumber: 0 PageCount: 5
+Route: windows-kvm-drivers PageNumber: 0 PageCount: 5
+Route: aws-lambda PageNumber: 0 PageCount: 5
+Route: nodejs-ansible PageNumber: 0 PageCount: 5
+Route: openstack-ansible PageNumber: 0 PageCount: 5
+Route: cloudflare-https-frontend PageNumber: 0 PageCount: 5
+Route: gcp PageNumber: 0 PageCount: 5
+Route: aws PageNumber: 0 PageCount: 5
+Route: vim-spellcheck PageNumber: 0 PageCount: 5
+Route: openstack PageNumber: 0 PageCount: 5
+Route: gcp-firestore-python PageNumber: 0 PageCount: 5
+Route: gcp-cloud-functions PageNumber: 0 PageCount: 5
+Route: aws-fargate PageNumber: 0 PageCount: 5
+Route: aws-s3-python PageNumber: 0 PageCount: 5
+Route: dial-home-device PageNumber: 0 PageCount: 5
+Route: errors PageNumber: 0 PageCount: 5
+Route: ops-cheatsheet PageNumber: 0 PageCount: 5
    Generating static pages (93/124) 
+Route: docker-shared-memory PageNumber: 0 PageCount: 5
+Route: git-reference PageNumber: 0 PageCount: 5
+Route: python-pypi PageNumber: 0 PageCount: 5
+Route: python-cheat-sheet PageNumber: 0 PageCount: 5
+Route: gaming-minecraft-feedthebeast PageNumber: 0 PageCount: 5
+Route: aws-ecr PageNumber: 0 PageCount: 5
+Route: python-sql-json PageNumber: 0 PageCount: 5
+Route: openstack-kolla-custom-plugin PageNumber: 0 PageCount: 5
+Route: ubuntu-wifi-to-wired-router PageNumber: 0 PageCount: 5
+Route: email-spf PageNumber: 0 PageCount: 5
+Route: x11-forwarding-ubuntu18 PageNumber: 0 PageCount: 5
+Route: ubuntu-bionic-wifi PageNumber: 0 PageCount: 5
+Route: ssh-tunnel PageNumber: 0 PageCount: 5
+Route: emails-bash-cron PageNumber: 0 PageCount: 5
+Route: emails-postfix-ubuntu PageNumber: 0 PageCount: 5
+Route: openstack-aio-ka-metal PageNumber: 0 PageCount: 5
+Route: dns-xfer-godaddy-cloudflare PageNumber: 0 PageCount: 5
+Route: automated-emails PageNumber: 0 PageCount: 5
+Route: openstack-aio-ka-vm PageNumber: 0 PageCount: 5
+Route: google-cloud-storage-website PageNumber: 0 PageCount: 5
+Route: google-cloud-build PageNumber: 0 PageCount: 5
+Route: google-container-registry PageNumber: 0 PageCount: 5
+Route: pelican-dev-environment PageNumber: 0 PageCount: 5
+Route: blog-website PageNumber: 0 PageCount: 5
+Route: docker-pelican-image PageNumber: 0 PageCount: 5
+Route: writing-pelican-content PageNumber: 0 PageCount: 5
  ✓ Generating static pages (124/124) 
    Finalizing page optimization ...
    Collecting build traces ...
@@ -83,20 +211,20 @@ Route0: tag Route1: nfs
 
 Route (pages)                              Size     First Load JS
 ┌   /_app                                  0 B             166 kB
-├ ● /[...route] (10778 ms)                 46.2 kB         212 kB
-├   ├ /index3 (1535 ms)
-├   ├ /index1 (1510 ms)
-├   ├ /index (1496 ms)
-├   ├ /index2 (1494 ms)
-├   ├ /index4 (1373 ms)
-├   ├ /index5 (1160 ms)
-├   ├ /category/projects
+├ ● /[...route] (13323 ms)                 46.5 kB         212 kB
+├   ├ /index2 (1660 ms)
+├   ├ /index3 (1635 ms)
+├   ├ /index (1629 ms)
+├   ├ /index1 (1605 ms)
+├   ├ /index4 (1527 ms)
+├   ├ /index5 (1481 ms)
+├   ├ /category/cloud
 ├   └ [+115 more paths]
 └ ○ /404                                   379 B           166 kB
 + First Load JS shared by all              166 kB
   ├ chunks/framework-11004818aa805a6b.js   46.8 kB
   ├ chunks/main-3df64238c1a66ec7.js        72.3 kB
-  ├ chunks/pages/_app-bc9da95d5a679b1d.js  44.5 kB
+  ├ chunks/pages/_app-a7782ed52ece8aaf.js  44.5 kB
   └ other shared chunks (total)            2.56 kB
 
 ○  (Static)  prerendered as static content
