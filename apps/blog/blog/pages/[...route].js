@@ -3,6 +3,7 @@ import IndexPage from '../components/IndexPage';
 import BlogPostContentPage from '../components/BlogPostContentPage';
 import { getMarkdownService, pageSize, paginate } from '../utils/MarkdownService';
 import { GlobalContextProvider } from '../utils/GlobalContext';
+import { getGitService } from '../utils/GitService';
 
 
 export async function getStaticPaths() {
@@ -82,6 +83,8 @@ export async function getStaticProps({params}) {
 		postContent = markdownService.markdownFilesBySlug[route[0]];
 	}
 	console.log("Route: " + route + " PageNumber: " + pageNumber + " PageCount: " + indexPageCount);
+	const gitService = await getGitService();
+	console.log("GitService: " + gitService.hash + " " + gitService.date);
 	return {
 		props: {
 			route: route,
@@ -91,11 +94,23 @@ export async function getStaticProps({params}) {
 			currentPageIndexNumber: pageNumber,
 			pageCount: indexPageCount,
 			postContent: postContent,
+			lastGitCommitHash: gitService.hash,
+			siteLastModified: gitService.date,
 		},
 	};
 }
 
-function BaseSiteComponent({ route, markdownFiles, categories, tags, currentPageIndexNumber, pageCount, postContent }) {
+function BaseSiteComponent({ 
+		route, 
+		markdownFiles, 
+		categories, 
+		tags, 
+		currentPageIndexNumber, 
+		pageCount, 
+		postContent,
+		lastGitCommitHash,
+		siteLastModified
+	}) {
 	/* 
 		Decide which component to render based on the route.
 		Each route has a different set of props that it needs to render.
@@ -107,13 +122,17 @@ function BaseSiteComponent({ route, markdownFiles, categories, tags, currentPage
 		if (route == '/') {
 			route = 'index';
 		}
-		console.log("Route0: " + route[0]+ " Route1: " + route[1]);
 		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} />;
 	} else {
 		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
 	}
 	return (
-		<GlobalContextProvider globalData={{ categories, tags }}>
+		<GlobalContextProvider globalData={{ 
+			categories, 
+			tags,
+			lastGitCommitHash,
+			siteLastModified
+		}}>
 			<SiteLayout>
 				{pageContent}
 			</SiteLayout>

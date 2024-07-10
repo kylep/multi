@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -6,6 +6,10 @@ import HomeIcon from '@mui/icons-material/Home';
 import { Link } from '@mui/material';
 import { Box } from '@mui/material';
 import BlogSidebar from './BlogSidebar';
+import { GlobalContext } from '../utils/GlobalContext';
+import { useTheme } from '@mui/material/styles';
+
+
 
 
 // spacing to make the header responsive
@@ -81,13 +85,22 @@ function SiteNavHeader() {
 }
 
 function SiteFooter() {
+  const globalData = useContext(GlobalContext);
+  const theme = useTheme();
   return (
-    <ResponsiveRow sx={{ 
+    <ResponsiveRow
+      sx={{ 
         width: '100%', 
-        backgroundColor: (theme) => theme.palette.grey.main,
-      }}>
-      <Typography variant="body1" sx={{marginLeft: "20px"}}>
-        Last updated 2024-02-05 by Kyle Pericak
+        height: "50px",
+        backgroundColor: theme.palette.headerGrey,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}
+    >
+      <Typography variant="body1" sx={{ textAlign: 'center' }}>
+        Last updated on {globalData.data.siteLastModified} by Kyle Pericak
+        - <a href={`https://github.com/kylep/multi/commit/${globalData.data.lastGitCommitHash}`}>{globalData.data.lastGitCommitHash}</a>
       </Typography>
     </ResponsiveRow>
   );

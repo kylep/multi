@@ -186,13 +186,6 @@ class MarkdownService {
 		  return acc;
 		}, {});
 	}
-  
-	static async getInstance() {
-	  if (!MarkdownService.instance) {
-		new MarkdownService();
-	  }
-	  return MarkdownService.instance;
-	}
   }
   
   export async function getMarkdownService() {
