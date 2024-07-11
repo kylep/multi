@@ -14,10 +14,7 @@ cd blog
 npm install
 ```
 
-Then from the base directory (with this README), verify the build
-```bash
-bin/build.sh
-```
+Then from the base directory (with this README), verify the setup by building the static files.
 
 ## Building the static files
 
@@ -25,7 +22,7 @@ Renders all the markdown files using the templating defined in this project,
 then outputs them to `out/` as .html files to be served as static content.
 
 ```bash
-bin/build.sh
+bin/build-blog-files.sh
 ls blog/out/
 ```
 
@@ -34,7 +31,8 @@ ls blog/out/
 Uses the nice built-in dev workflow, handy for fast build & check but not
 totally aligned with how it works in production. NextJS can be all
 too willing to act as a backend client-side rendering server instead of
-just a static site generator. 
+just a static site generator. At this point I think I've got dev working very closely
+to how prod works.
 
 ```bash
 bin/start-dev-npm.sh
@@ -44,14 +42,24 @@ bin/start-dev-npm.sh
 
 This behaves more like how prod works, using the actual static files from the build
 and serving them from a Docker container on a different port. It does volume-mount,
-so the dev-test cycle is still not terrible. 
+so the dev-test cycle is still not terrible if changes are needed, but you need to
+manually re-run the build each change.
 
 ```bash
-npm run build
+bin/start-staging-nginx.sh
 ```
 
 ## Deploy to production
-TODO, it'll be done in CI but leverage a script called ~ `bin/production-deploy-GCP.sh`
+
+Ships the build artifacts from out/ up to GCP where they're hosted.
+While I'm not using Pelican any more, I covered the infrastructure that uses in my old
+blog's Project post [here](https://kyle.pericak.com/blog-website.html).
+
+This is handled by the CI pipeline, but you can run it manually, too.
+
+```bash
+bin/prod-deploy.sh
+```
 
 
 ---

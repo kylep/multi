@@ -49,6 +49,9 @@ const theme = createTheme({
       fontWeight: 500,
       fontSize: "small"
     },
+    footerText: {
+      fontSize: "small",
+    }
   },
 });
 

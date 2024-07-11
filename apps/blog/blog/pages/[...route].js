@@ -82,9 +82,7 @@ export async function getStaticProps({params}) {
 	} else { // /<slug>.html
 		postContent = markdownService.markdownFilesBySlug[route[0]];
 	}
-	console.log("Route: " + route + " PageNumber: " + pageNumber + " PageCount: " + indexPageCount);
 	const gitService = await getGitService();
-	console.log("GitService: " + gitService.hash + " " + gitService.date);
 	return {
 		props: {
 			route: route,

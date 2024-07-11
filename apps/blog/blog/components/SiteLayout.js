@@ -95,12 +95,13 @@ function SiteFooter() {
         backgroundColor: theme.palette.headerGrey,
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        border: "1px dotted #AAAAAA",
       }}
     >
-      <Typography variant="body1" sx={{ textAlign: 'center' }}>
-        Last updated on {globalData.data.siteLastModified} by Kyle Pericak
-        - <a href={`https://github.com/kylep/multi/commit/${globalData.data.lastGitCommitHash}`}>{globalData.data.lastGitCommitHash}</a>
+      <Typography variant="footerText" sx={{ textAlign: 'center' }}>
+        Blog code last updated on {globalData.data.siteLastModified}:&nbsp;
+        <a href={`https://github.com/kylep/multi/commit/${globalData.data.lastGitCommitHash}`}>{globalData.data.lastGitCommitHash}</a>
       </Typography>
     </ResponsiveRow>
   );

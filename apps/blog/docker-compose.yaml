@@ -1,0 +1,9 @@
+services:
+  npm_builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gcr.io/kylepericak/nodejs:latest
+  
+
+
