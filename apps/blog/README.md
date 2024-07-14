@@ -57,6 +57,9 @@ blog's Project post [here](https://kyle.pericak.com/blog-website.html).
 
 This is handled by the CI pipeline, but you can run it manually, too.
 
+### Build the docker image
+
+
 ```bash
 bin/prod-deploy.sh
 ```
@@ -90,3 +93,8 @@ When rendering the static site, it works to create a .html file for each element
 - Using `remark` to format Markdown into HTML
 - Using `remark-toc` to format text headers to table of contents, like `#### Table of contents`
 - Using `remark-gfm` to allow support for tables and such, see [Github Flavoured Markdown](https://github.github.com/gfm/)
+
+## Syntax Highlighting
+
+I only downloaded the prism.js languages that I figured I was likely to use. If one isn't working,
+probably need a new css file. 

@@ -4,7 +4,7 @@
 
  ⚠ Specified "rewrites" will not automatically work with "output: export". See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
  ⚠ Specified "rewrites" will not automatically work with "output: export". See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
-   ▲ Next.js 14.1.0
+  ▲ Next.js 14.2.5
 
    Skipping linting
    Checking validity of types ...
@@ -13,282 +13,38 @@
  ✓ Compiled successfully
    Collecting page data ...
    Generating static pages (0/124) ...
-Route: category,cloud PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
 Warning: data for page "/[...route]" (path "/category/cloud") is 136 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
 See more info here: https://nextjs.org/docs/messages/large-page-data
-Route: category,systems administration PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: category,reference pages PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: category,development PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: category,projects PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: category,gaming PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: category,guides PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,openstack PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,https PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,openssl PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,mac os PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,ubuntu PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,kvm PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,http PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,api PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,tshark PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,tcpdump PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,nfs PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: index5 PageNumber: 5 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
 Current Page: 5 Total Pages: 5
-Route: index4 PageNumber: 4 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
 Current Page: 4 Total Pages: 5
-Route: tag,python PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,ceph PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: index3 PageNumber: 3 PageCount: 5
-Route: tag,aws PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,git PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,lambda PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: index1 PageNumber: 1 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Current Page: 1 Total Pages: 5
-Route: index2 PageNumber: 2 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Current Page: 2 Total Pages: 5
-Route: index PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
 Current Page: 0 Total Pages: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
+Current Page: 2 Total Pages: 5
 Current Page: 3 Total Pages: 5
-Route: tag,codebuild PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,windows PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,powershell PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,firebase PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,api gateway PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-   Generating static pages (31/124) 
-Route: tag,cicd PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,docker PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,codecommit PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,codepipeline PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,ec2 PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,node.js PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,ansible PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,cloudflare PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,vim PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,gcp PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,s3 PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,pure storage PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,remote access PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,bash PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,pypi PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,minecraft PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,email PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,wifi PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,chrome PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,ssh PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,postfix PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,pelican PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: rhel-virtio-initrd PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,ci/cd PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: tag,dns PageNumber: 0 PageCount: 1
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openssl-csr-san PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: mac-vlan-thunderbolt PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: ubuntu-nfs-server PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: ceph-reference PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openstack-fix-cli PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: windows-kvm-command-line PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: python-http-transfer PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: packet-tracing-reference PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: github-pages PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-   Generating static pages (62/124) 
-Route: python-ceph PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: firebase-circleci-cd PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-labmda-codecommit PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-codepipeline-ecr PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: certbot PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openstack-cloudinit-powershell PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-api-gateway-iam PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-lambda-iam PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-ec2-python PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: firebase-hello-world PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-lambda PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: ubuntu-trust-corporate-ca PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: windows-kvm-drivers PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: mac-fix-usb-drive PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: nodejs-ansible PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openstack-ansible PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openstack PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: cloudflare-https-frontend PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: gcp PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: vim-spellcheck PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: gcp-cloud-functions PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: gcp-firestore-python PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-s3-python PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-fargate PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: dial-home-device PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: ops-cheatsheet PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: errors PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-   Generating static pages (93/124) 
-Route: docker-shared-memory PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: git-reference PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: python-pypi PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: python-sql-json PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: gaming-minecraft-feedthebeast PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: python-cheat-sheet PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: ubuntu-wifi-to-wired-router PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: aws-ecr PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openstack-kolla-custom-plugin PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: email-spf PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: x11-forwarding-ubuntu18 PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: emails-bash-cron PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: ubuntu-bionic-wifi PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: ssh-tunnel PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openstack-aio-ka-metal PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: emails-postfix-ubuntu PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: openstack-aio-ka-vm PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: automated-emails PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: google-cloud-storage-website PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: dns-xfer-godaddy-cloudflare PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: google-cloud-build PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: google-container-registry PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: pelican-dev-environment PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: docker-pelican-image PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: writing-pelican-content PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
-Route: blog-website PageNumber: 0 PageCount: 5
-GitService: ca6875221b43bd81b6d2d6ba311abdc869772d9e 2024-07-09
- ✓ Generating static pages (124/124) 
+Current Page: 1 Total Pages: 5
+   Generating static pages (31/124) 
+   Generating static pages (62/124) 
+   Generating static pages (93/124) 
+ ✓ Generating static pages (124/124)
    Finalizing page optimization ...
    Collecting build traces ...
  ⚠ rewrites, redirects, and headers are not applied when exporting your application, detected (rewrites). See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
 
 Route (pages)                              Size     First Load JS
-┌   /_app                                  0 B             166 kB
-├ ● /[...route] (14064 ms)                 46.5 kB         212 kB
-├   ├ /index (1864 ms)
-├   ├ /index2 (1851 ms)
-├   ├ /index1 (1830 ms)
-├   ├ /index3 (1791 ms)
-├   ├ /index4 (1592 ms)
-├   ├ /index5 (1567 ms)
+┌   /_app                                  0 B             167 kB
+├ ● /[...route] (13988 ms)                 47.6 kB         215 kB
+├   ├ /index3 (1850 ms)
+├   ├ /index1 (1841 ms)
+├   ├ /index2 (1835 ms)
+├   ├ /index (1817 ms)
+├   ├ /index4 (1743 ms)
+├   ├ /index5 (1626 ms)
 ├   ├ /category/cloud
 ├   └ [+115 more paths]
-└ ○ /404                                   379 B           166 kB
-+ First Load JS shared by all              166 kB
+└ ○ /404                                   378 B           167 kB
++ First Load JS shared by all              167 kB
   ├ chunks/framework-11004818aa805a6b.js   46.8 kB
-  ├ chunks/main-3df64238c1a66ec7.js        72.3 kB
-  ├ chunks/pages/_app-a7782ed52ece8aaf.js  44.5 kB
+  ├ chunks/main-94ad46a48d932dcb.js        72.7 kB
+  ├ chunks/pages/_app-8ea7a865a7343f2e.js  45.2 kB
   └ other shared chunks (total)            2.56 kB
 
 ○  (Static)  prerendered as static content

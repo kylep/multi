@@ -1,4 +1,7 @@
-import '../styles/globals.css';
+import '../public/css/globals.css';
+import '../public/css/prism.css';
+import '../public/js/prism.js';
+
 import Head from 'next/head';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
