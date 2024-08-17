@@ -12,41 +12,44 @@
  ⚠ Production code optimization has been disabled in your project. Read more: https://nextjs.org/docs/messages/minification-disabled
  ✓ Compiled successfully
    Collecting page data ...
-   Generating static pages (0/124) ...
+   Generating static pages (0/125) ...
+Current Page: 4 Total Pages: 5
 Warning: data for page "/[...route]" (path "/category/cloud") is 136 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
 See more info here: https://nextjs.org/docs/messages/large-page-data
+Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Btagline%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:490)
+    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
+    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
+    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
+    at Zc (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:71:145)
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:89)
+    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
+    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
+
+Error occurred prerendering page "/about". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Btagline%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:490)
+    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
+    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
+    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
+    at Zc (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:71:145)
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:89)
+    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
+    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
+    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
 Current Page: 5 Total Pages: 5
-Current Page: 4 Total Pages: 5
-Current Page: 0 Total Pages: 5
-Current Page: 2 Total Pages: 5
 Current Page: 3 Total Pages: 5
+Current Page: 2 Total Pages: 5
+Current Page: 0 Total Pages: 5
 Current Page: 1 Total Pages: 5
-   Generating static pages (31/124) 
-   Generating static pages (62/124) 
-   Generating static pages (93/124) 
- ✓ Generating static pages (124/124)
-   Finalizing page optimization ...
-   Collecting build traces ...
- ⚠ rewrites, redirects, and headers are not applied when exporting your application, detected (rewrites). See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
+   Generating static pages (31/125) 
+   Generating static pages (62/125) 
+   Generating static pages (93/125) 
+ ✓ Generating static pages (125/125)
 
-Route (pages)                              Size     First Load JS
-┌   /_app                                  0 B             167 kB
-├ ● /[...route] (13988 ms)                 47.6 kB         215 kB
-├   ├ /index3 (1850 ms)
-├   ├ /index1 (1841 ms)
-├   ├ /index2 (1835 ms)
-├   ├ /index (1817 ms)
-├   ├ /index4 (1743 ms)
-├   ├ /index5 (1626 ms)
-├   ├ /category/cloud
-├   └ [+115 more paths]
-└ ○ /404                                   378 B           167 kB
-+ First Load JS shared by all              167 kB
-  ├ chunks/framework-11004818aa805a6b.js   46.8 kB
-  ├ chunks/main-94ad46a48d932dcb.js        72.7 kB
-  ├ chunks/pages/_app-8ea7a865a7343f2e.js  45.2 kB
-  └ other shared chunks (total)            2.56 kB
-
-○  (Static)  prerendered as static content
-●  (SSG)     prerendered as static HTML (uses getStaticProps)
-
+> Export encountered errors on following paths:
+	/about

@@ -70,7 +70,7 @@ function HeaderNavLink({ href, children, sx }) {
 }
 
 // Wrapper for the entire footer
-function SiteNavHeader() {
+export function SiteNavHeader() {
   return (
     <AppBar position="static" data-testid="Nav-AppBar" sx={{backgroundColor: 'white' }}>
       <Toolbar disableGutters variant="dense" data-testid="Nav-Toolbar" >
@@ -110,7 +110,10 @@ function SiteFooter() {
 
 
 // This is the main container that all pages are expected to be wrapped in
-function SiteLayout({ children }) {
+function SiteLayout({ children, context = true }) {
+  // with no context we cant render the sidebar or footer
+  const sidebar_element = context ? <BlogSidebar /> : null;
+  const footer_element = context ? <SiteFooter /> : null;
   return (
     <box suppressHydrationWarning>
       <SiteNavHeader />
@@ -119,9 +122,9 @@ function SiteLayout({ children }) {
         <Box sx={{width: 'calc(100% - 200px)', padding: '20px', }}>
           {children}
         </Box>
-        <BlogSidebar/>
+        {sidebar_element}
       </ResponsiveRow>
-      <SiteFooter></SiteFooter>
+      {footer_element}
     </box>
   );
 }
