@@ -21,7 +21,7 @@ roles. It builds on the function written [in my last post](/aws-lambda.html)
 
 ---
 
-# TOC
+### Table of Contents
 
 ---
 

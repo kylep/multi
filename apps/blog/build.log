@@ -16,40 +16,38 @@
 Current Page: 4 Total Pages: 5
 Warning: data for page "/[...route]" (path "/category/cloud") is 136 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
 See more info here: https://nextjs.org/docs/messages/large-page-data
-Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Btagline%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:490)
-    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
-    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
-    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
-    at Zc (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:71:145)
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:89)
-    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
-    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
-
-Error occurred prerendering page "/about". Read more: https://nextjs.org/docs/messages/prerender-error
-
-Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Btagline%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:490)
-    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
-    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
-    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
-    at Zc (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:71:145)
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:89)
-    at $c (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:78:98)
-    at bd (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:77:404)
-    at Z (/Users/kp/gh/multi/apps/blog/blog/node_modules/react-dom/cjs/react-dom-server.browser.production.min.js:76:217)
 Current Page: 5 Total Pages: 5
-Current Page: 3 Total Pages: 5
 Current Page: 2 Total Pages: 5
+Current Page: 3 Total Pages: 5
 Current Page: 0 Total Pages: 5
 Current Page: 1 Total Pages: 5
    Generating static pages (31/125) 
    Generating static pages (62/125) 
    Generating static pages (93/125) 
  ✓ Generating static pages (125/125)
+   Finalizing page optimization ...
+   Collecting build traces ...
+ ⚠ rewrites, redirects, and headers are not applied when exporting your application, detected (rewrites). See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
 
-> Export encountered errors on following paths:
-	/about
+Route (pages)                              Size     First Load JS
+┌   /_app                                  0 B             214 kB
+├ ● /[...route] (11556 ms)                 12.8 kB         262 kB
+├   ├ /index1 (1585 ms)
+├   ├ /index (1570 ms)
+├   ├ /index3 (1488 ms)
+├   ├ /index2 (1479 ms)
+├   ├ /index5 (1210 ms)
+├   ├ /tag/openssl (969 ms)
+├   ├ /index4
+├   └ [+115 more paths]
+├ ○ /404                                   378 B           214 kB
+└ ○ /about (633 ms)                        9.03 kB         259 kB
++ First Load JS shared by all              216 kB
+  ├ chunks/framework-11004818aa805a6b.js   46.8 kB
+  ├ chunks/main-94ad46a48d932dcb.js        72.7 kB
+  ├ chunks/pages/_app-d300fffa6dcfcdc5.js  92 kB
+  └ other shared chunks (total)            4.31 kB
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses getStaticProps)
+

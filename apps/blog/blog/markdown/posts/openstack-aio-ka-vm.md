@@ -11,12 +11,7 @@ image: openstack-kolla.png
 thumbnail: openstack-kolla-thumb.png
 ---
 
-
-**This post is linked to from the [OpenStack Deep Dive Project](/openstack.html)**
-
----
-
-[TOC]
+### Table of Contents
 
 ---
 

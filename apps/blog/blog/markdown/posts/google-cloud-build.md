@@ -11,16 +11,7 @@ image: google-cloud-build.png
 thumbnail: google-cloud-build-thumb.png
 ---
 
-
-**This post is linked to from the [Blog Website Project](/blog-website.html)**
-
-**This post is linked to from the [GCP: Deep Dive Project](/gcp.html)**
-
----
-
-
-[TOC]
-
+### Table of Contents
 
 ---
 

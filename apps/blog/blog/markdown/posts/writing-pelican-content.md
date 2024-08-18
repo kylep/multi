@@ -11,12 +11,6 @@ image: pelican.png
 thumbnail: pelican-thumb.png
 ---
 
-**This post is linked to from the [Blog Website Project](/blog-website.html)**
-
----
-
-
-
 # What is Pelican
 
 [Pelican](https://github.com/getpelican/pelican) is a free and open source

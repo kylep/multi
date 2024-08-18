@@ -11,11 +11,7 @@ image: windows.png
 thumbnail: windows-thumb.png
 ---
 
-**This post is linked to from the [OpenStack Deep Dive Project](/openstack.html)**
-
----
-
-[TOC]
+### Table of Contents
 
 ---
 

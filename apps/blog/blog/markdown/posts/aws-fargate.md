@@ -11,18 +11,13 @@ image: aws-fargate.png
 thumbnail: aws-fargate-thumb.png
 ---
 
-
-**This post is linked to from the [AWS: Deep Dive Project](/aws.html)**
-
----
-
 How to run a docker container on AWS ECS (Elastic Compute Cloud)  using the AWS 
 web console. A container from the Elastic Container Registry will be launched.
 It will run on Amazon's [Fargate Container-as-a-Service](https://aws.amazon.com/fargate/).
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

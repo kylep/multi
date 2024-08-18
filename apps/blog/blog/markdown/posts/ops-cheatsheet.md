@@ -20,7 +20,7 @@ This reference page contains operations-related mini-guides and minor posts.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

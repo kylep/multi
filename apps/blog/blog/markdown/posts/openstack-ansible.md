@@ -11,13 +11,6 @@ image: openstack.png
 thumbnail: openstack-thumb.png
 ---
 
-
-**This post is linked to from the [OpenStack Deep Dive Project](/openstack.html)**
-
----
-
-
-
 **Assumption:** To avoid dealing with varying OpenStack policy configuration,
 it's assumed that the scoped user has both `_member_` and `admin` on the scoped
 project.
@@ -31,7 +24,7 @@ to deploy workloads to an already-deployed cloud.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

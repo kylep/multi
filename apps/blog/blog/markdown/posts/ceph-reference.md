@@ -11,10 +11,7 @@ image: ceph.png
 thumbnail: ceph-thumb.png
 ---
 
-
----
-
-[TOC]
+### Table of Contents
 
 ---
 

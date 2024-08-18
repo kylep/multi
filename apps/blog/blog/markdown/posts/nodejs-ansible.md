@@ -17,7 +17,7 @@ solution to this and thought the solutions I found looked way too complicated.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

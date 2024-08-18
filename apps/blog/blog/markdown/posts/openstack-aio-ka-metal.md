@@ -11,12 +11,6 @@ image: openstack-kolla.png
 thumbnail: openstack-kolla-thumb.png
 ---
 
-
-
-**This post is linked to from the [OpenStack Deep Dive Project](/openstack.html)**
-
----
-
 This guide installs OpenStack on a single metal server.
 
 To install OpenStack, I use [Kolla-Ansible](https://github.com/openstack/kolla-ansible),
@@ -37,7 +31,7 @@ for overcloud networking, and include the following OpenStack APIs:
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

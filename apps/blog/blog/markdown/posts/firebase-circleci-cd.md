@@ -11,8 +11,7 @@ image: google-firestore.png
 thumbnail: google-firestore-thumb.png
 ---
 
-
-[TOC]
+### Table of Contents
 
 ---
 

@@ -12,10 +12,12 @@ const About = () => {
             <h1>About</h1>
             <img src = "/images/kyle-school-computers.png" alt="Me" className="me" />
             <hr />
-            <pre><code>
-                "Find a job you enjoy doing, and you will never have to work a day in your life." <br />
-                - Mark Twain
-            </code></pre>
+            <pre className={"language-python"}>
+                <code className={"language-python"}>
+                    "Find a job you enjoy doing, and you will never have to work a day in your life." <br />
+                    - Mark Twain
+                </code>
+            </pre>
             <hr />
             <h2>Social</h2>
             <Box sx={{ textAlign: "center", width: "100%", border: 0 }}>

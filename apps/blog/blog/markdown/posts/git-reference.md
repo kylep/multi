@@ -20,7 +20,7 @@ This page covers how to do some things in Git.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

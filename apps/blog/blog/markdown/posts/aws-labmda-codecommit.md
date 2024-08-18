@@ -12,11 +12,6 @@ thumbnail: aws-thumb.png
 ---
 
 
-**This post is linked to from the [AWS: Deep Dive Project](/aws.html)**
-
----
-
-
 This post is a follow-up to my [authenticated API Gateway post](/aws-api-gateway-iam.html).
 
 I've written a Lambda function and presented it using API Gateway. The API
@@ -30,10 +25,9 @@ guide.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
-
 
 # Create an S3 Bucket
 

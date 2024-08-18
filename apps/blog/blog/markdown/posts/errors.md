@@ -22,7 +22,7 @@ wants to talk about it.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

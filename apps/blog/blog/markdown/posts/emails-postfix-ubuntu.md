@@ -11,12 +11,6 @@ image: postfix.png
 thumbnail: postfix-thumb.png
 ---
 
-
-**This post is linked to from the [Automated Emails Project](/project-email.html)**
-
----
-
-
 In order to send emails from a VM you need a mail server. Often you can use
 a public, corproate, or cloud mail server, but sometimes you might need to
 deploy your own locally.
@@ -27,7 +21,7 @@ a dedicated Ubuntu VM.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

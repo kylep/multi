@@ -11,12 +11,6 @@ image: clock.png
 thumbnail: clock-thumb.png
 ---
 
-
-**This post is linked to from the [Automated Emails Project](/project-email.html)**
-
----
-
-
 This post covers how to create a bash script that runs every minute to send an
 email when a ping fails.
 
@@ -32,7 +26,7 @@ whatever other test you like.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

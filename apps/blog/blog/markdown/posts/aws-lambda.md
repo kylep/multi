@@ -11,14 +11,9 @@ image: aws-lambda.png
 thumbnail: aws-lambda-thumb.png
 ---
 
-
-**This post is linked to from the [AWS: Deep Dive Project](/aws.html)**
-
----
-
 This post covers the basics of using AWS Lambda functions.
 
-[TOC]
+### Table of Contents
 
 ---
 

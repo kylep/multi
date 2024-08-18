@@ -18,7 +18,7 @@ painful.
 This post will be updated frequently as I find more stuff I feel aught to be
 changed.
 
-[TOC]
+### Table of Contents
 
 ---
 

@@ -26,7 +26,7 @@ server it launched from.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 

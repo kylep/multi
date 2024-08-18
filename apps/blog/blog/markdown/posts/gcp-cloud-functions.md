@@ -18,7 +18,7 @@ IP address from the HTTP request, and return `Hello <source IP>`.
 
 ---
 
-[TOC]
+### Table of Contents
 
 ---
 
