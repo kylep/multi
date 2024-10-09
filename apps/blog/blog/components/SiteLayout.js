@@ -17,9 +17,11 @@ function ResponsiveRow({ children, sx }) {
   return (
     <Box sx={{ 
       display: 'flex',
+      flexDirection: ['column-reverse', 'row'],  // Stacks children vertically on smallest screens
       pl: '2%',
       pr: '2%' ,
-      '@media (min-width:600px)': { pl: '3%', pr: '3%' },
+      '@media (min-width:0px)': { flexDirection: 'row', pl: '3%', pr: '3%' },
+      '@media (min-width:600px)': { flexDirection: 'row', pl: '3%', pr: '3%' },  // Switches to horizontal layout on larger screens
       '@media (min-width:900px)': { pl: '6%', pr: '6%' },
       '@media (min-width:1200px)': { pl: '9%', pr: '9%' },
       ...sx,
@@ -37,7 +39,8 @@ function SiteTitle() {
       flexDirection: 'column',
       flexWrap: 'wrap',
       width: '100%', 
-      height: "200px",
+      '@media (min-width:0px)': { height: "170px"},
+      '@media (min-width:600px)': { height: "200px"},
       backgroundColor: "#EEEEEE",
     }}>
       <Typography variant="titleHeaderH1" component="h1" sx={{
@@ -97,11 +100,16 @@ function SiteFooter() {
         justifyContent: 'center',
         alignItems: 'center',
         border: "1px dotted #AAAAAA",
+        padding: '0 10px'
       }}
     >
-      <Typography variant="footerText" sx={{ textAlign: 'center' }}>
-        Blog code last updated on {globalData.data.siteLastModified}:&nbsp;
-        <a href={`https://github.com/kylep/multi/commit/${globalData.data.lastGitCommitHash}`}>{globalData.data.lastGitCommitHash}</a>
+      <Typography variant="footerText" sx={{ 
+        textAlign: 'center',
+        wordWrap: 'break-word',  // ensure sha does not overflow on mobile
+        overflowWrap: "anywhere",
+      }}>
+        Blog code last updated on {globalData.data.siteLastModified}:  
+        <a href={`https://github.com/kylep/multi/commit/${globalData.data.lastGitCommitHash}`}> {globalData.data.lastGitCommitHash}</a>
       </Typography>
     </ResponsiveRow>
   );
@@ -119,10 +127,19 @@ function SiteLayout({ children, context = true }) {
       <SiteNavHeader />
       <SiteTitle />
       <ResponsiveRow>
-        <Box sx={{width: 'calc(100% - 200px)', padding: '20px', }}>
+        <Box sx={{
+            width: 'calc(100% - 200px)', 
+            width: ['100%', 'calc(100% - 200px)'], // Full width on small screens, adjusted when sidebar is alongside
+            padding: '20px', 
+          }}>
           {children}
         </Box>
-        {sidebar_element}
+        <Box sx={{
+          width: ['100%', '200px'],
+          order: [-1, 0]  // Moves sidebar to the bottom on small screens
+        }}>
+          {sidebar_element}
+        </Box>
       </ResponsiveRow>
       {footer_element}
     </box>

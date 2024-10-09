@@ -4,6 +4,5 @@ services:
       context: .
       dockerfile: Dockerfile
     image: gcr.io/kylepericak/nodejs:latest
-  
 
 

@@ -6,7 +6,7 @@ This blog was previously powered by [Python Pelican](https://getpelican.com/), a
 nothing wrong with that, but I wanted to learn something new and modern. Plus I'd gone a few years without
 writing to my blog so I figured a new framework might help motivate me.
 
-## Set up the build environment
+## Setting up the dev environment
 
 Install next and the dependencies
 ```bash
@@ -49,21 +49,14 @@ manually re-run the build each change.
 bin/start-staging-nginx.sh
 ```
 
-## Deploy to production
+## Deploying to production
 
-Ships the build artifacts from out/ up to GCP where they're hosted.
-While I'm not using Pelican any more, I covered the infrastructure that uses in my old
-blog's Project post [here](https://kyle.pericak.com/blog-website.html).
+This should be done by merging your changes to main. The automation ships the build
+artifacts from out/ up to GCP where they're hosted. While I'm not using Pelican any
+more, I covered the infrastructure that uses in my old blog's Project post
+[here](https://kyle.pericak.com/blog-website.html).
 
-This is handled by the CI pipeline, but you can run it manually, too.
-
-### Build the docker image
-
-
-```bash
-bin/prod-deploy.sh
-```
-
+The core logic of the build and deploy can be found in `bin/prod-deploy.sh`
 
 ---
 
@@ -97,4 +90,27 @@ When rendering the static site, it works to create a .html file for each element
 ## Syntax Highlighting
 
 I only downloaded the prism.js languages that I figured I was likely to use. If one isn't working,
-probably need a new css file. 
+probably need a new css file.
+
+
+---
+
+# Build & CI Pipeline Details
+
+- The blog is hosted as static files in a GCP storage bucket that is public to the internet.
+- Google Cloud Build is configured to read `apps/blog/cloudbuild.yaml` on commit.
+- The Cloud Build Trigger is in the `global` region. You can find the config in `tf/`.
+
+
+## Applying the TF to config the cloud build setup
+
+This isn't in CI itself, sort of a chicken and egg thing. I just use my default gcloud
+auth with my own account for this, so no service account is involved here.
+
+```
+gcloud auth application-default login
+cd tf
+terraform init
+terraform plan  # Review the changes
+terraform apply
+```

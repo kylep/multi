@@ -23,7 +23,9 @@ const theme = createTheme({
     fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
     titleHeaderH1: {
       fontWeight: 500,
-      fontSize: '63px',
+      fontSize: ['50px', '63px'],
+      '@media (min-width:0px)': { fontSize: "50px"},
+      '@media (min-width:600px)': { fontSize: "63px"},
       color: customColors.headerBlue,
     },
     titleHeaderH3: {

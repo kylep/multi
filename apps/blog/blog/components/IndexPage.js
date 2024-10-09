@@ -8,7 +8,6 @@ function IndexRowContainer({ children, sx }) {
   return (
     <Box sx={{
       width: '100%',
-      height: "80px",
       display: 'flex',
       flexDirection: 'row',
       borderBottom: '1px dotted black',
@@ -58,8 +57,7 @@ function IndexPostTitle({ children, sx }) {
     <Typography sx={{
       fontWeight: 500,
       color: 'rgb(35, 82, 124)',
-      fontSize: "18px",
-      height: "24px",
+      fontSize: ['16px', '18px'],  // Smaller font size on smaller screens
       ...sx
     }}>
       {children}
