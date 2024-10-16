@@ -4,5 +4,6 @@ services:
       context: ../..
       dockerfile: apps/blog/Dockerfile
     image: gcr.io/kylepericak/kylepericakdotcom:latest
+    platform: linux/amd64
 
 
