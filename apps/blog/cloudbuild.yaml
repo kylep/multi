@@ -1,11 +1,10 @@
 steps:
 
-  - name: gcr.io/kylepericak/pelican:latest
-    entrypoint: pelican
-    args: ["/workspace/content",
-           "-o", "/workspace/output",
-           "-s", "/workspace/pelicanconf.py",]
+  - name: gcr.io/kylepericak/kylepericakdotcom
+    entrypoint: bash
+    args: ["bin/build-blog-files.sh", "/workspace/out"]
+    dir: "/app"
 
   - name: gcr.io/cloud-builders/gcloud
     entrypoint: gsutil
-    args: ["-m", "rsync", "-r", "-c", "-d", "./output", "gs://kyle.pericak.com"]
+    args: ["-m", "rsync", "-r", "-c", "-d", "/workspace/out", "gs://kyle.pericak.com"]

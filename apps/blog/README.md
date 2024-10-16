@@ -38,7 +38,7 @@ to how prod works.
 bin/start-dev-npm.sh
 ```
 
-## Launch the staging env
+## Launch the (local) staging env
 
 This behaves more like how prod works, using the actual static files from the build
 and serving them from a Docker container on a different port. It does volume-mount,
@@ -49,14 +49,6 @@ manually re-run the build each change.
 bin/start-staging-nginx.sh
 ```
 
-## Deploying to production
-
-This should be done by merging your changes to main. The automation ships the build
-artifacts from out/ up to GCP where they're hosted. While I'm not using Pelican any
-more, I covered the infrastructure that uses in my old blog's Project post
-[here](https://kyle.pericak.com/blog-website.html).
-
-The core logic of the build and deploy can be found in `bin/prod-deploy.sh`
 
 ---
 
@@ -73,10 +65,10 @@ When rendering the static site, it works to create a .html file for each element
 ## Styling & Content Paths
 
 - I've tried to keep the styles as close to the code as possible.  Primarily in react's `sx` props on page components
-- Components are defined in `blog/components`. 
+- Components are defined in `blog/components`.
   - The common/base page component is `blog/pages/[..route.js]`. It handles routes and page structure.
   - Components have been organized to have 1 export per file.
-- Theme styles and `<head>` are in `pages/_app.js`. 
+- Theme styles and `<head>` are in `pages/_app.js`.
   - Theme CSS is used mainly for component elements that can use `<Typography>` blocks
 - Global styles, and specifically styles for blog post content that gets rendered to HTML by `remark`, are in `styles/globals.css` since they can't easily use `<Typography>`
 
@@ -95,22 +87,49 @@ probably need a new css file.
 
 ---
 
-# Build & CI Pipeline Details
+
+# Prod Build & CI Pipeline Details
 
 - The blog is hosted as static files in a GCP storage bucket that is public to the internet.
 - Google Cloud Build is configured to read `apps/blog/cloudbuild.yaml` on commit.
 - The Cloud Build Trigger is in the `global` region. You can find the config in `tf/`.
 
 
-## Applying the TF to config the cloud build setup
+## IaC Google Cloud Build Setup
 
 This isn't in CI itself, sort of a chicken and egg thing. I just use my default gcloud
 auth with my own account for this, so no service account is involved here.
 
-```
+```bash
 gcloud auth application-default login
 cd tf
 terraform init
 terraform plan  # Review the changes
 terraform apply
 ```
+
+## Building and pushing the Docker image
+
+This is also outside of CI. I could make it fancy and only conditionally build it
+but honestly I'm working alone on this so just manually build and push it when it needs
+to change. Easiest way to do this is to run `build-and-push-docker-image.sh`, but the
+script is really just a reminder of the following commands.
+
+```bash
+gcloud auth configure-docker
+docker-compose build
+docker push gcr.io/kylepericak/kylepericakdotcom:latest
+```
+
+## Testing the Google Cloud Build setup
+
+GCB has a `/workspace` dir mounted to all running containers in a cloud build.
+This is used to first store the static files, then rsync them up to the storage bucket.
+
+Here's a command to test that build command locally:
+
+```bash
+docker run --rm -v ./blog/markdown:/app/blog/markdown:ro -v ./workspace:/workspace -it gcr.io/kylepericak/kylepericakdotcom bash /app/bin/build-blog-files.sh /workspace/out
+```
+
+

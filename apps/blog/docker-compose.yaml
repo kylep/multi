@@ -1,8 +1,8 @@
 services:
-  npm_builder:
+  kylepericakdotcom:
     build:
-      context: .
-      dockerfile: Dockerfile
-    image: gcr.io/kylepericak/nodejs:latest
+      context: ../..
+      dockerfile: apps/blog/Dockerfile
+    image: gcr.io/kylepericak/kylepericakdotcom:latest
 
 
