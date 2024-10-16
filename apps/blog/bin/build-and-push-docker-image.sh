@@ -4,5 +4,5 @@ if [ ! -d bin/ ]; then
   exit 1
 fi
 
-docker-compose build
+docker-compose --progress plain build
 # docker push gcr.io/kylepericak/kylepericakdotcom:latest
