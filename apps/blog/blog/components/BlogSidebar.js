@@ -38,7 +38,12 @@ function TagList() {
   const theme = useTheme();
 
   return (
-    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', marginTop: "10px", }}>
+    <Box sx={{ 
+      display: 'grid', 
+      gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+      gap: '1px', 
+      marginTop: "10px", 
+    }}>
       <Box sx={{ gridColumn: 'span 3' }}>
         <Typography variant="h5">Tags</Typography>
       </Box>
