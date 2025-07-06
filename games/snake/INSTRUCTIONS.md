@@ -75,18 +75,29 @@ The game will start in full-screen mode!
   - → Right arrow: Move right
 - **Q key**: Quit the game
 
-**Game Rules (Version 0):**
+**Game Rules (Version 1):**
 - The snake starts as a 2-square long snake (1 yellow head + 1 white body)
 - Use arrow keys to control the snake's direction
 - The snake moves continuously at a fixed speed
 - If the snake goes off the edge of the screen, it appears on the opposite side
-- The snake doesn't grow in this version (that's coming in v1!)
+- **Green squares (2x2)** are food - eat them to grow and score points! (Much easier to hit!)
+- **Red squares** are obstacles - avoid them or the game ends
+- Red squares appear after you eat your first green square
+- Green squares never spawn over red squares
+- Score increases with each green square eaten
+- If you hit yourself or a red square, the game ends
+- **Win condition**: If no space remains for new green squares, you win!
+- Press any key to restart after game over
 
 **What You'll See:**
 - A black screen with a 100x60 grid
 - A yellow square (the snake's head)
-- A white square (the snake's body)
+- White squares (the snake's body)
+- A large green square (2x2 food to eat) - much easier to hit!
+- Red squares (obstacles to avoid) - appear after first green square
+- Score counter in the top left corner
 - The snake moving around the screen
+- "You Win!" message when you fill the board
 
 ### Exiting the Game
 - Press **Q** to quit the game
@@ -122,10 +133,20 @@ This game is designed to be educational! Here's what you can learn:
 
 ## Next Steps
 
-Once you're comfortable with this version, look forward to v1 which will add:
-- Food for the snake to eat
-- Snake growth when eating
-- Score tracking
-- Game over conditions
+You've completed V1! The game now includes:
+- ✅ Food for the snake to eat (2x2 green squares - easier to hit!)
+- ✅ Snake growth when eating
+- ✅ Score tracking
+- ✅ Game over conditions
+- ✅ Restart functionality
+- ✅ Win condition when board is full
+- ✅ Smart spawning (green squares never overlap red obstacles)
+
+Future versions could add:
+- Different types of food with different effects
+- Power-ups
+- Multiple levels
+- High score tracking
+- Sound effects
 
 Have fun coding! 🐍 
