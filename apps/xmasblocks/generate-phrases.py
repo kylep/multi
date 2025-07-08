@@ -60,6 +60,11 @@ print("removing words we can't form from these blocks")
 formable_words = [word for word in trimmed_dictionary if can_form_word(word, blocks)]
 print(f"filtered down to {len(formable_words)} words")
 
+# write formable_words to a file
+with open('formable_words.txt', 'w') as f:
+    for word in formable_words:
+        f.write(word + '\n')
+
 tried = 0
 def build_phrases_recursive(remaining_blocks: list[list[str]], current_phrase: list[str], max_words: int = 5) -> list[list[str]]:
     global tried
@@ -93,7 +98,6 @@ for phrase in all_phrases:
     phrase_list.add(phrase_str)
 
 print(f"Generated {len(phrase_list)} unique phrases")
-print("Done 100% - writing to phrase-list.txt")
 with open('phrase-list.txt', 'w') as f:
     for word in sorted(phrase_list):
         f.write(word + '\n')
