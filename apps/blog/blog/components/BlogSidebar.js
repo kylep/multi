@@ -70,10 +70,11 @@ function TagList() {
   );
 }
 
-function BlogSidebar(sx) {
+function BlogSidebar({ sx }) {
   return (
     <Box sx={{
-      width: 300,
+      width: '100%',
+      maxWidth: 300,
       padding: '20px',
       ...sx
     }}>
