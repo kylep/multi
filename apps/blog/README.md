@@ -22,7 +22,7 @@ Renders all the markdown files using the templating defined in this project,
 then outputs them to `out/` as .html files to be served as static content.
 
 ```bash
-bin/build-blog-files.sh
+bin/build-blog-files.sh blog/out/
 ls blog/out/
 ```
 
@@ -33,6 +33,8 @@ totally aligned with how it works in production. NextJS can be all
 too willing to act as a backend client-side rendering server instead of
 just a static site generator. At this point I think I've got dev working very closely
 to how prod works.
+
+If you get a 404 on `http://localhost:3000`, try `http://localhost:3000/index1`
 
 ```bash
 bin/start-dev-npm.sh
