@@ -8,6 +8,11 @@ if [ ! -d bin/ ]; then
       exit 1
 fi
 
+if [[ "$1" == "" ]]; then
+  echo "ERROR: output_dir pos arg is reuqired"
+  exit 1
+fi
+
 cd blog
 mkdir -p out/
 
