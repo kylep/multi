@@ -74,7 +74,7 @@ export function SiteNavHeader() {
   return (
     <AppBar position="static" data-testid="Nav-AppBar" sx={{backgroundColor: 'white' }}>
       <Toolbar disableGutters variant="dense" data-testid="Nav-Toolbar" >
-        <ResponsiveRow data-testid="Nav-ResponsiveRow">
+        <ResponsiveRow data-testid="Nav-ResponsiveRow" sx={{ flexDirection: 'row' }}>
           <HeaderNavLink href="/" data-testid="Nav-Link-Home" sx={{marginLeft: 0}}><HomeIcon /></HeaderNavLink>
           <HeaderNavLink href="/index1.html" data-testid="Nav-Link-Archive">Archive</HeaderNavLink>
           <HeaderNavLink href="/about.html" data-testid="Nav-Link-About">About</HeaderNavLink>
