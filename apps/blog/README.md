@@ -51,6 +51,15 @@ manually re-run the build each change.
 bin/start-staging-nginx.sh
 ```
 
+## Manually push files to prod
+
+The CI should push the files up to prod, but if you're impatient or it's not working,
+build and push yourself. Make sure your gcloud cli is authd first.
+
+```
+build-blog-files.sh
+bin/prod-deploy.sh
+```
 
 ---
 

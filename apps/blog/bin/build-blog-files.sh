@@ -8,10 +8,6 @@ if [ ! -d bin/ ]; then
       exit 1
 fi
 
-if [[ "$1" == "" ]]; then
-  echo "ERROR: output_dir pos arg is reuqired"
-  exit 1
-fi
 
 cd blog
 mkdir -p out/
@@ -22,6 +18,11 @@ exec npm run build 2>&1 | tee ../build.log
 
 # copy index1.html to index.html for convenience and better ux
 cp out/index1.html out/index.html
+
+if [[ "$1" == "" ]]; then
+  echo "WARNING: output_dir pos arg is reuqired if copying to volume mount"
+  exit 0
+fi
 
 # Copy the contents to a directory im allowed to volume mount (same nextjs hack)
 cd ..
