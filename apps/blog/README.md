@@ -144,3 +144,20 @@ docker run --rm -v ./blog/markdown:/app/blog/markdown:ro -v ./workspace:/workspa
 ```
 
 
+---
+
+# Instructions for AI Agents
+
+## Authoring blog posts
+- Always use the same front matter keys as the other posts have.
+- Try to keep text lines at 88 chars or shorter so they're easier to manually review in tmux
+- Don't introduce new markup techniques, but you can use any that are supported already
+
+## Testing Commands
+```
+npm run build
+npm run lint
+npm test
+```
+
+.
