@@ -29,4 +29,4 @@ cd ..
 output_dir=$1
 echo "Copying the static files to $output_dir"
 mkdir -p $1
-cp -r blog/out/* $1/
+cp -r blog/out/* $1/ 2>&1 | grep -v "(not copied)"
