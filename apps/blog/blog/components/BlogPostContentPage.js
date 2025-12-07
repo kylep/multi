@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import { useEffect } from 'react';
 
 
 
@@ -18,6 +19,26 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
         thumbnail: 'gear-thumb.png'
     }
     */
+    useEffect(() => {
+        let isMounted = true;
+
+        async function initializeMermaid() {
+            const mermaidModule = await import('mermaid');
+            if (!isMounted) {
+                return;
+            }
+            const mermaid = mermaidModule.default;
+            mermaid.initialize({ startOnLoad: true, securityLevel: 'loose' });
+            mermaid.contentLoaded();
+        }
+
+        initializeMermaid();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [contentHtml]);
+
     return (
         <Box>
             <Box sx={{ marginBottom: '20px' }}>
