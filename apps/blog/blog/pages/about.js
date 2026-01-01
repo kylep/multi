@@ -63,7 +63,7 @@ const About = () => {
 
                 My name's Kyle Pericak, and I'm a technological jack-of-all-trades working around the Toronto, Canada area.  <br /><br />
 
-                I'm currently employed as a Senior Engineering Director running the Infrastructure organization at <a href="https://super.com">Super.com</a>, where I'm responsible for the DevOps/Infra, QA, TAM, Security, and Sales/Support Tooling teams.<br />
+                I'm currently employed as a Senior Engineering Director - Infrastructure at <a href="https://super.com">Super.com</a>, where I'm responsible for DevOps/Infra, QA, TAM/PSE, Security, and Sales/Support Tooling teams.<br />
                 I'm most interested in leading areas related to infrastructure, developer experience/productivity, platform engineering, security, and full stack software engineering. <br /><br />
 
                 While I work in a purely public-cloud environment lately (mainly AWS), physical datacenters are my <i>happy place</i> and OpenStack + Ceph hold a place in my heart. <br /><br />
