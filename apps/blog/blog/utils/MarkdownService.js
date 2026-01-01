@@ -4,9 +4,10 @@ import { remark } from 'remark';
 import fs from 'fs';
 import remarkHtml from 'remark-html'
 // Table of Contents: Converts "### Table of Contents"
-import remarkToc from 'remark-toc'; 
+import remarkToc from 'remark-toc';
 // GitHub Flavored Markdown: autolink literals, footnotes, strikethrough, tables, tasklists
-import remarkGfm from 'remark-gfm'; 
+import remarkGfm from 'remark-gfm';
+import remarkMermaidToHtml from './RemarkMermaid.js';
 
 
 
@@ -72,11 +73,12 @@ class MarkdownService {
 		// contentHtml is the rendered markdown, metaData is the front matter as a flat object
 		const { data: metaData, content: markdown } = matter(rawMarkdown);
 		MarkdownService.#serializeDates(metaData); 
-		const result = await remark()
-			.use(remarkGfm)
-			.use(remarkToc, {heading: 'Table of contents'})
-			.use(remarkHtml)
-			.process(markdown);
+                const result = await remark()
+                        .use(remarkGfm)
+                        .use(remarkToc, {heading: 'Table of contents'})
+                        .use(remarkMermaidToHtml)
+                        .use(remarkHtml, { sanitize: false })
+                        .process(markdown);
 		const contentHtml = result.toString();
 		const props = {props: {contentHtml, metaData},};
 		return props;

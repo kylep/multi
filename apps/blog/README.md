@@ -1,4 +1,4 @@
-# Blog
+git # Blog
 
 NextJS powered SSG for http://kyle.pericak.com.
 
@@ -21,10 +21,22 @@ Then from the base directory (with this README), verify the setup by building th
 Renders all the markdown files using the templating defined in this project,
 then outputs them to `out/` as .html files to be served as static content.
 
+### On Linux/Mac:
 ```bash
 bin/build-blog-files.sh blog/out/
 ls blog/out/
 ```
+
+### On Windows (or cross-platform using Docker):
+The standard build script uses git commands that don't work properly on Windows due to 
+single-quote handling differences. Use the Docker-based build script instead:
+
+```bash
+bin/docker-build-blog-files.sh blog/out/
+ls blog/out/
+```
+
+This runs the build inside a Linux container where the git commands work correctly.
 
 ## Launching dev server
 
@@ -49,6 +61,11 @@ manually re-run the build each change.
 
 ```bash
 bin/start-staging-nginx.sh
+```
+
+or just 
+```bash
+docker run --name blogdev -it -v "$(pwd)/blog/out/:/usr/share/nginx/html" -p 8080:80 --rm nginx:latest
 ```
 
 ## Manually push files to prod
@@ -144,3 +161,20 @@ docker run --rm -v ./blog/markdown:/app/blog/markdown:ro -v ./workspace:/workspa
 ```
 
 
+---
+
+# Instructions for AI Agents
+
+## Authoring blog posts
+- Always use the same front matter keys as the other posts have.
+- Try to keep text lines at 88 chars or shorter so they're easier to manually review in tmux
+- Don't introduce new markup techniques, but you can use any that are supported already
+
+## Testing Commands
+```
+npm run build
+npm run lint
+npm test
+```
+
+.

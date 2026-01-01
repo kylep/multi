@@ -1,6 +1,18 @@
 steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "build",
+        "-f",
+        "apps/blog/Dockerfile",
+        "-t",
+        "gcr.io/$PROJECT_ID/kylepericakdotcom:$COMMIT_SHA",
+        "-t",
+        "gcr.io/$PROJECT_ID/kylepericakdotcom:latest",
+        ".",
+      ]
 
-  - name: gcr.io/kylepericak/kylepericakdotcom
+  - name: gcr.io/$PROJECT_ID/kylepericakdotcom:$COMMIT_SHA
     entrypoint: bash
     args: ["bin/build-blog-files.sh", "/workspace/out"]
     dir: "/app"
@@ -8,3 +20,7 @@ steps:
   - name: gcr.io/cloud-builders/gcloud
     entrypoint: gsutil
     args: ["-m", "rsync", "-r", "-c", "-d", "/workspace/out", "gs://kyle.pericak.com"]
+
+images:
+  - gcr.io/$PROJECT_ID/kylepericakdotcom:$COMMIT_SHA
+  - gcr.io/$PROJECT_ID/kylepericakdotcom:latest
