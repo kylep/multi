@@ -28,7 +28,7 @@ async function generateImageIfMissing(postPath) {
       try {
         console.log(`🎨 Generating image: ${image} for post "${data.title}"`);
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-        const prompt = `Simple, tasteful, low-detail icon for a blog post titled "${data.title}". Transparent background.`;
+        const prompt = `Simple, minimalist icon for a blog post titled "${data.title}". Clean lines, lots of white space, no shadows or gradients. Flat design with transparent background.`;
         const result = await openai.images.generate({
           model: 'dall-e-3',
           prompt,
