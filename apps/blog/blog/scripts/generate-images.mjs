@@ -26,27 +26,30 @@ async function generateImageIfMissing(postPath) {
       console.warn(`OPENAI_API_KEY not set, skipping generation for ${image}`);
     } else {
       try {
+        console.log(`🎨 Generating image: ${image} for post "${data.title}"`);
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
         const prompt = `Simple, tasteful, low-detail icon for a blog post titled "${data.title}". Transparent background.`;
         const result = await openai.images.generate({
-          model: 'gpt-image-1',
+          model: 'dall-e-3',
           prompt,
-          size: '650x250'
+          size: '1024x1024',
+          response_format: 'b64_json'
         });
         const b64 = result.data[0].b64_json;
         fs.writeFileSync(imagePath, Buffer.from(b64, 'base64'));
-        console.log(`Generated image ${image}`);
+        console.log(`✅ Successfully generated image: ${image}`);
       } catch (err) {
-        console.error(`Failed to generate image for ${image}:`, err.message);
+        console.error(`❌ Failed to generate image ${image}:`, err.message);
       }
     }
   }
   if (thumbPath && !fs.existsSync(thumbPath) && fs.existsSync(imagePath)) {
     try {
+      console.log(`🖼️  Creating thumbnail: ${thumb}`);
       await sharp(imagePath).resize(70, 70).toFile(thumbPath);
-      console.log(`Created thumbnail ${thumb}`);
+      console.log(`✅ Successfully created thumbnail: ${thumb}`);
     } catch (err) {
-      console.error(`Failed to create thumbnail for ${image}:`, err.message);
+      console.error(`❌ Failed to create thumbnail ${thumb}:`, err.message);
     }
   }
 }

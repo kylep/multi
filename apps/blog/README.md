@@ -14,6 +14,18 @@ cd blog
 npm install
 ```
 
+### Environment Variables
+
+**OPENAI_API_KEY** (Optional): Set this environment variable to enable automatic blog post image generation. When building the blog, the system will automatically generate images for any posts that reference an image file that doesn't exist yet.
+
+```bash
+export OPENAI_API_KEY="your-openai-api-key-here"
+```
+
+If not set, the build will skip image generation and warn about missing images. You can also manually add images to `blog/public/images/` instead of using AI generation.
+
+For local dev you can add it to exports.sh, that file is gitignored.
+
 Then from the base directory (with this README), verify the setup by building the static files.
 
 ## Building the static files

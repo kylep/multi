@@ -8,6 +8,11 @@ if [ ! -d bin/ ]; then
       exit 1
 fi
 
+if [ -f exports.sh ]; then
+  echo "Found exports file. Sourcing it."
+  source exports.sh
+fi
+
 
 cd blog
 mkdir -p out/
