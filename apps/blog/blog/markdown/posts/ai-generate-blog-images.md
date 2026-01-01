@@ -11,12 +11,18 @@ image: ai-generated-blog-images.png
 thumbnail: ai-generated-blog-images-thumb.png
 ---
 
-Keeping visual assets in sync with blog posts can be a chore. To make publishing easier, this site now checks each markdown post during the build. If an image or thumbnail is missing, a prompt is built from the post title and content and sent to OpenAI's image API. The returned art is saved alongside the post and a 70×70 thumbnail is produced.
+Making blog thumbnails and images is tedious. I don't want to fight with Gimp or whatever and I don't think anyone cares what the image really is. 
 
-This automation was coded with Codex and lives in a small script that runs before `npm run build`. You can read the full discussion and code on [GitHub issue #9](https://github.com/kylep/multi/issues/9).
+To make publishing easier, this site now checks for the image in each markdown post during the build to see if it already exists. If not, a prompt is built from the post title and content and sent to OpenAI's image API. The returned art is saved alongside the post and a 70×70 thumbnail is produced using Sharp. 
+
+To make the image for this post it cost me about $0.12 CAD in OpenAI credits. Entertainingly that's probably more than what hosting this site will cost for like a week due to the setup I'm using to host this.
+
+This automation was initially coded with Codex, but it didn't work quite right. I fixed it up with Cursor, then a bit manually to get it across the finish line. This was as much about playing with the AI dev tools as building the feature.
+
+Check it out here [generate-images.mjs](https://github.com/kylep/multi/blob/main/apps/blog/blog/scripts/generate-images.mjs). 
+
 
 ## How It Works
-
 The image generation system is integrated into the build pipeline through the `package.json` build script:
 
 ```json
@@ -46,31 +52,20 @@ if (!fs.existsSync(imagePath)) {
   // Generate with OpenAI
   const prompt = `Simple, tasteful, low-detail icon for a blog post titled "${data.title}". Transparent background.`;
   const result = await openai.images.generate({
-    model: 'gpt-image-1',
+    model: 'dall-e-2',
     prompt,
-    size: '650x250'
+    size: '512x512'
   });
 }
 ```
 
-The system is designed to be **non-destructive** - it only generates images that don't already exist, so you can manually replace any AI-generated image and it won't be overwritten.
+You can manually replace any AI-generated image and it won't be overwritten.
 
 ### Environment Setup
 
-To enable image generation, set your OpenAI API key:
-
+Set your OpenAI API key
 ```bash
 export OPENAI_API_KEY="your-api-key-here"
 ```
 
-Without this key, the build continues normally but skips image generation with a warning. This makes the feature completely optional - the blog works fine with manually created images or no images at all.
-
-### Error Handling
-
-The script includes robust error handling:
-- **Missing API key**: Warns and continues without generation
-- **API failures**: Logs errors but doesn't break the build
-- **Image processing errors**: Continues with original image if thumbnail creation fails
-
-This ensures that a failed image generation never blocks publishing a blog post.
-
+Without this key the build just skips image generation with a warning.
