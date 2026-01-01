@@ -58,15 +58,20 @@ const About = () => {
                 <li>Encourage me to keep learning new things</li>
             </ol>
             <hr />
-            <h2>About the Author</h2>
+            <h2>About</h2>
             <p>
-                My name's Kyle Pericak, and I'm a technological jack-of-all-trades working around the Toronto, Canada area. <br />
-                I currently work as an Engineering Director at <a href="https://super.com">Super.com</a>, where I'm responsible for the DevOps, QA, Security, and Internal Tooling teams.<br />
-                I'm most interested in leading in areas related to infrastructure, developer experience, security, and full stack web dev. <br />
-                While I work in a purely public-cloud environment lately (mainly AWS), physical datacenters remain my <i>happy place</i>, and OpenStack maintains a place in my heart. <br /><br />
-                Outside of work I'm a father to two boys, a husband, a bad musician, and when time allows I enjoy board games and strategy video games. <br />
-                I listen to a lot of audiobooks and podcasts. <br /> <br />
-                I love learning new things, meeting new people, and travelling.
+
+                My name's Kyle Pericak, and I'm a technological jack-of-all-trades working around the Toronto, Canada area.  <br /><br />
+
+                I'm currently employed as a Senior Engineering Director running the Infrastructure organization at <a href="https://super.com">Super.com</a>, where I'm responsible for the DevOps/Infra, QA, TAM, Security, and Sales/Support Tooling teams.<br />
+                I'm most interested in leading areas related to infrastructure, developer experience/productivity, platform engineering, security, and full stack software engineering. <br /><br />
+
+                While I work in a purely public-cloud environment lately (mainly AWS), physical datacenters are my <i>happy place</i> and OpenStack + Ceph hold a place in my heart. <br /><br />
+
+                Outside of work I'm a father to two boys, a husband, a bad musician, and when time allows I enjoy board games and running. <br />
+
+                I listen to a *lot* of audiobooks and always enjoy taking about them. <br /> <br />
+                I love learning new things, meeting new people, conferences and travelling.
             </p>
             <hr />
             <h2>Contact</h2>
@@ -74,7 +79,7 @@ const About = () => {
             <br /><br /> <br /><br />
 
         </SiteLayout>
-       
+
     </>
   );
 };
