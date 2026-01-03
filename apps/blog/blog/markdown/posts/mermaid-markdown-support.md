@@ -19,7 +19,7 @@ AI wrote the first draft. It was bad. For the code, that was ok. It took some it
 
 The mermaid chart syntax example in this post is all AI. The actual writing style of AI makes my eyes glaze over and I don't want to subject other people to it, so I rewrote basically all of the actual text. No sense contributing too much towards a dead internet, right?
 
-Have feeling about the idea of AI being used for this sort of thing? I'd love to hear your thoughts. You can find my socials on the about page. 
+Have feelings about the idea of AI being used for this sort of thing? I'd love to hear your thoughts. You can find my socials on the about page. 
 
 
 ---
