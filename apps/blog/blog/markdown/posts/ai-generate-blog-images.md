@@ -22,7 +22,7 @@ This automation was initially coded with Codex, but it didn't work quite right. 
 Check it out here [generate-images.mjs](https://github.com/kylep/multi/blob/main/apps/blog/blog/scripts/generate-images.mjs). 
 
 
-## How It Works
+# How It Works
 The image generation system is integrated into the build pipeline through the `package.json` build script:
 
 ```json
@@ -36,30 +36,60 @@ Before Next.js builds the static site, the `generate-images.mjs` script runs and
 3. **Generates missing images** using OpenAI's DALL·E API if `OPENAI_API_KEY` is set
 4. **Creates thumbnails** by resizing generated images to 70×70 pixels using Sharp
 
-### The Generation Process
+## The Generation Process
 
-For each blog post, the script:
+It's all pretty straightforward:
 
+High level script logic: 
+1. If there's no image defined, do nothing
+1. If the image is defined in the front matter but doesn't exist, generate it.
+1. If the image does exist but thumbnail doesn't, resize it and save that too.
+
+Generating the image is also simple:
+1. If the front matter has `imgprompt` in it, use that as the `summary` of the post.
+1. If `imgprompt` is not present get `gpt-4o-mini'` to write a `summary` of the post.
+1. Use `dall-e-3` to create the image.
+1. Complain that it didn't look right, tweak the prompt, repeat until sufficiently frustrated, move on.
+
+### Prompts
+
+At time of writing (I won't keep this updated, check the code), I used these for the prompts:
+
+Making the summary:
 ```javascript
-// Parse the markdown front matter
-const { data, content } = matter(raw);
-const image = data.image;
-const thumb = data.thumbnail;
-
-// Check if image file exists
-const imagePath = path.join(IMAGES_DIR, image);
-if (!fs.existsSync(imagePath)) {
-  // Generate with OpenAI
-  const prompt = `Simple, tasteful, low-detail icon for a blog post titled "${data.title}". Transparent background.`;
-  const result = await openai.images.generate({
-    model: 'dall-e-2',
-    prompt,
-    size: '512x512'
+async function summarizeBlogContent(data, content) {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const prompt = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: `In max 20 words, describe a simple logo image that would represent this blog post: ${content}` }],
   });
+  const summary = prompt.choices[0].message.content;
+  console.log(`✨📝 Created summary of "${data.title}" → ${summary}`);
+  return summary;
 }
 ```
 
-You can manually replace any AI-generated image and it won't be overwritten.
+Making the image
+
+```javascript
+async function getPromptFromContent(data, content) {
+  const subject = data.imgprompt
+    ? data.imgprompt
+    : await summarizeBlogContent(data, content);
+  const prompt = [
+    "Simple minimalist flat vector icon.",
+    `Subject: "${subject}".`,
+    "Style: clean flat SVG-style vector, crisp edges, no gradients, no shadows, no textures, no lighting effects.",
+    "Colors: limited palette, high contrast, modern minimal. Black, white, and primary colors only.",
+    "Composition: centered subject with generous whitespace, 1:1 icon framing.",
+    "Background: pure solid white (#FFFFFF) and completely filled. Nothing around the logo.",
+    "No transparency. No checkerboard. No grid. No background elements.",
+    "No text. No words. Just a simple image centered in white space."
+  ].join("\n");
+  return prompt;
+}
+```
+
 
 ### Environment Setup
 
@@ -69,3 +99,23 @@ export OPENAI_API_KEY="your-api-key-here"
 ```
 
 Without this key the build just skips image generation with a warning.
+
+
+---
+
+# Outstanding Problem
+
+Dalle-3 is super frustrating when it comes to just making a white background. I spent a couple hours trying different prompts and it just refuses. Here's what the code came up with as a prompt for this page:
+
+```text
+Simple minimalist flat vector icon.
+Subject: "A simple logo featuring a stylized laptop and a paintbrush, symbolizing effortless content creation and automated design.".                     
+Style: clean flat SVG-style vector, crisp edges, no gradients, no shadows, no textures, no lighting effects.                                                                                                
+Colors: limited palette, high contrast, modern minimal. Black, white, and primary colors only.   
+Composition: centered subject with generous whitespace, 1:1 icon framing.                             
+Background: pure solid white (#FFFFFF) and completely filled. Nothing around the logo.                
+No transparency. No checkerboard. No grid. No background elements.                                    
+No text. No words. Just a simple image centered in white space. 
+```
+
+It does not seem to care for my preference. If anyone has any tricks for this I'd love to hear about it.

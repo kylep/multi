@@ -11,45 +11,75 @@ const __dirname = path.dirname(__filename);
 const POSTS_DIR = path.join(__dirname, '../markdown/posts');
 const IMAGES_DIR = path.join(__dirname, '../public/images');
 
-async function generateImageIfMissing(postPath) {
+async function summarizeBlogContent(data, content) {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const prompt = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: `In max 20 words, describe a simple logo image that would represent this blog post: ${content}` }],
+  });
+  const summary = prompt.choices[0].message.content;
+  console.log(`✨📝 Created summary of "${data.title}" → ${summary}`);
+  return summary;
+}
+
+async function getPromptFromContent(data, content) {
+  const subject = data.imgprompt
+    ? data.imgprompt
+    : await summarizeBlogContent(data, content);
+  const prompt = [
+    "Simple minimalist flat vector icon.",
+    `Subject: "${subject}".`,
+    "Style: clean flat SVG-style vector, crisp edges, no gradients, no shadows, no textures, no lighting effects.",
+    "Colors: limited palette, high contrast, modern minimal. Black, white, and primary colors only.",
+    "Composition: centered subject with generous whitespace, 1:1 icon framing.",
+    "Background: pure solid white (#FFFFFF) and completely filled. Nothing around the logo.",
+    "No transparency. No checkerboard. No grid. No background elements.",
+    "No text. No words. Just a simple image centered in white space."
+  ].join("\n");
+  return prompt;
+}
+
+async function generateNewImage(prompt, imageFullPath) {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  console.log(`\n🎨 Generating image: ${imageFullPath} with prompt:\n${prompt}`);
+  const response = await openai.images.generate({
+    model: 'dall-e-3',
+    prompt,
+    size: '1024x1024',
+    response_format: 'b64_json'
+  });
+  const imageBase64 = response.data[0].b64_json;
+  fs.writeFileSync(imageFullPath, Buffer.from(imageBase64, 'base64'));
+}
+
+async function resizeImageToThumbnail(imageFullPath, thumbFullPath) {
+  console.log(`🖼️  Creating thumbnail: ${thumbFullPath}`);
+  await sharp(imageFullPath).resize(70, 70).toFile(thumbFullPath);
+}
+
+async function saveMissingBlogImageAndThumbnail(postPath) {
+
   const raw = fs.readFileSync(postPath, 'utf8');
   const { data, content } = matter(raw);
-  const image = data.image;
-  const thumb = data.thumbnail;
-  if (!image) {
+  if (!data.image) {
+    console.warn(`No image defined for ${data.title}, skipping image-generation`);
     return;
   }
-  const imagePath = path.join(IMAGES_DIR, image);
-  const thumbPath = thumb ? path.join(IMAGES_DIR, thumb) : null;
-  if (!fs.existsSync(imagePath)) {
-    if (!process.env.OPENAI_API_KEY) {
-      console.warn(`OPENAI_API_KEY not set, skipping generation for ${image}`);
+  const imageFullPath = path.join(IMAGES_DIR, data.image);
+  // blog header image
+  if (data.image && !fs.existsSync(imageFullPath)) {
+    if (process.env.OPENAI_API_KEY) {
+      const prompt = await getPromptFromContent(data, content);
+      await generateNewImage(prompt, imageFullPath);
     } else {
-      try {
-        console.log(`🎨 Generating image: ${image} for post "${data.title}"`);
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-        const prompt = `Simple, minimalist icon for a blog post titled "${data.title}". Clean lines, lots of white space, no shadows or gradients. Flat design with transparent background.`;
-        const result = await openai.images.generate({
-          model: 'dall-e-3',
-          prompt,
-          size: '1024x1024',
-          response_format: 'b64_json'
-        });
-        const b64 = result.data[0].b64_json;
-        fs.writeFileSync(imagePath, Buffer.from(b64, 'base64'));
-        console.log(`✅ Successfully generated image: ${image}`);
-      } catch (err) {
-        console.error(`❌ Failed to generate image ${image}:`, err.message);
-      }
+      console.warn(`OPENAI_API_KEY not set, skipping ai generation for ${data.image}`);
     }
   }
-  if (thumbPath && !fs.existsSync(thumbPath) && fs.existsSync(imagePath)) {
-    try {
-      console.log(`🖼️  Creating thumbnail: ${thumb}`);
-      await sharp(imagePath).resize(70, 70).toFile(thumbPath);
-      console.log(`✅ Successfully created thumbnail: ${thumb}`);
-    } catch (err) {
-      console.error(`❌ Failed to create thumbnail ${thumb}:`, err.message);
+  // thumbnail
+  if (data.thumbnail && fs.existsSync(imageFullPath)) {
+    const thumbFullPath = path.join(IMAGES_DIR, data.thumbnail);
+    if (!fs.existsSync(thumbFullPath)) {
+      await resizeImageToThumbnail(imageFullPath, thumbFullPath);
     }
   }
 }
@@ -60,7 +90,7 @@ async function run() {
   }
   const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
   for (const file of files) {
-    await generateImageIfMissing(path.join(POSTS_DIR, file));
+    await saveMissingBlogImageAndThumbnail(path.join(POSTS_DIR, file));
   }
 }
 

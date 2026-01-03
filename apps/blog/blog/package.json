@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/generate-images.mjs && next build",
+    "build": "node --no-deprecation scripts/generate-images.mjs && next build",
     "start": "next start",
     "lint": "next lint"
   },
