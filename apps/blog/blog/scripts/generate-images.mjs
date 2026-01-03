@@ -15,7 +15,7 @@ async function summarizeBlogContent(data, content) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const prompt = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
-    messages: [{ role: 'user', content: `In max 20 words, describe a simple logo image that would represent this blog post: ${content}` }],
+    messages: [{ role: 'user', content: `In max 10 words, describe a simple text-free icon that would represent this blog post: ${content}` }],
   });
   const summary = prompt.choices[0].message.content;
   console.log(`✨📝 Created summary of "${data.title}" → ${summary}`);
@@ -27,14 +27,18 @@ async function getPromptFromContent(data, content) {
     ? data.imgprompt
     : await summarizeBlogContent(data, content);
   const prompt = [
-    "Simple minimalist flat vector icon.",
-    `Subject: "${subject}".`,
+    "Simple minimalist flat vector icon. 3 shapes max.",
     "Style: clean flat SVG-style vector, crisp edges, no gradients, no shadows, no textures, no lighting effects.",
-    "Colors: limited palette, high contrast, modern minimal. Black, white, and primary colors only.",
-    "Composition: centered subject with generous whitespace, 1:1 icon framing.",
-    "Background: pure solid white (#FFFFFF) and completely filled. Nothing around the logo.",
-    "No transparency. No checkerboard. No grid. No background elements.",
-    "No text. No words. Just a simple image centered in white space."
+    "Colors: Black, white, and primary colors only. No other colors. ",
+    "Composition: centered subject with generous whitespace, 1:1 icon framing. ",
+    "Background: pure solid white (#FFFFFF) and completely filled. ONLY WHITE AROUND THE ICON. ",
+    "No transparency. No checkerboard. No shadow. No grid. No background but white. ",
+    "No text. No words. ",
+    "Just a simple image centered in white space. ",
+    `Subject: "${subject}". `,
+    "ONLY WHITE SPACE AROUND THE ICON. NO GRID. NO BACKGROUND. NO SHADOW. ",
+    "ONLY WHITE SPACE AROUND THE ICON. NO GRID. NO BACKGROUND. NO SHADOW. ",
+    "...Please?"
   ].join("\n");
   return prompt;
 }

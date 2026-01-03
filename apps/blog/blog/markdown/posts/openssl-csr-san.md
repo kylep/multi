@@ -7,8 +7,8 @@ tags: https, openssl
 date: 2020-10-20
 modified: 2020-10-20
 status: published
-image: gear.png
-thumbnail: gear-thumb.png
+image: openssl-csr-san.png
+thumbnail: openssl-csr-san-thumb.png
 ---
 
 
