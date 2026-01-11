@@ -1,0 +1,17 @@
+# Default configuration for Robo Text Battle
+
+default_robot_stats:
+  health: 10
+  max_health: 10
+  energy: 20
+  max_energy: 20
+  defence: 0
+  attack: 0
+  hands: 2
+  dodge: 0
+  level: 0
+  exp: 0
+  inventory_size: 4
+
+starting_money: 100
+

@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "robotext-battle"
+version = "0.1.0"
+description = "A turn-based robot battle game"
+authors = ["Developer"]
+readme = "README.md"
+packages = [{include = "robotext"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyyaml = "^6.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+
+[tool.poetry.scripts]
+robotext = "main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
