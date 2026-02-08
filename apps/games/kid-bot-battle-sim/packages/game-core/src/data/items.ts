@@ -1,0 +1,261 @@
+export interface Weapon {
+  type: "weapon";
+  name: string;
+  level: number;
+  damage: number;
+  moneyCost: number;
+  energyCost: number;
+  accuracy: number;
+  hands: number;
+  requirements?: string[];
+  description: string;
+}
+
+export interface Gear {
+  type: "gear";
+  name: string;
+  level: number;
+  moneyCost: number;
+  requirements?: string[];
+  description: string;
+  effects: {
+    healthBonus?: number;
+    energyBonus?: number;
+    handsBonus?: number;
+    defenceBonus?: number;
+    dodgeBonus?: number;
+    attackBonus?: number;
+    moneyBonusPercent?: number;
+  };
+}
+
+export interface Consumable {
+  type: "consumable";
+  name: string;
+  level: number;
+  moneyCost: number;
+  description: string;
+  effects: {
+    healthRestore?: number;
+    damage?: number;
+    enemyDodgeReduction?: number;
+  };
+}
+
+export type Item = Weapon | Gear | Consumable;
+
+export const WEAPONS: Weapon[] = [
+  {
+    type: "weapon",
+    name: "Stick",
+    level: 0,
+    damage: 1,
+    moneyCost: 50,
+    energyCost: 1,
+    accuracy: 80,
+    hands: 1,
+    description: "It's just a stick. Hard to use and not very strong.",
+  },
+  {
+    type: "weapon",
+    name: "Sword",
+    level: 2,
+    damage: 10,
+    moneyCost: 150,
+    energyCost: 5,
+    accuracy: 100,
+    hands: 2,
+    description: "Metal single-edged longsword with a sharp blade.",
+  },
+  {
+    type: "weapon",
+    name: "Shock Rod",
+    level: 3,
+    damage: 5,
+    moneyCost: 200,
+    energyCost: 3,
+    accuracy: 95,
+    hands: 1,
+    description: "An electrified rod that delivers a shocking blow. Zap!",
+  },
+  {
+    type: "weapon",
+    name: "Sawed-off Shotgun",
+    level: 5,
+    damage: 15,
+    moneyCost: 300,
+    energyCost: 0,
+    accuracy: 150,
+    hands: 1,
+    requirements: ["Shotgun Shell"],
+    description: "A small gauge shotgun. Loud!",
+  },
+  {
+    type: "weapon",
+    name: "Flame Thrower",
+    level: 5,
+    damage: 10,
+    moneyCost: 150,
+    energyCost: 0,
+    accuracy: 90,
+    hands: 2,
+    description: "Fire hot",
+  },
+  {
+    type: "weapon",
+    name: "Lightsabre",
+    level: 10,
+    damage: 30,
+    moneyCost: 1000,
+    energyCost: 20,
+    accuracy: 90,
+    hands: 2,
+    description: "A laser sword. Very expensive! Bzzzzt.",
+  },
+];
+
+export const GEAR: Gear[] = [
+  {
+    type: "gear",
+    name: "Shotgun Shell",
+    level: 5,
+    moneyCost: 30,
+    description: "Allows you to fire a Shotgun weapon once. Consumed when fired.",
+    effects: {},
+  },
+  {
+    type: "gear",
+    name: "Cardboard Armor",
+    level: 0,
+    moneyCost: 100,
+    description: "Cheapest possible armor for a robot. Even a stick could break it.",
+    effects: { healthBonus: 5 },
+  },
+  {
+    type: "gear",
+    name: "Wooden Armor",
+    level: 2,
+    moneyCost: 600,
+    description: "This armor was a tree once. The lorax disapproves.",
+    effects: { healthBonus: 25 },
+  },
+  {
+    type: "gear",
+    name: "Third Arm",
+    level: 2,
+    moneyCost: 150,
+    description: "More hands, more weapons",
+    effects: { handsBonus: 1 },
+  },
+  {
+    type: "gear",
+    name: "Fourth Arm",
+    level: 5,
+    moneyCost: 250,
+    requirements: ["Third Arm"],
+    description: "Even more arms, even more weapons",
+    effects: { handsBonus: 1 },
+  },
+  {
+    type: "gear",
+    name: "Fifth Arm",
+    level: 5,
+    moneyCost: 350,
+    requirements: ["Fourth Arm"],
+    description: "This is just silly. Who needs 5 arms?",
+    effects: { handsBonus: 1 },
+  },
+  {
+    type: "gear",
+    name: "Gold Computer Chip",
+    level: 3,
+    moneyCost: 40,
+    description: "A computer chip that teaches the robot how to defend itself. Protect the face!",
+    effects: { defenceBonus: 1 },
+  },
+  {
+    type: "gear",
+    name: "Small Computer Chip",
+    level: 3,
+    moneyCost: 40,
+    description: "A computer chip that teaches the robot how to dodge. If you can dodge a wrench...",
+    effects: { dodgeBonus: 10 },
+  },
+  {
+    type: "gear",
+    name: "Power Chip",
+    level: 3,
+    moneyCost: 60,
+    description: "A computer chip that boosts attack power. Your attacks deal 10% more damage!",
+    effects: { attackBonus: 10 },
+  },
+  {
+    type: "gear",
+    name: "Money Maker",
+    level: 0,
+    moneyCost: 100,
+    description: "Earn more money from winning. It takes money to make money!",
+    effects: { moneyBonusPercent: 20 },
+  },
+  {
+    type: "gear",
+    name: "Propeller",
+    level: 1,
+    moneyCost: 50,
+    description: "A spinning propeller that helps the robot dodge attacks.",
+    effects: { dodgeBonus: 10 },
+  },
+  {
+    type: "gear",
+    name: "Small Battery",
+    level: 1,
+    moneyCost: 50,
+    description: "A small battery that increases energy capacity.",
+    effects: { energyBonus: 5 },
+  },
+  {
+    type: "gear",
+    name: "Medium Battery",
+    level: 4,
+    moneyCost: 150,
+    description: "A medium battery that increases energy capacity.",
+    effects: { energyBonus: 20 },
+  },
+  {
+    type: "gear",
+    name: "Big Battery",
+    level: 7,
+    moneyCost: 350,
+    description: "A big battery that increases energy capacity.",
+    effects: { energyBonus: 25 },
+  },
+];
+
+export const CONSUMABLES: Consumable[] = [
+  {
+    type: "consumable",
+    name: "Repair Kit",
+    level: 2,
+    moneyCost: 30,
+    description: "Repairs the robot. Can even leave it stronger than it started (for one battle).",
+    effects: { healthRestore: 10 },
+  },
+  {
+    type: "consumable",
+    name: "Grenade",
+    level: 8,
+    moneyCost: 100,
+    description: "A small bomb you can launch at the enemy.",
+    effects: { damage: 30 },
+  },
+  {
+    type: "consumable",
+    name: "Throwing Net",
+    level: 4,
+    moneyCost: 100,
+    description: "It's a net. You throw it. Destroys the net.",
+    effects: { enemyDodgeReduction: 30 },
+  },
+];
+
+export const ALL_ITEMS: Item[] = [...WEAPONS, ...GEAR, ...CONSUMABLES];

@@ -1,0 +1,22 @@
+{
+  "name": "@kid-bot-battle-sim/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "kid-bot-battle-sim": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --import tsx/esm src/index.ts"
+  },
+  "dependencies": {
+    "@kid-bot-battle-sim/game-core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}
