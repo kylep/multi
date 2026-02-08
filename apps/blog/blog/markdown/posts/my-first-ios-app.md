@@ -1,6 +1,6 @@
 ---
 title: "Making My First Mobile App"
-summary: AI made it easy: Building an iPhone app
+summary: AI made it easy: Building a minimal iPhone app
 slug: my-first-ios-app
 category: development
 tags: iOS,Swift,Mobile,AI
@@ -22,7 +22,7 @@ record and gamify things being silly. It was just a fun idea and while we're bot
 competent web developers neither of us have made mobile apps, so we never got around to
 it. I'm having so much fun with the new AI tooling though that I figured now was time.
 
-The app was made with Claude Code, Cursor, and a Macbook M2 w/ XCode.
+The app was made with Claude Code, and a Macbook M2 w/ XCode.
 
 
 ---
@@ -59,9 +59,15 @@ killall xcodebuild 2>/dev/null
 killall xcodelauncher 2>/dev/null
 ```
 
+Also verified this works, was fine though:
+```bash
+clang --version
+mdutil -s /
+```
+
 Then quit and re-open XCode. That fixed it for me.
 
-### Installing Cursor and Claude Code
+### Installing Claude Code
 I'm not including instructions here other than to say I hadn't done it yet on this
 laptop and had to set them up too. I'm not using XCode's IDE to author code but I guess
 it's needed to build, run, and sign the app.
@@ -91,4 +97,67 @@ because ChatGPT told me to after some prompting to pick what would be right...
 1. Choosing the location, I picked `multi/apps/sillyapp`.
   1. I double-clicked that and it kinda went off and made a bunch of files...
   1. I unchecked the Git option, this is also in my repo [multi](https://github.com/kylep/multi).
+1. Committed to git from here in case things get screwy...
 
+
+# Test the build
+
+If the build doesn't work now we're not going to have any fun later...
+
+1. Xcode > Product > Build
+1. Near top centre it should say it built successfully
+
+Run it in the similuator
+
+1. Click the ▶ Run button on the top left.
+1. It opens an iphone simulator, ios 17 for me
+1. click the app
+1. you got a white screen, then after a while you can click + to add/remove timestamps.
+
+
+# Get the robot (Claude) involved
+
+From here I launched Claude Code in the app directory. I've found that these tools work
+best when they can verify their own work, so that's the priority. Lots of permission
+granting followed.
+
+```text
+This is an iPhone app. I've never made one before. It was just initialized. Before you start modifying it, can you verify that it builds?
+```
+
+It struggled to find the right iOS version so I had it update CLAUDE.md.
+
+Next I needed to make sure it can run its tests.
+
+```text
+Do you have any tests? If yes, run them, and update CLAUDE.md with any learnings.
+```
+
+It took a while, like 5 min. Worked, though.
+
+
+## Make a minimal change
+
+Prompt
+```text
+Modify the app to have a light blue background and header text "Silly App"
+```
+
+It made the changes easily.
+
+
+# Test the changes
+
+Plug the iPhone into your macbook. In the top middle where it says which version of
+iOS you're testing with, click there. You can choose to use your phone. For me, it
+didn't work initially. I had to go to Settings > Privacy and enable Developer mode.
+
+That option wasn't there initially for me. I unplugged it, got distracted, came back
+later, tried again, and it was there. So maybe unplug it / plug it back in or turn it
+off and on again or something to get the option.
+
+From there I still couldn't launch it because my apple account wasn't trusted. So I had
+to again to go Settings > VPN & Device Management and say that I trust it.
+
+After all that, I was able to launch my app! Apparently getting it into the apple store
+is its own whole *thing* and has a review process, so I'm not doing that right now.
