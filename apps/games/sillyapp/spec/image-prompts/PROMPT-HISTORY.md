@@ -46,7 +46,7 @@ Write PREFLIGHT-ENV-SETUP.md such that for each of the checks that preflight-che
 
 While we're in the neighbourhood:
 ```text
-make an appropriate env file to store the dev env vars. Add it to gitignore and architecture doc.  Add build instructions to README.md including sourcing the file and running the pre-flight checks.
+make an appropriate env file to store the dev env vars. Add it to gitignore and architecture doc.  Add build instructions to README.md including sourcing the file and running the pre-flight checks. Each line of the env file should be commented.
 ```
 
 ---
