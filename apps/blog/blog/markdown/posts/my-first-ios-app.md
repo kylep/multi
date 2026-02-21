@@ -1,6 +1,6 @@
 ---
 title: "Making My First Mobile App"
-summary: AI made it easy: Building a minimal iPhone app
+summary: "AI made it easy: Building a minimal iPhone app"
 slug: my-first-ios-app
 category: development
 tags: iOS,Swift,Mobile,AI

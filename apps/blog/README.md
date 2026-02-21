@@ -86,7 +86,7 @@ The CI should push the files up to prod, but if you're impatient or it's not wor
 build and push yourself. Make sure your gcloud cli is authd first.
 
 ```
-build-blog-files.sh
+bin/build-blog-files.sh
 bin/prod-deploy.sh
 ```
 
