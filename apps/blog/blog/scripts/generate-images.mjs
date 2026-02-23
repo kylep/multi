@@ -11,6 +11,24 @@ const __dirname = path.dirname(__filename);
 const POSTS_DIR = path.join(__dirname, '../markdown/posts');
 const IMAGES_DIR = path.join(__dirname, '../public/images');
 
+const VALID_MODELS = ['openai', 'gemini', 'bfl'];
+const IMAGE_MODEL = process.env.IMAGE_MODEL || 'openai';
+
+const MODEL_ENV_KEYS = {
+  openai: 'OPENAI_API_KEY',
+  gemini: 'GEMINI_API_KEY',
+  bfl: 'BFL_API_KEY',
+};
+
+function getRequiredKey(model) {
+  const envVar = MODEL_ENV_KEYS[model];
+  const key = process.env[envVar];
+  if (!key) {
+    console.warn(`${envVar} not set, skipping image generation (IMAGE_MODEL=${model})`);
+  }
+  return key;
+}
+
 async function summarizeBlogContent(data, content) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const prompt = await openai.chat.completions.create({
@@ -23,37 +41,140 @@ async function summarizeBlogContent(data, content) {
 }
 
 async function getPromptFromContent(data, content) {
+  if (!data.imgprompt && !process.env.OPENAI_API_KEY) {
+    console.warn(`No imgprompt and no OPENAI_API_KEY to generate one, skipping "${data.title}"`);
+    return null;
+  }
   const subject = data.imgprompt
     ? data.imgprompt
     : await summarizeBlogContent(data, content);
   const prompt = [
-    "Simple minimalist flat vector icon. 3 shapes max.",
-    "Style: clean flat SVG-style vector, crisp edges, no gradients, no shadows, no textures, no lighting effects.",
-    "Colors: Black, white, and primary colors only. No other colors. ",
-    "Composition: centered subject with generous whitespace, 1:1 icon framing. ",
-    "Background: pure solid white (#FFFFFF) and completely filled. ONLY WHITE AROUND THE ICON. ",
-    "No transparency. No checkerboard. No shadow. No grid. No background but white. ",
-    "No text. No words. ",
-    "Just a simple image centered in white space. ",
-    `Subject: "${subject}". `,
-    "ONLY WHITE SPACE AROUND THE ICON. NO GRID. NO BACKGROUND. NO SHADOW. ",
-    "ONLY WHITE SPACE AROUND THE ICON. NO GRID. NO BACKGROUND. NO SHADOW. ",
-    "...Please?"
+    `Subject: "${subject}".`,
+    "Style: minimalist flat vector icon, clean lines, crisp edges, simplified geometric shapes.",
+    "Colors: black, white, and one primary accent color only. No gradients.",
+    "Composition: centered subject, generous negative space, wide landscape 16:9 aspect ratio. Keep subject within the center 60% of the frame.",
+    "Background: pure solid white (#FFFFFF), filling the entire image.",
+    "No text, no shadows, no textures, no transparency, no background elements.",
   ].join("\n");
   return prompt;
 }
 
-async function generateNewImage(prompt, imageFullPath) {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  console.log(`\n🎨 Generating image: ${imageFullPath} with prompt:\n${prompt}`);
+
+// --- Image generation providers ---
+
+async function generateImageOpenAI(prompt, imageFullPath) {
+  const apiKey = getRequiredKey('openai');
+  if (!apiKey) return false;
+  const openai = new OpenAI({ apiKey });
+  console.log(`\n🎨 [OpenAI] Generating image: ${imageFullPath}`);
   const response = await openai.images.generate({
-    model: 'dall-e-3',
+    model: 'gpt-image-1.5',
     prompt,
     size: '1024x1024',
-    response_format: 'b64_json'
+    quality: 'medium',
+    output_format: 'png',
   });
-  const imageBase64 = response.data[0].b64_json;
-  fs.writeFileSync(imageFullPath, Buffer.from(imageBase64, 'base64'));
+  fs.writeFileSync(imageFullPath, Buffer.from(response.data[0].b64_json, 'base64'));
+  return true;
+}
+
+async function generateImageGemini(prompt, imageFullPath) {
+  const apiKey = getRequiredKey('gemini');
+  if (!apiKey) return false;
+  console.log(`\n🎨 [Gemini] Generating image: ${imageFullPath}`);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseModalities: ['TEXT', 'IMAGE'],
+      },
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(`Gemini API error: ${response.status} ${await response.text()}`);
+  }
+  const result = await response.json();
+  const parts = result.candidates?.[0]?.content?.parts || [];
+  const imagePart = parts.find(p => p.inlineData?.mimeType?.startsWith('image/'));
+  if (!imagePart) {
+    throw new Error('Gemini API returned no image data');
+  }
+  fs.writeFileSync(imageFullPath, Buffer.from(imagePart.inlineData.data, 'base64'));
+  return true;
+}
+
+async function generateImageBFL(prompt, imageFullPath) {
+  const apiKey = getRequiredKey('bfl');
+  if (!apiKey) return false;
+  console.log(`\n🎨 [BFL] Generating image: ${imageFullPath}`);
+  const submitResponse = await fetch('https://api.bfl.ai/v1/flux-2-max', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Key': apiKey,
+    },
+    body: JSON.stringify({
+      prompt,
+      width: 1024,
+      height: 576,
+    }),
+  });
+  if (!submitResponse.ok) {
+    throw new Error(`BFL API submit error: ${submitResponse.status} ${await submitResponse.text()}`);
+  }
+  const { id: taskId } = await submitResponse.json();
+  const maxAttempts = 60;
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    const pollResponse = await fetch(`https://api.bfl.ai/v1/get_result?id=${taskId}`, {
+      headers: { 'X-Key': apiKey },
+    });
+    if (!pollResponse.ok) continue;
+    const result = await pollResponse.json();
+    if (result.status === 'Ready') {
+      const imgResponse = await fetch(result.result.sample);
+      const buffer = Buffer.from(await imgResponse.arrayBuffer());
+      fs.writeFileSync(imageFullPath, buffer);
+      return true;
+    }
+    if (result.status === 'Error') {
+      throw new Error(`BFL generation failed: ${JSON.stringify(result)}`);
+    }
+  }
+  throw new Error('BFL generation timed out after 2 minutes');
+}
+
+const IMAGE_GENERATORS = {
+  openai: generateImageOpenAI,
+  gemini: generateImageGemini,
+  bfl: generateImageBFL,
+};
+
+
+// --- Main logic ---
+
+const HEADER_HEIGHT = 500;
+const HEADER_WIDTH = Math.round(HEADER_HEIGHT * (16 / 9)); // 533
+
+async function cropToHeader(imageFullPath) {
+  const tempPath = imageFullPath + '.tmp.png';
+  await sharp(imageFullPath)
+    .resize(HEADER_WIDTH, HEADER_HEIGHT, { fit: 'cover', position: 'attention' })
+    .toFile(tempPath);
+  fs.renameSync(tempPath, imageFullPath);
+  console.log(`✂️  Cropped to ${HEADER_WIDTH}x${HEADER_HEIGHT}: ${imageFullPath}`);
+}
+
+async function generateNewImage(prompt, imageFullPath) {
+  const generator = IMAGE_GENERATORS[IMAGE_MODEL];
+  const success = await generator(prompt, imageFullPath);
+  if (success) {
+    await cropToHeader(imageFullPath);
+  }
+  return success;
 }
 
 async function resizeImageToThumbnail(imageFullPath, thumbFullPath) {
@@ -70,16 +191,11 @@ async function saveMissingBlogImageAndThumbnail(postPath) {
     return;
   }
   const imageFullPath = path.join(IMAGES_DIR, data.image);
-  // blog header image
   if (data.image && !fs.existsSync(imageFullPath)) {
-    if (process.env.OPENAI_API_KEY) {
-      const prompt = await getPromptFromContent(data, content);
-      await generateNewImage(prompt, imageFullPath);
-    } else {
-      console.warn(`OPENAI_API_KEY not set, skipping ai generation for ${data.image}`);
-    }
+    const prompt = await getPromptFromContent(data, content);
+    if (!prompt) return;
+    await generateNewImage(prompt, imageFullPath);
   }
-  // thumbnail
   if (data.thumbnail && fs.existsSync(imageFullPath)) {
     const thumbFullPath = path.join(IMAGES_DIR, data.thumbnail);
     if (!fs.existsSync(thumbFullPath)) {
@@ -89,6 +205,11 @@ async function saveMissingBlogImageAndThumbnail(postPath) {
 }
 
 async function run() {
+  if (!VALID_MODELS.includes(IMAGE_MODEL)) {
+    console.error(`Invalid IMAGE_MODEL="${IMAGE_MODEL}". Must be one of: ${VALID_MODELS.join(', ')}`);
+    process.exit(1);
+  }
+  console.log(`🔧 Image generation model: ${IMAGE_MODEL}`);
   if (!fs.existsSync(POSTS_DIR)) {
     return;
   }
