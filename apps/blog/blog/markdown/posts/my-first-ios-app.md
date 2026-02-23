@@ -6,7 +6,7 @@ category: development
 tags: iOS,Swift,Mobile,AI
 date: 2026-02-01
 modified: 2026-02-01
-status: published
+status: draft
 image: ios-app.png
 thumbnail: ios-app-thumb.png
 ---
