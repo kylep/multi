@@ -65,7 +65,9 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
                 <Box sx={{ display: 'flex', justifyContent: 'center' }} data-testid="ImageBox">
                     <Box component="img" src={"/images/"+metaData.image} alt={metaData.summary}  sx={{
                         maxWidth: '100%',
+                        maxHeight: '300px',
                         height: 'auto',
+                        objectFit: 'contain',
                     }} />
                 </Box>
             </Box>

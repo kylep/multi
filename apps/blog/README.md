@@ -16,15 +16,39 @@ npm install
 
 ### Environment Variables
 
-**OPENAI_API_KEY** (Optional): Set this environment variable to enable automatic blog post image generation. When building the blog, the system will automatically generate images for any posts that reference an image file that doesn't exist yet.
+The image generation script supports multiple providers. If the required API key for the selected model is not set, the build will skip image generation and warn about missing images. You can also manually add images to `blog/public/images/` instead.
+
+**IMAGE_MODEL** (Optional): Selects which image generation provider to use. Defaults to `openai`.
+
+| Value | Provider | Required Key |
+|-------|----------|-------------|
+| `openai` | OpenAI GPT Image 1.5 | `OPENAI_API_KEY` |
+| `gemini` | Nano Banana (Google Gemini) | `GEMINI_API_KEY` |
+| `bfl` | Flux 2 Max (Black Forest Labs) | `BFL_API_KEY` |
+
+```bash
+export IMAGE_MODEL="openai"
+```
+
+**OPENAI_API_KEY** (Optional): Required when `IMAGE_MODEL=openai`. Also used for gpt-4o-mini prompt summarization regardless of model.
 
 ```bash
 export OPENAI_API_KEY="your-openai-api-key-here"
 ```
 
-If not set, the build will skip image generation and warn about missing images. You can also manually add images to `blog/public/images/` instead of using AI generation.
+**GEMINI_API_KEY** (Optional): Required when `IMAGE_MODEL=gemini`.
 
-For local dev you can add it to exports.sh, that file is gitignored.
+```bash
+export GEMINI_API_KEY="your-gemini-api-key-here"
+```
+
+**BFL_API_KEY** (Optional): Required when `IMAGE_MODEL=bfl`.
+
+```bash
+export BFL_API_KEY="your-bfl-api-key-here"
+```
+
+For local dev you can add these to exports.sh, that file is gitignored.
 
 Then from the base directory (with this README), verify the setup by building the static files.
 
@@ -86,7 +110,7 @@ The CI should push the files up to prod, but if you're impatient or it's not wor
 build and push yourself. Make sure your gcloud cli is authd first.
 
 ```
-build-blog-files.sh
+bin/build-blog-files.sh
 bin/prod-deploy.sh
 ```
 
