@@ -226,7 +226,7 @@ kolla-ansible -i /etc/kolla/inventory post-deploy
 
 The OpenStack services are deployed, now to configure the cloud to be usable.
 
-For details about these commands, see my previous VM guide [here](/openstack-aio-ka-vm..html).
+For details about these commands, see my previous VM guide [here](/openstack-aio-ka-vm.html).
 
 These commands are ran right on the physical OpenStack host.
 

@@ -78,7 +78,7 @@ would not propagate even after over 24 hours. I transferred my domain to
 [Cloudflare](https://cloudflare.com/). Their updates apply basically right
 away!
 
-See also: [How I transferred the domain from GoDaddy to Cloudflare](/dns-xfer-godaddy-cloudflare).
+See also: [How I transferred the domain from GoDaddy to Cloudflare](/dns-xfer-godaddy-cloudflare.html).
 
 
 ---

@@ -5,23 +5,27 @@ slug: ai-image-gen-bakeoff
 category: ai
 tags: AI, Images, OpenAI, Flux, Nano Banana
 date: 2026-02-21
-modified: 2026-02-21
+modified: 2026-02-24
 status: published
 image: ai-image-gen-bakeoff.png
 thumbnail: ai-image-gen-bakeoff-thumb.png
 imgprompt: A cute robot wearing a short chefs hat and holding a paint brush
 ---
 
-I wrote about this blog's [automated image generation](/blog/ai-generated-blog-images) previously. The short version: `generate-images.mjs` runs before each build, finds posts with missing images, builds a prompt from the `imgprompt` front matter field (or has `gpt-4o-mini` summarize the post), then calls DALL-E 3 to produce a 1024x1024 image.
+I wrote about this blog's [automated image generation](/ai-generate-blog-images.html) previously. The short version: `generate-images.mjs` runs before each build, finds posts with missing images, builds a prompt from the `imgprompt` front matter field (or has `gpt-4o-mini` summarize the post), then calls DALL-E 3 to produce a 1024x1024 image.
 
 It works, but DALL-E 3 is frustrating. It ignores prompt details, can't make a white background to save its life, and the results look more "AI art" than "clean icon." Time to see what else is out there.
 
 
+*Lesson Learned*: Don't let Cursor/Claude look online to find the most recent model versions. It got it wrong twice. I had to manually go back and update it after noticing that Gemini's 2.0-flash was not the newer Nano Banana (2.5, 3).
+
+
 # Top Models Today
 
-This space moves fast. As of February 2026, these are the top 3 image generation models on the [LM Arena text-to-image leaderboard](https://lmarena.ai/leaderboard/text-to-image) that have public APIs. These rankings are based on blind human preference voting and will almost certainly be different by the time you read this.
+This space moves fast. As of February 2026, these are the top 3 image generation models on the [LM Arena text-to-image leaderboard](https://arena.ai/leaderboard/text-to-image) that have public APIs. These rankings are based on blind human preference voting and will almost certainly be different by the time you read this.
 
 **ELO Scores:** ELO is a rating system where users are shown two AI-generated images side by side (without knowing which model made which) and pick the one they prefer. Wins and losses shift each model's score, so a higher ELO means the model's images are consistently preferred by real people.
+
 
 | Model | Provider | Released | ELO | Notes |
 |-------|----------|----------|-----|-------|
@@ -108,10 +112,10 @@ The ambiguity here is mostly around GPT Image 1.5 — the token-based pricing me
 
 # Results
 
-Each model was given the same prompt, built from `imgprompt: "A cute robot holding a paint brush"`:
+Each model was given the same prompt, built from `imgprompt: "A cute robot wearing a short chefs hat and holding a paint brush"`:
 
 ```text
-Subject: "A cute robot holding a paint brush".
+Subject: "A cute robot wearing a short chefs hat and holding a paint brush".
 Style: minimalist flat vector icon, clean lines, crisp edges, simplified geometric shapes.
 Colors: black, white, and one primary accent color only. No gradients.
 Composition: centered subject, generous negative space, wide landscape 16:9 aspect ratio.
@@ -127,11 +131,23 @@ Model: `gpt-image-1.5`, size: 1024x1024, quality: medium. Estimated cost: ~$0.03
 
 ![GPT Image 1.5 result](/images/ai-image-gen-bakeoff-openai.png)
 
-## Nano Banana (Gemini)
+## Gemini 2.0 Flash (Google)
 
 Model: `gemini-2.0-flash-exp-image-generation`. Estimated cost: ~$0.02 (free tier may apply).
 
-![Nano Banana result](/images/ai-image-gen-bakeoff-gemini.png)
+![Nano Banana 2.0 result](/images/ai-image-gen-bakeoff-gemini-2.0.png)
+
+## Nano Banana (Gemini 2.5 Flash)
+
+Model: `gemini-2.5-flash-image`. Estimated cost: ~$0.02.
+
+![Nano Banana 2.5 Flash result](/images/ai-image-gen-bakeoff-gemini-2.5.png)
+
+## Nano Banana Pro (Gemini 3 Pro)
+
+Model: `gemini-3-pro-image-preview`. Estimated cost: ~$0.10.
+
+![Nano Banana 3 Pro result](/images/ai-image-gen-bakeoff-gemini-3-pro.png)
 
 ## Flux 2 Max (BFL)
 
@@ -141,10 +157,11 @@ Model: `flux-2-max`, size: 1024x576. Estimated cost: ~$0.04 (~0.6MP at $0.07/MP)
 
 
 # Conclusion
-It's OpenAI. It's got that annoying same-y generic feel that lets you know it's AI art, and I don't love that, but it's also definitely more cute.
+
+It's pretty close between OpenAI and Nano Banana 2.5. I'll likely switch back and forth between the two, but to pick a flat winner as default I'm going with OpenAI for now. 
+
+OpenAI has that annoying same-y generic feel that lets you know it's AI art, and I don't love that, but it's also definitely more cute.
+
+Nano Banana's ones are pretty original. I like 3-pro the most but not the price. 2.5-flash is fun, a bit cleaner than OpenAI's art, just kind of *busy*. I'll probably pick it when I'm aiming for cleaner images than cute ones.
 
 Flux's was more artsy. It's just kinda of... weird? It kept drawing unique stuff but just sort of unsettling.
-
-Nano Banana's ones are pretty original but it just keeps making it really small and not as cute despite `cute` being in the name. I think I might switch to it once I figure out the size problems and get bored of the generic ChatGPT style.
-
-Given the middling price too, `gpt-image-1.5` wins today (2026-02-22).

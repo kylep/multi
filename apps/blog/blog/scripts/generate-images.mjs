@@ -11,13 +11,21 @@ const __dirname = path.dirname(__filename);
 const POSTS_DIR = path.join(__dirname, '../markdown/posts');
 const IMAGES_DIR = path.join(__dirname, '../public/images');
 
-const VALID_MODELS = ['openai', 'gemini', 'bfl'];
+const VALID_MODELS = ['openai', 'gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-3-pro', 'bfl'];
 const IMAGE_MODEL = process.env.IMAGE_MODEL || 'openai';
 
 const MODEL_ENV_KEYS = {
   openai: 'OPENAI_API_KEY',
-  gemini: 'GEMINI_API_KEY',
+  'gemini-2.0-flash': 'GEMINI_API_KEY',
+  'gemini-2.5-flash': 'GEMINI_API_KEY',
+  'gemini-3-pro': 'GEMINI_API_KEY',
   bfl: 'BFL_API_KEY',
+};
+
+const GEMINI_MODEL_IDS = {
+  'gemini-2.0-flash': 'gemini-2.0-flash-exp-image-generation',
+  'gemini-2.5-flash': 'gemini-2.5-flash-image',
+  'gemini-3-pro': 'gemini-3-pro-image-preview',
 };
 
 function getRequiredKey(model) {
@@ -79,10 +87,11 @@ async function generateImageOpenAI(prompt, imageFullPath) {
 }
 
 async function generateImageGemini(prompt, imageFullPath) {
-  const apiKey = getRequiredKey('gemini');
+  const apiKey = getRequiredKey(IMAGE_MODEL);
   if (!apiKey) return false;
-  console.log(`\n🎨 [Gemini] Generating image: ${imageFullPath}`);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`;
+  const geminiModelId = GEMINI_MODEL_IDS[IMAGE_MODEL];
+  console.log(`\n🎨 [Gemini/${IMAGE_MODEL}] Generating image: ${imageFullPath}`);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModelId}:generateContent?key=${apiKey}`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -149,7 +158,9 @@ async function generateImageBFL(prompt, imageFullPath) {
 
 const IMAGE_GENERATORS = {
   openai: generateImageOpenAI,
-  gemini: generateImageGemini,
+  'gemini-2.0-flash': generateImageGemini,
+  'gemini-2.5-flash': generateImageGemini,
+  'gemini-3-pro': generateImageGemini,
   bfl: generateImageBFL,
 };
 

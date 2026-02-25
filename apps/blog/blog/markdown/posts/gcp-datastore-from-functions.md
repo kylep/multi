@@ -22,7 +22,7 @@ database anyways. It looks like Google doesn't offer a relational DBaaS product
 other than ones that spin up whole VMs though, which doesn't fit my primary
 goal of minimizing costs.
 
-If you've never used Cloud Functions, consider checking out my [earlier post](/gcp-cloud-functions),
+If you've never used Cloud Functions, consider checking out my [earlier post](/gcp-cloud-functions.html),
 where I create a simple Hello World function.
 
 I've also written [another post](/gcp-datastore-python) showing how to interact

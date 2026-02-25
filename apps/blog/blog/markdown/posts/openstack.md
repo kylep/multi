@@ -168,4 +168,4 @@ The [Kolla project](https://github.com/openstack/kolla) does such a great job
 of that, that there's no need to do it yourself. That is, until you need to
 change an image, for instance to install a Cinder plugin.
 
-**[Modifying OpenStack Kolla Docker Images](/copenstack-kolla-custom-plugin.html)**
+**[Modifying OpenStack Kolla Docker Images](/openstack-kolla-custom-plugin.html)**

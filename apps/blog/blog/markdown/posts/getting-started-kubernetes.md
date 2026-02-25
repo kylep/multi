@@ -15,7 +15,7 @@ This guide isn't finished, don't follow it
 
 This guide will use an already-deployed Kubernetes cluster to deploy a simple
 application. For more information about how to deploy Kubernetes, check out my
-guide [Deploy Magnum for OpenStack with Kolla-Ansible](/openstack-2-magnum.html).
+guide [Deploy Magnum for OpenStack with Kolla-Ansible](/openstack-magnum.html).
 Magnum is an open
 
 

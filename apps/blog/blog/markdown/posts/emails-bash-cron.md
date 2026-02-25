@@ -33,7 +33,7 @@ whatever other test you like.
 
 # Building the Alert Tool
 
-Before you begin, consider [setting up a local send-only postfix service](/emails-postfix-ubuntu).
+Before you begin, consider [setting up a local send-only postfix service](/emails-postfix-ubuntu.html).
 
 
 ## Test the mail command

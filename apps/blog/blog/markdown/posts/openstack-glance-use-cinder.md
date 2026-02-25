@@ -73,7 +73,7 @@ sudo glance-rootwrap /etc/glance/rootwrap.conf privsep-helper \
 To fix this I made a custom glance-api container.
 
 I've written a post that covers
-[how to modify OpenStack Kolla container images](/openstack-kolla-custom-plugin).
+[how to modify OpenStack Kolla container images](/openstack-kolla-custom-plugin.html).
 Those steps are needed here too.
 
 In the glance-api template, you need to do a few things to resolve this:

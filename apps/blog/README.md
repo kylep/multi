@@ -20,11 +20,13 @@ The image generation script supports multiple providers. If the required API key
 
 **IMAGE_MODEL** (Optional): Selects which image generation provider to use. Defaults to `openai`.
 
-| Value | Provider | Required Key |
-|-------|----------|-------------|
-| `openai` | OpenAI GPT Image 1.5 | `OPENAI_API_KEY` |
-| `gemini` | Nano Banana (Google Gemini) | `GEMINI_API_KEY` |
-| `bfl` | Flux 2 Max (Black Forest Labs) | `BFL_API_KEY` |
+| Value | Provider | Model | Required Key |
+|-------|----------|-------|-------------|
+| `openai` | OpenAI GPT Image 1.5 | `gpt-image-1.5` | `OPENAI_API_KEY` |
+| `gemini-2.0-flash` | Google Gemini (legacy) | `gemini-2.0-flash-exp-image-generation` | `GEMINI_API_KEY` |
+| `gemini-2.5-flash` | Google Nano Banana (fast) | `gemini-2.5-flash-image` | `GEMINI_API_KEY` |
+| `gemini-3-pro` | Google Nano Banana Pro | `gemini-3-pro-image-preview` | `GEMINI_API_KEY` |
+| `bfl` | Flux 2 Max (Black Forest Labs) | `flux-2-max` | `BFL_API_KEY` |
 
 ```bash
 export IMAGE_MODEL="openai"
@@ -36,7 +38,7 @@ export IMAGE_MODEL="openai"
 export OPENAI_API_KEY="your-openai-api-key-here"
 ```
 
-**GEMINI_API_KEY** (Optional): Required when `IMAGE_MODEL=gemini`.
+**GEMINI_API_KEY** (Optional): Required when `IMAGE_MODEL` is any `gemini-*` value.
 
 ```bash
 export GEMINI_API_KEY="your-gemini-api-key-here"
@@ -205,6 +207,9 @@ docker run --rm -v ./blog/markdown:/app/blog/markdown:ro -v ./workspace:/workspa
 - Always use the same front matter keys as the other posts have.
 - Try to keep text lines at 88 chars or shorter so they're easier to manually review in tmux
 - Don't introduce new markup techniques, but you can use any that are supported already
+- Internal links must use the format `/{slug}.html` — all posts are served flat at the
+  root, with no subdirectory prefix. The slug comes from the `slug:` field in the target
+  post's front matter. Example: `[link text](/ai-generate-blog-images.html)`
 
 ## Testing Commands
 ```

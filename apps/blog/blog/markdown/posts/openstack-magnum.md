@@ -19,8 +19,8 @@ Magnum depends on the core OpenStack projects, plus Heat and Octavia.
 
 To install OpenStack & Magnum, I've written two posts:
 
-- [OpenStack dev cluster in a VM](/openstack-1-vm-ka-aio.html)
-- [OpenStack dev cluster on one metal server](/openstack-3-metal-ka-aio.html)
+- [OpenStack dev cluster in a VM](/openstack-aio-ka-vm.html)
+- [OpenStack dev cluster on one metal server](/openstack-aio-ka-metal.html)
 
 
 **NOTE**: I haven't figured out how to get Octavia to actually work yet. Its

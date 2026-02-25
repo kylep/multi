@@ -56,8 +56,8 @@ Below are some example configuration files used for this site.
 Cloud Build is great for keeping your Docker Registry images aligned with your
 version control code.
 
-In this example I use Cloud Build to build and push a [pelican image](/docker-pelican-image)
-to the [Google Container Registry](/google-container-registry).
+In this example I use Cloud Build to build and push a [pelican image](/docker-pelican-image.html)
+to the [Google Container Registry](/google-container-registry.html).
 
 Be sure to keep the Dockerfile code in version control. Aside from being a good
 idea in general, Cloud Build can also use Git commits as a build trigger.
