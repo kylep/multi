@@ -164,7 +164,7 @@ llama-cli \
 
 Flags:
 - `-ngl 99`: offload all layers to Metal. Without this you're CPU-only and it's
-  very slow.
+  very slow. `--fit on` instead might be better, not sure.
 - `-c 8192`: context window. Comfortable with 16GB for the smaller two. Fine
   for Mistral Nemo too given the headroom.
 
@@ -200,8 +200,21 @@ the tokens per second, due to it not working in Reasoning mode. The writing styl
 Nemo was by far the best, and it adhered much better to the prompts.
 
 
+
+## Not enough tokens
+
+The `8192` tokens they all use got to feeling pretty small, pretty fast. I tried to
+push the continuity with a "Choose your own adventure" style conversation and it did
+well until it just kind of stopped. I think I've seen claude crushing context down when
+it gets near the limit, I wonder if there's a way to do that with this too, or get it
+to do some sort of context shifting where it restarts with just the later context when
+it runs low. Maybe I can run it in server mode and have a better client manage that,
+but that seems like its own post.
+
+
 ## Winner
 
 Nemo was the pretty clear winner. I'm not sure if that's because of the size of the
 model or something else, but it was a significant step up in its ability to stick to
 the prompt's instructions, and the writing style was better too.
+
