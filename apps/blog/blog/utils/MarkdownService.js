@@ -96,8 +96,8 @@ class MarkdownService {
 		status: draft | published
 	  }
 	  */
-	  // filters out .swp so vim doesn't break dev env
-	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => !filename.endsWith('.swp'));
+	  // filters out .swp so vim doesn't break dev env, and non-post .md files like CLAUDE.md
+	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => !filename.endsWith('.swp') && filename !== 'CLAUDE.md');
 	  let markdownFiles = await Promise.all(files.map( async filename => {
 		const fullPath = path.join(this.markdownDirectory, filename);
 		const rawMarkdown = fs.readFileSync(fullPath, 'utf8');
@@ -159,7 +159,7 @@ class MarkdownService {
 		// return an object counting the posts per category, 
 		// like { category1: 3, category2: 1}
 		return markdownFiles.reduce((acc, file) => {
-		  const category = file.metaData.category.toLowerCase();
+		  const category = file.metaData.category?.toLowerCase();
 		  if (category) {
 			if (acc[category]) {
 			  acc[category] += 1;
