@@ -96,6 +96,15 @@ Keep prose lines at 88 characters or shorter. This makes the raw markdown
 readable in a terminal or side-by-side diff.
 
 
+## Tags
+
+Tags are used as URL slugs. Keep them URL-safe: single words or hyphenated
+multi-word tags only. No spaces, no dots, no special characters.
+
+Good: `Apple-Silicon`, `llama-cpp`, `Node-js`
+Bad: `Apple Silicon`, `llama.cpp`, `Node.js`
+
+
 ## What to Avoid
 
 - AI writing tells: hedging qualifiers, hollow transitions, motivational sign-

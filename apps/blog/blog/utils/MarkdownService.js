@@ -142,7 +142,7 @@ class MarkdownService {
 		  const tags = file.metaData.tags;
 		  if (tags) {
 			tags.split(',').forEach(rawTag => {
-			  const tag = rawTag.trim().toLowerCase();
+			  const tag = rawTag.trim().toLowerCase().replace(/\s+/g, '-');
 			  if (acc[tag]) {
 				acc[tag].push(file);
 			  } else {
@@ -178,7 +178,7 @@ class MarkdownService {
 		  const tags = file.metaData.tags;
 		  if (tags) {
 			tags.split(',').forEach(rawTag => {
-			  const tag = rawTag.trim().toLowerCase();
+			  const tag = rawTag.trim().toLowerCase().replace(/\s+/g, '-');
 			  if (acc[tag]) {
 				acc[tag] += 1;
 			  } else {

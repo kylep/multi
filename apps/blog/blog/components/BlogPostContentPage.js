@@ -52,15 +52,19 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
                 <a href={`/category/${metaData.category.toLowerCase()}`} style={{textDecoration: 'none', margin: "0 0.5em"}}>{ metaData.category.toLowerCase() }</a>
                 {/*Tags Links*/}
                 <Typography variant="blogPostGreySubtitle">Tags:</Typography>
-                {metaData.tags.split(',').map((tag, index) => (
-                    <a 
-                        key={`${tag.trim().toLowerCase()}-${index}`} 
-                        href={`/tag/${tag.trim().toLowerCase()}`} 
-                        style={{ textDecoration: 'none', marginLeft: '5px' }}
-                    >
-                        {tag.trim().toLowerCase()}
-                    </a>
-                ))};
+                {metaData.tags.split(',').map((tag, index) => {
+                    const display = tag.trim().toLowerCase();
+                    const slug = display.replace(/\s+/g, '-');
+                    return (
+                        <a
+                            key={`${slug}-${index}`}
+                            href={`/tag/${slug}`}
+                            style={{ textDecoration: 'none', marginLeft: '5px' }}
+                        >
+                            {display}
+                        </a>
+                    );
+                })};
                 {/*Post Header Image*/}
                 <Box sx={{ display: 'flex', justifyContent: 'center' }} data-testid="ImageBox">
                     <Box component="img" src={"/images/"+metaData.image} alt={metaData.summary}  sx={{

@@ -4,7 +4,7 @@ summary: Running and comparing Qwen3 8B, DeepSeek-R1-Distill-Qwen-7B, and
   Mistral Nemo 12B locally using llama.cpp on Apple Silicon
 slug: local-llm-bakeoff
 category: ai
-tags: AI, LLM, Apple Silicon, llama.cpp, Qwen, DeepSeek, Mistral
+tags: AI, LLM, Apple-Silicon, llama-cpp, Qwen, DeepSeek, Mistral
 date: 2026-02-25
 modified: 2026-02-25
 status: published
