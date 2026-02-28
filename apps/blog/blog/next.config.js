@@ -3,6 +3,17 @@ module.exports = {
 
   productionBrowserSourceMaps: true,
 
+  // Strip .html from URLs in dev so links like /foo.html work the same as
+  // they do in prod (where static files are served directly). Rewrites are
+  // not supported with output: 'export' at build time, so guard on NODE_ENV.
+  ...(process.env.NODE_ENV === 'development' ? {
+    async rewrites() {
+      return [
+        { source: '/:path*.html', destination: '/:path*' },
+      ];
+    },
+  } : {}),
+
   output: 'export',
   images: {unoptimized: true},
   webpack: (config, { isServer }) => {
