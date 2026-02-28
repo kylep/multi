@@ -63,7 +63,7 @@ claude plugin install coderabbit
 
 Or from inside a Claude Code session:
 
-```
+```text
 /plugin install coderabbit
 ```
 
@@ -87,20 +87,20 @@ graph TD
 
 Inside a Claude Code session, after you've made changes:
 
-```
+```text
 /coderabbit:review uncommitted
 ```
 
 This reviews everything not yet committed. You can also review committed-but-
 not-pushed changes:
 
-```
+```text
 /coderabbit:review committed
 ```
 
 Or compare against a specific branch:
 
-```
+```text
 /coderabbit:review --base main
 ```
 
