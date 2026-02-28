@@ -1,0 +1,91 @@
+reviews:
+  profile: chill
+  poem: false
+  high_level_summary: true
+  auto_review:
+    enabled: true
+    base_branches:
+      - main
+
+  # Exclude generated files, build artifacts, and lock files.
+  # CodeRabbit reviewing node_modules or a pnpm-lock.yaml is pure noise.
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/__pycache__/**"
+    - "!**/.terraform/**"
+    - "!**/.next/**"
+    - "!**/dist/**"
+    - "!**/out/**"
+    - "!**/build/**"
+    - "!**/*.lock"
+    - "!**/pnpm-lock.yaml"
+    - "!**/package-lock.json"
+
+  path_instructions:
+    # Infrastructure: security is the only thing that matters here.
+    # Terraform style issues are not worth a comment.
+    - path: "infra/**"
+      instructions: >
+        Focus exclusively on security issues: hardcoded credentials, overly
+        permissive IAM policies, public S3 buckets, unencrypted storage, open
+        security groups. Flag Terraform anti-patterns that risk data loss or
+        unintended resource deletion. Ignore formatting and style entirely.
+
+    # kytrade has a real database and real auth. Treat it accordingly.
+    - path: "apps/kytrade/**"
+      instructions: >
+        Security-first review. Flag SQL injection risks, missing authentication
+        checks, hardcoded secrets, and insecure Flask patterns. Verify
+        SQLAlchemy queries use parameterized inputs. Flag exposed debug
+        endpoints or missing CORS restrictions. Style issues are low priority.
+
+    # Blog posts are written in a deliberate casual style defined in CLAUDE.md.
+    # CodeRabbit should not second-guess word choice or sentence structure.
+    - path: "apps/blog/blog/markdown/posts/**"
+      instructions: >
+        This is blog post content written in a deliberate informal engineering
+        style. Do not suggest grammar corrections, rephrasing, tone changes, or
+        style improvements. Only flag genuinely broken markdown syntax, invalid
+        frontmatter fields (missing required keys, wrong types), or mermaid
+        diagram syntax errors that would prevent rendering.
+
+    # Blog app: correctness over style.
+    - path: "apps/blog/**"
+      instructions: >
+        Focus on correctness: broken Next.js patterns, missing React list keys,
+        hydration mismatches, and incorrect static export usage. Flag anything
+        that would cause a build failure or broken page. Style improvements are
+        low priority.
+
+    # Game logic: type safety and correctness matter, style does not.
+    - path: "apps/games/kid-bot-battle-sim/**"
+      instructions: >
+        TypeScript game logic. Flag type safety issues, missing null checks,
+        and logic errors in game state transitions. In test files, flag tests
+        that would pass regardless of the implementation. Ignore style.
+
+    # Sample code is intentionally simplified for teaching. Don't flag
+    # the absence of production patterns that were deliberately left out.
+    - path: "samples/**"
+      instructions: >
+        Tutorial and sample code intentionally simplified for learning.
+        Production patterns like error handling, timeouts, and input validation
+        are omitted on purpose. Only flag security vulnerabilities or code that
+        would actively fail if a learner copied and ran it as written.
+
+    # Feature specs are design documents, not code.
+    - path: "apps/games/*/features/**"
+      instructions: >
+        These are game design specification documents. Only flag formatting
+        issues that would prevent parsing. Do not review content or suggest
+        changes to design decisions.
+
+    # Tests: assert meaningful behavior, not style.
+    - path: "**/tests/**"
+      instructions: >
+        Focus on whether tests actually assert meaningful behavior. Flag tests
+        that always pass regardless of the implementation under test. Ignore
+        naming conventions and style.
+
+chat:
+  auto_reply: true

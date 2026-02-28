@@ -128,54 +128,54 @@ This is the real win. One file, consistent rules across both tools.
 # `.coderabbit.yaml` for More Control
 
 The CLAUDE.md integration handles standards. For repo-level review behavior,
-`.coderabbit.yaml` at the root gives you more control:
+`.coderabbit.yaml` at the root gives you more control over what gets reviewed,
+how aggressively, and with what focus per directory.
 
-```yaml
-reviews:
-  auto_review: true
-  target_branches:
-    - main
-  path_filters:
-    - "**/*.{js,ts,tsx,md}"
-    - "!**/node_modules/**"
-    - "!**/dist/**"
-  path_instructions:
-    - path: "apps/**/tests/**"
-      instructions: >
-        Focus on test coverage and assertion quality.
-        Flag missing edge cases.
-    - path: "apps/**/src/**"
-      instructions: >
-        Check for security issues and code complexity.
-        Flag anything that should be split into smaller functions.
-```
+The two most useful fields:
 
-The `path_instructions` field lets you give CodeRabbit different instructions
-depending on what it's looking at. Tests get different scrutiny than production
-code.
+- `path_filters`: glob patterns for files to skip entirely (lock files, build
+  artifacts, node_modules — CodeRabbit reviewing a `pnpm-lock.yaml` is noise)
+- `path_instructions`: per-path AI instructions so review focus matches what
+  actually matters in each area
 
 Note: don't put `CLAUDE.md` in `path_instructions`. That makes CodeRabbit try
 to review the file rather than use it as guidelines. The auto-detection handles
 it correctly without any config.
 
 
-# GitHub App Setup
+# My Setup
 
-The local CLI works without this, but to get PR reviews on GitHub you need the
-app installed:
+Here's [the `.coderabbit.yaml` for this repo](https://github.com/kylep/multi/blob/main/.coderabbit.yaml).
+The repo is a monorepo with a Next.js blog, a TypeScript game engine, a Flask
+API with a real Postgres database, Terraform infrastructure, and some tutorial
+sample code. Each of those needs different treatment.
 
-1. Go to [github.com/apps/coderabbit](https://github.com/apps/coderabbit)
-2. Install for your repo
-3. Grant the requested permissions (read for most things, read-write for PR
-   comments)
+**`profile: chill`** is the most impactful setting. CodeRabbit's default
+profile generates a lot of comments. Chill mode cuts the noise significantly
+and focuses on things that actually matter. Combined with targeted
+`path_instructions`, it stops the review from feeling like a style guide
+argument.
 
-After installation, any PR against `main` gets an automatic review posted as
-comments within a few minutes.
+**`poem: false`** turns off CodeRabbit's habit of writing a short poem at the
+end of each PR summary. It's charming once. Less so on the fifteenth PR.
 
+**Path filters** drop lock files, build artifacts, and generated directories.
+There's no value in reviewing a `package-lock.json` diff.
 
-# That's It
+**`infra/` and `apps/kytrade/`** get security-focused instructions with
+everything else deprioritized. Terraform style is not worth a comment.
+A misconfigured IAM policy is.
 
-The setup is: CLI install, auth, Claude Code plugin, optionally a
-`.coderabbit.yaml`. Your CLAUDE.md already does double duty. The local review
-command cuts the push-wait-fix cycle down to something you control before anyone
-else sees the PR.
+**`apps/blog/blog/markdown/posts/`** gets a specific instruction to ignore
+grammar, phrasing, and tone entirely. The blog has a deliberate writing style
+defined in its own `CLAUDE.md`. CodeRabbit shouldn't fight it. It's only asked
+to flag broken frontmatter or broken mermaid syntax.
+
+**`samples/`** is tutorial code where error handling and timeouts are
+intentionally absent. Without an explicit instruction, CodeRabbit flags every
+missing timeout as a production concern. With it, the reviews are quiet unless
+something would actively break for a learner copying the code.
+
+**`**/tests/**`** is told to focus on whether tests actually assert something,
+not on style. A test that always passes is a real problem. Variable naming is
+not.
