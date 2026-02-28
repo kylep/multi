@@ -21,4 +21,4 @@ gsutil -m rsync -r -c -d $src_url $dst_url
 
 # Disable all caching
 echo "Disabling cache headers..."
-gsutil -m setmeta -h "Cache-Control:no-cache,no-store,must-revalidate" -r $dst_url
+gsutil setmeta -h "Cache-Control:no-cache,no-store,must-revalidate" -r $dst_url
