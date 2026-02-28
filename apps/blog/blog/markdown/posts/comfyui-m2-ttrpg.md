@@ -7,7 +7,7 @@ category: ai
 tags: AI, Images, ComfyUI, Apple-Silicon, SDXL, IP-Adapter, TTRPG
 date: 2026-02-26
 modified: 2026-02-26
-status: published
+status: draft
 image: comfyui-m2-ttrpg.png
 thumbnail: comfyui-m2-ttrpg-thumb.png
 imgprompt: A tiny robot dungeon master painting miniature fantasy character portraits at a glowing desk
