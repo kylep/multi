@@ -3,16 +3,6 @@ module.exports = {
 
   productionBrowserSourceMaps: true,
 
-  async rewrites() {
-
-    return [
-      // make dev work like stage/prod's post-build index file overwite
-      {source: '/', destination: '/index1.html',},
-
-      // strip .html from URLs for matching dev and staging... Maybe.
-      { source: '/:path*.html', destination: '/:path*',},
-    ]
-  },
   output: 'export',
   images: {unoptimized: true},
   webpack: (config, { isServer }) => {

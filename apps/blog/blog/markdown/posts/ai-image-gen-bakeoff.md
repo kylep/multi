@@ -164,4 +164,4 @@ OpenAI has that annoying same-y generic feel that lets you know it's AI art, and
 
 Nano Banana's ones are pretty original. I like 3-pro the most but not the price. 2.5-flash is fun, a bit cleaner than OpenAI's art, just kind of *busy*. I'll probably pick it when I'm aiming for cleaner images than cute ones.
 
-Flux's was more artsy. It's just kinda of... weird? It kept drawing unique stuff but just sort of unsettling.
+Flux's was more artsy. It's just kind of... weird? It kept drawing unique stuff but just sort of unsettling.
