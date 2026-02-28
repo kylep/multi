@@ -1,12 +1,12 @@
 ---
 title: Local LLM Bakeoff on Apple M2 Air
-summary: Running and comparing Qwen3 8B, DeepSeek-R1-Distill-Qwen-7B, and
-  Mistral Nemo 12B locally using llama.cpp on Apple Silicon
+summary: Running and comparing Qwen3 8B, DeepSeek-R1-Distill-Qwen-7B, Mistral
+  Nemo 12B, and Mistral Small 3.1 24B locally using llama.cpp on Apple Silicon
 slug: local-llm-bakeoff
 category: ai
 tags: AI, LLM, Apple-Silicon, llama-cpp, Qwen, DeepSeek, Mistral
 date: 2026-02-25
-modified: 2026-02-25
+modified: 2026-02-28
 status: published
 image: local-llm-m2-air.png
 thumbnail: local-llm-m2-air-thumb.png
@@ -19,13 +19,15 @@ good quality, or push into 12B at a lower quant.
 
 This runs three models locally and compares them:
 
-| Model | Params | Style | Q4_K_L Size |
-|-------|--------|-------|-------------|
-| Qwen3 8B | 8B | Instruction | 5.49 GB |
-| DeepSeek-R1-Distill-Qwen-7B | 7B | Reasoning | 5.09 GB |
-| Mistral Nemo Instruct 2407 | 12B | Instruction | 7.98 GB |
+| Model | Params | Style | Quant | Size |
+|-------|--------|-------|-------|------|
+| Qwen3 8B | 8B | Instruction | Q4_K_L | 5.49 GB |
+| DeepSeek-R1-Distill-Qwen-7B | 7B | Reasoning | Q4_K_L | 5.09 GB |
+| Mistral Nemo Instruct 2407 | 12B | Instruction | Q4_K_L | 7.98 GB |
+| Mistral Small 3.1 24B | 24B | Instruction | Q4_K_S | 13.5 GB |
 
-All three fit comfortably in 16GB with room for context. To browse other models,
+The first three fit comfortably in 16GB with room for context. Mistral Small
+3.1 at 13.5 GB leaves very little headroom on a 16GB machine. To browse other models,
 [bartowski's HuggingFace page](https://huggingface.co/bartowski) is a good
 starting point for well-tested GGUF quantizations.
 
@@ -36,10 +38,13 @@ parameters generally means more capable, but also more RAM and slower inference.
 **Quantization** is how a full-precision model gets compressed to fit on
 consumer hardware. The original weights are 16 or 32-bit floats; quantization
 rounds them down to fewer bits, trading a small amount of accuracy for a large
-reduction in size and RAM usage. **Q4_K_L** specifically uses 4-bit weights
-with the embedding and output layers kept at 8-bit to preserve quality. It's a
-good default: much smaller than the lossless formats, better output than plain
-Q4.
+reduction in size and RAM usage. **Q4_K_L** uses 4-bit weights with the
+embedding and output layers kept at higher precision (8-bit) to preserve
+quality. **Q4_K_S** is the smaller sibling: same 4-bit compression throughout,
+including the embedding layers, shaving off a bit of quality for a smaller
+file. For Mistral Small 3.1 that's the difference between 13.5 GB (K_S) and
+14.8 GB (K_L). On a 16GB machine, that 1.3 GB matters, so K_S is the right
+pick there.
 
 **Instruction** models are trained to follow directions and answer questions
 directly. You ask, they answer. **Reasoning** models think out loud first,
@@ -126,6 +131,27 @@ hf download bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF \
   --local-dir ~/models/deepseek-r1-qwen-7b/
 ```
 
+## Mistral Small 3.1 24B
+
+Released March 17, 2025. Mistral's most capable small model at the time.
+24B parameters, multimodal (supports image input), 128k context window,
+Apache 2.0. Mistral officially recommends 32GB RAM for this one, so running
+it on a 16GB M2 Air is pushing it. It loads and runs, but context has to stay
+small.
+
+Note: bartowski's repo for this model has a `mistralai_` prefix in the name,
+unlike the others.
+
+```bash
+hf download bartowski/mistralai_Mistral-Small-3.1-24B-Instruct-2503-GGUF \
+  Mistral-Small-3.1-24B-Instruct-2503-Q4_K_S.gguf \
+  --local-dir ~/models/mistral-small-3.1-24b/
+```
+
+K_S over K_L here because at 13.5 GB vs 14.8 GB, the difference determines
+whether you have any RAM left for context and the OS.
+
+
 ## Mistral Nemo Instruct 12B
 
 Mistral's 12B model (released July 2024, jointly with NVIDIA). Bigger than the
@@ -160,6 +186,11 @@ llama-cli \
 llama-cli \
   -m ~/models/mistral-nemo-12b/Mistral-Nemo-Instruct-2407-Q4_K_L.gguf \
   -ngl 99 -c 8192
+
+# Mistral Small 3.1 24B — tight on RAM, keep context small
+llama-cli \
+  -m ~/models/mistral-small-3.1-24b/Mistral-Small-3.1-24B-Instruct-2503-Q4_K_S.gguf \
+  -ngl 99 -c 2048
 ```
 
 Flags:
@@ -198,6 +229,9 @@ same 3 paragraph limit. Overall I was pretty dissapointed given its reputation.
 **Mistral Nemo 12B** The direct responses felt fast even though it ran at about half
 the tokens per second, due to it not working in Reasoning mode. The writing style of
 Nemo was by far the best, and it adhered much better to the prompts.
+
+**Mistral Nemo 24B** Not enough RAM. I'd figured I could close things and make it work
+but it's not worth it. Maybe on a better computer.
 
 
 
