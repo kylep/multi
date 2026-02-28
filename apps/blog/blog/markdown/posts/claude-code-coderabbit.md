@@ -55,11 +55,17 @@ coderabbit --version
 
 # Install the Claude Code Plugin
 
-Inside Claude Code, install the CodeRabbit plugin from the marketplace:
+From any terminal:
 
-1. Open the plugins panel
-2. Discover plugins, search "coderabbit"
-3. Install it
+```bash
+claude plugin install coderabbit
+```
+
+Or from inside a Claude Code session:
+
+```
+/plugin install coderabbit
+```
 
 The plugin wraps the CLI and exposes review commands you can run directly in
 your Claude Code session. It also lets you trigger a review with plain English,
