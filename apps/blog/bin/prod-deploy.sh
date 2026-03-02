@@ -17,8 +17,26 @@ fi
 # -d    Delete extra files under dst_url not found under src_url
 src_url="blog/out"
 dst_url="gs://kyle.pericak.com"
+
+# Dry run first to find which files will change
+echo "Checking for changes..."
+dry_run_output=$(gsutil -m rsync -r -c -d -n $src_url $dst_url)
+if [ $? -ne 0 ]; then
+  echo "Dry-run failed, aborting."
+  exit 1
+fi
+
 gsutil -m rsync -r -c -d $src_url $dst_url
 
-# Disable all caching
-echo "Disabling cache headers..."
-gsutil setmeta -h "Cache-Control:no-cache,no-store,must-revalidate" -r $dst_url
+# Build array of changed GCS URLs (array handles spaces in names safely)
+mapfile -t changed_urls < <(echo "$dry_run_output" \
+  | grep "^Would copy" \
+  | sed "s|Would copy .* to \(gs://.*\)$|\1|")
+
+if [ ${#changed_urls[@]} -gt 0 ]; then
+  echo "Disabling cache headers on ${#changed_urls[@]} changed file(s)..."
+  gsutil -m setmeta -h "Cache-Control:no-cache,no-store,must-revalidate" \
+    "${changed_urls[@]}"
+else
+  echo "No files changed, skipping metadata update."
+fi
