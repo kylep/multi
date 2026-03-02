@@ -31,7 +31,7 @@ gsutil -m rsync -r -c -d $src_url $dst_url
 # Build array of changed GCS URLs (array handles spaces in names safely)
 mapfile -t changed_urls < <(echo "$dry_run_output" \
   | grep "^Would copy" \
-  | sed "s|Would copy .* to \(gs://[^ ]*\).*|\1|")
+  | sed "s|Would copy .* to \(gs://.*\)$|\1|")
 
 if [ ${#changed_urls[@]} -gt 0 ]; then
   echo "Disabling cache headers on ${#changed_urls[@]} changed file(s)..."
