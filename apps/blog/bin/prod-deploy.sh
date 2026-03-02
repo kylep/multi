@@ -20,17 +20,23 @@ dst_url="gs://kyle.pericak.com"
 
 # Dry run first to find which files will change
 echo "Checking for changes..."
-changed_files=$(gsutil -m rsync -r -c -d -n $src_url $dst_url 2>/dev/null \
-  | grep "^Would copy" \
-  | sed "s|Would copy .* to \(gs://[^ ]*\).*|\1|")
+dry_run_output=$(gsutil -m rsync -r -c -d -n $src_url $dst_url)
+if [ $? -ne 0 ]; then
+  echo "Dry-run failed, aborting."
+  exit 1
+fi
 
 gsutil -m rsync -r -c -d $src_url $dst_url
 
-# Set cache headers only on files that changed
-if [ -n "$changed_files" ]; then
-  echo "Disabling cache headers on changed files..."
-  echo "$changed_files" | xargs gsutil -m setmeta \
-    -h "Cache-Control:no-cache,no-store,must-revalidate"
+# Build array of changed GCS URLs (array handles spaces in names safely)
+mapfile -t changed_urls < <(echo "$dry_run_output" \
+  | grep "^Would copy" \
+  | sed "s|Would copy .* to \(gs://[^ ]*\).*|\1|")
+
+if [ ${#changed_urls[@]} -gt 0 ]; then
+  echo "Disabling cache headers on ${#changed_urls[@]} changed file(s)..."
+  gsutil -m setmeta -h "Cache-Control:no-cache,no-store,must-revalidate" \
+    "${changed_urls[@]}"
 else
   echo "No files changed, skipping metadata update."
 fi
