@@ -1,7 +1,3 @@
-
-
-<!-- Source: .ruler/style.md -->
-
 # Blog Post Writing Style
 
 This file guides AI assistants writing or editing posts in this directory.

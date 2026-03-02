@@ -1,7 +1,3 @@
-
-
-<!-- Source: .ruler/build.md -->
-
 # sillyapp - iOS App
 
 ## Build
