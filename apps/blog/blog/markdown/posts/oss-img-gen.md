@@ -2,14 +2,14 @@
 title: "ComfyUI on M2: Local Image API with Character Consistency"
 summary: Setting up ComfyUI on a 16GB Apple Silicon MacBook as a local REST API,
   with IP-Adapter for generating consistent character portraits in a tabletop RPG game
-slug: comfyui-m2-ttrpg
+slug: oss-img-gen
 category: ai
 tags: AI, Images, ComfyUI, Apple-Silicon, SDXL, IP-Adapter, TTRPG
-date: 2026-02-26
-modified: 2026-02-26
-status: draft
-image: comfyui-m2-ttrpg.png
-thumbnail: comfyui-m2-ttrpg-thumb.png
+date: 2026-03-01
+modified: 2026-03-01
+status: published
+image: oss-img-gen-knight.png
+thumbnail: oss-img-gen-knight-thumb.png
 imgprompt: A tiny robot dungeon master painting miniature fantasy character portraits at a glowing desk
 ---
 
@@ -32,9 +32,11 @@ scenes, at combat start) rather than continuously.
 
 16GB comfortably fits:
 - **SDXL** (fp16, ~6.5GB): mature IP-Adapter ecosystem, good portrait quality
-- **FLUX.1-schnell** (fp8 quantized, ~6.5GB): faster, 4-step generation, IP-Adapter
-  support exists but is less tested
-- **FLUX.1-dev** (fp8, ~8GB): better quality than schnell, 20-50 steps
+- **FLUX.2-klein-4B** (fp8, ~8-9GB): Apache 2.0, released November 2025, 4-step
+  distilled generation, supersedes FLUX.1-schnell. IP-Adapter support less
+  mature than SDXL.
+- **FLUX.1-dev** (fp8, ~8GB): previous generation but still the best quality
+  option that fits 16GB. FLUX.2-dev exists but won't fit.
 
 For this post I'm using SDXL. Its IP-Adapter tools are battle-tested for exactly
 this use case, and 6.5GB leaves plenty of headroom for additional models.
@@ -47,11 +49,11 @@ everything automatically. Use that if you just want the UI. For API access and
 full control, manual install is cleaner.
 
 ```bash
-# Python 3.11+ required
-python3 --version
-
 git clone https://github.com/comfyanonymous/ComfyUI
 cd ComfyUI
+python3.13 -m venv venv
+source venv/bin/activate
+python --version  # must say 3.13 — if it says 3.9 you have an old venv, rm -rf venv and redo
 pip install -r requirements.txt
 ```
 
@@ -61,46 +63,83 @@ automatically. No CUDA, no special flags.
 Start it:
 
 ```bash
+source venv/bin/activate
 python main.py --listen 0.0.0.0 --port 8188
 ```
 
 `--listen 0.0.0.0` binds to all interfaces instead of localhost only. Needed for
 the API to be reachable from other processes or devices on your network.
 
+I keep a `start-comfyui.sh` in `~/models/` next to the model README so there's
+one place for everything model-related:
+
+```bash
+#!/bin/bash
+source /path/to/ComfyUI/venv/bin/activate
+cd /path/to/ComfyUI
+python main.py --listen 0.0.0.0 --port 8188
+```
+
 Open `http://localhost:8188`. You should see the node graph UI with a default
-workflow loaded.
+workflow loaded. No models needed for the server to start — the UI comes up
+regardless.
+
+
+# Model Storage
+
+Models don't need to live inside the repo. ComfyUI will look in additional
+directories if you tell it to via `extra_model_paths.yaml`:
+
+```bash
+cp extra_model_paths.yaml.example extra_model_paths.yaml
+```
+
+Then add an entry pointing at wherever you keep models. For example, if you
+store them under `~/models/`:
+
+```yaml
+my_models:
+  base_path: ~/models/
+  checkpoints: sdxl/
+  ipadapter: ipadapter/
+  clip_vision: clip_vision/
+```
+
+Adjust the subdirectory names to match your layout. ComfyUI merges these with
+its own paths and shows everything in the UI dropdowns.
 
 
 # Models
 
-Download into `ComfyUI/models/checkpoints/`:
+Download SDXL (~6.5GB):
 
 ```bash
-# SDXL base (6.5GB)
-huggingface-cli download stabilityai/stable-diffusion-xl-base-1.0 \
+hf download stabilityai/stable-diffusion-xl-base-1.0 \
   sd_xl_base_1.0.safetensors \
-  --local-dir ComfyUI/models/checkpoints/
+  --local-dir ~/models/sdxl/
 ```
 
-For IP-Adapter, first install the custom node:
+For IP-Adapter, clone the custom node into ComfyUI's `custom_nodes/` directory:
 
 ```bash
-cd ComfyUI/custom_nodes
+cd /path/to/ComfyUI/custom_nodes
 git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus
-pip install -r ComfyUI_IPAdapter_plus/requirements.txt
 ```
+
+No pip install needed — it has no extra dependencies beyond what ComfyUI
+already installs. ComfyUI picks it up automatically on next startup.
 
 Then download the IP-Adapter weights:
 
 ```bash
 # IP-Adapter for SDXL
-huggingface-cli download h94/IP-Adapter \
+hf download h94/IP-Adapter \
   sdxl_models/ip-adapter_sdxl.bin \
-  --local-dir ComfyUI/models/ipadapter/
+  --local-dir ~/models/ipadapter/
 
-# CLIP vision encoder (required by IP-Adapter)
-huggingface-cli download openai/clip-vit-large-patch14 \
-  --local-dir ComfyUI/models/clip_vision/clip-vit-large-patch14/
+# CLIP vision encoder (required by IP-Adapter — must be ViT-bigG, not ViT-L)
+hf download laion/CLIP-ViT-bigG-14-laion2B-39B-b160k \
+  --local-dir ~/models/clip_vision/CLIP-ViT-bigG-14-laion2B-39B-b160k/
 ```
 
 Restart ComfyUI after installing custom nodes. It rescans the nodes directory on
@@ -111,13 +150,89 @@ startup.
 
 Before touching the API, confirm generation works at all.
 
-1. In the UI, find the "Load Checkpoint" node and select
-   `sd_xl_base_1.0.safetensors`
-2. Set a positive prompt: `a fantasy rogue in a dark alley, RPG portrait, detailed`
-3. Hit Queue Prompt
+The built-in Templates target newer models and won't work with SDXL. ComfyUI
+ships a test workflow in the repo — open it with **File > Open**:
 
-First generation is slower while the model loads into memory. On M2 Air at 20
-steps, SDXL takes roughly 25-45 seconds. Subsequent generations are faster.
+```
+/path/to/ComfyUI/tests/inference/graphs/default_graph_sdxl1_0.json
+```
+
+![ComfyUI web interface](/images/comfyui-web-interface.png)
+
+It's a base+refiner workflow with two Load Checkpoint nodes. The top one
+should already show `sd_xl_base_1.0.safetensors`. The bottom one defaults to
+`sd_xl_refiner_1.0.safetensors` — change it to `sd_xl_base_1.0.safetensors`
+too. We're not doing base+refiner, just running base twice.
+
+Drop a prompt into one of the CLIP Text Encode nodes and hit **Run**:
+
+```
+a knight in plate armor holding a mace and shield, fantasy RPG portrait,
+detailed face, dramatic lighting, painterly style, 4k, highly detailed
+```
+
+First run is slow while the model loads. On M2 Air, SDXL at 20 steps takes
+90-120 seconds. Subsequent runs with the model cached are faster but still
+in that range — the Air throttles under sustained load with no active cooling.
+
+![Knight portrait generated with SDXL](/images/oss-img-gen-knight.png)
+
+
+# Img2Img: Post-Battle
+
+Txt2img generates from noise. Img2img starts from an existing image and
+nudges it toward a new prompt. Good way to stay close to a character while
+changing context or condition.
+
+Add two nodes to the current workflow. Right-click empty canvas space (not
+on a node) to get the picker:
+
+- **image → Load Image** — then select your knight from `ComfyUI/output/`
+  using the dropdown in the node, or upload it from there
+- **latent → VAE Encode** — converts a pixel image into the latent space
+  the sampler works in, replacing the EmptyLatentImage
+
+Then make three connections. To draw a wire: click and drag from an output
+dot (right side of a node) to an input dot (left side of another node).
+The dots are color-coded by type and will only connect to compatible ports.
+
+1. Drag from the **IMAGE** dot (blue, right side of Load Image) to the
+   **pixels** dot on VAE Encode
+2. Drag from either **Load Checkpoint VAE** dot → **VAE Encode vae** dot
+3. Drag from **VAE Encode LATENT** dot → **KSampler latent_image** dot
+   (disconnects EmptyLatentImage automatically)
+
+The test workflow uses **KSampler Advanced**, which has no `denoise` slider.
+Instead set **start_at_step** to `6`. With 20 total steps that runs the last
+14, equivalent to about 70% denoise. Lower start_at_step = more faithful to
+original, higher = more change.
+
+Update the positive prompt — that's the CLIP Text Encode node wired to the
+KSampler's **positive** input, as opposed to the negative one (which holds
+your "ugly, blurry..." text):
+
+```
+a knight in plate armor, damaged armor, battle-worn, dented helmet,
+scratches and dents, mud-stained, exhausted, fantasy RPG portrait,
+detailed face, dramatic lighting, painterly style, 4k, highly detailed
+```
+
+Hit **Run**. If it's changing too much, drop start_at_step to 4. If the
+damage isn't reading, push to 8.
+
+![Knight after img2img battle damage pass](/images/img2image-knight.png)
+
+Img2img works, but it's coarse. Fine details like face structure get lost
+as you increase denoise, and at low denoise the prompt has limited
+influence. Good for "same scene, different state." Not what you want for
+generating the same character across completely different scenes.
+
+That's what IP-Adapter is for. Instead of perturbing the reference image,
+it encodes it through CLIP vision into an embedding that gets injected
+alongside the text conditioning during generation. The sampler still starts
+from pure noise, but the attention layers are nudged toward the character's
+appearance at every step. Face and body survive across very different
+scenes because the conditioning runs throughout, not just at the start.
 
 
 # The API
@@ -226,7 +341,7 @@ Add these nodes to the workflow above:
 },
 "11": {
   "class_type": "CLIPVisionLoader",
-  "inputs": { "clip_name": "clip-vit-large-patch14" }
+  "inputs": { "clip_name": "CLIP-ViT-bigG-14-laion2B-39B-b160k/open_clip_model.safetensors" }
 },
 "12": {
   "class_type": "LoadImage",
@@ -240,7 +355,7 @@ Add these nodes to the workflow above:
     "image": ["12", 0],
     "clip_vision": ["11", 0],
     "weight": 0.6,
-    "weight_type": "original",
+    "weight_type": "linear",
     "combine_embeds": "concat",
     "start_at": 0.0,
     "end_at": 1.0,
@@ -250,6 +365,11 @@ Add these nodes to the workflow above:
 ```
 
 Then change node `"3"`'s `model` input from `["4", 0]` to `["13", 0]`.
+
+The prompt here asks for the same knight in a tavern — completely different
+scene, same character used as reference.
+
+![Knight in a tavern, generated with IP-Adapter using the portrait as reference](/images/oss-img-gen-ipadapter.png)
 
 `weight` is the main knob. At 0.5 you get style and general appearance influence.
 At 0.8 it starts fighting the text prompt. For character identity, 0.6-0.7 is
@@ -274,19 +394,21 @@ this by extracting face embeddings specifically rather than encoding the whole i
 Download:
 
 ```bash
-huggingface-cli download h94/IP-Adapter-FaceID \
+hf download h94/IP-Adapter-FaceID \
   ip-adapter-faceid-plusv2_sdxl.bin \
-  --local-dir ComfyUI/models/ipadapter/
+  --local-dir ~/models/ipadapter/
 ```
 
-FaceID also requires InsightFace, which isn't on HuggingFace. You need to download
-the `antelopev2` model package from the
+FaceID also requires InsightFace, which isn't on HuggingFace. Download the
+`antelopev2` model package from the
 [InsightFace model zoo](https://github.com/deepinsight/insightface/tree/master/model_zoo)
-and place it at `ComfyUI/models/insightface/models/antelopev2/`.
+and place it under `~/models/insightface/models/antelopev2/` (or wherever your
+`extra_model_paths.yaml` maps `insightface`).
 
-Install the Python package:
+Install the Python package into the ComfyUI venv:
 
 ```bash
+source /path/to/ComfyUI/venv/bin/activate
 pip install insightface onnxruntime
 ```
 
@@ -313,150 +435,3 @@ graph TD
     F --> G[Display in game]
     G --> D
 ```
-
-Python client that wraps the API:
-
-```python
-import json
-import time
-import requests
-from pathlib import Path
-
-COMFYUI = "http://localhost:8188"
-
-def generate(
-    prompt: str,
-    negative: str = "ugly, blurry, watermark, bad anatomy",
-    reference_image: str | None = None,  # filename in ComfyUI/input/
-    seed: int = -1,
-) -> bytes:
-    workflow = json.loads(Path("workflow_sdxl.json").read_text())
-    workflow["6"]["inputs"]["text"] = prompt
-    workflow["7"]["inputs"]["text"] = negative
-    workflow["3"]["inputs"]["seed"] = seed
-
-    if reference_image:
-        workflow["12"]["inputs"]["image"] = reference_image
-        workflow["3"]["inputs"]["model"] = ["13", 0]  # route through IPAdapter
-    else:
-        workflow["3"]["inputs"]["model"] = ["4", 0]   # bypass IPAdapter
-
-    resp = requests.post(f"{COMFYUI}/prompt", json={"prompt": workflow})
-    resp.raise_for_status()
-    prompt_id = resp.json()["prompt_id"]
-
-    # Note: add a timeout in production to avoid waiting forever if ComfyUI hangs
-    while True:
-        history = requests.get(f"{COMFYUI}/history/{prompt_id}").json()
-        if prompt_id in history and history[prompt_id]["status"]["completed"]:
-            break
-        time.sleep(1)
-
-    outputs = history[prompt_id]["outputs"]
-    filename = next(
-        (img["filename"]
-        for node_output in outputs.values()
-        for img in node_output.get("images", [])),
-        None
-    )
-    if not filename:
-        raise RuntimeError("No images in generation output")
-
-    return requests.get(f"{COMFYUI}/view", params={"filename": filename}).content
-
-
-def upload_reference(path: str) -> str:
-    with open(path, "rb") as f:
-        resp = requests.post(f"{COMFYUI}/upload/image", files={"image": f})
-    return resp.json()["name"]
-```
-
-Character class for the game:
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class Character:
-    name: str
-    traits: str          # "tall elf rogue, purple hair, leather armor"
-    portrait_ref: str | None = None  # filename in ComfyUI/input/ after first gen
-
-    def prompt(self, scene: str) -> str:
-        return f"{self.traits}, {scene}, fantasy RPG portrait, detailed"
-
-    def is_known(self) -> bool:
-        return self.portrait_ref is not None
-
-
-def get_character_image(character: Character, scene: str) -> bytes:
-    image_bytes = generate(
-        prompt=character.prompt(scene),
-        reference_image=character.portrait_ref,
-    )
-
-    # Store portrait on first generation
-    if not character.is_known():
-        tmp_path = f"/tmp/{character.name}_portrait.png"
-        Path(tmp_path).write_bytes(image_bytes)
-        character.portrait_ref = upload_reference(tmp_path)
-
-    return image_bytes
-```
-
-First call for any character generates without a reference and stores the result.
-Every subsequent call for that character passes the stored portrait to IP-Adapter.
-
-
-# Running as a Background Service
-
-For a game that's actually running, keep ComfyUI up automatically.
-
-```bash
-# ~/scripts/comfyui.sh
-#!/bin/bash
-cd /path/to/ComfyUI
-python main.py --listen 0.0.0.0 --port 8188
-```
-
-As a LaunchAgent (auto-start on login):
-
-```xml
-<!-- ~/Library/LaunchAgents/local.comfyui.plist -->
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>local.comfyui</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/usr/bin/python3</string>
-    <string>/path/to/ComfyUI/main.py</string>
-    <string>--listen</string>
-    <string>0.0.0.0</string>
-    <string>--port</string>
-    <string>8188</string>
-  </array>
-  <key>RunAtLoad</key>
-  <true/>
-  <key>StandardOutPath</key>
-  <string>/tmp/comfyui.log</string>
-  <key>StandardErrorPath</key>
-  <string>/tmp/comfyui-error.log</string>
-</dict>
-</plist>
-```
-
-```bash
-launchctl load ~/Library/LaunchAgents/local.comfyui.plist
-
-# Verify it started:
-curl http://localhost:8188/system_stats
-```
-
-Note on the Air: sustained image generation will cause throttling after a few
-minutes. The machine slows down noticeably rather than stops entirely. For a game
-that generates at scene boundaries rather than in a tight loop, this is fine in
-practice.
