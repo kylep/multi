@@ -160,6 +160,7 @@ async function generateImageBFL(prompt, imageFullPath) {
 
 const IMAGE_GENERATORS = {
   openai: generateImageOpenAI,
+  'gemini': generateImageGemini,
   'gemini-2.0-flash': generateImageGemini,
   'gemini-2.5-flash': generateImageGemini,
   'gemini-3-pro': generateImageGemini,
@@ -226,7 +227,8 @@ async function run() {
   if (!fs.existsSync(POSTS_DIR)) {
     return;
   }
-  const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
+  const META_FILES = new Set(['CLAUDE.md', 'AGENTS.md']);
+  const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md') && !META_FILES.has(f));
   for (const file of files) {
     await saveMissingBlogImageAndThumbnail(path.join(POSTS_DIR, file));
   }
