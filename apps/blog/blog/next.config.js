@@ -25,6 +25,7 @@ module.exports = {
       };
     }
     config.optimization.minimize = false;
+    config.infrastructureLogging = { level: 'error' };
     return config;
   },
   eslint: {
