@@ -11,11 +11,12 @@ const __dirname = path.dirname(__filename);
 const POSTS_DIR = path.join(__dirname, '../markdown/posts');
 const IMAGES_DIR = path.join(__dirname, '../public/images');
 
-const VALID_MODELS = ['openai', 'gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-3-pro', 'bfl'];
+const VALID_MODELS = ['openai', 'gemini', 'gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-3-pro', 'bfl'];
 const IMAGE_MODEL = process.env.IMAGE_MODEL || 'openai';
 
 const MODEL_ENV_KEYS = {
   openai: 'OPENAI_API_KEY',
+  'gemini': 'GEMINI_API_KEY',
   'gemini-2.0-flash': 'GEMINI_API_KEY',
   'gemini-2.5-flash': 'GEMINI_API_KEY',
   'gemini-3-pro': 'GEMINI_API_KEY',
@@ -23,6 +24,7 @@ const MODEL_ENV_KEYS = {
 };
 
 const GEMINI_MODEL_IDS = {
+  'gemini': 'gemini-3-pro-image-preview',
   'gemini-2.0-flash': 'gemini-2.0-flash-exp-image-generation',
   'gemini-2.5-flash': 'gemini-2.5-flash-image',
   'gemini-3-pro': 'gemini-3-pro-image-preview',
@@ -158,6 +160,7 @@ async function generateImageBFL(prompt, imageFullPath) {
 
 const IMAGE_GENERATORS = {
   openai: generateImageOpenAI,
+  'gemini': generateImageGemini,
   'gemini-2.0-flash': generateImageGemini,
   'gemini-2.5-flash': generateImageGemini,
   'gemini-3-pro': generateImageGemini,
@@ -224,7 +227,8 @@ async function run() {
   if (!fs.existsSync(POSTS_DIR)) {
     return;
   }
-  const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
+  const META_FILES = new Set(['CLAUDE.md', 'AGENTS.md']);
+  const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md') && !META_FILES.has(f));
   for (const file of files) {
     await saveMissingBlogImageAndThumbnail(path.join(POSTS_DIR, file));
   }

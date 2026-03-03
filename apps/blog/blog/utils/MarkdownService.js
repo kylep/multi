@@ -96,8 +96,13 @@ class MarkdownService {
 		status: draft | published
 	  }
 	  */
-	  // filters out .swp so vim doesn't break dev env, and non-post .md files like CLAUDE.md
-	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => !filename.endsWith('.swp') && filename !== 'CLAUDE.md');
+	  // only load .md files that are actual files (not dirs), skipping meta files
+	  const META_FILES = new Set(['CLAUDE.md', 'AGENTS.md']);
+	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => {
+	    if (!filename.endsWith('.md')) return false;
+	    if (META_FILES.has(filename)) return false;
+	    return fs.statSync(path.join(this.markdownDirectory, filename)).isFile();
+	  });
 	  let markdownFiles = await Promise.all(files.map( async filename => {
 		const fullPath = path.join(this.markdownDirectory, filename);
 		const rawMarkdown = fs.readFileSync(fullPath, 'utf8');

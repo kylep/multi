@@ -1,7 +1,3 @@
-
-
-<!-- Source: .ruler/interfaces.md -->
-
 # Interfaces
 When there's an empty `# Interfaces` section/header, fill it in with reasonable
 details. If there's already content, leave it be unless asked to modify it.
