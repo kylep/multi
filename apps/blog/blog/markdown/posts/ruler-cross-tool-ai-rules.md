@@ -44,9 +44,6 @@ Claude Code has CLAUDE.md files scattered through the tree:
 | `apps/blog/.../posts/CLAUDE.md` | Blog writing voice, formatting rules, structure |
 | `apps/games/kid-bot-battle-sim/features/CLAUDE.md` | Interface details for that feature set |
 
-The monorepo rule lives only in Cursor. Claude Code has never seen it.
-The branching rule lives only in Claude Code. Neither tool has the full
-picture. Two separate rule stores, both incomplete.
 
 
 # Ruler Setup
@@ -102,18 +99,16 @@ might win. That doesn't help with Skills, though.
 
 ## Skills
 
-Rules are always-loaded context. Skills are on-demand — invocable commands
-you call by name when you need them. Claude Code has these as slash commands
-(`/commit`, `/review-pr`). Cursor has its own equivalent. At work I use one in
-particularly for tying together MCP tools to triage Datadog alerts, for example.
-
-Ruler distributes skills the same way it distributes rules. Drop skill
-files into `.ruler/` and `ruler apply` copies them to each tool's native
-skills directory:
+Rules are basically just fancy prompt context that are always loaded.
+Skills are just fancy prompt context loaded on-demand, maybe with some extra files
+sometimes. Different tools implement them in different ways:
 
 - Claude Code: `.claude/skills/`
 - Cursor: `.cursor/skills/`
 - Other tools follow the same pattern under their own config directories
+
+Ruler figures it out and distributes them for you. Could this all just be a bash
+script? Yes. Does it do a bunch of stuff I don't understand too? Also, probably, yes.
 
 Enabled by default. Pass `--no-skills` to skip it:
 
@@ -122,6 +117,7 @@ ruler apply           # distributes rules + skills
 ruler apply --no-skills  # rules only
 ```
 
+---
 
 # Consolidating rules: Migration steps
 
