@@ -14,18 +14,18 @@ thumbnail: ruler-cross-tool-ai-rules-thumb.png
 imgprompt: A tiny robot holding a ruler standing in front of multiple computer screens each showing a different code editor
 ---
 
-I use Cursor and Claude Code. I occasionally use Codex, and I'm planning to
-try OpenCode next. Each tool has its own config format, and right now my
-instructions are split across two separate places with tedious consolidation.
-
-[Ruler](https://github.com/intellectronica/ruler) seems popular and we're testing it at
-work too. Going to use it for this job.
+I use Cursor and Claude Code, sometimes Codex, and I'm about to try OpenCode.
+Each tool has its own rules format, and I've been maintaining them separately.
+[Ruler](https://github.com/intellectronica/ruler) generates each tool's native
+config from a single source. Worth setting up.
 
 
-# What I Have Today
+# Tool agnosticism with common rules
+I'm trying to keep up. There are too many tools. I don't want to migrate things around.
+We're using this at work too, since different devs use different tools. Here's how I
+set up Ruler to consolidate my Cursor and Claude rules together.
 
-As of 2026-03-02, I've only got the one **Cursor** rule at `.cursor/rules/monorepo.md`:
-
+I had this rule in Cursor:
 ```markdown
 # Monorepo rules
 
@@ -35,7 +35,7 @@ Each directory within apps/ and games/ is a sub-project. They shouldn't
 share code.
 ```
 
-**Claude Code** has CLAUDE.md files at multiple levels of the tree:
+Claude Code has CLAUDE.md files scattered through the tree:
 
 | File | Contents |
 |------|----------|
@@ -45,40 +45,39 @@ share code.
 | `apps/games/kid-bot-battle-sim/features/CLAUDE.md` | Interface details for that feature set |
 
 The monorepo rule lives only in Cursor. Claude Code has never seen it.
-The blog style guide only Claude Code sees. The branching rule is in the root
-CLAUDE.md but not in `.cursor/rules/`, so Cursor doesn't know about it either.
-
-Two tools, two separate instruction stores, with real gaps between them.
+The branching rule lives only in Claude Code. Neither tool has the full
+picture. Two separate rule stores, both incomplete.
 
 
-# How Ruler Works
+# Ruler Setup
 
 ```bash
 npm install -g @intellectronica/ruler
 ```
 
-Initialize in the repo root:
+Initialize at the repo root:
 
 ```bash
 ruler init
 ```
 
-This creates a `.ruler/` directory and a `ruler.toml` config. You put your
-instructions as Markdown files inside `.ruler/`. Then:
+This creates a `.ruler/` directory and a `ruler.toml` config. Drop your
+instructions as Markdown files inside `.ruler/`, then:
 
 ```bash
 ruler apply
 ```
 
-Each enabled agent gets its native config generated from the same source.
+## What happens when you run it
+
 Claude Code gets `CLAUDE.md`. Everything else (Cursor, OpenCode, Codex,
-Copilot, and 30+ others) gets `AGENTS.md`. Generated files go into
-`.gitignore` automatically, so only the `.ruler/` source is committed.
+Copilot, 30+ others) gets `AGENTS.md`. Generated files go into `.gitignore`
+automatically, so only the `.ruler/` source is committed.
 
 Ruler supports nested directories. A `.ruler/` at the repo root applies
 globally. A `.ruler/` inside a sub-project applies when an agent is working
-there. This maps exactly to how Claude Code already loads CLAUDE.md files
-walking up the directory tree.
+there. That matches how Claude Code already loads CLAUDE.md files walking up
+the directory tree.
 
 ```mermaid
 graph TD
@@ -92,25 +91,39 @@ graph TD
     C --> H[AGENTS.md]
 ```
 
-
-# Wait, Can't I Just Use AGENTS.md?
-
-Most tools have converged on `AGENTS.md`: Cursor, OpenCode, Codex, and
-30-odd others all read it. So fair question: if everything agrees on one
-format, why bother with Ruler at all?
-
-The honest answer: Claude Code is the odd one out. It prefers `CLAUDE.md`
-over `AGENTS.md`. If you just maintain `AGENTS.md` files, Claude Code will
-read them, but you're not using its native format. Ruler generates `CLAUDE.md`
-for Claude Code and `AGENTS.md` for everything else from the same source.
-
-If you only used Claude Code, you'd just maintain CLAUDE.md files directly.
-If you dropped Claude Code and used only AGENTS.md-native tools, you'd just
-maintain AGENTS.md files. Ruler earns its keep when you have both in the mix,
-which I do.
+You can symlink ~/.ruler to your dir too if you want global Claude rules.
 
 
-# Migrating My Setup
+# Note: Consider just using AGENTS.md
+
+Most tools read `AGENTS.md`: Cursor, OpenCode, Codex, ~others~. If all you have is
+rules, it's not a bad idea to skip all of this and just use that format. I think it
+might win. That doesn't help with Skills, though.
+
+## Skills
+
+Rules are always-loaded context. Skills are on-demand — invocable commands
+you call by name when you need them. Claude Code has these as slash commands
+(`/commit`, `/review-pr`). Cursor has its own equivalent. At work I use one in
+particularly for tying together MCP tools to triage Datadog alerts, for example.
+
+Ruler distributes skills the same way it distributes rules. Drop skill
+files into `.ruler/` and `ruler apply` copies them to each tool's native
+skills directory:
+
+- Claude Code: `.claude/skills/`
+- Cursor: `.cursor/skills/`
+- Other tools follow the same pattern under their own config directories
+
+Enabled by default. Pass `--no-skills` to skip it:
+
+```bash
+ruler apply           # distributes rules + skills
+ruler apply --no-skills  # rules only
+```
+
+
+# Consolidating rules: Migration steps
 
 The `ruler.toml` at the root lists the agents to target:
 
@@ -118,10 +131,7 @@ The `ruler.toml` at the root lists the agents to target:
 default_agents = ["claude", "cursor"]
 ```
 
-I'll add `"opencode"` when I get there. One line, re-run apply.
-
-The migration is moving content out of existing configs into `.ruler/` source
-files. The resulting structure:
+Content moves from existing config files into `.ruler/` source files:
 
 ```
 .ruler/
@@ -138,7 +148,7 @@ apps/games/kid-bot-battle-sim/features/
     interfaces.md     # from features/CLAUDE.md
 ```
 
-**Root `.ruler/branching.md`** (currently only in Claude Code):
+Root `.ruler/branching.md` (was only in Claude Code):
 
 ```markdown
 # Branching
@@ -147,7 +157,7 @@ Never commit directly to `main`. Always create a branch and open a PR
 against main for review.
 ```
 
-**Root `.ruler/monorepo.md`** (currently only in Cursor):
+Root `.ruler/monorepo.md` (was only in Cursor):
 
 ```markdown
 # Monorepo
@@ -158,14 +168,10 @@ Each directory in those folders is its own isolated project.
 ```
 
 The project-specific files (sillyapp build commands, blog style guide)
-move into `.ruler/` inside their directories essentially unchanged. Content
-stays the same; only the location shifts.
+move into `.ruler/` inside their directories unchanged. Content stays the
+same, location shifts.
 
 Note: the existing hand-written CLAUDE.md files get replaced by generated
-versions after running `ruler apply`. Edit the `.ruler/` source, not the
-generated output.
+versions after `ruler apply`. Edit the `.ruler/` source, not the output.
 
-After running apply, Claude Code gets `CLAUDE.md` at each level and
-everything else gets `AGENTS.md`. The monorepo and branching rules that were
-previously split across two tools now come from one place. Adding OpenCode or
-Codex to `default_agents` in `ruler.toml` and re-running apply is all it takes.
+
