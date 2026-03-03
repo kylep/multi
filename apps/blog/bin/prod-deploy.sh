@@ -29,7 +29,11 @@ fi
 gsutil -m rsync -r -c -d $src_url $dst_url
 
 # Build array of changed GCS URLs (array handles spaces in names safely)
-mapfile -t changed_urls < <(echo "$dry_run_output" \
+# Note: mapfile requires bash 4+, macOS ships bash 3.2 — use while-read instead
+changed_urls=()
+while IFS= read -r url; do
+  [[ -n "$url" ]] && changed_urls+=("$url")
+done < <(echo "$dry_run_output" \
   | grep "^Would copy" \
   | sed "s|Would copy .* to \(gs://.*\)$|\1|")
 
