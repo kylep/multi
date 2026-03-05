@@ -1,7 +1,3 @@
-
-
-<!-- Source: .ruler/blog-dev.md -->
-
 # Blog Development Workflow
 
 ## Project location
@@ -45,31 +41,3 @@ When done verifying, kill the dev server with `kill $BLOG_DEV_PID` or `pkill -f 
 ## Blog post format
 - Markdown posts live at `apps/blog/blog/markdown/posts/*.md`
 - The build step compiles them to JSON; the dev server hot-reloads
-
-
-
-<!-- Source: .ruler/branching.md -->
-
-# Repo Guidelines
-
-## Branching
-
-Never commit directly to `main`. Always create a new branch and open a PR against
-`main` for review instead.
-
-```bash
-git checkout -b <branch-name>
-# make changes
-git push -u origin <branch-name>
-gh pr create --base main
-```
-
-
-
-<!-- Source: .ruler/monorepo.md -->
-
-# Monorepo rules
-
-This git repo is a monorepo. It contains multiple sub-projects.
-Do not look for context or cross-reference calls between sub-projects.
-Each directory within apps/ and games/ is a sub-project. They shouldn't share code.
