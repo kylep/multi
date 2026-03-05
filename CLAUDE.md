@@ -22,7 +22,7 @@ The dev server listens on **http://localhost:3000**.
 
 To kill it when done:
 ```bash
-kill $BLOG_DEV_PID 2>/dev/null || pkill -f "next dev" 2>/dev/null
+bin/kill-dev.sh
 ```
 
 If you need to build static files first (e.g. to regenerate markdown → JSON):
@@ -41,6 +41,17 @@ After starting the dev server, use the Playwright MCP tools to visually verify t
 5. **Rebuild** if needed (`bin/build-blog-files.sh`) and repeat
 
 When done verifying, kill the dev server with `kill $BLOG_DEV_PID` or `pkill -f "next dev"`.
+
+## Pre-PR checklist
+
+If the change includes JavaScript (anything under `apps/blog/blog/` except
+`markdown/posts/`), run a CodeRabbit review before opening the PR:
+
+```bash
+coderabbit review --plain
+```
+
+No review needed for markdown-only blog post changes.
 
 ## Blog post format
 - Markdown posts live at `apps/blog/blog/markdown/posts/*.md`
