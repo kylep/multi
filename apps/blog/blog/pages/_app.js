@@ -3,6 +3,7 @@ import '../public/css/prism.css';
 import '../public/js/prism.js';
 
 import Head from 'next/head';
+import Script from 'next/script';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -68,6 +69,18 @@ export default function MyApp({ Component, pageProps }) {
       <Head>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-LF6FVVWFMN"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-LF6FVVWFMN');
+        `}
+      </Script>
       <ThemeProvider theme={theme}>
         <CssBaseline /> {/* resets browser default styles (like margins, font sizes, and line heights)  */}
         <Component {...pageProps} />
