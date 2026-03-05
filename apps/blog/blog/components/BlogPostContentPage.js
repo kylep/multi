@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useEffect } from 'react';
+import Head from 'next/head';
 
 
 
@@ -41,6 +42,7 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
 
     return (
         <Box>
+            <Head><title>{metaData.title}</title></Head>
             <Box sx={{ marginBottom: '20px' }}>
                 {/* Created and Updated timestamps above the title */}
                 <Typography variant="blogPostGreySubtitle">Created: { metaData.date }</Typography> 

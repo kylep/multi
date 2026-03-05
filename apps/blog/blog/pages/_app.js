@@ -4,6 +4,8 @@ import '../public/js/prism.js';
 
 import Head from 'next/head';
 import Script from 'next/script';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -64,6 +66,18 @@ const theme = createTheme({
 
 
 export default function MyApp({ Component, pageProps }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleRouteChange = (url) => {
+      if (typeof window.gtag === 'function') {
+        window.gtag('config', 'G-LF6FVVWFMN', { page_path: url });
+      }
+    };
+    router.events.on('routeChangeComplete', handleRouteChange);
+    return () => router.events.off('routeChangeComplete', handleRouteChange);
+  }, [router.events]);
+
   return (
     <>
       <Head>
