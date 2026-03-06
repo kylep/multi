@@ -198,9 +198,16 @@ class MarkdownService {
 	}
   }
   
+  let devWatcher = null;
+
   export async function getMarkdownService() {
 	if (!MarkdownService.instance) {
 	  new MarkdownService();
+	  if (process.env.NODE_ENV === 'development' && !devWatcher) {
+		devWatcher = fs.watch(path.join('markdown', 'posts'), { persistent: false }, () => {
+		  MarkdownService.instance = null;
+		});
+	  }
 	}
 	await MarkdownService.instance.waitForReady(); // Wait for all the markdown files to load...
 	return MarkdownService.instance;
