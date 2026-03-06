@@ -302,7 +302,7 @@ file is what documents how the UI is supposed to behave.
 
 A `CLAUDE.md` in `tests/` gives Claude guidance when generating tests, things
 like keeping the suite under a minute, no sleeps, one assertion per scenario.
-If you're using [Ruler](/ruler-cross-tool-ai-rules) to share rules across tools,
+If you're using [Ruler](/ruler-cross-tool-ai-rules.html) to share rules across tools,
 put that content in `tests/.ruler/` instead and let Ruler generate the
 `CLAUDE.md` alongside your `AGENTS.md`.
 

@@ -16,7 +16,7 @@ imgprompt: The Linear Logo; a blue circle, top-right-half solid blue, bott-left-
 # WARNING
 
 This blog post, unlike all my others, is currently entirely AI generated. It's a test
-of using [OpenCode agentic swarms](/local-opencode-setup). I'll go through it
+of using [OpenCode agentic swarms](/local-opencode-setup.html). I'll go through it
 later this week and de-slop things.
 
 ---

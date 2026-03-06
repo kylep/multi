@@ -249,7 +249,7 @@ about a codebase.
 
 ## Ruler Support for OpenCode
 
-If you use [Ruler](/ruler-cross-tool-ai-rules) to manage rules across
+If you use [Ruler](/ruler-cross-tool-ai-rules.html) to manage rules across
 multiple coding agents, it does support OpenCode. Here's what it
 handles and what it doesn't.
 
@@ -565,4 +565,4 @@ MCP tool list, changelog, and setup docs. The fact-checker
 independently verifies whatever the writer produces. You get
 a post you didn't write, about a tool the agents researched
 themselves. The result of this test is
-[Linear MCP: From Tab-Switching to Flow](/linear-mcp).
+[Linear MCP: From Tab-Switching to Flow](/linear-mcp.html).
