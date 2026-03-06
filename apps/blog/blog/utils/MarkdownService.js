@@ -60,9 +60,9 @@ class MarkdownService {
 			if (Object.prototype.hasOwnProperty.call(obj, key)) {
 				// dates wrapped in quotes wont be instanceof Date
 				if (obj[key] instanceof Date) {
-					const year = obj[key].getFullYear();
-					const month = String(obj[key].getMonth() + 1).padStart(2, '0');
-					const day = String(obj[key].getDate()).padStart(2, '0');
+					const year = obj[key].getUTCFullYear();
+					const month = String(obj[key].getUTCMonth() + 1).padStart(2, '0');
+					const day = String(obj[key].getUTCDate()).padStart(2, '0');
 					obj[key] = `${year}-${month}-${day}`;
 				}
 			}
@@ -198,9 +198,16 @@ class MarkdownService {
 	}
   }
   
+  let devWatcher = null;
+
   export async function getMarkdownService() {
 	if (!MarkdownService.instance) {
 	  new MarkdownService();
+	  if (process.env.NODE_ENV === 'development' && !devWatcher) {
+		devWatcher = fs.watch(path.join('markdown', 'posts'), { persistent: false }, () => {
+		  MarkdownService.instance = null;
+		});
+	  }
 	}
 	await MarkdownService.instance.waitForReady(); // Wait for all the markdown files to load...
 	return MarkdownService.instance;

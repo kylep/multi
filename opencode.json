@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "linear": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-remote", "https://mcp.linear.app/sse"],
+      "enabled": true
+    }
+  },
+  "agent": {
+    "build": {
+      "permission": {
+        "task": {
+          "*": "deny",
+          "researcher": "allow",
+          "writer": "allow",
+          "fact-checker": "allow",
+          "reviewer": "allow"
+        }
+      }
+    }
+  }
+}

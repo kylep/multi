@@ -40,7 +40,8 @@ After starting the dev server, use the Playwright MCP tools to visually verify t
 4. **Fix** any rendering issues in the markdown or blog source
 5. **Rebuild** if needed (`bin/build-blog-files.sh`) and repeat
 
-When done verifying, kill the dev server with `kill $BLOG_DEV_PID` or `pkill -f "next dev"`.
+When done verifying, close the Playwright browser with `mcp__playwright__browser_close`,
+then kill the dev server with `kill $BLOG_DEV_PID` or `pkill -f "next dev"`.
 
 ## Pre-PR checklist
 
