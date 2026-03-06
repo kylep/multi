@@ -23,6 +23,7 @@ imgprompt: Three logos arranged in a triangle; Claude (anthropic logo), Cursor (
 | Primary interface         | CLI / TUI     | CLI                  | GUI editor |
 | Agent autonomy            | high          | medium               | low        |
 | Multi-agent orchestration | native        | limited              | minimal    |
+| LSP integration           | yes           | no                   | yes        |
 | IDE features              | none          | none                 | full       |
 | Tool execution            | built-in      | built-in             | limited    |
 
@@ -67,6 +68,26 @@ agent spawn both in parallel via the Task tool and coordinate the
 output. In Claude Code you can spawn subagents but you can't define
 custom named agent types with their own models. In Cursor you press a
 button and hope for the best.
+
+### About LSP Support
+
+OpenCode runs Language Server Protocol clients in the
+background. The agent gets a tool that can jump to
+definitions, find references, inspect types, and walk call
+hierarchies. Same operations you'd do in an IDE, but
+available to the agent.
+
+Claude Code doesn't have this. It navigates code with grep,
+glob, and file reads. That works surprisingly well for most
+tasks, but in a large typed codebase where `save` appears
+in 40 files, LSP gets you to the right one faster.
+
+Cursor has LSP by default since it's a full IDE. OpenCode
+is the only CLI tool that offers it.
+
+For blog writing or small projects, this doesn't matter.
+It shows up in large TypeScript or Python codebases where
+the type hierarchy and call graph are complex.
 
 
 # OpenCode as a Coding Assistant
@@ -504,34 +525,13 @@ From your project root:
 opencode
 ```
 
-Run `/connect` in the TUI to set up your providers. You need
-Zen (free, gives you Big Pickle for writer/reviewer) and
-Google (free tier Gemini 2.5 Flash for researcher/fact-checker).
-Make sure you're in `build` mode, not `plan`. Hit `Tab` to
-toggle.
+Run `/connect` to set up your providers. You need Zen (free,
+gives you Big Pickle for writer/reviewer) and Google (free
+tier Gemini 2.5 Flash for researcher/fact-checker). Make sure
+you're in `build` mode, not `plan`. Hit `Tab` to toggle.
 
-Then paste a prompt like:
-
-```
-Write a blog post about [topic]. Follow this pipeline:
-1. Spawn researcher to gather facts. Wait for the brief.
-2. Spawn writer with the brief. Tell it to write the draft
-   to apps/blog/blog/markdown/posts/[slug].md
-3. Spawn fact-checker with the draft file path.
-4. Spawn reviewer with the draft file path.
-5. If either found issues, spawn writer again with the
-   feedback. Re-run fact-checker until clean.
-```
-
-The build agent handles the orchestration from there. It's not
-magic, you're giving it an explicit workflow to follow. The
-agents just make each step focused and repeatable.
-
-### Try it: Linear MCP blog post
-
-A good first test for the swarm: have it write a blog post
-about Linear's MCP server. Add the Linear MCP connector to
-`opencode.json`:
+As a first test, have it write a post about Linear's MCP
+server. Add the Linear MCP connector to `opencode.json`:
 
 ```json
 {
@@ -544,22 +544,25 @@ about Linear's MCP server. Add the Linear MCP connector to
 }
 ```
 
-Then kick off the swarm with a prompt like:
+Then paste a prompt like:
 
 ```
 Write a blog post about using Linear's MCP server for
 AI-assisted project management. Follow this pipeline:
 1. Spawn researcher to look up Linear's MCP docs and
-   changelog for current capabilities.
+   changelog for current capabilities. Wait for the brief.
 2. Spawn writer with the brief. Write the draft to
    apps/blog/blog/markdown/posts/linear-mcp.md
 3. Spawn fact-checker with the draft path.
 4. Spawn reviewer with the draft path.
-5. Fix and re-check until clean.
+5. If either found issues, spawn writer again with the
+   feedback. Re-run fact-checker until clean.
 ```
 
-The researcher gets web search via Gemini and can pull the
-Linear MCP tool list, recent changelog entries, and setup
-docs. The fact-checker independently verifies whatever the
-writer produces. You get a post you didn't write, about a
-tool the agents researched themselves.
+The build agent handles orchestration from there. The
+researcher gets web search via Gemini and pulls the Linear
+MCP tool list, changelog, and setup docs. The fact-checker
+independently verifies whatever the writer produces. You get
+a post you didn't write, about a tool the agents researched
+themselves. The result of this test is
+[Linear MCP: From Tab-Switching to Flow](/linear-mcp).
