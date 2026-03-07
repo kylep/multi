@@ -85,3 +85,53 @@ gh pr create --base main
 This git repo is a monorepo. It contains multiple sub-projects.
 Do not look for context or cross-reference calls between sub-projects.
 Each directory within apps/ and games/ is a sub-project. They shouldn't share code.
+
+
+
+<!-- Source: .ruler/security.md -->
+
+# Security Scanning
+
+The Docker image `kpericak/ai-security-toolkit-1:0.1` bundles
+semgrep, trivy, and gitleaks in one Alpine container.
+
+Run from the repo root. Mount the project directory as /workspace.
+
+## Static analysis (semgrep)
+```bash
+docker run --rm -v "$(pwd):/workspace:ro" \
+  kpericak/ai-security-toolkit-1:0.1 \
+  -c "semgrep scan --config auto /workspace"
+```
+
+## Vulnerability scanning (trivy)
+```bash
+docker run --rm -v "$(pwd):/workspace:ro" \
+  kpericak/ai-security-toolkit-1:0.1 \
+  -c "trivy fs --scanners vuln,secret,misconfig --skip-dirs samples,apps/kytrade,infra/aws,infra/local-k8s /workspace"
+```
+
+## Container image scanning (trivy)
+```bash
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  kpericak/ai-security-toolkit-1:0.1 \
+  -c "trivy image <image:tag>"
+```
+
+## Secret scanning (gitleaks)
+```bash
+docker run --rm -v "$(pwd):/workspace:ro" \
+  kpericak/ai-security-toolkit-1:0.1 \
+  -c "cd /workspace && gitleaks detect --source ."
+```
+
+## When to scan
+Run security scans before opening PRs that touch dependencies,
+infrastructure, or authentication code. Use these to review
+third-party repos before forking or installing them.
+
+## Zero-vuln policy
+Keep SCA vulnerabilities at 0 in active projects. Major package
+upgrades are acceptable to achieve this. Run Playwright tests
+after dependency upgrades to catch regressions.

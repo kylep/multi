@@ -204,6 +204,7 @@ async function saveMissingBlogImageAndThumbnail(postPath) {
     console.warn(`No image defined for ${data.title}, skipping image-generation`);
     return;
   }
+  // nosemgrep: path-join-resolve-traversal -- data from own frontmatter, not user input
   const imageFullPath = path.join(IMAGES_DIR, data.image);
   if (data.image && !fs.existsSync(imageFullPath)) {
     const prompt = await getPromptFromContent(data, content);
@@ -211,6 +212,7 @@ async function saveMissingBlogImageAndThumbnail(postPath) {
     await generateNewImage(prompt, imageFullPath);
   }
   if (data.thumbnail && fs.existsSync(imageFullPath)) {
+    // nosemgrep: path-join-resolve-traversal
     const thumbFullPath = path.join(IMAGES_DIR, data.thumbnail);
     if (!fs.existsSync(thumbFullPath)) {
       await resizeImageToThumbnail(imageFullPath, thumbFullPath);

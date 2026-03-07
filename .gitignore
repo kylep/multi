@@ -15,11 +15,17 @@ postgres-data/
 
 
 # START Ruler Generated Files
-AGENTS.md
-AGENTS.md.bak
-CLAUDE.md
-CLAUDE.md.bak
+/AGENTS.md
+/AGENTS.md.bak
+/CLAUDE.md
+/CLAUDE.md.bak
 # END Ruler Generated Files
+
+# Ruler artifacts in sub-projects
+**/AGENTS.md
+**/AGENTS.md.bak
+**/CLAUDE.md
+**/CLAUDE.md.bak
 
 # Playwright
 **/.playwright-mcp/

@@ -1,0 +1,10 @@
+# Go stdlib CVEs in gitleaks binary (built with Go 1.25.4).
+# No newer gitleaks release available. Will resolve when upstream rebuilds.
+CVE-2025-68121
+CVE-2025-61726
+CVE-2025-61728
+CVE-2025-61729
+
+# Windows-only privilege escalation via malicious Docker CLI plugins.
+# Not exploitable in this Alpine container.
+CVE-2025-15558

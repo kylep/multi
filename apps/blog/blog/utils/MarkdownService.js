@@ -99,13 +99,14 @@ class MarkdownService {
 	  // only load .md files that are actual files (not dirs), skipping meta files
 	  const files = fs.readdirSync(this.markdownDirectory).filter(filename => {
 	    if (!filename.endsWith('.md')) return false;
+	    // nosemgrep: path-join-resolve-traversal -- filename from readdirSync, not user input
 	    if (!fs.statSync(path.join(this.markdownDirectory, filename)).isFile()) return false;
 	    // Skip files without frontmatter (ruler-generated meta files, etc.)
-	    const content = fs.readFileSync(path.join(this.markdownDirectory, filename), 'utf8');
+	    const content = fs.readFileSync(path.join(this.markdownDirectory, filename), 'utf8'); // nosemgrep: path-join-resolve-traversal
 	    return content.trimStart().startsWith('---');
 	  });
 	  let markdownFiles = await Promise.all(files.map( async filename => {
-		const fullPath = path.join(this.markdownDirectory, filename);
+		const fullPath = path.join(this.markdownDirectory, filename); // nosemgrep: path-join-resolve-traversal
 		const rawMarkdown = fs.readFileSync(fullPath, 'utf8');
 		const props = await MarkdownService.getRenderedMarkdownAndProps(rawMarkdown);
 		props.props.metaData.slug = filename.replace('.md', '');
