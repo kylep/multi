@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import { GlobalContext } from '../utils/GlobalContext';
 import { useTheme } from '@mui/material/styles';
@@ -48,7 +48,7 @@ function TagList() {
         <Typography variant="h5">Tags</Typography>
       </Box>
       {
-        sortedTags.map(([tag, count]) => (
+        sortedTags.map(([tag, _count]) => (
           <Box key={tag} sx={{
             display: 'flex',
             alignItems: 'center',

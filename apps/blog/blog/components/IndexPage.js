@@ -1,5 +1,4 @@
 import { Box, Typography, Link } from '@mui/material';
-import React from 'react';
 import Image from 'next/image';
 import Pagination from '../components/Pagination';
 
@@ -21,7 +20,7 @@ function IndexRowContainer({ children, sx }) {
 }
 
 function ImageBox({ thumbnail, sx }) {
-  const imagePath = thumbnail ? ('/images/'+thumbnail) : '/images/gear-thumb.png';
+  const imagePath = thumbnail ? (`/images/${thumbnail}`) : '/images/gear-thumb.png';
   return (
     <Box sx={{
       width: '75px',
@@ -89,7 +88,7 @@ function DateStamp({ children, sx }) {
   );
 }
 
-function BlogPostIndexSummary({ file, sx }) {
+function BlogPostIndexSummary({ file }) {
   return (
     <IndexRowContainer>
         <ImageBox thumbnail={file.thumbnail} />

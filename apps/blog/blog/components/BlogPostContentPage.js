@@ -66,10 +66,10 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
                             {display}
                         </a>
                     );
-                })};
+                })}
                 {/*Post Header Image*/}
                 <Box sx={{ display: 'flex', justifyContent: 'center' }} data-testid="ImageBox">
-                    <Box component="img" src={"/images/"+metaData.image} alt={metaData.summary}  sx={{
+                    <Box component="img" src={`/images/${metaData.image}`} alt={metaData.summary}  sx={{
                         maxWidth: '100%',
                         maxHeight: '300px',
                         height: 'auto',

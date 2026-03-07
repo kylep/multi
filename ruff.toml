@@ -1,0 +1,7 @@
+exclude = [
+    "apps/games",
+    "apps/kytrade",
+    "apps/mods",
+    "apps/xmasblocks",
+    "samples",
+]

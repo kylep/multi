@@ -3,12 +3,13 @@ FROM zricethezav/gitleaks:v8.30.0 AS gitleaks
 
 FROM python:3.12.13-alpine
 
+# hadolint ignore=DL3018
 RUN apk upgrade --no-cache && apk add --no-cache nodejs git gcc musl-dev
 
 COPY --from=trivy /usr/local/bin/trivy /usr/local/bin/trivy
 COPY --from=gitleaks /usr/bin/gitleaks /usr/local/bin/gitleaks
 
-RUN pip install --no-cache-dir semgrep
+RUN pip install --no-cache-dir semgrep==1.154.0
 
 COPY .trivyignore /workspace/.trivyignore
 

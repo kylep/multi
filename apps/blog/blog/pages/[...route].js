@@ -58,7 +58,7 @@ export async function getStaticProps({params}) {
 	*/
 
 	const markdownService = await getMarkdownService();
-	let route = params.route;
+	const route = params.route;
 	route[route.length - 1] = route[route.length - 1];
 	const markdownFilesBeforePagination = markdownService.markdownFiles;
 	const paginatedMarkdownFiles = paginate(markdownFilesBeforePagination, pageSize);
@@ -66,16 +66,16 @@ export async function getStaticProps({params}) {
 	let markdownFiles = [];
 	let postContent = {};
 	let pageNumber = 0; // varies by filtered size of markdownFiles
-	if (route[0] == 'index') { // default index page, treat like index1
+	if (route[0] === 'index') { // default index page, treat like index1
 		markdownFiles = paginatedMarkdownFiles[0];
 	} else if (route[0].startsWith('index')) { // index1.html, index2.html, etc
-		pageNumber = parseInt(route[0].replace('index', ''));
+		pageNumber = parseInt(route[0].replace('index', ''), 10);
 		markdownFiles = paginatedMarkdownFiles[pageNumber - 1];
-	} else if  (route[0] == 'category') { // category/<category>.html
+	} else if  (route[0] === 'category') { // category/<category>.html
 		const category = route[1]; // [1] is the <category> in /category/<category>
 		markdownFiles = markdownService.markdownFilesByCategory[category];
 		indexPageCount = 1; // hack to hide pagination, temporary
-	} else if (route[0] == 'tag') { // tag/<tag>.html
+	} else if (route[0] === 'tag') { // tag/<tag>.html
 		const tag = route[1]; // [1] is the <tag> in /tag/<tag>
 		markdownFiles = markdownService.markdownFilesByTag[tag];
 		indexPageCount = 1; // hack to hide pagination, temporary
@@ -116,8 +116,8 @@ function BaseSiteComponent({
 	// "unefined" was a product of bad markdown processing
 	//if (route == "undefined") { route = ['index']; }
 	let pageContent = <></>;
-	if (route[0].startsWith('index') || route[0] == 'category' || route[0] == 'tag' || route[0] == "/") {
-		if (route == '/') {
+	if (route[0].startsWith('index') || route[0] === 'category' || route[0] === 'tag' || route[0] === "/") {
+		if (route === '/') {
 			route = 'index';
 		}
 		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} />;

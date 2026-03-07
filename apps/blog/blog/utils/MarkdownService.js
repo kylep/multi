@@ -1,7 +1,7 @@
-import path from 'path';
+import path from 'node:path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
-import fs from 'fs';
+import fs from 'node:fs';
 import remarkHtml from 'remark-html'
 // Table of Contents: Converts "### Table of Contents"
 import remarkToc from 'remark-toc';
@@ -57,7 +57,7 @@ class MarkdownService {
 		// matter turns dates into Date objects, want them as YYYY-MM-DD strings
 		// todo fix - not a fan of how this pattern mutates props
 		for (const key in obj) {
-			if (Object.prototype.hasOwnProperty.call(obj, key)) {
+			if (Object.hasOwn(obj, key)) {
 				// dates wrapped in quotes wont be instanceof Date
 				if (obj[key] instanceof Date) {
 					const year = obj[key].getUTCFullYear();
