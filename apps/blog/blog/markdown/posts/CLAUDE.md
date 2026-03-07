@@ -109,6 +109,15 @@ Good: `Apple-Silicon`, `llama-cpp`, `Node-js`
 Bad: `Apple Silicon`, `llama.cpp`, `Node.js`
 
 
+## Internal Links
+
+This blog uses static HTML export. All internal links between posts must
+end in `.html`. Use the slug from frontmatter plus `.html`:
+
+Good: `[my post](/some-slug.html)`
+Bad: `[my post](/some-slug)`
+
+
 ## What to Avoid
 
 - AI writing tells: hedging qualifiers, hollow transitions, motivational sign-
@@ -116,3 +125,4 @@ Bad: `Apple Silicon`, `llama.cpp`, `Node.js`
 - Em-dashes (use commas or periods instead)
 - Starting every section with a definition of the section's topic
 - Explaining what you're about to do instead of doing it
+- Internal links without `.html` extension (static export requires it)

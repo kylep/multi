@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import React, { useContext } from 'react';
-import { List, ListItem,  ListItemButton, ListItemText, Typography } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import { GlobalContext } from '../utils/GlobalContext';
 import { useTheme } from '@mui/material/styles';
 
@@ -55,13 +55,8 @@ function TagList() {
             backgroundColor: theme.palette.headerGrey,
             minHeight: '1.5em'
           }}>
-            <a href={`/tag/${tag}.html`} style={{ textDecoration: 'none' }}>
-              <ListItemButton sx={{ padding: 0, marginLeft: '2px', height: 'auto'  }}>
-                <ListItemText
-                  primary={tag}
-                  primaryTypographyProps={{ variant: 'sidebarLink' }}
-                />
-              </ListItemButton>
+            <a href={`/tag/${tag}.html`} style={{ textDecoration: 'none', marginLeft: '2px' }}>
+              <Typography variant="sidebarLink">{tag}</Typography>
             </a>
           </Box>
         ))
