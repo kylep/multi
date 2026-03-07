@@ -56,7 +56,7 @@ source secrets/export-kytrade.sh
 
 ### Pre-commit hooks
 
-Runs [TruffleHog](https://github.com/trufflesecurity/trufflehog) via Docker on commit and push to detect secrets.
+Runs [gitleaks](https://gitleaks.io/) via Docker on commit and push to detect secrets.
 
 ```bash
 pre-commit install

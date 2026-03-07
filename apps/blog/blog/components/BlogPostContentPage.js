@@ -77,6 +77,7 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
                     }} />
                 </Box>
             </Box>
+            {/* nosemgrep: react-dangerouslysetinnerhtml -- SSG, HTML from own markdown */}
             <Box dangerouslySetInnerHTML={{ __html: contentHtml }}></Box>
         </Box>
     );

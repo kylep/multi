@@ -21,6 +21,12 @@ postgres-data/
 /CLAUDE.md.bak
 # END Ruler Generated Files
 
+# Ruler artifacts in sub-projects
+**/AGENTS.md
+**/AGENTS.md.bak
+**/CLAUDE.md
+**/CLAUDE.md.bak
+
 # Playwright
 **/.playwright-mcp/
 **/test-results/

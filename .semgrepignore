@@ -1,0 +1,12 @@
+# Old sample/learning projects
+samples/
+
+# Legacy infra (not in production)
+infra/aws/
+infra/local-k8s/
+
+# Vendored third-party JS
+apps/blog/blog/public/js/prism.js
+
+# Legacy project
+apps/kytrade/
