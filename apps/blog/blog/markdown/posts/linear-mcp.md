@@ -1,6 +1,6 @@
 ---
-title: "Linear MCP: From Tab-Switching to Flow"
-summary: Connecting AI coding tools directly to Linear for seamless project management.
+title: "Linear MCP: Planning with Robots"
+summary: Connecting AI coding tools directly to Linear so AI can pull tasks in
 slug: linear-mcp
 category: ai
 tags: Linear, MCP, Claude-Code, Cursor, AI
@@ -13,65 +13,29 @@ imgprompt: The Linear Logo; a blue circle, top-right-half solid blue, bott-left-
 ---
 
 
-# WARNING
+Linear's official MCP server launched in May 2025. It lets the robots lean in on the
+project management work. I want to get some ideation-bots going.
 
-This blog post, unlike all my others, is currently entirely AI generated. It's a test
-of using [OpenCode agentic swarms](/local-opencode-setup.html). I'll go through it
-later this week and de-slop things.
+## Supported Commands
 
----
-
-Linear's official MCP server launched in May 2025. It connects your Linear workspace directly to Claude, Cursor, Windsurf, Codex, and other AI tools. No more copy-pasting issue details into your AI assistant.
-
-I've been using it for a few weeks now. Here's what it does and how to set it up.
-
-## What you get
-
-Linear's MCP server exposes:
-
-- **Issues**: create, list, get, update, delete
-- **Projects**: manage projects and updates
-- **Teams**: list teams and users
-- **Milestones**: create and edit
-- **Initiatives**: manage strategic initiatives
-- **Labels and statuses**: query available options
-- **Comments**: add with markdown
-
-The February 2026 update added initiatives, milestones, project updates, and labels. Product planning workflows now work too.
+| Category | Commands |
+|----------|----------|
+| Issues | list, get, create/update, status, statuses |
+| Projects | list, get, create/update, labels |
+| Documents | list, get, create, update, search |
+| Comments | list, create/update, delete |
+| Attachments | get, create, delete, extract images |
+| Milestones | list, get, create/update |
+| Cycles | list |
+| Teams | list, get |
+| Users | list, get |
+| Labels | list issue labels, create issue label |
 
 ## Setup
 
-Linear hosts the MCP server at `https://mcp.linear.app/mcp`. Use that endpoint, not the old SSE one which is deprecated.
+Linear hosts the MCP server at `https://mcp.linear.app/mcp`. Use that endpoint, not the
+old SSE one which is deprecated.
 
-### Cursor
-
-1. `Ctrl/Cmd + Shift + P` → "Open MCP Settings"
-2. Add:
-
-```json
-{
-  "mcpServers": {
-    "linear": {
-      "url": "https://mcp.linear.app/mcp"
-    }
-  }
-}
-```
-
-### Claude Desktop
-
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "linear": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.linear.app/mcp"]
-    }
-  }
-}
-```
 
 ### Claude Code
 
@@ -81,31 +45,122 @@ claude mcp add --transport http linear-server https://mcp.linear.app/mcp
 
 Restart and authenticate via OAuth.
 
-## Using it
 
-Ask your AI tool:
+---
 
-- "What issues are assigned to me this sprint?"
-- "Show me blocked tickets"
-- "Create a bug ticket for login timeout, high priority"
-- "How are the Q1 roadmap initiatives progressing?"
+# Idea: Nightly Ideation Engine
 
-You can self-assign issues with "me" as assignee, add comments with markdown, and filter by cycle.
+Instead of using Linear as a human-operated task tracker, an AI agent can read youri
+codebase, compare it against goals, and file suggestions directly.
 
-One practical example: I'm working on a feature, hit a blocker, and ask "is there a related issue for the auth API?" My AI assistant queries Linear and finds the context I need. No tab switch. No lost momentum.
+What I'm hoping to build is a system where a scheduled agent runs nightly. It reads
+blog posts, checks page speed, reviews SEO metadata, and compares everything against a
+set of high-level goals:
 
-## Why it matters
+- 100% accurate content
+- Fast loading
+- Low cost
+- Looks good
+- Good SEO
+- Interesting tutorials about emerging tooling
 
-Manual copy-paste between Linear and your AI tool adds up fast. With MCP:
+It should create Linear issues for anything worth improving, labeled "Suggestion" and
+drop them into the Backlog.
 
-- AI reads current data, not your memory
-- Agents can create issues and update status autonomously  
-- Product managers keep initiatives in sync without leaving their AI tool
+### The pipeline
 
-The traditional workflow is dead. This is the new way.
+Linear's built-in statuses act as gates between human and agent
+work.
 
-## What's next
+```mermaid
+stateDiagram-v2
+    [*] --> Backlog: AI files suggestion
+    Backlog --> Todo: Human promotes
+    Backlog --> Canceled: Human rejects
+    Todo --> InProgress: Agent picks up
+    InProgress --> InReview: Agent finishes
+    InReview --> Done: Human approves
+    InReview --> InProgress: Human pushes back
+```
 
-Linear added initiatives and milestones in February 2026. More is coming: cycles, custom views, automated status transitions.
+Each step has a clear owner:
 
-Five minutes of setup. Try it.
+| Status | Owner | What happens |
+|--------|-------|-------------|
+| Backlog | AI | Nightly agent creates suggestion issues |
+| Todo | Human | You move the good ones forward |
+| In Progress | Agent | A working agent picks it up |
+| In Review | Agent | Agent finishes, leaves a comment |
+| Done | Human | You verify and close |
+| Canceled | Human | Bad idea, toss it |
+
+### Agent notes via comments
+
+When agents work on an issue, they leave comments. This beats
+internal context files because comments are visible, searchable,
+and survive across sessions. If one agent starts a task and another
+finishes it, the full history is right there on the issue.
+
+I might also run multiple planning agents that each comment on a
+ticket before I review it. A fact-checker, a SEO reviewer, and a
+style auditor could all weigh in on the same Backlog issue. By the
+time I look at it, there's already a thread of perspectives.
+
+```bash
+# An agent checking for work:
+# list_issues with label="Suggestion", state="Todo"
+
+# An agent leaving notes:
+# save_comment with issueId and markdown body
+```
+
+### Filtering
+
+The nightly agent queries existing Backlog suggestions before
+creating new ones, avoiding duplicates. Working agents filter
+by label and status to find their next task:
+
+```
+list_issues → label: "Suggestion", state: "Todo"
+```
+
+## Defining State as Prompts
+
+Linear's community Terraform provider exists but only covers teams,
+labels, workflow states, and templates. No custom views. The GraphQL
+API has a `customViewCreate` mutation, but nobody's wrapped it in
+IaC tooling yet.
+
+So instead of declaring views in HCL, I described mine as a prompt
+and had Claude set it up via Playwright MCP:
+
+> Create a custom view called "Suggestion Backlog" on the Pericak
+> team. Filter to issues where label includes "Suggestion" and
+> status is "Backlog". Description: "AI-generated improvement
+> suggestions awaiting human review".
+
+Claude navigated to Linear in Chromium, clicked "Add new view",
+filled in the name, added both filters, and hit Save. The view
+now lives as a tab on the team page.
+
+This is nondeterministic state management. There's no lock file,
+no plan/apply, no drift detection. But it works, and the prompt
+is the documentation. If the view ever gets deleted, re-run the
+prompt.
+
+### A Linear-Admin agent
+
+A "Linear-Admin" agent could own all workspace
+configuration: views, labels, workflow states, notification
+settings. You'd feed it a doc describing your desired workspace
+setup, and it would use Playwright to converge Linear's UI to
+match. Like Terraform, but with a browser instead of an API.
+
+The tradeoffs are real. Playwright clicks are slow, brittle if
+Linear redesigns their UI, and hard to make idempotent. But for
+a personal workspace where the alternative is "click around in
+the UI manually," the prompt-as-IaC approach is surprisingly
+practical.
+
+Still faster than a person.
+
