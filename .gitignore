@@ -15,10 +15,10 @@ postgres-data/
 
 
 # START Ruler Generated Files
-AGENTS.md
-AGENTS.md.bak
-CLAUDE.md
-CLAUDE.md.bak
+/AGENTS.md
+/AGENTS.md.bak
+/CLAUDE.md
+/CLAUDE.md.bak
 # END Ruler Generated Files
 
 # Playwright

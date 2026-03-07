@@ -9,3 +9,9 @@ repos:
       entry: bash -c 'docker run -v "$(pwd):/workdir" -i --rm trufflesecurity/trufflehog:latest git file:///workdir --since-commit HEAD --fail'
       language: system
       stages: ["commit", "push"]
+    - id: gitleaks
+      name: Gitleaks
+      description: Scan for leaked secrets using the security toolkit image.
+      entry: bash -c 'PATH="/Users/kp/.rd/bin:$PATH" docker run -v "$(pwd):/workspace" --rm kpericak/ai-security-toolkit-1:0.1 -c "gitleaks detect --source /workspace --no-git"'
+      language: system
+      stages: ["commit", "push"]
