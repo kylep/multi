@@ -99,7 +99,7 @@ docker run --rm -v "$(pwd):/workspace" \
 ## Secret scanning (gitleaks)
 docker run --rm -v "$(pwd):/workspace" \
   kpericak/ai-security-toolkit-1:0.1 \
-  -c "gitleaks detect --source /workspace --no-git"
+  -c "cd /workspace && gitleaks detect --source ."
 
 ## Dependency audit (npm)
 docker run --rm -v "$(pwd):/workspace" \
@@ -128,7 +128,7 @@ TruffleHog hook. This catches secrets before they hit the remote.
   description: Scan for leaked secrets using the security toolkit image.
   entry: bash -c 'docker run -v "$(pwd):/workspace" --rm
     kpericak/ai-security-toolkit-1:0.1
-    -c "gitleaks detect --source /workspace --no-git"'
+    -c "cd /workspace && gitleaks detect --source ."'
   language: system
   stages: ["commit", "push"]
 ```
@@ -185,18 +185,13 @@ and image optimization. Good signal for when to bump dependencies.
 ## gitleaks
 
 ```
-Finding:     ...REDACTED...
-RuleID:      generic-api-key
-Entropy:     4.463604
-File:        exports.sh
-
-14 leaks found.
+144 commits scanned.
+no leaks found.
 ```
 
-14 findings. Most are false positives from blog post content, things
-like GCP tutorial code snippets that match the `curl-auth-user`
-rule. The real finds were API keys in an `exports.sh` file that
-shouldn't be committed. Exactly the kind of thing you want caught.
+Clean. Gitleaks scans git history by default, so it respects
+`.gitignore` and only checks committed content. No `--no-git`
+needed when running inside a mounted repo.
 
 ## npm audit
 

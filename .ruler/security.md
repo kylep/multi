@@ -23,7 +23,7 @@ PATH="/Users/kp/.rd/bin:$PATH" docker run --rm -v "$(pwd):/workspace" \
 ```bash
 PATH="/Users/kp/.rd/bin:$PATH" docker run --rm -v "$(pwd):/workspace" \
   kpericak/ai-security-toolkit-1:0.1 \
-  -c "gitleaks detect --source /workspace --no-git"
+  -c "cd /workspace && gitleaks detect --source ."
 ```
 
 ## Dependency audit (npm)
