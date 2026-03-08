@@ -59,7 +59,6 @@ export async function getStaticProps({params}) {
 
 	const markdownService = await getMarkdownService();
 	const route = params.route;
-	route[route.length - 1] = route[route.length - 1];
 	const markdownFilesBeforePagination = markdownService.markdownFiles;
 	const paginatedMarkdownFiles = paginate(markdownFilesBeforePagination, pageSize);
 	let indexPageCount = Math.ceil(markdownFilesBeforePagination.length / pageSize); 

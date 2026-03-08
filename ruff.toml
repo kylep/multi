@@ -1,4 +1,4 @@
-exclude = [
+extend-exclude = [
     "apps/games",
     "apps/kytrade",
     "apps/mods",
