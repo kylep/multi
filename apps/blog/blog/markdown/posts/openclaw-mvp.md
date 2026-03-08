@@ -5,8 +5,8 @@ summary: Setting up OpenClaw as a self-hosted AI agent on
 slug: openclaw-mvp
 category: dev
 tags: openclaw, telegram, linear, ai, self-hosted
-date: 2026-03-07
-modified: 2026-03-07
+date: 2026-03-08
+modified: 2026-03-08
 status: published
 image: openclaw-mvp.png
 thumbnail: openclaw-mvp-thumb.png
