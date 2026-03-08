@@ -10,3 +10,6 @@ apps/blog/blog/public/js/prism.js
 
 # Legacy project
 apps/kytrade/
+
+# Generated reports
+megalinter-reports/

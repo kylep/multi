@@ -1,7 +1,11 @@
 # gcr.io/kylepericak/kylepericakdotcom:latest
 FROM ubuntu:noble
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 WORKDIR /app
 
+# hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
          nodejs \
@@ -20,6 +24,6 @@ RUN git config --global --add safe.directory /app
 # The build was freezing on npm install when building on my mac arm64 for amd64,
 # so verbose and maxsockets were added. Seems to have helped.
 # The rm -rf node_modules slows this WAY down (~5s to ~40s), avoids intermitten issues.
-RUN cd blog \
-    && rm -rf node_modules \
+WORKDIR /app/blog
+RUN rm -rf node_modules \
     && npm install --verbose --maxsockets=1

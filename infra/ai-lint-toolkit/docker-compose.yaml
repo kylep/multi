@@ -1,0 +1,4 @@
+services:
+  lint-toolkit:
+    build: .
+    image: kpericak/ai-lint-toolkit:0.1

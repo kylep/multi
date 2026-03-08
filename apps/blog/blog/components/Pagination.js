@@ -22,7 +22,7 @@ const PageNavButon = ({ children, isDisabled, isActive, onClick }) => (
   
   
   const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    console.log("Current Page: " + currentPage + " Total Pages: " + totalPages);
+    console.log(`Current Page: ${currentPage} Total Pages: ${totalPages}`);
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
       pageNumbers.push(i);
