@@ -28,7 +28,7 @@ postgres-data/
 **/CLAUDE.md.bak
 
 # Generated reports
-megalinter-reports/
+**/megalinter-reports/
 
 # Playwright
 **/.playwright-mcp/
