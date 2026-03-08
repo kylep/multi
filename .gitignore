@@ -27,6 +27,9 @@ postgres-data/
 **/CLAUDE.md
 **/CLAUDE.md.bak
 
+# Core dumps
+*.core
+
 # Generated reports
 **/megalinter-reports/
 

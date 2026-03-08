@@ -7,9 +7,9 @@ Feature: Site navigation
     When I click the home logo
     Then I am on the blog homepage
 
-  Scenario: Archive link works
+  Scenario: Blog link works
     Given I navigate to the blog homepage
-    When I click the Archive link
+    When I click the Blog link
     Then I see a list of posts
 
   Scenario: About page loads
