@@ -8,9 +8,9 @@ test('Home link returns to index', async ({ page }) => {
   await expect(page).toHaveURL('/');
 });
 
-test('Archive link works', async ({ page }) => {
+test('Blog link works', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: 'Archive' }).click();
+  await page.getByTestId('Nav-Toolbar').getByRole('link', { name: 'Blog' }).click();
   await expect(page).toHaveURL('/index1.html');
   await expect(page.locator('a:has(p)').first()).toBeVisible();
 });
