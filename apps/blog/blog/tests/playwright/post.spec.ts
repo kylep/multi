@@ -18,6 +18,23 @@ test('Post has readable content', async ({ page }) => {
   await expect(page.locator('pre').first()).toBeVisible();
 });
 
+test('Heading anchor IDs are generated from heading text', async ({ page }) => {
+  await page.goto(POST_URL);
+  const h2 = page.locator('h2[id]').first();
+  await expect(h2).toBeVisible();
+  const id = await h2.getAttribute('id');
+  expect(id).toBeTruthy();
+  expect(id).toMatch(/^[a-z0-9_-]+$/);
+});
+
+test('Hash URL scrolls to the target heading', async ({ page }) => {
+  await page.goto(POST_URL);
+  const h2 = page.locator('h2[id]').first();
+  const id = await h2.getAttribute('id');
+  await page.goto(`${POST_URL}#${id}`);
+  await expect(h2).toBeInViewport();
+});
+
 test('No console errors on post load', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', msg => {
