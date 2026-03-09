@@ -18,21 +18,19 @@ test('Post has readable content', async ({ page }) => {
   await expect(page.locator('pre').first()).toBeVisible();
 });
 
-test('Heading anchor IDs are generated from heading text', async ({ page }) => {
+test('Heading anchor IDs match heading text', async ({ page }) => {
   await page.goto(POST_URL);
-  const h2 = page.locator('h2[id]').first();
-  await expect(h2).toBeVisible();
-  const id = await h2.getAttribute('id');
-  expect(id).toBeTruthy();
-  expect(id).toMatch(/^[a-z0-9_-]+$/);
+  const heading = page.locator('h2', { hasText: 'browser_navigate' });
+  await expect(heading).toBeVisible();
+  await expect(heading).toHaveAttribute('id', 'browser_navigate');
 });
 
-test('Hash URL scrolls to the target heading', async ({ page }) => {
+test('Hash URL scrolls to a heading far down the page', async ({ page }) => {
   await page.goto(POST_URL);
-  const h2 = page.locator('h2[id]').first();
-  const id = await h2.getAttribute('id');
-  await page.goto(`${POST_URL}#${id}`);
-  await expect(h2).toBeInViewport();
+  const heading = page.locator('h2', { hasText: 'Playwright Config for the Blog' });
+  await expect(heading).not.toBeInViewport();
+  await page.goto(`${POST_URL}#playwright-config-for-the-blog`);
+  await expect(heading).toBeInViewport();
 });
 
 test('No console errors on post load', async ({ page }) => {
