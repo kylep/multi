@@ -8,6 +8,7 @@ server:
       ui = false
       listener "tcp" {
         address = "0.0.0.0:8200"
+        # TODO: enable TLS for production. OK for dev, traffic is in-cluster only.
         tls_disable = 1
       }
       storage "file" {

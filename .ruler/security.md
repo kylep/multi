@@ -22,6 +22,7 @@ docker run --rm -v "$(pwd):/workspace:ro" \
 ## Container image scanning (trivy)
 ```bash
 docker run --rm --user root \
+  -v "$(pwd):/workspace:ro" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   kpericak/ai-security-toolkit-1:0.2 \
   -c "trivy image --ignorefile /workspace/.trivyignore --severity HIGH,CRITICAL <image:tag>"

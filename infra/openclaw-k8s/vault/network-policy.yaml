@@ -39,6 +39,8 @@ spec:
         - protocol: TCP
           port: 8200
     # K8s API for TokenReview (Vault K8s auth)
+    # Broad CIDR because K3s API server isn't a pod (can't target by label).
+    # Restrict to API server IP in production.
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0

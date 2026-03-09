@@ -3,6 +3,8 @@ set -euo pipefail
 
 # Store OpenClaw secrets in Vault
 # Usage: ./store-secrets.sh
+# Note: secrets passed via sh -c args, visible in process listings.
+# Acceptable for single-node dev. See setup-vault.sh header.
 
 VAULT_CREDS="$HOME/.vault-init"
 if [ ! -f "$VAULT_CREDS" ]; then

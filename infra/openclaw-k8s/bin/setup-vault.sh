@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Note: ROOT_TOKEN is passed via sh -c args, visible in process listings on the
+# pod. Acceptable for single-node dev. For production, use Vault's HTTP API or
+# kubectl exec --env (K8s 1.30+).
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VAULT_DIR="$SCRIPT_DIR/../vault"
