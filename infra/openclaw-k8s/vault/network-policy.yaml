@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    # Only openclaw namespace can reach Vault
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openclaw
+      ports:
+        - protocol: TCP
+          port: 8200
+    # Vault pods talk to each other (injector → server)
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8200
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Vault internal (injector ↔ server, K8s API for auth)
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8200
+    # K8s API for TokenReview (Vault K8s auth)
+    # Broad CIDR because K3s API server isn't a pod (can't target by label).
+    # Restrict to API server IP in production.
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443

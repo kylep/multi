@@ -1,0 +1,56 @@
+# Vault Helm values for single-node Rancher Desktop K8s
+# Standalone mode with file storage, no HA, no UI
+
+server:
+  standalone:
+    enabled: true
+    config: |
+      ui = false
+      listener "tcp" {
+        address = "0.0.0.0:8200"
+        # TODO: enable TLS for production. OK for dev, traffic is in-cluster only.
+        tls_disable = 1
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
+
+  dataStorage:
+    enabled: true
+    size: 1Gi
+    storageClass: local-path
+
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 250m
+
+  # Run as non-root
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 100
+    runAsGroup: 1000
+
+  # No ingress needed, internal only
+  ingress:
+    enabled: false
+
+  # Single replica for dev
+  replicas: 1
+
+# Agent injector for sidecar injection
+injector:
+  enabled: true
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 250m
+
+ui:
+  enabled: false

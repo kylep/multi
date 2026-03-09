@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openclaw
+  labels:
+    kubernetes.io/metadata.name: openclaw
+    app.kubernetes.io/name: openclaw
+    # Pod Security Standards - reject pods that don't meet restricted profile
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted

@@ -114,6 +114,32 @@ Good: `[my post](/some-slug.html)`
 Bad: `[my post](/some-slug)`
 
 
+## Honesty
+
+Never write anything dishonest, even in grey areas. Don't embellish, dramatize,
+or frame events misleadingly to make them sound better. If something is cool,
+let it stand on its own.
+
+Don't fabricate output. If a blog post includes command output, error messages,
+or conversation transcripts, they must be from real runs.
+
+
+## Attribution: "I" vs. "Claude"
+
+The author is a human who directs Claude to do work. Get the attribution right:
+
+- **"I"** for decisions the author made: choosing tools, architectures,
+  approaches, tradeoffs. The author would have changed these if Claude got them
+  wrong. "I went with Vault" or "I moved it into Kubernetes" are correct.
+- **"Claude"** / **"I had Claude..."** for implementation work Claude did
+  autonomously between prompts: writing code, running commands, talking to other
+  agents, debugging errors. "I had Claude add chmod calls to the init container"
+  or "Claude ran the healthcheck and found three issues."
+
+Don't over-attribute. Not every line needs "Claude did X." Use it where saying
+"I" would be dishonest about who did the work.
+
+
 ## What to Avoid
 
 - AI writing tells: hedging qualifiers, hollow transitions, motivational sign-
@@ -122,3 +148,4 @@ Bad: `[my post](/some-slug)`
 - Starting every section with a definition of the section's topic
 - Explaining what you're about to do instead of doing it
 - Internal links without `.html` extension (static export requires it)
+- Dishonest attribution (see above)
