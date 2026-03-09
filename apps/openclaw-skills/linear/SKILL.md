@@ -1,7 +1,7 @@
 ---
 name: linear
 description: Manage Linear issues, projects, and comments via the Linear GraphQL API.
-metadata: {"openclaw": {"emoji": "📐", "requires": {"bins": ["curl", "jq"], "env": ["LINEAR_API_KEY"]}}}
+metadata: {"openclaw": {"emoji": "📐", "requires": {"bins": ["curl"], "env": ["LINEAR_API_KEY"]}}}
 ---
 
 # Linear Skill

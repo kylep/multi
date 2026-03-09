@@ -24,6 +24,7 @@ spec:
           {{- with secret "secret/openclaw" -}}
           export GEMINI_API_KEY="{{ .Data.data.gemini_api_key }}"
           export TELEGRAM_BOT_TOKEN="{{ .Data.data.telegram_bot_token }}"
+          {{ if .Data.data.linear_api_key }}export LINEAR_API_KEY="{{ .Data.data.linear_api_key }}"{{ end }}
           {{- end }}
     spec:
       serviceAccountName: openclaw
@@ -53,11 +54,17 @@ spec:
               chmod 600 /data/openclaw.json 2>/dev/null || true
               mkdir -p /data/credentials
               chmod 700 /data/credentials 2>/dev/null || true
+              # Copy skills onto PVC workspace (resolves ConfigMap symlinks)
+              mkdir -p /data/workspace/skills/linear
+              cp /skill-src/linear/SKILL.md /data/workspace/skills/linear/SKILL.md
           volumeMounts:
             - name: data
               mountPath: /data
             - name: config
               mountPath: /config
+              readOnly: true
+            - name: linear-skill
+              mountPath: /skill-src/linear
               readOnly: true
           resources:
             requests:
@@ -169,6 +176,9 @@ spec:
         - name: config
           configMap:
             name: openclaw-config
+        - name: linear-skill
+          configMap:
+            name: linear-skill
         - name: dshm
           emptyDir:
             medium: Memory

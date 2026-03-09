@@ -26,14 +26,16 @@ obvious path is ClawHub, OpenClaw's public skill
 marketplace. Install a community skill, set your API key,
 done. I didn't do that.
 
-In February 2026, a campaign called ClawHavoc compromised
-ClawHub. Researchers at Trend Micro and Snyk documented
-over 1,184 malicious skills that had been published to the
-registry. The skills looked legitimate, had normal names
-and descriptions, and passed ClawHub's automated checks.
-They distributed Atomic macOS Stealer, a credential
-harvester targeting Keychain, browser passwords, and crypto
-wallets.
+In February 2026, a campaign called
+[ClawHavoc](https://cybersecuritynews.com/clawhavoc-poisoned-openclaws-clawhub/)
+compromised ClawHub. Researchers at Trend Micro and Antiy
+documented over 1,184 malicious skills that had been
+published to the registry. The skills looked legitimate,
+had normal names and descriptions, and passed ClawHub's
+automated checks. They distributed
+[Atomic macOS Stealer](https://www.trendmicro.com/en_us/research/26/b/openclaw-skills-used-to-distribute-atomic-macos-stealer.html),
+a credential harvester targeting Keychain, browser
+passwords, and crypto wallets.
 
 The publishing bar was low. A one-week-old GitHub account
 was enough to push a skill to ClawHub. No code review, no
@@ -48,7 +50,7 @@ and high-privilege execution is a target. ClawHub is no
 different.
 
 My approach: write the skill myself, keep it in my repo,
-and audit every line. The Linear skill I need is maybe 150
+and audit every line. The Linear skill I need is about 150
 lines of markdown. That's a small surface to own compared
 to trusting a stranger's code with my credentials.
 
@@ -81,15 +83,14 @@ name: linear
 description: Manage Linear issues, projects,
   and comments via the Linear GraphQL API.
 metadata: {"openclaw": {"emoji": "📐",
-  "requires": {"bins": ["curl", "jq"],
+  "requires": {"bins": ["curl"],
   "env": ["LINEAR_API_KEY"]}}}
 ---
 ```
 
 OpenClaw checks these requirements at load time. If `curl`
-or `jq` aren't on PATH, or `LINEAR_API_KEY` isn't set,
-the skill doesn't load. No runtime errors, no mysterious
-failures.
+isn't on PATH, or `LINEAR_API_KEY` isn't set, the skill
+doesn't load. No runtime errors, no mysterious failures.
 
 
 # The skill
@@ -102,13 +103,10 @@ at `apps/openclaw-skills/linear/SKILL.md` in my monorepo.
 Linear's API is GraphQL-only. No REST endpoints. Every
 request is a POST to `https://api.linear.app/graphql` with
 a JSON body containing the query. The skill uses `curl`
-for HTTP and `jq` to parse responses. One API key, no
-OAuth dance.
+for HTTP. One API key, no OAuth dance.
 
-The auth header is just `Authorization: $LINEAR_API_KEY`.
-Linear personal API keys don't use the `Bearer` prefix.
-I got this wrong initially by copying patterns from other
-APIs.
+The auth header is `Authorization: $LINEAR_API_KEY`.
+Linear personal API keys don't use a `Bearer` prefix.
 
 Here's what listing issues looks like:
 
@@ -119,8 +117,7 @@ curl -s -X POST https://api.linear.app/graphql \
   -d '{"query": "{ issues(filter: { team: \
     { key: { eq: \"PER\" } } }, first: 25) \
     { nodes { id identifier title \
-    state { name } } } }"}' \
-  | jq '.data.issues.nodes'
+    state { name } } } }"}'
 ```
 
 And creating an issue:
@@ -133,8 +130,7 @@ curl -s -X POST https://api.linear.app/graphql \
     { teamId: \"TEAM_UUID\", \
     title: \"Issue title\", \
     description: \"Issue description\" }) \
-    { success issue { id identifier url } } }"}' \
-  | jq '.data.issueCreate'
+    { success issue { id identifier url } } }"}'
 ```
 
 The skill also covers workflow statuses. Changing an
@@ -162,51 +158,130 @@ Trello skill as a pattern, checked the Linear GraphQL API
 docs, and produced a skill that follows the same structure.
 One AI building capabilities for another AI.
 
-This isn't a novel observation, but it's worth noting as
-a workflow. I described what I wanted at a high level, and
-Claude handled the GraphQL query syntax, the jq filters,
-and the escape sequences. I reviewed the output. The whole
-thing took one conversation.
+I described what I wanted at a high level, and Claude
+handled the GraphQL query syntax, the jq filters, and the
+escape sequences. I reviewed the output. The whole thing
+took one conversation.
 
 The skill lives in my monorepo under version control. If
 Linear changes their API or I need a new operation, I
 update one file.
 
 
-# Installing it
+# Loading it into K8s
 
-Point OpenClaw at the skill directory. The simplest way
-is `skills.load.extraDirs` in `~/.openclaw/openclaw.json`:
+Getting the skill into the running OpenClaw pod took more
+work than writing it. The skill file needs to end up in
+the right directory inside the container, the API key
+needs to be injected, and OpenClaw needs to discover it.
 
-```json
-{
-  "skills": {
-    "load": {
-      "extraDirs": ["/path/to/openclaw-skills"]
-    }
-  }
-}
+## Injecting the API key
+
+I added the Linear API key to Vault alongside the existing
+Gemini and Telegram secrets, then updated the Vault Agent
+template to export it:
+
+```text
+{{- with secret "secret/openclaw" -}}
+export GEMINI_API_KEY="{{ .Data.data.gemini_api_key }}"
+export TELEGRAM_BOT_TOKEN="..."
+{{ if .Data.data.linear_api_key }}
+export LINEAR_API_KEY="{{ .Data.data.linear_api_key }}"
+{{ end }}
+{{- end }}
 ```
 
-OpenClaw scans subdirectories for `SKILL.md` files, so it
-picks up `linear/SKILL.md` automatically. You can also
-symlink the skill directory into your workspace's `skills/`
-folder.
+## Mounting the skill
 
-Before loading the skill into OpenClaw, test the curl
-commands standalone. Set `LINEAR_API_KEY` in your shell
-and run the "List teams" query. If you get JSON back with
-your team name, the skill will work.
+I stored the SKILL.md in a ConfigMap and mounted it into
+the init container. ConfigMap mounts use symlinks
+internally, and OpenClaw's skill loader rejects symlinked
+paths as a security measure. So the init container copies
+the file onto the PVC as a regular file:
+
+```yaml
+initContainers:
+  - name: config-seed
+    command: ["sh", "-c"]
+    args:
+      - |
+        # ... existing config seed logic ...
+        # Copy skills onto PVC workspace
+        mkdir -p /data/workspace/skills/linear
+        cp /skill-src/linear/SKILL.md \
+          /data/workspace/skills/linear/SKILL.md
+    volumeMounts:
+      - name: linear-skill
+        mountPath: /skill-src/linear
+        readOnly: true
+```
+
+The key detail: skills must live under the workspace
+directory (`<workspace>/skills/`), not just anywhere on
+the filesystem. OpenClaw's skill discovery only scans
+three locations: bundled, managed (`~/.openclaw/skills`),
+and workspace. I initially tried `extraDirs` and the
+managed path. Neither worked until I put it in the
+workspace.
+
+## The jq problem
+
+The original skill required both `curl` and `jq` in its
+`requires.bins` frontmatter. The OpenClaw container has
+`curl` but not `jq`. The skill gating check runs at
+startup: missing binary means the skill silently doesn't
+load. Claude dropped `jq` from the requirements. The agent
+is smart enough to parse JSON responses on its own using
+the `node` binary that's already in the container.
+
+## Stale sessions
+
+After all that, I asked Pai what skills it had. Still
+three. OpenClaw snapshots eligible skills when a session
+starts and reuses that list for the session's lifetime.
+The `openclaw agent --message` CLI command was reusing an
+existing session from before the skill was loaded.
+Clearing the sessions directory forced a fresh snapshot:
 
 ```bash
-export LINEAR_API_KEY="lin_api_..."
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Content-Type: application/json" \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -d '{"query": "{ teams { nodes { id name } } }"}' \
-  | jq '.data.teams.nodes'
+rm -rf /home/node/.openclaw/agents/main/sessions/*
 ```
 
-Once it loads, ask OpenClaw to list your teams or create
-an issue. The agent reads the skill, picks the right curl
-command, substitutes your values, and runs it.
+After that, the skill appeared.
+
+
+# Talking to Pai (Pericak AI)
+
+With the skill loaded, Claude Code talked to Pai (the
+OpenClaw agent running Gemini 2.5 Flash) through
+`kubectl exec`, using the same pattern from the
+[K8s post](/openclaw-k8s.html).
+
+```text
+Claude: List my Linear teams using the linear skill.
+Pai: Your Linear teams are:
+  - Pericak (Key: PER)
+
+Claude: List my Linear issues for team PER.
+Pai: Here are the Linear issues for team PER:
+  - PER-10: ... (State: Backlog)
+  - PER-9: ... (State: Todo)
+  - PER-8: ... (State: Todo)
+  - PER-7: ... (State: Todo)
+  - PER-6: ... (State: Todo)
+  - PER-5: ... (State: Todo)
+  ...
+```
+
+That's real output (titles redacted). Pai read the
+skill's curl commands, called the Linear GraphQL API
+with the Vault-injected API key, and returned my actual
+issues. The full chain: Claude Code runs `kubectl exec`,
+which calls the `openclaw agent` CLI, which sends the
+message to Gemini 2.5 Flash, which reads the skill, runs
+curl against Linear's API, and returns the result.
+
+Two AIs, two different models, coordinating through a
+Kubernetes pod with Vault-injected secrets and a
+hand-written skill file. The whole thing is auditable
+from end to end.

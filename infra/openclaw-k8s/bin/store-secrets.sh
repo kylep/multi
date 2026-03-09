@@ -14,12 +14,39 @@ fi
 
 ROOT_TOKEN=$(grep ROOT_TOKEN "$VAULT_CREDS" | cut -d= -f2)
 
+# Bail if Vault is sealed
+SEALED=$(kubectl exec -n vault vault-0 -- vault status -format=json 2>/dev/null \
+  | jq -r '.sealed' 2>/dev/null || echo "true")
+if [ "$SEALED" = "true" ]; then
+  echo "Error: Vault is sealed. Unseal it first:"
+  echo "  source ~/.vault-init && kubectl exec -n vault vault-0 -- vault operator unseal \"\$VAULT_UNSEAL_KEY\""
+  exit 1
+fi
+
+# Check which secrets are already set in Vault
+EXISTING=$(kubectl exec -n vault vault-0 -- sh -c \
+  "VAULT_TOKEN=$ROOT_TOKEN vault kv get -format=json secret/openclaw" 2>/dev/null \
+  | jq -r '.data.data // {} | keys[]' 2>/dev/null || true)
+
+show_status() {
+  if echo "$EXISTING" | grep -qx "$1"; then
+    echo " [Already set]"
+  else
+    echo ""
+  fi
+}
+
 echo "Enter your secrets (leave blank to skip):"
 echo ""
 
-read -sp "Gemini API key: " GEMINI_KEY
+printf "Gemini API key%s: " "$(show_status gemini_api_key)"
+read -sp "" GEMINI_KEY
 echo ""
-read -sp "Telegram bot token: " TELEGRAM_TOKEN
+printf "Telegram bot token%s: " "$(show_status telegram_bot_token)"
+read -sp "" TELEGRAM_TOKEN
+echo ""
+printf "Linear API key%s: " "$(show_status linear_api_key)"
+read -sp "" LINEAR_KEY
 echo ""
 
 # Use kv patch to merge with existing values (won't erase
@@ -37,6 +64,11 @@ fi
 if [ -n "$TELEGRAM_TOKEN" ]; then
   CMD="$CMD telegram_bot_token=$TELEGRAM_TOKEN"
   FALLBACK_CMD="$FALLBACK_CMD telegram_bot_token=$TELEGRAM_TOKEN"
+  HAS_KEYS=true
+fi
+if [ -n "$LINEAR_KEY" ]; then
+  CMD="$CMD linear_api_key=$LINEAR_KEY"
+  FALLBACK_CMD="$FALLBACK_CMD linear_api_key=$LINEAR_KEY"
   HAS_KEYS=true
 fi
 
