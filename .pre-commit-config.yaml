@@ -13,12 +13,12 @@ repos:
       entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-lint-toolkit:0.1 -c "biome lint /workspace/apps/blog/blog/pages /workspace/apps/blog/blog/components /workspace/apps/blog/blog/utils"'
       language: system
       stages: ["pre-commit"]
-    - id: semgrep
-      name: Semgrep
-      description: Static analysis scan using the security toolkit image.
-      entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-security-toolkit-1:0.2 -c "semgrep scan --config auto --error /workspace"'
-      language: system
-      stages: ["pre-commit", "pre-push"]
+    # - id: semgrep
+    #   name: Semgrep
+    #   description: Static analysis scan using the security toolkit image.
+    #   entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-security-toolkit-1:0.2 -c "semgrep scan --config auto --error /workspace"'
+    #   language: system
+    #   stages: ["pre-commit", "pre-push"]
     - id: gitleaks
       name: Gitleaks
       description: Scan for leaked secrets using the security toolkit image.

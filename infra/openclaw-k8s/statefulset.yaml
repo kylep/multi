@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: openclaw
+  namespace: openclaw
+  labels:
+    app.kubernetes.io/name: openclaw
+spec:
+  serviceName: openclaw
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: openclaw
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: openclaw
+      annotations:
+        # Vault Agent Injector annotations
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "openclaw"
+        vault.hashicorp.com/agent-inject-secret-config: "secret/openclaw"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "secret/openclaw" -}}
+          export GEMINI_API_KEY="{{ .Data.data.gemini_api_key }}"
+          export TELEGRAM_BOT_TOKEN="{{ .Data.data.telegram_bot_token }}"
+          {{- end }}
+    spec:
+      serviceAccountName: openclaw
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # Seed openclaw.json onto PVC if not already present
+        - name: config-seed
+          image: busybox@sha256:bf9536d50cebf4337eb4a802e4786f25a9068665385d82a780d210316b818cf8
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -f /data/openclaw.json ]; then
+                cp /config/openclaw.json /data/openclaw.json
+                echo "Seeded openclaw.json onto PVC"
+              else
+                echo "openclaw.json already exists on PVC, skipping"
+              fi
+              # Fix PVC permissions (local-path-provisioner defaults to 777)
+              # Root dir is owned by root, can't chmod it as uid 1000
+              chmod 600 /data/openclaw.json 2>/dev/null || true
+              mkdir -p /data/credentials
+              chmod 700 /data/credentials 2>/dev/null || true
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+              readOnly: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        # OpenClaw application
+        - name: openclaw
+          image: ghcr.io/openclaw/openclaw@sha256:70c5677580a958f704eb27297a62661b501534c3b2b9dec7a61e5ed5aa0c24cf
+          command:
+            - sh
+            - -c
+            - |
+              # Source Vault-injected secrets
+              if [ -f /vault/secrets/config ]; then
+                . /vault/secrets/config
+              fi
+              exec node openclaw.mjs gateway --allow-unconfigured
+          ports:
+            - name: gateway
+              containerPort: 18789
+              protocol: TCP
+            - name: canvas
+              containerPort: 18793
+              protocol: TCP
+          env:
+            - name: OPENCLAW_DISABLE_BONJOUR
+              value: "1"
+            - name: CHROMIUM_URL
+              value: "http://localhost:9222"
+          volumeMounts:
+            - name: data
+              mountPath: /home/node/.openclaw
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          # Gateway binds to loopback, use exec probe
+          livenessProbe:
+            exec:
+              command:
+                - node
+                - -e
+                - "fetch('http://127.0.0.1:18789/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - node
+                - -e
+                - "fetch('http://127.0.0.1:18789/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+        # Chromium sidecar for browser automation
+        - name: chromium
+          image: ghcr.io/browserless/chromium@sha256:71ae7fa09bd1bf78efaa2803d75c837ab5a56e0d7637695bff3077d87248e642
+          env:
+            - name: PORT
+              value: "9222"
+          ports:
+            - name: cdp
+              containerPort: 9222
+              protocol: TCP
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: chromium-tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: openclaw-data
+        - name: config
+          configMap:
+            name: openclaw-config
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 256Mi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 512Mi
+        - name: chromium-tmp
+          emptyDir:
+            sizeLimit: 256Mi
