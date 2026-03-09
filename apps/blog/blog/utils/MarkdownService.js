@@ -8,6 +8,22 @@ import remarkToc from 'remark-toc';
 // GitHub Flavored Markdown: autolink literals, footnotes, strikethrough, tables, tasklists
 import remarkGfm from 'remark-gfm';
 import remarkMermaidToHtml from './RemarkMermaid.js';
+import { visit } from 'unist-util-visit';
+import { toString as mdastToString } from 'mdast-util-to-string';
+import GithubSlugger from 'github-slugger';
+
+function remarkSlug() {
+	return (tree) => {
+		const slugger = new GithubSlugger();
+		visit(tree, 'heading', (node) => {
+			const text = mdastToString(node);
+			const id = slugger.slug(text);
+			node.data = node.data || {};
+			node.data.hProperties = node.data.hProperties || {};
+			node.data.hProperties.id = id;
+		});
+	};
+}
 
 
 
@@ -75,6 +91,7 @@ class MarkdownService {
 		MarkdownService.#serializeDates(metaData); 
                 const result = await remark()
                         .use(remarkGfm)
+                        .use(remarkSlug)
                         .use(remarkToc, {heading: 'Table of contents'})
                         .use(remarkMermaidToHtml)
                         .use(remarkHtml, { sanitize: false })

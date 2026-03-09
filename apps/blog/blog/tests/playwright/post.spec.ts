@@ -18,6 +18,21 @@ test('Post has readable content', async ({ page }) => {
   await expect(page.locator('pre').first()).toBeVisible();
 });
 
+test('Heading anchor IDs match heading text', async ({ page }) => {
+  await page.goto(POST_URL);
+  const heading = page.locator('h2', { hasText: 'browser_navigate' });
+  await expect(heading).toBeVisible();
+  await expect(heading).toHaveAttribute('id', 'browser_navigate');
+});
+
+test('Hash URL scrolls to a heading far down the page', async ({ page }) => {
+  await page.goto(POST_URL);
+  const heading = page.locator('h2', { hasText: 'Playwright Config for the Blog' });
+  await expect(heading).not.toBeInViewport();
+  await page.goto(`${POST_URL}#playwright-config-for-the-blog`);
+  await expect(heading).toBeInViewport();
+});
+
 test('No console errors on post load', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', msg => {
