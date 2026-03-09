@@ -20,6 +20,8 @@ Manage Linear issues, projects, and comments from OpenClaw.
 ## Usage
 
 All commands use `curl` to hit the Linear GraphQL API.
+Examples pipe through `jq` for readability. The agent
+handles JSON parsing internally if `jq` is not available.
 
 ### List teams
 

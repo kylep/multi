@@ -18,5 +18,6 @@ for i in $(seq 1 30); do
   sleep 0.5
 done
 
+kill "$DEV_PID" 2>/dev/null || true
 echo "Dev server did not start in time" >&2
 exit 1
