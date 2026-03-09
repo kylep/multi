@@ -8,17 +8,14 @@ All blog work happens under `apps/blog/`. Scripts must be run from that director
 Start the Next.js dev server in the background so Playwright can verify against it:
 
 ```bash
-cd apps/blog/blog && npm run dev &
-BLOG_DEV_PID=$!
-# Wait for the server to be ready
-sleep 5
+cd apps/blog && bin/start-dev-bg.sh
 ```
 
 The dev server listens on **http://localhost:3000**.
 
 To kill it when done:
 ```bash
-bin/kill-dev.sh
+cd apps/blog && bin/kill-dev.sh
 ```
 
 If you need to build static files first (e.g. to regenerate markdown → JSON):
