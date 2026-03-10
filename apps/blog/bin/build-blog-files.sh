@@ -19,10 +19,14 @@ mkdir -p out/
 
 echo "Building the static files..."
 # TODO: Support toggling the node_env with an argument
-exec npm run build 2>&1 | tee ../build.log
+npm run build 2>&1 | tee ../build.log
 
 # copy index1.html to index.html for convenience and better ux
 cp out/index1.html out/index.html
+
+# Generate sitemap.xml in out/
+echo "Generating sitemap..."
+node scripts/generate-sitemap.mjs
 
 if [[ "$1" == "" ]]; then
   echo "WARNING: output_dir pos arg is reuqired if copying to volume mount"

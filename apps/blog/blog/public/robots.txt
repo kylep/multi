@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kyle.pericak.com/sitemap.xml
