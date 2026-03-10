@@ -6,7 +6,7 @@ import Head from 'next/head';
 const SITE_URL = 'https://kyle.pericak.com';
 
 export function BlogPostContentPage({ contentHtml, metaData }) {
-    const canonicalUrl = `${SITE_URL}/${metaData.slug}.html`;
+    const canonicalUrl = `${SITE_URL}/${encodeURIComponent(metaData.slug)}.html`;
     const imagePath = metaData.image ? `/images/${metaData.image}` : null;
     const imageUrl = imagePath ? `${SITE_URL}${imagePath}` : null;
     const jsonLd = {
