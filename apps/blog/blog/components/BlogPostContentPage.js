@@ -53,7 +53,7 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
                 <meta property="og:url" content={canonicalUrl} />
                 <meta property="og:type" content="article" />
                 {imageUrl && <meta property="og:image" content={imageUrl} />}
-                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
                 <meta name="twitter:title" content={metaData.title} />
                 <meta name="twitter:description" content={metaData.summary} />
                 {imageUrl && <meta name="twitter:image" content={imageUrl} />}

@@ -36,6 +36,15 @@ function toISODate(dateStr) {
   return String(dateStr);
 }
 
+function escapeXml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 function generateSitemap() {
   const posts = getPosts();
 
@@ -68,18 +77,18 @@ function generateSitemap() {
 
   // Category pages
   for (const cat of categories) {
-    urls.push({ loc: `${SITE_URL}/category/${cat}`, changefreq: 'weekly', priority: '0.6' });
+    urls.push({ loc: `${SITE_URL}/category/${encodeURIComponent(cat)}`, changefreq: 'weekly', priority: '0.6' });
   }
 
   // Tag pages
   for (const tag of tags) {
-    urls.push({ loc: `${SITE_URL}/tag/${tag}`, changefreq: 'weekly', priority: '0.5' });
+    urls.push({ loc: `${SITE_URL}/tag/${encodeURIComponent(tag)}`, changefreq: 'weekly', priority: '0.5' });
   }
 
   // Post pages
   posts.forEach(p => {
     urls.push({
-      loc: `${SITE_URL}/${p.slug}.html`,
+      loc: `${SITE_URL}/${encodeURIComponent(p.slug)}.html`,
       lastmod: toISODate(p.modified || p.date),
       changefreq: 'monthly',
       priority: '0.7',
@@ -89,7 +98,7 @@ function generateSitemap() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url>
-    <loc>${u.loc}</loc>${u.lastmod ? `\n    <lastmod>${u.lastmod}</lastmod>` : ''}
+    <loc>${escapeXml(u.loc)}</loc>${u.lastmod ? `\n    <lastmod>${escapeXml(u.lastmod)}</lastmod>` : ''}
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
   </url>`).join('\n')}

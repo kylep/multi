@@ -111,7 +111,7 @@ const handlePageChange = (page) => {
 };
 
 function getCanonicalUrl(route) {
-	if (!route || route[0] === 'index') return SITE_URL + '/';
+	if (!route || route[0] === 'index' || route[0] === 'index1') return SITE_URL + '/';
 	if (route[0] === 'category') return `${SITE_URL}/category/${route[1]}`;
 	if (route[0] === 'tag') return `${SITE_URL}/tag/${route[1]}`;
 	return `${SITE_URL}/${route[0]}.html`;
