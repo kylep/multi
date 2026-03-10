@@ -2,11 +2,24 @@ import Head from 'next/head';
 import { Box, Grid, Typography } from '@mui/material';
 import SiteLayout  from '../components/SiteLayout';
 
+const SITE_URL = 'https://kyle.pericak.com';
+
 const About = () => {
+  const description = 'About Kyle Pericak - Senior Engineering Director working in infrastructure, DevOps, security, and software engineering.';
+  const canonicalUrl = `${SITE_URL}/about.html`;
   return (
     <>
         <Head>
-            <title>About</title>
+            <title>About - Kyle Pericak</title>
+            <meta name="description" content={description} />
+            <link rel="canonical" href={canonicalUrl} />
+            <meta property="og:title" content="About - Kyle Pericak" />
+            <meta property="og:description" content={description} />
+            <meta property="og:url" content={canonicalUrl} />
+            <meta property="og:type" content="website" />
+            <meta name="twitter:card" content="summary" />
+            <meta name="twitter:title" content="About - Kyle Pericak" />
+            <meta name="twitter:description" content={description} />
         </Head>
         <SiteLayout  context={false}>
             <h1>About</h1>

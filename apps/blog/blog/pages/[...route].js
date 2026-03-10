@@ -119,7 +119,7 @@ function BaseSiteComponent({
 		if (route === '/') {
 			route = 'index';
 		}
-		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} />;
+		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} route={route} />;
 	} else {
 		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
 	}

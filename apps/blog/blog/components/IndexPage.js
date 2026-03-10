@@ -1,6 +1,9 @@
 import { Box, Typography, Link } from '@mui/material';
 import Image from 'next/image';
+import Head from 'next/head';
 import Pagination from '../components/Pagination';
+
+const SITE_URL = 'https://kyle.pericak.com';
 
 
 function IndexRowContainer({ children, sx }) {
@@ -19,7 +22,7 @@ function IndexRowContainer({ children, sx }) {
   );
 }
 
-function ImageBox({ thumbnail, sx }) {
+function ImageBox({ thumbnail, title, sx }) {
   const imagePath = thumbnail ? (`/images/${thumbnail}`) : '/images/gear-thumb.png';
   return (
     <Box sx={{
@@ -31,7 +34,7 @@ function ImageBox({ thumbnail, sx }) {
       padding: 0,
       ...sx
     }}>
-      <Image src={imagePath} alt="" width={70} height={70} />
+      <Image src={imagePath} alt={title || ''} width={70} height={70} />
     </Box>
   );
 }
@@ -91,7 +94,7 @@ function DateStamp({ children, sx }) {
 function BlogPostIndexSummary({ file }) {
   return (
     <IndexRowContainer>
-        <ImageBox thumbnail={file.thumbnail} />
+        <ImageBox thumbnail={file.thumbnail} title={file.title} />
         <IndexPostTextContainer>
           <Link underline="hover" href={`/${file.slug}.html`}>
             <IndexPostTitle>{file.title}</IndexPostTitle>
@@ -107,9 +110,39 @@ const handlePageChange = (page) => {
     window.location.href = `/index${page}.html`;
 };
 
-export function IndexPage({ markdownFiles, currentPageIndexNumber, pageCount }) {
+function getCanonicalUrl(route) {
+	if (!route || route[0] === 'index' || route[0] === 'index1') return SITE_URL + '/';
+	if (route[0] === 'category') return `${SITE_URL}/category/${encodeURIComponent(route[1])}`;
+	if (route[0] === 'tag') return `${SITE_URL}/tag/${encodeURIComponent(route[1])}`;
+	return `${SITE_URL}/${encodeURIComponent(route[0])}.html`;
+}
+
+function getPageTitle(route) {
+	if (!route || route[0] === 'index' || route[0].startsWith('index')) return "Kyle Pericak's Blog";
+	if (route[0] === 'category') return `${route[1]} - Kyle Pericak's Blog`;
+	if (route[0] === 'tag') return `${route[1]} - Kyle Pericak's Blog`;
+	return "Kyle Pericak's Blog";
+}
+
+const SITE_DESCRIPTION = "Kyle Pericak's blog about infrastructure, DevOps, security, and software engineering.";
+
+export function IndexPage({ markdownFiles, currentPageIndexNumber, pageCount, route }) {
+	const canonicalUrl = getCanonicalUrl(route);
+	const pageTitle = getPageTitle(route);
 	return (
 		<>
+			<Head>
+				<title>{pageTitle}</title>
+				<meta name="description" content={SITE_DESCRIPTION} />
+				<link rel="canonical" href={canonicalUrl} />
+				<meta property="og:title" content={pageTitle} />
+				<meta property="og:description" content={SITE_DESCRIPTION} />
+				<meta property="og:url" content={canonicalUrl} />
+				<meta property="og:type" content="website" />
+				<meta name="twitter:card" content="summary" />
+				<meta name="twitter:title" content={pageTitle} />
+				<meta name="twitter:description" content={SITE_DESCRIPTION} />
+			</Head>
 			{markdownFiles.map((file) => (
 				<BlogPostIndexSummary key={file.metaData.slug} file={file.metaData} />
 			))}

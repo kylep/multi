@@ -31,6 +31,7 @@ export default function Home({ markdownFiles, categories, tags, pageCount, lastG
 					categories={categories}
 					currentPageIndexNumber={1}
 					pageCount={pageCount}
+					route={['index']}
 				/>
 			</SiteLayout>
 		</GlobalContextProvider>
