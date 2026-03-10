@@ -25,6 +25,7 @@ spec:
           export GEMINI_API_KEY="{{ .Data.data.gemini_api_key }}"
           export TELEGRAM_BOT_TOKEN="{{ .Data.data.telegram_bot_token }}"
           {{ if .Data.data.linear_api_key }}export LINEAR_API_KEY="{{ .Data.data.linear_api_key }}"{{ end }}
+          {{ if .Data.data.openrouter_api_key }}export OPENROUTER_API_KEY="{{ .Data.data.openrouter_api_key }}"{{ end }}
           {{- end }}
     spec:
       serviceAccountName: openclaw
