@@ -31,7 +31,10 @@ cp out/index1.html out/index.html
 
 # Generate sitemap.xml in out/
 echo "Generating sitemap..."
-node scripts/generate-sitemap.mjs
+if ! node scripts/generate-sitemap.mjs; then
+  echo "Sitemap generation failed"
+  exit 1
+fi
 
 if [[ "$1" == "" ]]; then
   echo "WARNING: output_dir pos arg is reuqired if copying to volume mount"

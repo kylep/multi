@@ -7,7 +7,8 @@ const SITE_URL = 'https://kyle.pericak.com';
 
 export function BlogPostContentPage({ contentHtml, metaData }) {
     const canonicalUrl = `${SITE_URL}/${metaData.slug}.html`;
-    const imageUrl = metaData.image ? `${SITE_URL}/images/${metaData.image}` : null;
+    const imagePath = metaData.image ? `/images/${metaData.image}` : null;
+    const imageUrl = imagePath ? `${SITE_URL}${imagePath}` : null;
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
@@ -88,14 +89,16 @@ export function BlogPostContentPage({ contentHtml, metaData }) {
                     );
                 })}
                 {/*Post Header Image*/}
-                <Box sx={{ display: 'flex', justifyContent: 'center' }} data-testid="ImageBox">
-                    <Box component="img" src={`/images/${metaData.image}`} alt={metaData.summary}  sx={{
-                        maxWidth: '100%',
-                        maxHeight: '300px',
-                        height: 'auto',
-                        objectFit: 'contain',
-                    }} />
-                </Box>
+                {imagePath && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }} data-testid="ImageBox">
+                        <Box component="img" src={imagePath} alt={metaData.summary} sx={{
+                            maxWidth: '100%',
+                            maxHeight: '300px',
+                            height: 'auto',
+                            objectFit: 'contain',
+                        }} />
+                    </Box>
+                )}
             </Box>
             {/* nosemgrep: react-dangerouslysetinnerhtml -- SSG, HTML from own markdown */}
             <Box dangerouslySetInnerHTML={{ __html: contentHtml }}></Box>
