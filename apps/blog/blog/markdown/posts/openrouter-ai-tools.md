@@ -1,7 +1,6 @@
 ---
 title: "OpenRouter for Claude Code, OpenCode, and OpenClaw"
-summary: Configuring three AI coding tools to route through
-  OpenRouter so I can control model spend in one place.
+summary: Configuring OpenRouter to be where all my tools go for tokens and making a custom MCP server for it
 slug: openrouter-ai-tools
 category: dev
 tags: openrouter, Claude-Code, opencode, openclaw, AI, mcp
