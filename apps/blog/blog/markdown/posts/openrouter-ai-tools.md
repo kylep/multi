@@ -4,9 +4,9 @@ summary: Configuring three AI coding tools to route through
   OpenRouter so I can control model spend in one place.
 slug: openrouter-ai-tools
 category: dev
-tags: openrouter, Claude-Code, opencode, openclaw, AI
-date: 2026-03-09
-modified: 2026-03-09
+tags: openrouter, Claude-Code, opencode, openclaw, AI, mcp
+date: 2026-03-10
+modified: 2026-03-10
 status: published
 image: openrouter-ai-tools.png
 thumbnail: openrouter-ai-tools-thumb.png
@@ -142,36 +142,19 @@ command execution.
 
 # OpenCode
 
-OpenCode has native OpenRouter support, but the setup
-isn't what I expected.
+OpenCode has native OpenRouter support.
 
 ## What didn't work
 
-I tried putting the API key in `opencode.json`:
-
-```json
-{
-  "provider": {
-    "openrouter": {
-      "options": {
-        "apiKey": "sk-or-v1-..."
-      }
-    }
-  },
-  "model": "openrouter/anthropic/claude-sonnet-4-6"
-}
-```
-
-This passed config validation but OpenCode still tried
-to bill through its own payment system. "No payment
-method" error pointing at OpenCode's billing page, not
-OpenRouter's.
+I tried putting the API key in `opencode.json`. It passed config validation but
+OpenCode still tried to bill through its own payment system. "No payment method" error
+pointing at OpenCode's billing page, not OpenRouter's.
 
 ## What worked
 
-OpenCode picks up `OPENROUTER_API_KEY` from the
-environment automatically. The config file only needs
-the model names:
+OpenCode picks up `OPENROUTER_API_KEY` from the environment automatically. The config
+file only needs the model names. `opencode.json` goes in the project root where you
+launch it, or the global `~/.config/opencode/opencode.json`.
 
 ```json
 {
@@ -180,8 +163,7 @@ the model names:
 }
 ```
 
-But the key still has to be registered through
-OpenCode's auth system. Inside the TUI:
+The key has to be registered through OpenCode's auth system. Inside the TUI:
 
 1. Run `/connect`
 2. Search for "OpenRouter"
@@ -193,11 +175,7 @@ provider to use.
 
 Note: OpenCode shows a warning when you select
 OpenRouter saying requests "will often be routed to
-subpar providers." That's partly true (OpenRouter does
-use third-party hosting) and partly an upsell for
-OpenCode Zen, their own paid hosting. You can pin
-provider routing on OpenRouter's side if quality
-matters for specific models.
+subpar providers." That feels like they're trying to just sell their own model hosting.
 
 
 # OpenClaw
@@ -206,7 +184,9 @@ OpenClaw has native OpenRouter support. The model
 reference format is `openrouter/<provider>/<model>`,
 same as OpenCode.
 
-In `openclaw.json`:
+In OpenClaw's home directory, `openclaw.json`, for the K8s setup
+`/home/node/.openclaw/openclaw.json` (the PVC mount). For a local install it'd be
+`~/.openclaw/openclaw.json.`:
 
 ```json5
 {
@@ -237,7 +217,7 @@ pattern as the
 [Linear API key](/openclaw-linear-skill.html) from the
 previous post.
 
-After redeploying, I cleared Pai's sessions (OpenClaw
+After redeploying, I cleared my OpenClaw agent's sessions (OpenClaw
 caches the model config per session) and asked what
 model it was running:
 
@@ -256,3 +236,98 @@ The Linear skill still works through the new model.
 Pai listed my teams and issues the same as before.
 The skill's curl commands don't care which model is
 driving the agent.
+
+
+# Custom OpenRouter Usage MCP
+
+With everything routed through OpenRouter, I wanted
+to check my spend without leaving the terminal. OpenRouter
+has a billing API, so I built a small
+[MCP server](https://github.com/kylep/multi/tree/main/apps/mcp-servers/openrouter)
+that queries it.
+
+The server has two tools. `get_usage` calls the
+`/api/v1/key` endpoint and returns daily, weekly, monthly,
+and total spend plus remaining credits. `get_model_pricing`
+calls `/api/v1/models` and shows per-million-token costs,
+with an optional filter to search by model name.
+
+The whole thing is one TypeScript file using the MCP SDK
+with stdio transport. It reads `OPENROUTER_API_KEY` from
+the environment, same key the other tools already use.
+
+## Registering it
+
+In `~/.claude.json`, under the project's `mcpServers`:
+
+```json
+"openrouter": {
+  "type": "stdio",
+  "command": "node",
+  "args": [
+    "/path/to/openrouter-mcp/build/index.js"
+  ]
+}
+```
+
+No `env` block needed. Claude Code spawns it as a child
+process, which inherits the shell environment.
+
+## Usage output
+
+After restarting Claude Code, I asked it to check my
+OpenRouter usage:
+
+```text
+Key: sk-or-v1-3fd...374
+Free tier: no
+
+Usage:
+  Today:  $0.5467
+  Week:   $0.5467
+  Month:  $0.5467
+  Total:  $0.5467
+
+Credit limit:
+  Limit:     $200.0000
+  Remaining: $199.4533
+```
+
+That $0.55 is from a few hours of Claude Code and
+OpenCode use. The $200 limit is what I set on the key
+in OpenRouter's dashboard.
+
+The pricing tool is useful for comparing models before
+switching. Searching "claude-sonnet-4" shows all the
+Sonnet variants and their per-million-token rates side
+by side.
+
+## Model pricing snapshot
+
+Pulled from `get_model_pricing` on 2026-03-10:
+
+| Model | Prompt | Completion | Context |
+|-------|--------|------------|---------|
+| openai/gpt-5.4-pro | $30.00/M | $180.00/M | 1050k |
+| openai/gpt-5.4 | $2.50/M | $15.00/M | 1050k |
+| openai/gpt-5.3-codex | $1.75/M | $14.00/M | 400k |
+| openai/gpt-5.2-pro | $21.00/M | $168.00/M | 400k |
+| openai/gpt-5.1 | $1.25/M | $10.00/M | 400k |
+| anthropic/claude-opus-4.6 | $5.00/M | $25.00/M | 1000k |
+| anthropic/claude-sonnet-4.6 | $3.00/M | $15.00/M | 1000k |
+| anthropic/claude-haiku-4.5 | $1.00/M | $5.00/M | 200k |
+| anthropic/claude-opus-4 | $15.00/M | $75.00/M | 200k |
+| anthropic/claude-sonnet-4 | $3.00/M | $15.00/M | 200k |
+| google/gemini-3.1-pro-preview | $2.00/M | $12.00/M | 1049k |
+| google/gemini-2.5-pro | $1.25/M | $10.00/M | 1049k |
+| google/gemini-2.5-flash | $0.30/M | $2.50/M | 1049k |
+| google/gemini-2.5-flash-lite | $0.10/M | $0.40/M | 1049k |
+| deepseek/deepseek-v3.2 | $0.25/M | $0.40/M | 164k |
+| deepseek/deepseek-r1-0528 | $0.45/M | $2.15/M | 164k |
+| meta-llama/llama-4-maverick | $0.15/M | $0.60/M | 1049k |
+| mistralai/mistral-large-2512 | $0.50/M | $1.50/M | 262k |
+| qwen/qwen3.5-397b-a17b | $0.39/M | $2.34/M | 262k |
+| qwen/qwen3-coder-plus | $0.65/M | $3.25/M | 1000k |
+
+Prices are per million tokens. These change often.
+Check OpenRouter's models page for current rates.
