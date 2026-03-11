@@ -47,7 +47,11 @@ reviews:
         style. Do not suggest grammar corrections, rephrasing, tone changes, or
         style improvements. Only flag genuinely broken markdown syntax, invalid
         frontmatter fields (missing required keys, wrong types), or mermaid
-        diagram syntax errors that would prevent rendering.
+        diagram syntax errors that would prevent rendering. Frontmatter tags
+        use comma-separated values on a single line (e.g.
+        "tags: Claude-Code, Security, Hooks"). This is intentional and handled
+        by the blog's markdown parser. Do not suggest converting to YAML list
+        format.
 
     # Blog app: correctness over style.
     - path: "apps/blog/**"

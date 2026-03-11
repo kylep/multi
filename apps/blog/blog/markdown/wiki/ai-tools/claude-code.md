@@ -11,7 +11,9 @@ keywords:
 related:
   - wiki/ai-tools/opencode
   - wiki/mcp
+  - wiki/devops/coderabbit
   - claude-code-coderabbit
+  - claude-hooks
 scope: "Covers Claude Code setup, configuration, MCP integration, hooks, and usage patterns. Does not cover Claude chat interface or Anthropic API."
 last_verified: 2026-03-10
 ---
@@ -52,6 +54,9 @@ Example MCP servers used in this ecosystem:
 
 - [Claude Code + CodeRabbit](/claude-code-coderabbit.html): local AI code
   review before PR creation
+- [Safety Hooks for Claude Code](/claude-hooks.html): PreToolUse and
+  PostToolUse hooks for blocking destructive commands, protecting
+  sensitive files, and audit logging
 - [Playwright MCP](/playwright-mcp.html): browser verification via MCP
 - [Cross-Tool AI Rules with Ruler](/ruler-cross-tool-ai-rules.html):
   sharing instructions across Claude Code and other tools

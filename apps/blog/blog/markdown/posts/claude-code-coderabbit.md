@@ -7,7 +7,7 @@ slug: claude-code-coderabbit
 category: dev
 tags: Claude-Code, CodeRabbit, AI, Code-Review, GitHub
 date: 2026-02-28
-modified: 2026-02-28
+modified: 2026-03-11
 status: published
 image: claude-code-coderabbit.png
 thumbnail: claude-code-coderabbit-thumb.png
@@ -153,3 +153,21 @@ like a robot, I can't stand the writing style. CodeRabbit shouldn't fight it.
 **`**/tests/**`** is told to focus on whether tests actually assert something,
 not on style. A test that always passes is a real problem. Variable naming is
 not.
+
+
+## Update: teaching it about false positives (2026-03-11)
+
+CodeRabbit kept flagging my blog frontmatter tags as needing YAML
+list format. The blog parser handles comma-separated tags on one
+line, so this was a false positive on every post.
+
+The fix is `path_instructions` in `.coderabbit.yaml`. I added a
+note to the blog posts path telling it not to suggest converting
+frontmatter tags to list format. CodeRabbit applies these
+instructions on every review, so the false positive should stop
+recurring.
+
+You can also reply `@coderabbitai` on a PR comment to teach it
+inline. It stores those as "learnings" and applies them to future
+reviews. The `.coderabbit.yaml` approach is more durable since
+it's checked into the repo.

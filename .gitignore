@@ -9,6 +9,7 @@ secrets/*.sh
 *.swp
 *.pyc
 __pycache__/
+logs/
 node_modules/
 postgres-data/
 **/values-*.yaml
