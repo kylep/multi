@@ -249,6 +249,14 @@ After a session, the log looks like:
 You could pipe this into whatever alerting or analysis you
 want. I'm keeping it simple for now, just a file on disk.
 
+The end goal is to use this log to build something like
+[Dippy](https://github.com/ldayton/Dippy), a smart
+auto-approve hook. Dippy parses bash commands with an AST
+and auto-approves safe ones while still prompting for
+anything destructive. I want to do the same thing but
+trained on my own audit trail, so the approve/deny decisions
+reflect how I actually work. That's a future post.
+
 
 # Wiring it up
 
