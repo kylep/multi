@@ -16,7 +16,6 @@ scope: "Covers OpenClaw architecture, deployment, and skill development. Does no
 last_verified: 2026-03-10
 ---
 
-# OpenClaw
 
 OpenClaw is a self-hosted AI agent that runs on macOS or Kubernetes.
 It connects to Telegram as a chat interface and supports custom

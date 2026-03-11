@@ -9,8 +9,10 @@ class WikiService {
 		if (WikiService.instance) {
 			return WikiService.instance;
 		}
-		this.ready = false;
-		this.init().then(() => { this.ready = true; });
+		this.readyPromise = this.init().catch((error) => {
+			WikiService.instance = null;
+			throw error;
+		});
 		WikiService.instance = this;
 	}
 
@@ -21,9 +23,7 @@ class WikiService {
 	}
 
 	async waitForReady() {
-		while (!this.ready) {
-			await new Promise(resolve => setTimeout(resolve, 100));
-		}
+		await this.readyPromise;
 	}
 
 	// Recursively build the wiki tree from the filesystem

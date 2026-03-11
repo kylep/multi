@@ -14,7 +14,6 @@ scope: "Covers Linear MCP server capabilities and usage. Does not cover Linear's
 last_verified: 2026-03-10
 ---
 
-# Linear MCP
 
 The Linear MCP server connects AI tools to Linear project management.
 Agents can create issues, update status, query backlogs, and manage

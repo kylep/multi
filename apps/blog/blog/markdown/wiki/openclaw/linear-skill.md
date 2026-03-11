@@ -15,7 +15,6 @@ scope: "Covers the Linear skill implementation for OpenClaw. Does not cover Line
 last_verified: 2026-03-10
 ---
 
-# OpenClaw Linear Skill
 
 A custom skill that gives OpenClaw access to Linear project management.
 Developed as the first custom skill for the platform.

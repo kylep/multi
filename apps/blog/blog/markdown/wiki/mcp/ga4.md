@@ -14,7 +14,6 @@ scope: "Covers GA4 MCP server setup and available reports. Does not cover GA4 co
 last_verified: 2026-03-10
 ---
 
-# GA4 MCP
 
 The GA4 Analytics MCP server gives AI agents access to Google Analytics
 data. Used for traffic analysis, content performance review, and

@@ -15,7 +15,6 @@ scope: "Covers local LLM inference on macOS with Apple Silicon. Does not cover c
 last_verified: 2026-03-10
 ---
 
-# Local LLMs
 
 Local inference using llama.cpp on Apple Silicon hardware. Tested on
 M2 Air (24GB unified memory).

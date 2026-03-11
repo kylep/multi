@@ -16,7 +16,6 @@ scope: "Covers OpenRouter configuration for various AI tools. Does not cover ind
 last_verified: 2026-03-10
 ---
 
-# OpenRouter
 
 OpenRouter provides a single API endpoint that routes to multiple LLM
 providers (Anthropic, OpenAI, Google, open-source models). It simplifies

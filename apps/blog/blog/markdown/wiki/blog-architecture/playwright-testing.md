@@ -15,7 +15,6 @@ scope: "Covers the Playwright test framework setup for the blog. Does not cover 
 last_verified: 2026-03-10
 ---
 
-# Playwright Testing
 
 End-to-end tests verify the blog renders correctly. Tests run against
 the Next.js dev server on localhost:3000.

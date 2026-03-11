@@ -17,7 +17,6 @@ scope: "Covers Kubernetes security configuration for OpenClaw. Does not cover Op
 last_verified: 2026-03-10
 ---
 
-# OpenClaw Kubernetes Security
 
 Security hardening for running OpenClaw on a K3s cluster. Six layers
 of defense-in-depth applied to the deployment.

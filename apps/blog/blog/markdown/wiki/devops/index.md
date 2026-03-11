@@ -14,7 +14,6 @@ scope: "Covers DevOps tooling and security scanning. Does not cover infrastructu
 last_verified: 2026-03-10
 ---
 
-# DevOps & Security
 
 Tooling for code quality, security scanning, and cross-tool
 configuration management. Most tools are packaged as Docker images

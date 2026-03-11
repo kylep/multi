@@ -16,7 +16,6 @@ scope: "Covers Claude Code setup, configuration, MCP integration, hooks, and usa
 last_verified: 2026-03-10
 ---
 
-# Claude Code
 
 Claude Code is Anthropic's CLI tool for AI-assisted software engineering.
 It operates directly in the terminal, reading and editing files, running

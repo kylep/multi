@@ -13,7 +13,6 @@ scope: "Covers MCP server configurations and usage patterns. Does not cover the 
 last_verified: 2026-03-10
 ---
 
-# MCP Integrations
 
 MCP (Model Context Protocol) servers expose external tools to AI
 assistants. Each server runs as a subprocess and communicates via

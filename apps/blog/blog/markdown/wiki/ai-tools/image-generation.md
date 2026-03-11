@@ -16,7 +16,6 @@ scope: "Covers image generation tools and workflows. Does not cover text-based A
 last_verified: 2026-03-10
 ---
 
-# AI Image Generation
 
 Image generation for blog post headers and other visual content.
 Both local (ComfyUI) and cloud-based (DALL-E, Flux) pipelines.

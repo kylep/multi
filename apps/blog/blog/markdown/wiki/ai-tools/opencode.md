@@ -15,7 +15,6 @@ scope: "Covers OpenCode installation, configuration, multi-agent setup, and comp
 last_verified: 2026-03-10
 ---
 
-# OpenCode
 
 OpenCode is an open-source AI coding tool that supports multiple LLM
 providers and custom agent definitions. It provides a terminal UI with

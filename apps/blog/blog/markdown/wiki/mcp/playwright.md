@@ -15,7 +15,6 @@ scope: "Covers Playwright MCP server setup and usage for AI-driven browser verif
 last_verified: 2026-03-10
 ---
 
-# Playwright MCP
 
 The Playwright MCP server gives AI agents direct browser control.
 Primary use case: verifying rendered output during development.

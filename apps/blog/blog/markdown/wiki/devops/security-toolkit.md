@@ -18,7 +18,6 @@ scope: "Covers the security toolkit Docker image and its three bundled tools. Do
 last_verified: 2026-03-10
 ---
 
-# Security Toolkit
 
 A single Docker image (`kpericak/ai-security-toolkit-1:0.2`) that
 bundles three security scanning tools. Designed for AI agents to run

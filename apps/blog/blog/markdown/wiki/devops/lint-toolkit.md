@@ -16,7 +16,6 @@ scope: "Covers the lint toolkit Docker image and bundled linters. Does not cover
 last_verified: 2026-03-10
 ---
 
-# Lint Toolkit
 
 Docker image bundling multiple linters for AI agent use. Provides
 consistent code quality checking without installing tools locally.

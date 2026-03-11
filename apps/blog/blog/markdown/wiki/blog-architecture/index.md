@@ -14,7 +14,6 @@ scope: "Covers the blog's technical implementation. Does not cover blog content 
 last_verified: 2026-03-10
 ---
 
-# Blog Architecture
 
 kyle.pericak.com is a statically exported Next.js 14 site. Markdown
 files are processed at build time into HTML pages. The site is deployed

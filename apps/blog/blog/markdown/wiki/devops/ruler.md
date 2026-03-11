@@ -15,7 +15,6 @@ scope: "Covers Ruler setup and rule authoring. Does not cover individual tool co
 last_verified: 2026-03-10
 ---
 
-# Ruler
 
 Ruler solves the problem of maintaining AI assistant instructions across
 multiple tools. Write rules once in `.ruler/` markdown files, then

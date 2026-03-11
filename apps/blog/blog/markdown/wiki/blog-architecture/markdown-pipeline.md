@@ -14,7 +14,6 @@ scope: "Covers the MarkdownService build pipeline. Does not cover wiki processin
 last_verified: 2026-03-10
 ---
 
-# Markdown Pipeline
 
 The blog's build pipeline converts markdown files to static HTML pages
 using Next.js static generation.

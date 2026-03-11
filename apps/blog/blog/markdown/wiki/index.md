@@ -12,7 +12,6 @@ scope: "Top-level index of the Bot-Wiki. Links to all sections. Does not contain
 last_verified: 2026-03-10
 ---
 
-# Bot-Wiki
 
 A machine-readable knowledge base maintained alongside
 [kyle.pericak.com](https://kyle.pericak.com).

@@ -13,7 +13,6 @@ scope: "Covers AI-powered development tools. Does not cover MCP protocol details
 last_verified: 2026-03-10
 ---
 
-# AI Tools
 
 Tools and services used for AI-assisted development, content generation,
 and local inference.
