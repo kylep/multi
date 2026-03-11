@@ -131,7 +131,8 @@ function BaseSiteComponent({
 	// "unefined" was a product of bad markdown processing
 	//if (route == "undefined") { route = ['index']; }
 	let pageContent = <></>;
-	if (route[0] === 'wiki') {
+	const isWiki = route[0] === 'wiki';
+	if (isWiki) {
 		pageContent = <WikiPage wikiContent={wikiContent} />;
 	} else if (route[0].startsWith('index') || route[0] === 'category' || route[0] === 'tag' || route[0] === "/") {
 		if (route === '/') {
@@ -142,13 +143,13 @@ function BaseSiteComponent({
 		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
 	}
 	return (
-		<GlobalContextProvider globalData={{ 
-			categories, 
+		<GlobalContextProvider globalData={{
+			categories,
 			tags,
 			lastGitCommitHash,
 			siteLastModified
 		}}>
-			<SiteLayout>
+			<SiteLayout hideSidebar={isWiki}>
 				{pageContent}
 			</SiteLayout>
 		</GlobalContextProvider>

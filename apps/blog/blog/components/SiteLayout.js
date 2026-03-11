@@ -116,26 +116,31 @@ function SiteFooter() {
 
 
 // This is the main container that all pages are expected to be wrapped in
-function SiteLayout({ children, context = true }) {
+function SiteLayout({ children, context = true, hideSidebar = false }) {
   // with no context we cant render the sidebar or footer
-  const sidebar_element = context ? <BlogSidebar /> : null;
+  const sidebar_element = context && !hideSidebar ? <BlogSidebar /> : null;
   const footer_element = context ? <SiteFooter /> : null;
+  const contentWidth = hideSidebar
+    ? '100%'
+    : ['100%', 'calc(100% - 300px)'];
   return (
     <Box suppressHydrationWarning>
       <SiteNavHeader />
       <SiteTitle />
       <ResponsiveRow>
         <Box sx={{
-          width: ['100%', 'calc(100% - 300px)'], // Full width on small screens, adjusted when sidebar is alongside
+          width: contentWidth,
           padding: '20px',
         }}>
           {children}
         </Box>
-        <Box sx={{
-          width: ['100%', '300px'],
-        }}>
-          {sidebar_element}
-        </Box>
+        {!hideSidebar && (
+          <Box sx={{
+            width: ['100%', '300px'],
+          }}>
+            {sidebar_element}
+          </Box>
+        )}
       </ResponsiveRow>
       {footer_element}
     </Box>
