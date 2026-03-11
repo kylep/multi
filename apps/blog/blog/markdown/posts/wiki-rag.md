@@ -6,7 +6,7 @@ slug: wiki-rag
 category: ai
 tags: RAG, FAISS, OpenRouter, embeddings, Bot-Wiki, Python
 date: 2026-03-11
-modified: 2026-03-1
+modified: 2026-03-11
 status: published
 image: wiki-rag.png
 thumbnail: wiki-rag-thumb.png
