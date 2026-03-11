@@ -19,9 +19,11 @@ repos:
       entry: bash -c 'FILES=""; for f in "$@"; do FILES="$FILES /workspace/$f"; done; docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-security-toolkit-1:0.2 -c "timeout 60 semgrep scan --config auto --error $FILES"' --
       language: system
       stages: ["pre-commit", "pre-push"]
+      types_or: [javascript, ts, jsx, tsx, python]
     - id: gitleaks
       name: Gitleaks
       description: Scan for leaked secrets using the security toolkit image.
       entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-security-toolkit-1:0.2 -c "cd /workspace && gitleaks detect --source ."'
       language: system
       stages: ["pre-commit", "pre-push"]
+      pass_filenames: false

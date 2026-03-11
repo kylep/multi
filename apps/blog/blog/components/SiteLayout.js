@@ -77,6 +77,7 @@ export function SiteNavHeader() {
         <ResponsiveRow data-testid="Nav-ResponsiveRow" sx={{ flexDirection: 'row' }}>
           <HeaderNavLink href="/" data-testid="Nav-Link-Home" sx={{marginLeft: 0}}><HomeIcon /></HeaderNavLink>
           <HeaderNavLink href="/index1.html" data-testid="Nav-Link-Blog">Blog</HeaderNavLink>
+          <HeaderNavLink href="/wiki.html" data-testid="Nav-Link-Wiki">Wiki</HeaderNavLink>
           <HeaderNavLink href="/about.html" data-testid="Nav-Link-About">About</HeaderNavLink>
         </ResponsiveRow>
       </Toolbar>

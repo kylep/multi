@@ -41,7 +41,7 @@ export function paginate(array, pageSize) {
   
 
 // Singleton, only want to compute everything once in the build
-class MarkdownService {
+export class MarkdownService {
 	constructor() {
 		if (MarkdownService.instance) {
 			return MarkdownService.instance;

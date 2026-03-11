@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const SITE_URL = 'https://kyle.pericak.com';
 const postsDir = path.join(__dirname, '..', 'markdown', 'posts');
+const wikiDir = path.join(__dirname, '..', 'markdown', 'wiki');
 const outDir = path.join(__dirname, '..', 'out');
 
 function getPosts() {
@@ -83,6 +84,29 @@ function generateSitemap() {
   // Tag pages
   for (const tag of tags) {
     urls.push({ loc: `${SITE_URL}/tag/${encodeURIComponent(tag)}`, changefreq: 'weekly', priority: '0.5' });
+  }
+
+  // Wiki pages
+  function getWikiSlugs(dir, baseSlug = 'wiki') {
+    const slugs = [];
+    if (!fs.existsSync(dir)) return slugs;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    // index.md represents this directory's page
+    if (entries.some(e => e.isFile() && e.name === 'index.md')) {
+      slugs.push(baseSlug);
+    }
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+        slugs.push(...getWikiSlugs(path.join(dir, entry.name), `${baseSlug}/${entry.name}`));
+      } else if (entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'index.md') {
+        slugs.push(`${baseSlug}/${entry.name.replace('.md', '')}`);
+      }
+    }
+    return slugs;
+  }
+  for (const wikiSlug of getWikiSlugs(wikiDir)) {
+    urls.push({ loc: `${SITE_URL}/${wikiSlug}.html`, changefreq: 'monthly', priority: '0.6' });
   }
 
   // Post pages

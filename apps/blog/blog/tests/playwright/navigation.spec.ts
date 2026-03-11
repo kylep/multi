@@ -15,6 +15,13 @@ test('Blog link works', async ({ page }) => {
   await expect(page.locator('a:has(p)').first()).toBeVisible();
 });
 
+test('Wiki link works', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('Nav-Toolbar').getByRole('link', { name: 'Wiki' }).click();
+  await expect(page).toHaveURL('/wiki.html');
+  await expect(page.locator('h1').nth(1)).toBeVisible();
+});
+
 test('About page loads', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'About' }).click();

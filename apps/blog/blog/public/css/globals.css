@@ -36,6 +36,25 @@ td {
   padding: 5px;
 }
 
+/* Wiki directory tree */
+[data-testid="wiki-tree"] ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+[data-testid="wiki-tree"] li {
+  padding: 1px 0;
+  white-space: nowrap;
+}
+
+[data-testid="wiki-tree"] .tree-prefix {
+  color: #888;
+  font-family: monospace;
+  font-size: 14px;
+  user-select: none;
+}
+
 /* round buttons linking to things like reddit and twitter */
 .social-button{
   padding: 0;
