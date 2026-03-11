@@ -140,6 +140,18 @@ Don't over-attribute. Not every line needs "Claude did X." Use it where saying
 "I" would be dishonest about who did the work.
 
 
+## External References
+
+When mentioning research, CVEs, products, or tools by name, always link to
+the primary source. Link to the original publication, not a news summary.
+If you reference a GitHub project, link to the repo. If you reference a
+security advisory, link to the researcher's writeup or the CVE page.
+
+Don't drop names without links. "Lasso Security published research" is
+incomplete. "Lasso Security published a [prompt injection taxonomy](url)"
+is correct.
+
+
 ## What to Avoid
 
 - AI writing tells: hedging qualifiers, hollow transitions, motivational sign-

@@ -341,14 +341,15 @@ data. You clone it, run Claude Code, and the repo's hooks
 run instead of yours.
 
 This is a real attack vector. In 2025, Check Point Research
-found CVE-2025-59536: an attacker plants a
-`.claude/settings.json` with hooks in a repo. You clone it,
-run Claude Code, approve the trust dialog (which doesn't
-mention hooks), and the hook commands execute immediately.
-Reverse shell, data exfiltration, whatever the attacker
-wants. Anthropic patched it in August 2025, but the lesson
-stands: keep safety hooks in global config where only you
-control them.
+found
+[CVE-2025-59536](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/):
+an attacker plants a `.claude/settings.json` with hooks in
+a repo. You clone it, run Claude Code, approve the trust
+dialog (which doesn't mention hooks), and the hook commands
+execute immediately. Reverse shell, data exfiltration,
+whatever the attacker wants. Anthropic patched it in August
+2025, but the lesson stands: keep safety hooks in global
+config where only you control them.
 
 
 # Same idea, different tools
