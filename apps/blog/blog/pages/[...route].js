@@ -1,7 +1,9 @@
 import SiteLayout from '../components/SiteLayout';
 import IndexPage from '../components/IndexPage';
 import BlogPostContentPage from '../components/BlogPostContentPage';
+import WikiPage from '../components/WikiPage';
 import { getMarkdownService, pageSize, paginate } from '../utils/MarkdownService';
+import { getWikiService } from '../utils/WikiService';
 import { GlobalContextProvider } from '../utils/GlobalContext';
 import { getGitService } from '../utils/GitService';
 
@@ -49,6 +51,13 @@ export async function getStaticPaths() {
 	const postPaths = slugs.map(slug => ({ params: { route: [slug] } }));
 	paths.push(...postPaths);
 
+	// Routes for each wiki page
+	const wikiService = await getWikiService();
+	const wikiPaths = Object.keys(wikiService.wikiPagesBySlug).map(slug => ({
+		params: { route: slug.split('/') }
+	}));
+	paths.push(...wikiPaths);
+
 	return { paths, fallback: false };
 }
 
@@ -64,8 +73,13 @@ export async function getStaticProps({params}) {
 	let indexPageCount = Math.ceil(markdownFilesBeforePagination.length / pageSize); 
 	let markdownFiles = [];
 	let postContent = {};
+	let wikiContent = {};
 	let pageNumber = 0; // varies by filtered size of markdownFiles
-	if (route[0] === 'index') { // default index page, treat like index1
+	if (route[0] === 'wiki') { // wiki pages
+		const wikiService = await getWikiService();
+		const wikiSlug = route.join('/');
+		wikiContent = wikiService.wikiPagesBySlug[wikiSlug] || {};
+	} else if (route[0] === 'index') { // default index page, treat like index1
 		markdownFiles = paginatedMarkdownFiles[0];
 	} else if (route[0].startsWith('index')) { // index1.html, index2.html, etc
 		pageNumber = parseInt(route[0].replace('index', ''), 10);
@@ -91,20 +105,22 @@ export async function getStaticProps({params}) {
 			currentPageIndexNumber: pageNumber,
 			pageCount: indexPageCount,
 			postContent: postContent,
+			wikiContent: wikiContent,
 			lastGitCommitHash: gitService.hash,
 			siteLastModified: gitService.date,
 		},
 	};
 }
 
-function BaseSiteComponent({ 
-		route, 
-		markdownFiles, 
-		categories, 
-		tags, 
-		currentPageIndexNumber, 
-		pageCount, 
+function BaseSiteComponent({
+		route,
+		markdownFiles,
+		categories,
+		tags,
+		currentPageIndexNumber,
+		pageCount,
 		postContent,
+		wikiContent,
 		lastGitCommitHash,
 		siteLastModified
 	}) {
@@ -115,7 +131,9 @@ function BaseSiteComponent({
 	// "unefined" was a product of bad markdown processing
 	//if (route == "undefined") { route = ['index']; }
 	let pageContent = <></>;
-	if (route[0].startsWith('index') || route[0] === 'category' || route[0] === 'tag' || route[0] === "/") {
+	if (route[0] === 'wiki') {
+		pageContent = <WikiPage wikiContent={wikiContent} />;
+	} else if (route[0].startsWith('index') || route[0] === 'category' || route[0] === 'tag' || route[0] === "/") {
 		if (route === '/') {
 			route = 'index';
 		}
