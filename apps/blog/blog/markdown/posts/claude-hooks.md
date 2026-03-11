@@ -314,8 +314,11 @@ data. If Claude is reading web pages, parsing documents,
 or pulling content from APIs, a malicious payload in that
 content could try to hijack the session.
 
-Lasso Security has published research on these attack
-patterns. A PostToolUse hook is the right place to catch
+Lasso Security published a
+[prompt injection taxonomy](https://www.lasso.security/blog/prompt-injection-taxonomy-techniques)
+cataloging these techniques: encoding, obfuscation,
+role-playing, context manipulation, and more. A PostToolUse
+hook is the right place to catch
 them because you see the actual content before Claude acts
 on it.
 
