@@ -2,3 +2,4 @@ out/
 workspace/
 build.log
 exports.sh
+.venv/
