@@ -5,8 +5,8 @@ summary: Building a FAISS retrieval pipeline over the wiki
 slug: wiki-rag
 category: ai
 tags: RAG, FAISS, OpenRouter, embeddings, Bot-Wiki, Python
-date: 2026-03-10
-modified: 2026-03-10
+date: 2026-03-11
+modified: 2026-03-1
 status: published
 image: wiki-rag.png
 thumbnail: wiki-rag-thumb.png
@@ -34,6 +34,44 @@ Python script that:
 Dependencies: `faiss-cpu`, `openai` (for the OpenAI-compatible
 API), and `pyyaml`. That's it.
 
+## Why FAISS
+
+[FAISS](https://github.com/facebookresearch/faiss) is Meta's
+library for similarity search over dense vectors. It runs
+in-process, no server needed. You give it vectors, it gives
+you nearest neighbors. The index is a flat file you can
+commit to git.
+
+I picked it because this is 21 vectors. There's no need for
+a database, a server, or a managed service. `pip install
+faiss-cpu`, build an index, save it, done. The index is
+129 KB. It loads in milliseconds.
+
+If you're working at larger scale or want more features,
+the main alternatives are:
+
+- [Chroma](https://github.com/chroma-core/chroma): embedded
+  vector database with a nice Python API. Good if you want
+  metadata filtering or persistence without managing files
+  yourself. Still runs locally.
+- [Qdrant](https://github.com/qdrant/qdrant): vector search
+  engine written in Rust. Runs as a server, supports
+  filtering and payloads. Better fit when you have millions
+  of vectors or need a proper API.
+- [Pinecone](https://www.pinecone.io/): fully managed cloud
+  vector database. Zero ops, but you're paying per query and
+  your data lives on someone else's servers.
+
+If you're already running PostgreSQL,
+[pgvector](https://github.com/pgvector/pgvector) is worth
+a look. It adds vector columns and similarity search to
+your existing database. No new service to run, and your
+vectors live next to your relational data.
+
+For 21 pages committed to a git repo, FAISS is the obvious
+choice. No dependencies beyond the pip package, no running
+services, no accounts.
+
 ## Why whole-page chunks
 
 The wiki pages are short, 18 to 65 lines each. Splitting them
@@ -58,6 +96,38 @@ engineering. It operates directly in the terminal...
 Prepending the summary, keywords, and scope to the body gives
 the embedding model more signal about what the page covers.
 21 chunks, 5,434 tokens total.
+
+### Chunking in general
+
+Most RAG guides recommend chunks of 256 to 512 tokens. That's
+a reasonable default for long documents where you want to
+retrieve a specific paragraph, not the whole thing. Smaller
+chunks give more precise retrieval. Larger chunks give the
+LLM more context per result.
+
+The tradeoffs:
+
+- **Too small** (under 100 tokens): chunks lose meaning on
+  their own. "See above" or "as mentioned" with no referent.
+  Retrieval finds fragments, not answers.
+- **Too large** (over 1000 tokens): embeddings become diluted.
+  A chunk about five topics matches all five weakly instead
+  of one strongly. You also burn more of the LLM's context
+  window per retrieved result.
+- **Overlap** helps when chunks split mid-thought. A common
+  pattern is 512-token chunks with 50-100 tokens of overlap.
+  This adds redundancy but reduces the chance of cutting a
+  relevant passage in half.
+
+The wiki pages average about 260 tokens each, which lands
+right in the sweet spot. They're also self-contained by
+design, each page covers one topic with clear boundaries.
+No reason to split them further.
+
+If I were indexing longer documents (blog posts, docs, book
+chapters), I'd split by section headers first, then by token
+count within sections. Semantic boundaries beat arbitrary
+ones.
 
 ## Building the index
 
@@ -89,6 +159,33 @@ content doesn't change often, and there's no reason to pay for
 embeddings on every deploy.
 
 ## Querying
+
+A query hits two models. First, the question gets embedded
+into a vector using the same embedding model that indexed
+the wiki pages. FAISS compares that vector against the 21
+stored vectors and returns the closest matches. Those
+matches are wiki pages that are semantically similar to the
+question, not keyword matches, but meaning matches.
+
+Then the retrieved pages get passed to an LLM (Claude
+Sonnet) as context, along with the original question. The
+LLM reads the pages and writes an answer grounded in what
+they actually say. Without the retrieval step, the LLM
+would just guess from its training data. With it, the LLM
+answers from your specific documents.
+
+That's the "retrieval-augmented" part of RAG: find relevant
+documents first, then generate an answer from them.
+
+```mermaid
+graph LR
+    Q[Question] --> E[Embed question]
+    E --> F[FAISS search]
+    F --> R[Top 3 wiki pages]
+    R --> P[Build prompt]
+    P --> LLM[Claude Sonnet]
+    LLM --> A[Answer + sources]
+```
 
 ```bash
 python bin/wiki-rag.py query "What MCP servers does this
@@ -176,11 +273,10 @@ $0.0001. Each query embeds a short question (maybe 20 tokens)
 plus one chat completion. A query costs roughly $0.002 to
 $0.01 depending on the response length.
 
-## What's next
+Building the index and running test queries cost $0.03
+total on OpenRouter. That covers the embedding API calls
+and the chat completions for query-mode answers. The
+development itself (writing the script, iterating on the
+blog post) ran through Claude Code on an Anthropic Max
+subscription, so that cost isn't on the OpenRouter bill.
 
-The index is committed to git, so any tool can read it. Next
-steps would be wiring this into Claude Code as an MCP tool
-(so it can search the wiki during a session) or giving OpenClaw
-a skill that queries it via Telegram. The wiki keeps growing
-as I document more of the ecosystem, and rebuilding the index
-is one command.
