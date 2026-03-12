@@ -56,7 +56,7 @@ prompts when the later agent needs that context.
 
 Read wiki pages for context before deciding which agents to invoke:
 
-```
+```text
 apps/blog/blog/markdown/wiki/projects/agent-team/index.md
 ```
 

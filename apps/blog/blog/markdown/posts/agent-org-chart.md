@@ -37,7 +37,7 @@ myself. If I want the CMO to propose blog topics and the
 CTO to review feasibility, I'm copy-pasting between
 sessions.
 
-So I built [Pai](/openclaw-linear-skill.html) into a proper
+So I built Pai into a proper
 executive assistant agent that decomposes multi-agent
 requests, invokes the right agents in order, and synthesizes
 the results. The full setup is an org chart: named
@@ -218,7 +218,7 @@ Each agent has a page in the
 [Bot-Wiki](/bot-wiki.html) that documents its goal, tools,
 subagents, and example prompts.
 
-```
+```text
 agent-team/
 ├── index.md          # org chart and coordination model
 ├── pai.md            # orchestration agent
