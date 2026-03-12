@@ -6,7 +6,7 @@ slug: agent-org-chart
 category: ai
 tags: AI, Claude-Code, agents, orchestration, Bot-Wiki
 date: 2026-03-11
-modified: 2026-03-11
+modified: 2026-03-12
 status: published
 image: agent-org-chart.png
 thumbnail: agent-org-chart-thumb.png
@@ -20,28 +20,34 @@ imgprompt: A simple flat vector slice of pie with the Greek
 
 # Why an org chart for AI agents
 
-I have a handful of
-[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
-agents that each do one thing:
+I've defined a team of Claude Code agents that each have a named
+role, themed around being a virtual agent company. Any of them
+work fine on their own:
 
-- The CMO pulls GA4 traffic data
-- The CFO tracks OpenRouter spend
-- The CTO checks Linear for blocked issues
+```bash
+claude --agent cmo -p "What are my top 5 posts by pageviews?"
+```
 
-They work fine on their own.
+The benefit is persistent context. Each agent definition carries
+its goal, tools, rules, and domain knowledge. I don't re-explain
+what the CMO does every time I invoke it. The definition is the
+context.
 
-The problem is coordination. If I want to ask about traffic
-and spend and blockers in the same conversation, I have to
-run three agents manually and stitch the results together
-myself. If I want the CMO to propose blog topics and the
-CTO to review feasibility, I'm copy-pasting between
-sessions.
+The challenge is coordination. When a request spans multiple
+agents, someone has to decide which agents to call, in what
+order, and how to stitch the results together. That's robot
+work, not a good use of human time. I also don't want to be
+the medium for shared context, copying output from one agent
+into another's prompt.
 
-So I built Pai into a proper
-executive assistant agent that decomposes multi-agent
-requests, invokes the right agents in order, and synthesizes
-the results. The full setup is an org chart: named
-roles, a shared wiki for context, and an orchestration layer.
+I repurposed my OpenClaw agent
+[Pai](/openclaw-linear-skill.html) into an orchestrator. Pai
+decomposes multi-agent requests and invokes the right agents
+in sequence. The C-suite agents (CMO, CFO, CTO, CDO, CSO) each
+own a domain and can sub-orchestrate their own subagents. The
+CMO delegates to SEO, the CFO delegates to Cost Tracker, and
+so on.
+
 
 # The agents
 
@@ -53,26 +59,39 @@ roles, a shared wiki for context, and an orchestration layer.
 | CTO | Delivery, blockers | Sonnet | Linear MCP, Bash |
 | CDO | Knowledge management | Sonnet | Wiki read/write, Bash |
 | CSO | Security and privacy | Sonnet | File tools, Bash |
+| AR | Agent onboarding, mediation | Sonnet | File tools, Bash |
+| Publisher | Blog content pipeline | Sonnet | Bash, file tools |
 | SEO | Search audits | Sonnet | GA4, WebSearch |
 | Cost Tracker | Spend reports | Haiku | OpenRouter MCP |
 | Librarian | Wiki read/write | Haiku | Wiki file tools |
 | Privacy Auditor | Flag confidential data | Haiku | File tools |
-| AR | Agent onboarding, mediation | Sonnet | File tools, Bash |
-| Publisher | Blog pipeline | Mixed | Bash, file tools |
+| Researcher | Gather sourced facts | Sonnet | WebSearch, Read |
+| Writer | Draft posts from briefs | Sonnet | Read, Write |
+| Fact Checker | Verify claims | Haiku | WebSearch, Read |
+| Reviewer | Style and structure | Haiku | Read, Grep |
+| QA | Production readiness | Sonnet | Bash, Playwright |
 
 Each C-suite agent owns a domain and has subagents for
 specialized work. SEO reports to the CMO. Cost Tracker
 reports to the CFO. The Librarian reports to the CDO. The
-Privacy Auditor reports to the CSO. AR handles agent
-onboarding and role boundary mediation. The Publisher is
-its own pipeline with a researcher, writer, fact-checker,
-and reviewer.
+Privacy Auditor reports to the CSO. AR (Agent Resources,
+the HR department) handles agent onboarding and role boundary
+mediation.
+
+The Publisher is its own sub-org with a four-stage content
+pipeline: researcher, writer, fact-checker, and reviewer.
+QA runs after the pipeline to verify the post actually
+builds, renders, and links correctly before it goes live.
 
 Every agent connects to real
 [MCP](https://modelcontextprotocol.io/) servers. No mocks. The
 CMO queries real GA4 data. The CFO pulls real OpenRouter bills.
 
 # The org chart
+
+This is accurate as of 2026-03-12. The
+[bot-wiki version](/bot-wiki.html) stays up to date as agents
+are added or reorganized.
 
 ```mermaid
 graph TD
@@ -95,6 +114,7 @@ graph TD
     Writer["Writer"]
     FactChecker["Fact Checker"]
     Reviewer["Reviewer"]
+    QA["QA"]
 
     Kyle --> Pai
     Kyle --> CMO
@@ -126,9 +146,12 @@ graph TD
     Publisher --> Writer
     Publisher --> FactChecker
     Publisher --> Reviewer
+    Publisher --> QA
 ```
 
-Kyle sits at the top. Every agent is directly invocable.
+It being my blog and virtual team, I get to sit at the top. Every agent is directly
+invocable by me, but ideally I don't need to do that often.
+
 Solid lines mean "reports to." Dashed lines from Pai mean
 "orchestrates." Dashed lines to the Librarian mean "can
 read/write wiki through."
@@ -137,22 +160,30 @@ The Privacy Auditor is the gatekeeper. Any agent writing
 content that will end up in git or on the internet should
 check with the Privacy Auditor first. It scans for leaked
 analytics data, spend numbers, secrets, and anything else
-that shouldn't be public.
+that shouldn't be public. This came from a scare where one of my agents with access
+to mildly confidential data referenced it in content that
+would have been public. I feel strongly that all agent flows
+need a privacy step at minimum, and ideally agents should
+have purposefully curtailed access to sensitive data.
 
-Pai is a peer, not a boss. I can still run
-`claude --agent cmo` whenever I want. Pai is for when a
-request spans multiple domains and I don't want to do the
-routing myself.
+Pai is structured as a peer to the other top-level agents, and orchestrator. I can
+still run `claude --agent cmo` whenever I want. Pai is for when a request spans
+multiple agents and I don't want to do the routing myself.
 
-The Librarian is the interesting one. Any agent can talk to
-it directly to persist notes, plans, or evidence to the wiki.
-That's how agents share context between stateless sessions.
-The CDO owns the wiki strategy, but the Librarian does the
-actual reading and writing.
+The Librarian is an experiment in context management and
+shared state. Any agent can talk to it directly to persist
+notes, plans, or evidence to the wiki. I already built a
+[RAG system](/wiki-rag.html) over the wiki. Once the wiki
+gets big enough that agents can't skim it all, I'll have
+them query the RAG index instead. For now, the agents just
+use git and local file storage for wiki access. The CDO
+owns the wiki strategy, but the Librarian does the actual
+reading and writing.
 
 # Pai: the executive assistant
 
-Here's the agent definition frontmatter:
+Agent definitions live in `.claude/agents/`. Here's Pai's
+frontmatter:
 
 ```yaml
 # .claude/agents/pai.md
@@ -183,6 +214,25 @@ context with each other.
 This is the main tradeoff. Fresh sessions mean no shared
 state, but Pai bridges the gap by reading output from one
 agent and passing relevant parts into the next agent's prompt.
+
+The alternatives I considered:
+
+- **Shared memory / message bus.** Tools like LangGraph or
+  CrewAI give agents shared state. More powerful, but more
+  moving parts. I wanted something I could debug by reading
+  a bash script.
+- **Single mega-agent.** One agent definition with all the
+  tools. Simpler, but the context window fills up fast and
+  the agent loses focus. Splitting by role keeps each
+  session lean.
+- **MCP-based orchestration.** Route through an MCP server
+  that manages agent sessions. Interesting, but overkill
+  for a blog. I'd rather build on `claude --agent` which
+  already works.
+
+I went with the dumb approach: Bash calls and text passing.
+It's easy to understand, easy to debug, and the wiki handles
+long-term memory. If I outgrow it, I'll upgrade.
 
 ## Dry-run mode
 
@@ -231,8 +281,7 @@ agent-team/
 └── phase-2.md        # future async architecture
 ```
 
-The wiki isn't just documentation. It's the shared memory
-layer.
+The wiki is the shared memory layer.
 
 Every agent session is stateless. The CMO doesn't remember
 what the CTO said last week. But if the CTO writes its
@@ -252,6 +301,8 @@ This is cheaper than giving every agent write access to
 the full file system. The Librarian runs on Haiku, knows
 the wiki format, and won't accidentally clobber unrelated
 files.
+
+In time I may have the CFO tweak the models the agents use to manage costs, too.
 
 # Pai in action
 
@@ -366,4 +417,10 @@ pulled the same PER-37/PER-38 dependency from the health
 check. It flagged the same blocker from two different angles
 without being told about the first run.
 
-Next up: the SEO agent that audits the blog.
+
+# Watching them work
+I got bored waiting for the agents to finish doing their thing so I made them all
+post status updates to a local file. I `tail -f` the file and watch them work. It's
+neat. Eventually I think I might plug them into some chat app or something instead so
+it looks more like people talking to each other. I think
+that'd be fun.

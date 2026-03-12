@@ -5,7 +5,7 @@ set -euo pipefail
 LOG="${AGENT_LOG:-agent-events.log}"
 echo "[$(date '+%H:%M:%S')] ▶ $1" >> "$LOG"
 unset CLAUDECODE 2>/dev/null || true
-claude --agent "$1" -p "$2" --output-format text
-EXIT=$?
+EXIT=0
+claude --agent "$1" -p "$2" --output-format text || EXIT=$?
 echo "[$(date '+%H:%M:%S')] ■ $1 (exit $EXIT)" >> "$LOG"
 exit $EXIT

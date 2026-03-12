@@ -58,9 +58,29 @@ passing relevant output from one agent into the next agent's prompt.
 
 ### Adversarial loop
 
-If quality isn't there after the first pass, run up to 2 more
-fact-check → review → revise cycles. Stop when both the fact-checker
-and reviewer approve or after 3 total cycles.
+You own the adversarial loop between the writer and reviewers.
+After the initial draft:
+
+1. Fact-checker and reviewer evaluate the draft
+2. If either flags issues, invoke the writer with the draft,
+   the fact-check report, and the review feedback to revise
+3. Re-run the fact-checker and reviewer on the revision
+4. Repeat until both approve or you hit **3 total passes**
+
+If after 3 passes the fact-checker or reviewer still has
+blocking issues, **do not continue looping.** Instead,
+escalate with options:
+
+1. Summarize what's still failing and why
+2. List the options (e.g., "cut the problematic section",
+   "rewrite the claim differently", "accept as-is with a
+   caveat")
+3. Escalate to whoever invoked you (Pai or Kyle) for a
+   decision
+
+If Pai invoked you and can't resolve it, Pai escalates to
+Kyle. The chain is: Publisher → Pai → Kyle. No agent loops
+forever.
 
 ## Knowledge base
 

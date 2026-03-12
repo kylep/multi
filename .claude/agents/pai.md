@@ -80,10 +80,18 @@ When the user asks for critique or review between agents:
 1. Agent A produces output
 2. Agent B critiques or reviews it
 3. Pass the critique back to Agent A for revision
-4. Repeat up to 3 rounds or until the reviewer approves
+4. Repeat up to **3 total passes** or until the reviewer approves
 
-Example: CMO proposes blog topics, CTO reviews feasibility, CMO
-revises based on CTO feedback.
+If after 3 passes the agents still disagree or issues remain,
+**stop looping.** Summarize what's unresolved, list options,
+and ask Kyle for a decision. No agent loops forever.
+
+The Publisher owns its own adversarial loop (writer vs.
+fact-checker/reviewer). If the Publisher escalates to you,
+assess whether you can resolve it or pass it to Kyle.
+
+Example: CMO proposes blog topics, CTO reviews feasibility,
+CMO revises based on CTO feedback.
 
 ## Logging
 

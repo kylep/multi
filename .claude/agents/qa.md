@@ -35,7 +35,7 @@ Read the post file and confirm:
 Run the blog build and confirm it exits cleanly:
 
 ```bash
-cd /Users/kp/gh/multi/apps/blog && bin/build-blog-files.sh
+cd apps/blog && bin/build-blog-files.sh
 ```
 
 Report any errors or warnings from the build output. A non-zero exit
@@ -46,7 +46,7 @@ code is a blocking failure.
 Start the dev server if it isn't already running:
 
 ```bash
-cd /Users/kp/gh/multi/apps/blog && bin/start-dev-bg.sh
+cd apps/blog && bin/start-dev-bg.sh
 ```
 
 Navigate to the post in Playwright using the post's slug:
