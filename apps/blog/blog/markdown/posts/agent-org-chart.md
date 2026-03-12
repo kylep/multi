@@ -22,10 +22,13 @@ imgprompt: A simple flat vector slice of pie with the Greek
 
 I have a handful of
 [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
-agents that each do one thing.
-The CMO pulls GA4 traffic data. The CFO tracks OpenRouter spend.
-The CTO checks Linear for blocked issues. They work fine on
-their own.
+agents that each do one thing:
+
+- The CMO pulls GA4 traffic data
+- The CFO tracks OpenRouter spend
+- The CTO checks Linear for blocked issues
+
+They work fine on their own.
 
 The problem is coordination. If I want to ask about traffic
 and spend and blockers in the same conversation, I have to
