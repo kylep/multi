@@ -18,7 +18,19 @@ imgprompt: A simple flat vector slice of pie with the Greek
 
 ## Table of contents
 
+# A warning
+
+As of 2026-03-11, this is a "Hey this is neat" post and not a "this works really well!"
+one. I found the process of building and testing this really fun, but I've also been
+using this approach for basically no time at all and I'm sure a bunch of the things I'm
+trying here are just going to straight up not work the way I want in the long run. I'll
+be iterating on it a lot. The bot-wiki is meant to be kept up to date and that + the
+code are probably the right places to check (or just ask me) how things are working
+later on in time.
+
 # Why an org chart for AI agents
+
+Because it's cool, mostly. Also I hope it will work really well. But mostly, it's cool.
 
 I've defined a team of Claude Code agents that each have a named
 role, themed around being a virtual agent company. Any of them
@@ -230,6 +242,13 @@ The alternatives I considered:
   that manages agent sessions. Interesting, but overkill
   for a blog. I'd rather build on `claude --agent` which
   already works.
+- **[Beads](https://github.com/steveyegge/beads).** A
+  structured task memory for AI agents, backed by Dolt
+  (version-controlled SQL). I looked into it, but it's
+  more of an alternative to Linear than to the wiki. It
+  solves task tracking and agent handoff, not knowledge
+  management. I like Linear for tasks and markdown files
+  for knowledge.
 
 I went with the dumb approach: Bash calls and text passing.
 It's easy to understand, easy to debug, and the wiki handles
