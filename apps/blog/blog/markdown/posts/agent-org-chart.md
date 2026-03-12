@@ -47,21 +47,26 @@ roles, a shared wiki for context, and an orchestration layer.
 
 | Agent | Role | Model | Key Tools |
 |-------|------|-------|-----------|
+| Agent | Role | Model | Key Tools |
+|-------|------|-------|-----------|
 | Pai | Orchestration | Sonnet | Bash, Linear MCP |
 | CMO | Traffic and growth | Sonnet | GA4 Analytics MCP |
 | CFO | AI spend | Sonnet | OpenRouter MCP |
 | CTO | Delivery, blockers | Sonnet | Linear MCP, Bash |
 | CDO | Knowledge management | Sonnet | Wiki read/write, Bash |
+| CSO | Security and privacy | Sonnet | File tools, Bash |
 | SEO | Search audits | Sonnet | GA4, WebSearch |
 | Cost Tracker | Spend reports | Haiku | OpenRouter MCP |
 | Librarian | Wiki read/write | Haiku | Wiki file tools |
+| Privacy Auditor | Flag confidential data | Haiku | File tools |
 | Content Team | Blog pipeline | Mixed | Playwright, file tools |
 
 Each C-suite agent owns a domain and has subagents for
 specialized work. SEO reports to the CMO. Cost Tracker
 reports to the CFO. The Librarian reports to the CDO. The
-Content Team is its own pipeline with a researcher, writer,
-fact-checker, and reviewer.
+Privacy Auditor reports to the CSO. The Content Team is its
+own pipeline with a researcher, writer, fact-checker, and
+reviewer.
 
 Every agent connects to real
 [MCP](https://modelcontextprotocol.io/) servers. No mocks. The
@@ -77,11 +82,13 @@ graph TD
     CFO["CFO — Optimize Spend"]
     CTO["CTO — Delivery"]
     CDO["CDO — Knowledge"]
+    CSO["CSO — Security"]
     Content["Content Team"]
 
     SEO["SEO Subagent"]
     CostTracker["Cost Tracker"]
     Librarian["Librarian"]
+    PrivacyAuditor["Privacy Auditor"]
 
     Researcher["Researcher"]
     Writer["Writer"]
@@ -93,17 +100,20 @@ graph TD
     Kyle --> CFO
     Kyle --> CTO
     Kyle --> CDO
+    Kyle --> CSO
     Kyle --> Content
 
     Pai -.->|orchestrates| CMO
     Pai -.->|orchestrates| CFO
     Pai -.->|orchestrates| CTO
     Pai -.->|orchestrates| CDO
+    Pai -.->|orchestrates| CSO
     Pai -.->|orchestrates| Content
 
     CMO --> SEO
     CFO --> CostTracker
     CDO --> Librarian
+    CSO --> PrivacyAuditor
 
     CMO -.->|reads/writes| Librarian
     CFO -.->|reads/writes| Librarian
@@ -119,6 +129,12 @@ Kyle sits at the top. Every agent is directly invocable.
 Solid lines mean "reports to." Dashed lines from Pai mean
 "orchestrates." Dashed lines to the Librarian mean "can
 read/write wiki through."
+
+The Privacy Auditor is the gatekeeper. Any agent writing
+content that will end up in git or on the internet should
+check with the Privacy Auditor first. It scans for leaked
+analytics data, spend numbers, secrets, and anything else
+that shouldn't be public.
 
 Pai is a peer, not a boss. I can still run
 `claude --agent cmo` whenever I want. Pai is for when a
@@ -207,6 +223,7 @@ agent-team/
 ├── cfo.md            # AI spend
 ├── cto.md            # delivery and blockers
 ├── cdo.md            # knowledge management
+├── cso.md            # security and privacy
 ├── content-team.md   # blog pipeline
 └── phase-2.md        # future async architecture
 ```
@@ -272,25 +289,26 @@ adjust before committing.
 Same request without `--dry-run`. Pai invoked three agents
 and synthesized everything into one report.
 
-**Traffic** (from CMO): GA4 only had 7 days of data. 190
-sessions total, trending from 6 to 37 sessions per day.
-Almost entirely direct traffic, organic search at 2%. The
-site is too new for meaningful quarter-over-quarter
-comparison.
+**Traffic** (from CMO): GA4 only had a week of data. The
+site is new enough that there's no meaningful baseline yet.
+Almost entirely direct traffic, organic search barely
+registering. CMO recommended connecting Search Console and
+revisiting in 30 days.
 
-**AI spend** (from CFO): $23.91 total against a $200 credit.
-88% of budget remaining. OpenRouter's API only surfaced
-account-level totals, no per-model breakdown.
+**AI spend** (from CFO): well under budget with no pressure.
+OpenRouter's API only surfaced account-level totals, no
+per-model breakdown. CFO noted the biggest future lever is
+routing non-reasoning tasks to flash-tier models.
 
-**Delivery** (from CTO): 12 issues done, 1 in progress
-(this blog post), 18 in backlog. No hard blockers, but three
-dependency chains worth watching:
+**Delivery** (from CTO): most issues done or in backlog,
+one in progress (this blog post). No hard blockers, but
+three dependency chains worth watching:
 
-1. RSS feed (PER-22) is high priority but hasn't started.
-   Four distribution issues are gated on it.
-2. CMO and CFO baseline runs (PER-37, PER-38) haven't
-   started. They gate two future blog posts.
-3. PER-39 (this post) has an open PR to close.
+1. RSS feed is high priority but hasn't started. Four
+   distribution issues are gated on it.
+2. CMO and CFO baseline runs haven't started. They gate
+   two future blog posts.
+3. This post has an open PR to close.
 
 Pai wrote a log entry automatically:
 
@@ -299,8 +317,8 @@ Pai wrote a log entry automatically:
 
 | Agent | Prompt Summary | Result |
 |-------|---------------|--------|
-| cmo | 90-day traffic trend | success: 190 sessions |
-| cfo | 90-day AI spend | success: $23.91 total |
+| cmo | 90-day traffic trend | success |
+| cfo | 90-day AI spend | success |
 | cto | Blocked/stalled issues | success: 3 clusters |
 
 **Synthesis:** Early launch phase, minimal spend,

@@ -9,7 +9,9 @@ keywords:
   - cfo
   - cto
   - cdo
+  - cso
   - librarian
+  - privacy-auditor
   - subagents
   - bot-wiki
   - linear
@@ -43,6 +45,7 @@ graph TD
     CFO["CFO — Optimize Spend"]
     CTO["CTO — Delivery"]
     CDO["CDO — Knowledge"]
+    CSO["CSO — Security"]
     Content["Content Team"]
 
     SEO["SEO Subagent"]
@@ -50,6 +53,7 @@ graph TD
     CostTracker["Cost Tracker"]
     DeliveryBot["Delivery Bot (future)"]
     Librarian["Librarian"]
+    PrivacyAuditor["Privacy Auditor"]
 
     Researcher["Researcher"]
     Writer["Writer"]
@@ -61,12 +65,14 @@ graph TD
     Kyle --> CFO
     Kyle --> CTO
     Kyle --> CDO
+    Kyle --> CSO
     Kyle --> Content
 
     Pai -.->|orchestrates| CMO
     Pai -.->|orchestrates| CFO
     Pai -.->|orchestrates| CTO
     Pai -.->|orchestrates| CDO
+    Pai -.->|orchestrates| CSO
     Pai -.->|orchestrates| Content
 
     CMO --> SEO
@@ -74,6 +80,7 @@ graph TD
     CFO --> CostTracker
     CTO --> DeliveryBot
     CDO --> Librarian
+    CSO --> PrivacyAuditor
 
     CMO -.->|reads/writes| Librarian
     CFO -.->|reads/writes| Librarian
@@ -132,6 +139,7 @@ real, working deliverable.
 | CFO | Optimize AI token spend | [CFO](/wiki/projects/agent-team/cfo.html) |
 | CTO | Track delivery, flag blockers | [CTO](/wiki/projects/agent-team/cto.html) |
 | CDO | Manage shared knowledge and wiki | [CDO](/wiki/projects/agent-team/cdo.html) |
+| CSO | Security and privacy | [CSO](/wiki/projects/agent-team/cso.html) |
 | Content Team | Research, write, verify, review blog posts | [Content Team](/wiki/projects/agent-team/content-team.html) |
 
 ## Invocation
@@ -143,7 +151,9 @@ claude --agent cmo
 claude --agent cfo
 claude --agent cto
 claude --agent cdo
+claude --agent cso
 claude --agent librarian
+claude --agent privacy-auditor
 ```
 
 OpenCode: use the agent picker to select from the `org/` group.
