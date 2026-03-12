@@ -12,6 +12,12 @@ keywords:
   - cso
   - librarian
   - privacy-auditor
+  - ar
+  - publisher
+  - researcher
+  - writer
+  - fact-checker
+  - reviewer
   - subagents
   - bot-wiki
   - linear
@@ -46,7 +52,8 @@ graph TD
     CTO["CTO — Delivery"]
     CDO["CDO — Knowledge"]
     CSO["CSO — Security"]
-    Content["Content Team"]
+    AR["AR — Agent Resources"]
+    Publisher["Publisher — Content Pipeline"]
 
     SEO["SEO Subagent"]
     Social["Social Subagent (future)"]
@@ -66,14 +73,16 @@ graph TD
     Kyle --> CTO
     Kyle --> CDO
     Kyle --> CSO
-    Kyle --> Content
+    Kyle --> AR
+    Kyle --> Publisher
 
     Pai -.->|orchestrates| CMO
     Pai -.->|orchestrates| CFO
     Pai -.->|orchestrates| CTO
     Pai -.->|orchestrates| CDO
     Pai -.->|orchestrates| CSO
-    Pai -.->|orchestrates| Content
+    Pai -.->|orchestrates| AR
+    Pai -.->|orchestrates| Publisher
 
     CMO --> SEO
     CMO --> Social
@@ -86,11 +95,14 @@ graph TD
     CFO -.->|reads/writes| Librarian
     CTO -.->|reads/writes| Librarian
 
-    Content --> Researcher
-    Content --> Writer
-    Content --> FactChecker
-    Content --> Reviewer
+    Publisher --> Researcher
+    Publisher --> Writer
+    Publisher --> FactChecker
+    Publisher --> Reviewer
 ```
+
+See the dedicated [Org Chart](/wiki/projects/agent-team/org-chart.html)
+page for a bot-friendly YAML version.
 
 ## Coordination
 
@@ -106,6 +118,9 @@ Agents coordinate through two shared systems and one orchestrator:
 - **Pai** — the orchestration layer. Decomposes multi-domain requests
   into agent calls, passes context between them, and synthesizes
   results. Optional. Each agent still works independently.
+- **[Event Log](/wiki/projects/agent-team/event-log.html)** — real-time
+  observability. All agents log progress to `agent-events.log`. Watch
+  with `tail -f agent-events.log`.
 
 ## Phases
 
@@ -140,7 +155,8 @@ real, working deliverable.
 | CTO | Track delivery, flag blockers | [CTO](/wiki/projects/agent-team/cto.html) |
 | CDO | Manage shared knowledge and wiki | [CDO](/wiki/projects/agent-team/cdo.html) |
 | CSO | Security and privacy | [CSO](/wiki/projects/agent-team/cso.html) |
-| Content Team | Research, write, verify, review blog posts | [Content Team](/wiki/projects/agent-team/content-team.html) |
+| AR | Agent onboarding and role mediation | [AR](/wiki/projects/agent-team/ar.html) |
+| Publisher | Orchestrate blog content pipeline | [Publisher](/wiki/projects/agent-team/publisher.html) |
 
 ## Invocation
 
@@ -154,9 +170,15 @@ claude --agent cdo
 claude --agent cso
 claude --agent librarian
 claude --agent privacy-auditor
+claude --agent ar
+claude --agent publisher
+claude --agent researcher
+claude --agent writer
+claude --agent fact-checker
+claude --agent reviewer
 ```
 
-OpenCode: use the agent picker to select from the `org/` group.
+OpenCode: use the agent picker to select from the `org/` or `blog/` group.
 
 ## Tools
 
@@ -169,4 +191,4 @@ Each agent connects to real MCP servers and tools. No mocks.
 **Data:**
 - **GA4 Analytics MCP** — traffic data for CMO/SEO
 - **OpenRouter MCP** — usage and pricing data for CFO
-- **Playwright MCP** — browser verification (content team)
+- **Playwright MCP** — browser verification (Publisher pipeline)

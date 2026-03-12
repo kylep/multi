@@ -34,7 +34,8 @@ postgres-data/
 # Generated reports
 **/megalinter-reports/
 
-# Pai orchestration logs
+# Agent event and orchestration logs
+agent-events.log
 pai-log-*.md
 
 # Playwright

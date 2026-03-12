@@ -1,8 +1,9 @@
 ---
-title: "Content Team"
-summary: "Blog content pipeline agents: researcher, writer, fact-checker, and reviewer. Existing agents mapped into the org chart."
+title: "Publisher / Content Team"
+summary: "Publisher agent and blog content pipeline: researcher, writer, fact-checker, reviewer. Defined in both Claude Code and OpenCode."
 keywords:
-  - content-team
+  - publisher
+  - content-pipeline
   - blog-pipeline
   - researcher
   - writer
@@ -10,14 +11,19 @@ keywords:
   - reviewer
 related:
   - wiki/projects/agent-team
+  - wiki/projects/agent-team/publisher
   - wiki/blog-architecture
-scope: "Maps the existing blog content pipeline agents into the agent org chart."
+scope: "Maps the blog content pipeline agents across Claude Code and OpenCode definitions."
 last_verified: 2026-03-11
 ---
 
 
-The content team is the blog post production pipeline. These agents
-existed before the org chart — they're mapped in here for completeness.
+The Publisher orchestrates the blog post production pipeline. Four
+subagents handle research, writing, fact-checking, and review.
+
+This page covers the agent definitions. For the Publisher's role in the
+org chart, pipeline diagram, and invocation examples, see the
+[Publisher wiki page](/wiki/projects/agent-team/publisher.html).
 
 ## Pipeline
 
@@ -35,27 +41,35 @@ graph LR
 
 ## Agent Definitions
 
-These are defined as OpenCode agents in `.opencode/agents/blog/`:
+Agents are defined in both Claude Code and OpenCode:
 
-| Agent | Model | File |
-|-------|-------|------|
-| Researcher | gemini-2.5-flash | `.opencode/agents/blog/researcher.md` |
-| Writer | big-pickle | `.opencode/agents/blog/writer.md` |
-| Fact Checker | gemini-2.5-flash | `.opencode/agents/blog/fact-checker.md` |
-| Reviewer | claude-sonnet-4-6 | `.opencode/agents/blog/reviewer.md` |
+| Agent | Claude Code | OpenCode |
+|-------|------------|----------|
+| Publisher | `.claude/agents/publisher.md` (Sonnet) | — |
+| Researcher | `.claude/agents/researcher.md` (Haiku) | `.opencode/agents/blog/researcher.md` (Gemini Flash) |
+| Writer | `.claude/agents/writer.md` (Sonnet) | `.opencode/agents/blog/writer.md` (Big Pickle) |
+| Fact Checker | `.claude/agents/fact-checker.md` (Haiku) | `.opencode/agents/blog/fact-checker.md` (Gemini Flash) |
+| Reviewer | `.claude/agents/reviewer.md` (Haiku) | `.opencode/agents/blog/reviewer.md` (Big Pickle) |
+
+The Claude Code agents reference the style guide at
+`apps/blog/blog/markdown/posts/.ruler/style.md` at runtime rather than
+duplicating rules inline.
 
 ## Relationship to Org Chart
 
-The content team reports to the mission directly, not to any C-suite
-role. The CMO may direct what topics to write about, but the content
-team's pipeline is independent.
+The Publisher reports to the mission directly, not to any C-suite
+role. The CMO may direct what topics to write about, but the
+Publisher's pipeline is independent.
 
 ## Invocation
 
-These agents are invoked through OpenCode's agent picker, typically
-chained by a human operator:
+Claude Code:
+```bash
+claude --agent publisher
+claude --agent researcher
+claude --agent writer
+claude --agent fact-checker
+claude --agent reviewer
+```
 
-1. Run researcher with a topic
-2. Hand the brief to the writer
-3. Run fact-checker on the draft
-4. Run reviewer for final polish
+OpenCode: use the agent picker to select from the `blog/` group.

@@ -57,14 +57,16 @@ roles, a shared wiki for context, and an orchestration layer.
 | Cost Tracker | Spend reports | Haiku | OpenRouter MCP |
 | Librarian | Wiki read/write | Haiku | Wiki file tools |
 | Privacy Auditor | Flag confidential data | Haiku | File tools |
-| Content Team | Blog pipeline | Mixed | Playwright, file tools |
+| AR | Agent onboarding, mediation | Sonnet | File tools, Bash |
+| Publisher | Blog pipeline | Mixed | Bash, file tools |
 
 Each C-suite agent owns a domain and has subagents for
 specialized work. SEO reports to the CMO. Cost Tracker
 reports to the CFO. The Librarian reports to the CDO. The
-Privacy Auditor reports to the CSO. The Content Team is its
-own pipeline with a researcher, writer, fact-checker, and
-reviewer.
+Privacy Auditor reports to the CSO. AR handles agent
+onboarding and role boundary mediation. The Publisher is
+its own pipeline with a researcher, writer, fact-checker,
+and reviewer.
 
 Every agent connects to real
 [MCP](https://modelcontextprotocol.io/) servers. No mocks. The
@@ -81,7 +83,8 @@ graph TD
     CTO["CTO — Delivery"]
     CDO["CDO — Knowledge"]
     CSO["CSO — Security"]
-    Content["Content Team"]
+    AR["AR — Agent Resources"]
+    Publisher["Publisher — Content Pipeline"]
 
     SEO["SEO Subagent"]
     CostTracker["Cost Tracker"]
@@ -99,14 +102,16 @@ graph TD
     Kyle --> CTO
     Kyle --> CDO
     Kyle --> CSO
-    Kyle --> Content
+    Kyle --> AR
+    Kyle --> Publisher
 
     Pai -.->|orchestrates| CMO
     Pai -.->|orchestrates| CFO
     Pai -.->|orchestrates| CTO
     Pai -.->|orchestrates| CDO
     Pai -.->|orchestrates| CSO
-    Pai -.->|orchestrates| Content
+    Pai -.->|orchestrates| AR
+    Pai -.->|orchestrates| Publisher
 
     CMO --> SEO
     CFO --> CostTracker
@@ -117,10 +122,10 @@ graph TD
     CFO -.->|reads/writes| Librarian
     CTO -.->|reads/writes| Librarian
 
-    Content --> Researcher
-    Content --> Writer
-    Content --> FactChecker
-    Content --> Reviewer
+    Publisher --> Researcher
+    Publisher --> Writer
+    Publisher --> FactChecker
+    Publisher --> Reviewer
 ```
 
 Kyle sits at the top. Every agent is directly invocable.
@@ -222,7 +227,7 @@ agent-team/
 ├── cto.md            # delivery and blockers
 ├── cdo.md            # knowledge management
 ├── cso.md            # security and privacy
-├── content-team.md   # blog pipeline
+├── publisher.md      # blog pipeline
 └── phase-2.md        # future async architecture
 ```
 
