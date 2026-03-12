@@ -404,4 +404,5 @@ tests and reporting back. They work in parallel. Failures come back as tasks.
 
 Not wired up yet. But the spec files, generated tests, and MCP config are what
 make it possible to hand verification to a different agent without losing the
-context of what the tests mean.
+context of what the tests mean. I ended up wiring this into a [QA subagent in
+the agent team](/agent-org-chart.html).

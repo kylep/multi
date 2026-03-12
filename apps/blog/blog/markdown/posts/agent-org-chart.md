@@ -68,7 +68,7 @@ their own, I like to think of it as them enforcing high standards.
 |-------|------|-------|-----------|
 | Pai | Orchestration | Sonnet | Bash, Linear MCP |
 | CMO | Traffic and growth | Sonnet | GA4 Analytics MCP |
-| CFO | AI spend | Sonnet | OpenRouter MCP |
+| CFO | AI spend | Sonnet | [OpenRouter MCP](/openrouter-ai-tools.html) |
 | CTO | Delivery, blockers | Sonnet | Linear MCP, Bash |
 | CDO | Knowledge management | Sonnet | Wiki read/write, Bash |
 | CSO | Security and privacy | Sonnet | File tools, Bash |
@@ -95,6 +95,8 @@ The Publisher is its own sub-org with a four-stage content
 pipeline: researcher, writer, fact-checker, and reviewer.
 QA runs after the pipeline to verify the post actually
 builds, renders, and links correctly before it goes live.
+QA uses [Playwright MCP](/playwright-mcp.html) to take screenshots
+and inspect the rendered page.
 
 Every agent connects to real
 [MCP](https://modelcontextprotocol.io/) servers. No mocks. The

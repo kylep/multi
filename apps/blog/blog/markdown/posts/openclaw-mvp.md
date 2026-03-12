@@ -257,5 +257,5 @@ pkill -f openclaw-gateway
 # What's next
 
 I wanted to set this up with Linear, but honestly I don't love it runing flat on my
-Macbook. I'm gonna put it in K8s and producitonize this now that I've got the MVP
-figured out.
+Macbook. I'm gonna [put it in K8s](/openclaw-k8s.html) and producitonize this now
+that I've got the MVP figured out.
