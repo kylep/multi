@@ -47,8 +47,6 @@ roles, a shared wiki for context, and an orchestration layer.
 
 | Agent | Role | Model | Key Tools |
 |-------|------|-------|-----------|
-| Agent | Role | Model | Key Tools |
-|-------|------|-------|-----------|
 | Pai | Orchestration | Sonnet | Bash, Linear MCP |
 | CMO | Traffic and growth | Sonnet | GA4 Analytics MCP |
 | CFO | AI spend | Sonnet | OpenRouter MCP |
