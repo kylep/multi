@@ -26,11 +26,21 @@ and answers questions using the retrieved context.
 - **Metadata**: `apps/blog/blog/markdown/wiki/.index/metadata.json`
 - **Venv**: `apps/blog/.venv/` (gitignored)
 
+## Setup
+
+```bash
+cd apps/blog
+python3 -m venv .venv
+.venv/bin/pip install -r bin/requirements-rag.txt
+```
+
+The venv is gitignored. All wiki-rag commands must use the venv python.
+
 ## Building the index
 
 ```bash
 cd apps/blog
-python bin/wiki-rag.py build
+.venv/bin/python bin/wiki-rag.py build
 ```
 
 Embeds all wiki pages using `text-embedding-3-small` via OpenRouter.
@@ -43,7 +53,7 @@ Use `--dry-run` to parse pages without calling the API.
 ## Querying
 
 ```bash
-python bin/wiki-rag.py query "How do I run security scans?"
+.venv/bin/python bin/wiki-rag.py query "How do I run security scans?"
 ```
 
 Embeds the question, finds the top-k nearest wiki pages (default 3),

@@ -132,8 +132,9 @@ ones.
 ## Building the index
 
 ```bash
-pip install -r bin/requirements-rag.txt
-python bin/wiki-rag.py build
+python3 -m venv .venv
+.venv/bin/pip install -r bin/requirements-rag.txt
+.venv/bin/python bin/wiki-rag.py build
 ```
 
 ```
@@ -188,8 +189,8 @@ graph LR
 ```
 
 ```bash
-python bin/wiki-rag.py query "What MCP servers does this
-  project use?"
+.venv/bin/python bin/wiki-rag.py query \
+  "What MCP servers does this project use?"
 ```
 
 ```
@@ -216,7 +217,7 @@ project-level .claude.json file.
 The retrieval nailed the right pages. Here's a different query:
 
 ```bash
-python bin/wiki-rag.py query "How do I run security scans?"
+.venv/bin/python bin/wiki-rag.py query "How do I run security scans?"
 ```
 
 ```

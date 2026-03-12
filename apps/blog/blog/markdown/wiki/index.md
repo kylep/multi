@@ -20,6 +20,15 @@ This wiki is structured for AI agent consumption and RAG retrieval.
 Each page includes metadata fields (summary, keywords, scope, related)
 designed for programmatic access.
 
+## Sections
+
+- [AI Tools](/wiki/ai-tools.html) — Claude Code, OpenCode, and other AI tools
+- [MCP](/wiki/mcp.html) — Model Context Protocol integrations
+- [DevOps](/wiki/devops.html) — Infrastructure and deployment
+- [Blog Architecture](/wiki/blog-architecture.html) — How this blog works
+- [OpenClaw](/wiki/openclaw.html) — Multi-agent orchestration
+- [Projects](/wiki/projects.html) — Active project plans and architecture docs
+
 ## About
 
 Content is organized by topic. Each page includes structured metadata

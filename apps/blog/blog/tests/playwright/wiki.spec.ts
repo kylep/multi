@@ -43,6 +43,6 @@ test('Wiki breadcrumbs link back to parent', async ({ page }) => {
 test('Wiki pages render on mobile viewport', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 667 });
   await page.goto('/wiki.html');
-  await expect(page.getByRole('link', { name: /AI Tools/i })).toBeVisible();
+  await expect(page.getByTestId('wiki-tree').getByRole('link', { name: 'AI Tools' })).toBeVisible();
   await expect(page.locator('h1').nth(1)).toContainText('Bot-Wiki');
 });
