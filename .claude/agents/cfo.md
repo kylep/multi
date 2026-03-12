@@ -1,4 +1,5 @@
 ---
+name: cfo
 description: CFO — Analyze AI token spend and recommend optimizations
 model: sonnet
 tools:

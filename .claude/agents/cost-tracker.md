@@ -1,4 +1,5 @@
 ---
+name: cost-tracker
 description: Cost tracker subagent — Produce spend reports and flag anomalies
 model: haiku
 tools:

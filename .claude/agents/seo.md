@@ -1,4 +1,5 @@
 ---
+name: seo
 description: SEO subagent — Keyword gaps, internal linking, content analysis
 model: sonnet
 tools:

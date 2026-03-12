@@ -1,4 +1,5 @@
 ---
+name: cto
 description: CTO — Review project status and flag blocked work
 model: sonnet
 tools:
