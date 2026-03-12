@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { Link } from '@mui/material';
+import { useEffect } from 'react';
 import Head from 'next/head';
 
 const SITE_URL = 'https://kyle.pericak.com';
@@ -8,6 +9,26 @@ const SITE_URL = 'https://kyle.pericak.com';
 export function WikiPage({ wikiContent }) {
 	const { slug, title, summary, contentHtml, metaData, breadcrumbs, childTreeHtml } = wikiContent;
 	const canonicalUrl = `${SITE_URL}/${slug}.html`;
+
+	useEffect(() => {
+		let isMounted = true;
+
+		async function initializeMermaid() {
+			const mermaidModule = await import('mermaid');
+			if (!isMounted) {
+				return;
+			}
+			const mermaid = mermaidModule.default;
+			mermaid.initialize({ startOnLoad: true, securityLevel: 'loose' });
+			mermaid.contentLoaded();
+		}
+
+		initializeMermaid();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [contentHtml]);
 	const keywords = metaData.keywords || [];
 	const related = metaData.related || [];
 	const jsonLd = [

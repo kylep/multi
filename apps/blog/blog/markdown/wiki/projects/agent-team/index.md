@@ -4,13 +4,25 @@ summary: "AI agent organization with named C-suite roles and subagents. Mission:
 keywords:
   - agent-org-chart
   - ai-agents
+  - pai
   - cmo
   - cfo
   - cto
+  - cdo
+  - cso
+  - librarian
+  - privacy-auditor
+  - ar
+  - publisher
+  - researcher
+  - writer
+  - fact-checker
+  - reviewer
   - subagents
   - bot-wiki
   - linear
   - coordination
+  - orchestration
 related:
   - wiki/ai-tools/claude-code
   - wiki/ai-tools/opencode
@@ -33,49 +45,82 @@ Help Kyle and the online community learn interesting and useful things.
 
 ```mermaid
 graph TD
-    Mission["Mission: Help Kyle & community learn"]
+    Kyle["Kyle"]
+    Pai["Pai — Executive Assistant"]
     CMO["CMO — Grow Readership"]
     CFO["CFO — Optimize Spend"]
     CTO["CTO — Delivery"]
-    Content["Content Team"]
+    CDO["CDO — Knowledge"]
+    CSO["CSO — Security"]
+    AR["AR — Agent Resources"]
+    Publisher["Publisher — Content Pipeline"]
 
     SEO["SEO Subagent"]
     Social["Social Subagent (future)"]
     CostTracker["Cost Tracker"]
     DeliveryBot["Delivery Bot (future)"]
+    Librarian["Librarian"]
+    PrivacyAuditor["Privacy Auditor"]
 
     Researcher["Researcher"]
     Writer["Writer"]
     FactChecker["Fact Checker"]
     Reviewer["Reviewer"]
 
-    Mission --> CMO
-    Mission --> CFO
-    Mission --> CTO
-    Mission --> Content
+    Kyle --> Pai
+    Kyle --> CMO
+    Kyle --> CFO
+    Kyle --> CTO
+    Kyle --> CDO
+    Kyle --> CSO
+    Kyle --> AR
+    Kyle --> Publisher
+
+    Pai -.->|orchestrates| CMO
+    Pai -.->|orchestrates| CFO
+    Pai -.->|orchestrates| CTO
+    Pai -.->|orchestrates| CDO
+    Pai -.->|orchestrates| CSO
+    Pai -.->|orchestrates| AR
+    Pai -.->|orchestrates| Publisher
 
     CMO --> SEO
     CMO --> Social
     CFO --> CostTracker
     CTO --> DeliveryBot
+    CDO --> Librarian
+    CSO --> PrivacyAuditor
 
-    Content --> Researcher
-    Content --> Writer
-    Content --> FactChecker
-    Content --> Reviewer
+    CMO -.->|reads/writes| Librarian
+    CFO -.->|reads/writes| Librarian
+    CTO -.->|reads/writes| Librarian
+
+    Publisher --> Researcher
+    Publisher --> Writer
+    Publisher --> FactChecker
+    Publisher --> Reviewer
 ```
+
+See the dedicated [Org Chart](/wiki/projects/agent-team/org-chart.html)
+page for a bot-friendly YAML version.
 
 ## Coordination
 
-Agents coordinate through two shared systems:
+Agents coordinate through two shared systems and one orchestrator:
 
 - **Bot-Wiki** — the knowledge layer. Agents read and write wiki pages
-  for learnings, decisions, project plans, and aspirational ideas. This
-  is how agents share context about how things work and where the
-  project is headed.
+  through the Librarian for learnings, decisions, project plans, and
+  aspirational ideas. The CDO owns wiki strategy; the Librarian handles
+  read/write operations on behalf of any agent.
 - **Linear** — the task layer. Scoped work items meant to be picked up
   by an agent or Kyle. If it's actionable and bounded, it's a Linear
   issue. If it's context or direction, it's a wiki page.
+- **Pai** — the orchestration layer. Decomposes multi-domain requests
+  into agent calls, passes context between them, and synthesizes
+  results. Optional. Each agent still works independently.
+- **[Event Log](/wiki/projects/agent-team/event-log.html)** — real-time
+  observability. All agents log progress to `agent-events.log`. Watch
+  with `tail -f agent-events.log`.
 
 ## Phases
 
@@ -104,21 +149,36 @@ real, working deliverable.
 
 | Role | Goal | Page |
 |------|------|------|
+| Pai | Orchestrate multi-agent workflows | [Pai](/wiki/projects/agent-team/pai.html) |
 | CMO | Grow readership via analytics and SEO | [CMO](/wiki/projects/agent-team/cmo.html) |
 | CFO | Optimize AI token spend | [CFO](/wiki/projects/agent-team/cfo.html) |
 | CTO | Track delivery, flag blockers | [CTO](/wiki/projects/agent-team/cto.html) |
-| Content Team | Research, write, verify, review blog posts | [Content Team](/wiki/projects/agent-team/content-team.html) |
+| CDO | Manage shared knowledge and wiki | [CDO](/wiki/projects/agent-team/cdo.html) |
+| CSO | Security and privacy | [CSO](/wiki/projects/agent-team/cso.html) |
+| AR | Agent onboarding and role mediation | [AR](/wiki/projects/agent-team/ar.html) |
+| Publisher | Orchestrate blog content pipeline | [Publisher](/wiki/projects/agent-team/publisher.html) |
 
 ## Invocation
 
 Claude Code:
 ```bash
+claude --agent pai
 claude --agent cmo
 claude --agent cfo
 claude --agent cto
+claude --agent cdo
+claude --agent cso
+claude --agent librarian
+claude --agent privacy-auditor
+claude --agent ar
+claude --agent publisher
+claude --agent researcher
+claude --agent writer
+claude --agent fact-checker
+claude --agent reviewer
 ```
 
-OpenCode: use the agent picker to select from the `org/` group.
+OpenCode: use the agent picker to select from the `org/` or `blog/` group.
 
 ## Tools
 
@@ -131,4 +191,4 @@ Each agent connects to real MCP servers and tools. No mocks.
 **Data:**
 - **GA4 Analytics MCP** — traffic data for CMO/SEO
 - **OpenRouter MCP** — usage and pricing data for CFO
-- **Playwright MCP** — browser verification (content team)
+- **Playwright MCP** — browser verification (Publisher pipeline)
