@@ -46,7 +46,8 @@ decomposes multi-agent requests and invokes the right agents
 in sequence. The C-suite agents (CMO, CFO, CTO, CDO, CSO) each
 own a domain and can sub-orchestrate their own subagents. The
 CMO delegates to SEO, the CFO delegates to Cost Tracker, and
-so on.
+so on. The top-level/C-Suite agents also work as antagonistic loop orchestrators of
+their own, I like to think of it as them enforcing high standards.
 
 
 # The agents
@@ -90,8 +91,8 @@ CMO queries real GA4 data. The CFO pulls real OpenRouter bills.
 # The org chart
 
 This is accurate as of 2026-03-12. The
-[bot-wiki version](/bot-wiki.html) stays up to date as agents
-are added or reorganized.
+[bot-wiki org chart](/wiki/projects/agent-team/org-chart.html)
+stays up to date as agents are added or reorganized.
 
 ```mermaid
 graph TD
