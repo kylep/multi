@@ -189,8 +189,8 @@ graph LR
 ```
 
 ```bash
-.venv/bin/python bin/wiki-rag.py query "What MCP servers does this
-  project use?"
+.venv/bin/python bin/wiki-rag.py query \
+  "What MCP servers does this project use?"
 ```
 
 ```
