@@ -61,6 +61,7 @@ graph TD
     Pai -.->|orchestrates| CMO
     Pai -.->|orchestrates| CFO
     Pai -.->|orchestrates| CTO
+    Pai -.->|orchestrates| Content
 
     CMO --> SEO
     CMO --> Social
