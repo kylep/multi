@@ -7,7 +7,7 @@ slug: seo-agent
 category: ai
 tags: AI, Claude-Code, SEO, agents, GA4
 date: 2026-03-12
-status: published
+status: draft
 ---
 
 [Post 1](/agent-org-chart.html) described the agent team. This is the SEO

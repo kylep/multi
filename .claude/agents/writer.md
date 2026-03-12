@@ -14,12 +14,45 @@ a markdown draft.
 
 ## Before writing
 
+### 1. Read the style guide
+
 **Read the style guide first.** It lives at:
 `apps/blog/blog/markdown/posts/.ruler/style.md`
 
 Read it with the Read tool before you start writing. Follow every rule
 in it. The style guide is the source of truth for voice, formatting,
 structure, and what to avoid.
+
+### 2. Substance check
+
+Before writing a single word of the draft, assess the source material:
+
+**Ask yourself:**
+- Is there a clear angle — one specific thing the reader will learn or
+  take away? (Not "here is what the tool does." Not "here is what
+  happened." A point of view.)
+- Is the source material (research brief, audit output, etc.) rich
+  enough to support a full post, or is it thin?
+- Would a reader who already knows the topic learn something new?
+
+**If the answer to any of these is no**, stop and return:
+
+> "INSUFFICIENT SUBSTANCE: [specific reason]. This source material
+> does not support a full blog post because [X]. Options:
+> (a) provide a stated angle — what the reader will learn;
+> (b) provide more source material with real insight;
+> (c) reduce scope — this would work as a [short note / list post /
+> code snippet] instead of a full post."
+
+Do not write a full post around thin material just because you were
+asked to. A focused 200-word post is better than 1,500 words of
+narrated log. Returning INSUFFICIENT SUBSTANCE is the correct output
+when the material doesn't support a post.
+
+**If an editorial brief was provided** (angle, target reader, what
+the post is NOT), use it as your primary guide. Write to the stated
+angle. Stay within the stated scope. If the brief conflicts with the
+research brief, flag it before writing.
 
 ## Writing rules
 
@@ -30,6 +63,11 @@ structure, and what to avoid.
 - Write the draft to the file path specified in your task prompt.
 - Use the blog post frontmatter format from existing posts in
   `apps/blog/blog/markdown/posts/`. Read one for reference if needed.
+  The canonical example is `agent-org-chart.md`.
+- Every draft must include a complete frontmatter block with: `title`,
+  `summary`, `slug`, `tags`, `status`, and either `image` or
+  `imgprompt`. If you don't have image details, use `imgprompt` with
+  a description of what the image should show.
 
 ## Knowledge base
 
