@@ -8,6 +8,8 @@ keywords:
   - cmo
   - cfo
   - cto
+  - cdo
+  - librarian
   - subagents
   - bot-wiki
   - linear
@@ -40,12 +42,14 @@ graph TD
     CMO["CMO — Grow Readership"]
     CFO["CFO — Optimize Spend"]
     CTO["CTO — Delivery"]
+    CDO["CDO — Knowledge"]
     Content["Content Team"]
 
     SEO["SEO Subagent"]
     Social["Social Subagent (future)"]
     CostTracker["Cost Tracker"]
     DeliveryBot["Delivery Bot (future)"]
+    Librarian["Librarian"]
 
     Researcher["Researcher"]
     Writer["Writer"]
@@ -56,17 +60,24 @@ graph TD
     Kyle --> CMO
     Kyle --> CFO
     Kyle --> CTO
+    Kyle --> CDO
     Kyle --> Content
 
     Pai -.->|orchestrates| CMO
     Pai -.->|orchestrates| CFO
     Pai -.->|orchestrates| CTO
+    Pai -.->|orchestrates| CDO
     Pai -.->|orchestrates| Content
 
     CMO --> SEO
     CMO --> Social
     CFO --> CostTracker
     CTO --> DeliveryBot
+    CDO --> Librarian
+
+    CMO -.->|reads/writes| Librarian
+    CFO -.->|reads/writes| Librarian
+    CTO -.->|reads/writes| Librarian
 
     Content --> Researcher
     Content --> Writer
@@ -79,9 +90,9 @@ graph TD
 Agents coordinate through two shared systems and one orchestrator:
 
 - **Bot-Wiki** — the knowledge layer. Agents read and write wiki pages
-  for learnings, decisions, project plans, and aspirational ideas. This
-  is how agents share context about how things work and where the
-  project is headed.
+  through the Librarian for learnings, decisions, project plans, and
+  aspirational ideas. The CDO owns wiki strategy; the Librarian handles
+  read/write operations on behalf of any agent.
 - **Linear** — the task layer. Scoped work items meant to be picked up
   by an agent or Kyle. If it's actionable and bounded, it's a Linear
   issue. If it's context or direction, it's a wiki page.
@@ -120,6 +131,7 @@ real, working deliverable.
 | CMO | Grow readership via analytics and SEO | [CMO](/wiki/projects/agent-team/cmo.html) |
 | CFO | Optimize AI token spend | [CFO](/wiki/projects/agent-team/cfo.html) |
 | CTO | Track delivery, flag blockers | [CTO](/wiki/projects/agent-team/cto.html) |
+| CDO | Manage shared knowledge and wiki | [CDO](/wiki/projects/agent-team/cdo.html) |
 | Content Team | Research, write, verify, review blog posts | [Content Team](/wiki/projects/agent-team/content-team.html) |
 
 ## Invocation
@@ -130,6 +142,8 @@ claude --agent pai
 claude --agent cmo
 claude --agent cfo
 claude --agent cto
+claude --agent cdo
+claude --agent librarian
 ```
 
 OpenCode: use the agent picker to select from the `org/` group.

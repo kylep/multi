@@ -48,14 +48,17 @@ roles, a shared wiki for context, and an orchestration layer.
 | CMO | Traffic and growth | Sonnet | GA4 Analytics MCP |
 | CFO | AI spend | Sonnet | OpenRouter MCP |
 | CTO | Delivery, blockers | Sonnet | Linear MCP, Bash |
+| CDO | Knowledge management | Sonnet | Wiki read/write, Bash |
 | SEO | Search audits | Sonnet | GA4, WebSearch |
 | Cost Tracker | Spend reports | Haiku | OpenRouter MCP |
+| Librarian | Wiki read/write | Haiku | Wiki file tools |
 | Content Team | Blog pipeline | Mixed | Playwright, file tools |
 
-The C-suite agents (CMO, CFO, CTO) each own a domain and have
-subagents for specialized work. SEO reports to the CMO. Cost
-Tracker reports to the CFO. The Content Team is its own
-pipeline with a researcher, writer, fact-checker, and reviewer.
+Each C-suite agent owns a domain and has subagents for
+specialized work. SEO reports to the CMO. Cost Tracker
+reports to the CFO. The Librarian reports to the CDO. The
+Content Team is its own pipeline with a researcher, writer,
+fact-checker, and reviewer.
 
 Every agent connects to real
 [MCP](https://modelcontextprotocol.io/) servers. No mocks. The
@@ -70,10 +73,12 @@ graph TD
     CMO["CMO — Grow Readership"]
     CFO["CFO — Optimize Spend"]
     CTO["CTO — Delivery"]
+    CDO["CDO — Knowledge"]
     Content["Content Team"]
 
     SEO["SEO Subagent"]
     CostTracker["Cost Tracker"]
+    Librarian["Librarian"]
 
     Researcher["Researcher"]
     Writer["Writer"]
@@ -84,15 +89,22 @@ graph TD
     Kyle --> CMO
     Kyle --> CFO
     Kyle --> CTO
+    Kyle --> CDO
     Kyle --> Content
 
     Pai -.->|orchestrates| CMO
     Pai -.->|orchestrates| CFO
     Pai -.->|orchestrates| CTO
+    Pai -.->|orchestrates| CDO
     Pai -.->|orchestrates| Content
 
     CMO --> SEO
     CFO --> CostTracker
+    CDO --> Librarian
+
+    CMO -.->|reads/writes| Librarian
+    CFO -.->|reads/writes| Librarian
+    CTO -.->|reads/writes| Librarian
 
     Content --> Researcher
     Content --> Writer
@@ -100,15 +112,21 @@ graph TD
     Content --> Reviewer
 ```
 
-Kyle sits at the top. Every agent is directly invocable. The
-solid lines mean "Kyle can call this agent directly." The
-dashed lines mean "Pai can orchestrate this agent on Kyle's
-behalf."
+Kyle sits at the top. Every agent is directly invocable.
+Solid lines mean "reports to." Dashed lines from Pai mean
+"orchestrates." Dashed lines to the Librarian mean "can
+read/write wiki through."
 
 Pai is a peer, not a boss. I can still run
 `claude --agent cmo` whenever I want. Pai is for when a
 request spans multiple domains and I don't want to do the
 routing myself.
+
+The Librarian is the interesting one. Any agent can talk to
+it directly to persist notes, plans, or evidence to the wiki.
+That's how agents share context between stateless sessions.
+The CDO owns the wiki strategy, but the Librarian does the
+actual reading and writing.
 
 # Pai: the executive assistant
 
@@ -185,15 +203,32 @@ agent-team/
 ├── cmo.md            # traffic and growth
 ├── cfo.md            # AI spend
 ├── cto.md            # delivery and blockers
+├── cdo.md            # knowledge management
 ├── content-team.md   # blog pipeline
 └── phase-2.md        # future async architecture
 ```
 
-Agents read these pages before making decisions. Pai reads
-the index to understand what agents are available. The CMO
-reads its own page for metric definitions. The wiki is the
-shared context layer that compensates for each agent session
-being stateless.
+The wiki isn't just documentation. It's the shared memory
+layer.
+
+Every agent session is stateless. The CMO doesn't remember
+what the CTO said last week. But if the CTO writes its
+findings to the wiki through the Librarian, the CMO can
+read them next time it runs. The wiki is how agents share
+context across sessions.
+
+The Librarian (a Haiku subagent under the CDO) handles
+all wiki read/write operations. Any agent can invoke it
+directly with `claude --agent librarian -p "..."` to
+persist notes, plans, evidence, or whatever else needs to
+survive between sessions. The CDO owns the strategy:
+what gets documented, how pages are structured, when
+content is stale.
+
+This is cheaper than giving every agent write access to
+the full file system. The Librarian runs on Haiku, knows
+the wiki format, and won't accidentally clobber unrelated
+files.
 
 # Pai in action
 
