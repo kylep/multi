@@ -4,6 +4,7 @@ summary: "AI agent organization with named C-suite roles and subagents. Mission:
 keywords:
   - agent-org-chart
   - ai-agents
+  - pai
   - cmo
   - cfo
   - cto
@@ -11,6 +12,7 @@ keywords:
   - bot-wiki
   - linear
   - coordination
+  - orchestration
 related:
   - wiki/ai-tools/claude-code
   - wiki/ai-tools/opencode
@@ -33,7 +35,8 @@ Help Kyle and the online community learn interesting and useful things.
 
 ```mermaid
 graph TD
-    Mission["Mission: Help Kyle & community learn"]
+    Kyle["Kyle"]
+    Pai["Pai — Executive Assistant"]
     CMO["CMO — Grow Readership"]
     CFO["CFO — Optimize Spend"]
     CTO["CTO — Delivery"]
@@ -49,10 +52,15 @@ graph TD
     FactChecker["Fact Checker"]
     Reviewer["Reviewer"]
 
-    Mission --> CMO
-    Mission --> CFO
-    Mission --> CTO
-    Mission --> Content
+    Kyle --> Pai
+    Kyle --> CMO
+    Kyle --> CFO
+    Kyle --> CTO
+    Kyle --> Content
+
+    Pai -.->|orchestrates| CMO
+    Pai -.->|orchestrates| CFO
+    Pai -.->|orchestrates| CTO
 
     CMO --> SEO
     CMO --> Social
@@ -67,7 +75,7 @@ graph TD
 
 ## Coordination
 
-Agents coordinate through two shared systems:
+Agents coordinate through two shared systems and one orchestrator:
 
 - **Bot-Wiki** — the knowledge layer. Agents read and write wiki pages
   for learnings, decisions, project plans, and aspirational ideas. This
@@ -76,6 +84,9 @@ Agents coordinate through two shared systems:
 - **Linear** — the task layer. Scoped work items meant to be picked up
   by an agent or Kyle. If it's actionable and bounded, it's a Linear
   issue. If it's context or direction, it's a wiki page.
+- **Pai** — the orchestration layer. Decomposes multi-domain requests
+  into agent calls, passes context between them, and synthesizes
+  results. Optional. Each agent still works independently.
 
 ## Phases
 
@@ -104,6 +115,7 @@ real, working deliverable.
 
 | Role | Goal | Page |
 |------|------|------|
+| Pai | Orchestrate multi-agent workflows | [Pai](/wiki/projects/agent-team/pai.html) |
 | CMO | Grow readership via analytics and SEO | [CMO](/wiki/projects/agent-team/cmo.html) |
 | CFO | Optimize AI token spend | [CFO](/wiki/projects/agent-team/cfo.html) |
 | CTO | Track delivery, flag blockers | [CTO](/wiki/projects/agent-team/cto.html) |
@@ -113,6 +125,7 @@ real, working deliverable.
 
 Claude Code:
 ```bash
+claude --agent pai
 claude --agent cmo
 claude --agent cfo
 claude --agent cto

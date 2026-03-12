@@ -1,0 +1,307 @@
+---
+title: "Building an AI Agent Org Chart"
+summary: A working multi-agent setup with named roles, a shared
+  wiki, and an orchestration agent that coordinates between them.
+slug: agent-org-chart
+category: ai
+tags: AI, Claude-Code, agents, orchestration, Bot-Wiki
+date: 2026-03-11
+modified: 2026-03-11
+status: published
+image: agent-org-chart.png
+thumbnail: agent-org-chart-thumb.png
+imgprompt: A simple flat vector slice of pie with the Greek
+  letter pi on it, minimal lines, solid pastel colors, no
+  shading, clean geometric shapes on a plain background
+---
+
+
+## Table of contents
+
+# Why an org chart for AI agents
+
+I have a handful of
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
+agents that each do one thing.
+The CMO pulls GA4 traffic data. The CFO tracks OpenRouter spend.
+The CTO checks Linear for blocked issues. They work fine on
+their own.
+
+The problem is coordination. If I want a quarterly health
+check, I have to run three agents manually and stitch the
+results together myself. If I want the CMO to propose blog
+topics and the CTO to review feasibility, I'm copy-pasting
+between sessions.
+
+So I built Pai, an executive assistant agent that decomposes
+multi-agent requests, invokes the right agents in order, and
+synthesizes the results. The full setup is an org chart: named
+roles, a shared wiki for context, and an orchestration layer.
+
+# The agents
+
+| Agent | Role | Model | Key Tools |
+|-------|------|-------|-----------|
+| Pai | Orchestration | Sonnet | Bash, Linear MCP |
+| CMO | Traffic and growth | Sonnet | GA4 Analytics MCP |
+| CFO | AI spend | Sonnet | OpenRouter MCP |
+| CTO | Delivery, blockers | Sonnet | Linear MCP, Bash |
+| SEO | Search audits | Sonnet | GA4, WebSearch |
+| Cost Tracker | Spend reports | Haiku | OpenRouter MCP |
+| Content Team | Blog pipeline | Mixed | Playwright, file tools |
+
+The C-suite agents (CMO, CFO, CTO) each own a domain and have
+subagents for specialized work. SEO reports to the CMO. Cost
+Tracker reports to the CFO. The Content Team is its own
+pipeline with a researcher, writer, fact-checker, and reviewer.
+
+Every agent connects to real
+[MCP](https://modelcontextprotocol.io/) servers. No mocks. The
+CMO queries real GA4 data. The CFO pulls real OpenRouter bills.
+
+# The org chart
+
+```mermaid
+graph TD
+    Kyle["Kyle"]
+    Pai["Pai — Executive Assistant"]
+    CMO["CMO — Grow Readership"]
+    CFO["CFO — Optimize Spend"]
+    CTO["CTO — Delivery"]
+    Content["Content Team"]
+
+    SEO["SEO Subagent"]
+    CostTracker["Cost Tracker"]
+
+    Researcher["Researcher"]
+    Writer["Writer"]
+    FactChecker["Fact Checker"]
+    Reviewer["Reviewer"]
+
+    Kyle --> Pai
+    Kyle --> CMO
+    Kyle --> CFO
+    Kyle --> CTO
+    Kyle --> Content
+
+    Pai -.->|orchestrates| CMO
+    Pai -.->|orchestrates| CFO
+    Pai -.->|orchestrates| CTO
+
+    CMO --> SEO
+    CFO --> CostTracker
+
+    Content --> Researcher
+    Content --> Writer
+    Content --> FactChecker
+    Content --> Reviewer
+```
+
+Kyle sits at the top. Every agent is directly invocable. The
+solid lines mean "Kyle can call this agent directly." The
+dashed lines mean "Pai can orchestrate this agent on Kyle's
+behalf."
+
+Pai is a peer, not a boss. I can still run
+`claude --agent cmo` whenever I want. Pai is for when a
+request spans multiple domains and I don't want to do the
+routing myself.
+
+# Pai: the executive assistant
+
+Here's the agent definition frontmatter:
+
+```yaml
+# .claude/agents/pai.md
+name: pai
+description: >-
+  Pai — Executive assistant that orchestrates
+  multi-agent workflows
+model: sonnet
+tools:
+  - Bash
+  - Read
+  - Glob
+  - Grep
+  - Write
+  - mcp__linear-server__list_issues
+  - mcp__linear-server__list_projects
+```
+
+The body of the definition has four key sections.
+
+## Agent invocation via Bash
+
+Pai invokes other agents with
+`claude --agent <name> -p "prompt"` through the Bash tool.
+Each call is a fresh session. Agents don't share memory or
+context with each other.
+
+This is the main tradeoff. Fresh sessions mean no shared
+state, but Pai bridges the gap by reading output from one
+agent and passing relevant parts into the next agent's prompt.
+
+## Dry-run mode
+
+Add `--dry-run` to your message and Pai outputs the
+orchestration plan without executing anything. Which agents,
+what prompts, what order, how it would synthesize.
+
+Useful for checking that Pai will do what you want before it
+burns tokens on three agent calls.
+
+## Adversarial loops
+
+For requests that need critique or review between agents:
+
+1. Agent A produces output
+2. Agent B critiques it
+3. Agent A revises based on feedback
+4. Up to 3 rounds or until the reviewer approves
+
+CMO proposes blog topics, CTO reviews technical feasibility,
+CMO revises. The back-and-forth produces better output than
+either agent alone.
+
+## Logging
+
+Every orchestration run appends a timestamped entry to
+`pai-log-YYYY-MM-DD.md`. Agent name, prompt summary, result
+status, and a one-line synthesis.
+
+# The wiki layer
+
+Each agent has a page in the
+[Bot-Wiki](/bot-wiki.html) that documents its goal, tools,
+subagents, and example prompts.
+
+```
+agent-team/
+├── index.md          # org chart and coordination model
+├── pai.md            # orchestration agent
+├── cmo.md            # traffic and growth
+├── cfo.md            # AI spend
+├── cto.md            # delivery and blockers
+├── content-team.md   # blog pipeline
+└── phase-2.md        # future async architecture
+```
+
+Agents read these pages before making decisions. Pai reads
+the index to understand what agents are available. The CMO
+reads its own page for metric definitions. The wiki is the
+shared context layer that compensates for each agent session
+being stateless.
+
+# Pai in action
+
+## The dry-run
+
+I asked Pai for a quarterly health check with `--dry-run`:
+
+```bash
+claude --agent pai -p "Give me a quarterly health check. \
+  How's traffic trending, what am I spending on AI, and \
+  are there any blocked issues? --dry-run"
+```
+
+Pai planned three parallel agent calls:
+
+> **Agent 1, CMO:** Pull a quarterly traffic report for
+> kyle.pericak.com. Total sessions and users for the quarter
+> vs prior quarter, top 5 posts by pageviews, traffic channel
+> breakdown.
+>
+> **Agent 2, CFO:** Pull OpenRouter AI spend for Q1 2026.
+> Break it down by model and by month. Flag any month-over-month
+> spikes > 20%.
+>
+> **Agent 3, CTO:** Review all open Linear issues and flag any
+> that are blocked, stalled (no update in 14+ days), or missing
+> an assignee.
+
+It also laid out the synthesis plan: group results by theme
+(traffic, spend, delivery), cross-reference findings, and
+call out any cross-domain issues.
+
+No agents ran. No tokens burned. I could review the plan and
+adjust before committing.
+
+## The real run
+
+Same request without `--dry-run`. Pai invoked three agents
+and synthesized everything into one report.
+
+**Traffic** (from CMO): GA4 only had 7 days of data. 190
+sessions total, trending from 6 to 37 sessions per day.
+Almost entirely direct traffic, organic search at 2%. The
+site is too new for meaningful quarter-over-quarter
+comparison.
+
+**AI spend** (from CFO): $23.91 total against a $200 credit.
+88% of budget remaining. OpenRouter's API only surfaced
+account-level totals, no per-model breakdown.
+
+**Delivery** (from CTO): 12 issues done, 1 in progress
+(this blog post), 18 in backlog. No hard blockers, but three
+dependency chains worth watching:
+
+1. RSS feed (PER-22) is high priority but hasn't started.
+   Four distribution issues are gated on it.
+2. CMO and CFO baseline runs (PER-37, PER-38) haven't
+   started. They gate two future blog posts.
+3. PER-39 (this post) has an open PR to close.
+
+Pai wrote a log entry automatically:
+
+```markdown
+## 21:30 — Quarterly health check
+
+| Agent | Prompt Summary | Result |
+|-------|---------------|--------|
+| cmo | 90-day traffic trend | success: 190 sessions |
+| cfo | 90-day AI spend | success: $23.91 total |
+| cto | Blocked/stalled issues | success: 3 clusters |
+
+**Synthesis:** Early launch phase, minimal spend,
+no hard blockers but three dependency chains.
+```
+
+## The adversarial demo
+
+I asked Pai to have the CMO propose blog topics and the CTO
+review feasibility:
+
+```bash
+claude --agent pai -p "The CMO wants to propose 3 new \
+  blog topics. Have CTO review feasibility."
+```
+
+CMO proposed three posts:
+
+1. **Give Your Agents a Memory** - wire agents to read/write
+   wiki context on startup
+2. **Agents That Run Themselves** - scheduled execution with
+   cron and cost guardrails
+3. **Teach Your CTO Agent to Review PRs** - GitHub Actions
+   workflow that fires the CTO agent on every PR
+
+CTO reviewed each one:
+
+- Post 6 (wiki memory): needs groundwork. Wiki is read-only
+  from agents today. A write protocol means git commits from
+  within agent sessions.
+- Post 7 (scheduling): blocked. Phase 2 prerequisites from
+  the wiki aren't met. PER-37 and PER-38 haven't started.
+- Post 8 (PR review): needs groundwork. Most self-contained,
+  but `.github/workflows/` doesn't exist yet.
+
+CTO's recommended ship order: complete PER-37 and PER-38
+first, then post 6, then post 8, then post 7 last (after
+the others prove stability).
+
+The interesting thing here is the cross-referencing. The CTO
+pulled the same PER-37/PER-38 dependency from the health
+check. It flagged the same blocker from two different angles
+without being told about the first run.
+
+Next up: the SEO agent that audits the blog.
