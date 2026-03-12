@@ -27,15 +27,17 @@ The CMO pulls GA4 traffic data. The CFO tracks OpenRouter spend.
 The CTO checks Linear for blocked issues. They work fine on
 their own.
 
-The problem is coordination. If I want a quarterly health
-check, I have to run three agents manually and stitch the
-results together myself. If I want the CMO to propose blog
-topics and the CTO to review feasibility, I'm copy-pasting
-between sessions.
+The problem is coordination. If I want to ask about traffic
+and spend and blockers in the same conversation, I have to
+run three agents manually and stitch the results together
+myself. If I want the CMO to propose blog topics and the
+CTO to review feasibility, I'm copy-pasting between
+sessions.
 
-So I built Pai, an executive assistant agent that decomposes
-multi-agent requests, invokes the right agents in order, and
-synthesizes the results. The full setup is an org chart: named
+So I built [Pai](/openclaw-linear-skill.html) into a proper
+executive assistant agent that decomposes multi-agent
+requests, invokes the right agents in order, and synthesizes
+the results. The full setup is an org chart: named
 roles, a shared wiki for context, and an orchestration layer.
 
 # The agents
