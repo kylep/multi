@@ -243,7 +243,8 @@ well until it just kind of stopped. I think I've seen claude crushing context do
 it gets near the limit, I wonder if there's a way to do that with this too, or get it
 to do some sort of context shifting where it restarts with just the later context when
 it runs low. Maybe I can run it in server mode and have a better client manage that,
-but that seems like its own post.
+but that seems like its own post. If you want to run models through an API
+rather than locally, [OpenRouter](/openrouter-ai-tools.html) is worth a look.
 
 
 ## Winner

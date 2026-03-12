@@ -951,6 +951,5 @@ have Claude write me a purpose-built Linear skill that I
 own and can audit than install someone else's code into
 a system that holds API keys.
 
-That's next. Along with Vault auto-unseal, TLS on
-Vault, network policy audit logging (Cilium), and image
-scanning in CI.
+[That's next](/openclaw-linear-skill.html). Along with Vault auto-unseal,
+TLS on Vault, network policy audit logging (Cilium), and image scanning in CI.
