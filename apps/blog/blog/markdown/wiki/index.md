@@ -28,6 +28,9 @@ designed for programmatic access.
 - [Blog Architecture](/wiki/blog-architecture.html) — How this blog works
 - [OpenClaw](/wiki/openclaw.html) — Multi-agent orchestration
 - [Projects](/wiki/projects.html) — Active project plans and architecture docs
+- [Designs](/wiki/designs.html) — Architecture and design documents for planned systems
+- [Research](/wiki/research.html) — Deep Research reports for reference and analysis
+- [History](/wiki/history.html) — Agent ecosystem changelog and architecture decisions
 
 ## About
 

@@ -1,41 +1,27 @@
 ---
 title: "Agent Team"
-summary: "AI agent organization with named C-suite roles and subagents. Mission: help Kyle and the online community learn interesting and useful things."
+summary: "AI agent team with 7 focused roles: Publisher, Analyst, Synthesizer, Researcher, Reviewer, QA, and Security Auditor."
 keywords:
-  - agent-org-chart
+  - agent-team
   - ai-agents
-  - pai
-  - cmo
-  - cfo
-  - cto
-  - cdo
-  - cso
-  - librarian
-  - privacy-auditor
-  - ar
   - publisher
   - researcher
-  - writer
-  - fact-checker
   - reviewer
-  - subagents
-  - bot-wiki
-  - linear
-  - coordination
-  - orchestration
+  - qa
+  - security-auditor
+  - analyst
+  - content-pipeline
 related:
   - wiki/ai-tools/claude-code
-  - wiki/ai-tools/opencode
   - wiki/mcp
-  - wiki/mcp/linear
   - wiki/projects
-scope: "Overview of the agent team project: mission, org chart, coordination model, blog post series, and links to individual role pages."
-last_verified: 2026-03-11
+  - wiki/history
+scope: "Overview of the agent team: mission, org chart, coordination model, and invocation."
+last_verified: 2026-03-13
 ---
 
-
-An AI agent organization with named roles, each backed by real tools
-and invocable on demand via Claude Code or OpenCode.
+An AI agent team with 7 focused roles, each backed by real tools
+and invocable on demand via Claude Code.
 
 ## Mission
 
@@ -46,59 +32,21 @@ Help Kyle and the online community learn interesting and useful things.
 ```mermaid
 graph TD
     Kyle["Kyle"]
-    Pai["Pai — Executive Assistant"]
-    CMO["CMO — Grow Readership"]
-    CFO["CFO — Optimize Spend"]
-    CTO["CTO — Delivery"]
-    CDO["CDO — Knowledge"]
-    CSO["CSO — Security"]
-    AR["AR — Agent Resources"]
-    Publisher["Publisher — Content Pipeline"]
+    Publisher["Publisher — Content Pipeline (Opus)"]
+    Analyst["Analyst — Research Ingestion + System Improvement (Opus)"]
+    Synthesizer["Synthesizer — Cross-Source Synthesis (Opus)"]
+    Researcher["Researcher — Sourced Facts (Sonnet)"]
+    Reviewer["Reviewer — Style + Substance + Sourcing (Opus)"]
+    QA["QA — Build + Render + Links (Sonnet)"]
+    Security["Security Auditor — OWASP + Privacy (Opus)"]
 
-    SEO["SEO Subagent"]
-    Social["Social Subagent (future)"]
-    CostTracker["Cost Tracker"]
-    DeliveryBot["Delivery Bot (future)"]
-    Librarian["Librarian"]
-    PrivacyAuditor["Privacy Auditor"]
-
-    Researcher["Researcher"]
-    Writer["Writer"]
-    FactChecker["Fact Checker"]
-    Reviewer["Reviewer"]
-
-    Kyle --> Pai
-    Kyle --> CMO
-    Kyle --> CFO
-    Kyle --> CTO
-    Kyle --> CDO
-    Kyle --> CSO
-    Kyle --> AR
     Kyle --> Publisher
-
-    Pai -.->|orchestrates| CMO
-    Pai -.->|orchestrates| CFO
-    Pai -.->|orchestrates| CTO
-    Pai -.->|orchestrates| CDO
-    Pai -.->|orchestrates| CSO
-    Pai -.->|orchestrates| AR
-    Pai -.->|orchestrates| Publisher
-
-    CMO --> SEO
-    CMO --> Social
-    CFO --> CostTracker
-    CTO --> DeliveryBot
-    CDO --> Librarian
-    CSO --> PrivacyAuditor
-
-    CMO -.->|reads/writes| Librarian
-    CFO -.->|reads/writes| Librarian
-    CTO -.->|reads/writes| Librarian
-
+    Kyle --> Analyst
+    Kyle --> Synthesizer
     Publisher --> Researcher
-    Publisher --> Writer
-    Publisher --> FactChecker
     Publisher --> Reviewer
+    Publisher --> QA
+    Publisher --> Security
 ```
 
 See the dedicated [Org Chart](/wiki/projects/agent-team/org-chart.html)
@@ -106,89 +54,53 @@ page for a bot-friendly YAML version.
 
 ## Coordination
 
-Agents coordinate through two shared systems and one orchestrator:
+Agents coordinate through two existing systems:
 
-- **Bot-Wiki** — the knowledge layer. Agents read and write wiki pages
-  through the Librarian for learnings, decisions, project plans, and
-  aspirational ideas. The CDO owns wiki strategy; the Librarian handles
-  read/write operations on behalf of any agent.
-- **Linear** — the task layer. Scoped work items meant to be picked up
-  by an agent or Kyle. If it's actionable and bounded, it's a Linear
-  issue. If it's context or direction, it's a wiki page.
-- **Pai** — the orchestration layer. Decomposes multi-domain requests
-  into agent calls, passes context between them, and synthesizes
-  results. Optional. Each agent still works independently.
-- **[Event Log](/wiki/projects/agent-team/event-log.html)** — real-time
-  observability. All agents log progress to `agent-events.log`. Watch
-  with `tail -f agent-events.log`.
+- **Git** — shared state. Subagents write reports to files; the
+  publisher reads those files. All artifacts live in the repo.
+- **Claude Code memory** — cross-session context. Persistent notes
+  about user preferences, project state, and feedback.
 
-## Phases
-
-**Phase 1 (current):** On-demand invocation. Each agent is a Claude Code
-or OpenCode agent definition you run manually. Real tools, real data.
-
-**Phase 2 (future):** Async and event-driven. Cron-triggered reports,
-event-based analysis, automated pipelines. See
-[Phase 2 Architecture](/wiki/projects/agent-team/phase-2.html).
-
-## Blog Post Series
-
-Each post ships something that works on its own and builds toward the
-bigger agent team. No "here's my plan" posts. Every post produces a
-real, working deliverable.
-
-| # | Post | Deliverable | Status |
-|---|------|-------------|--------|
-| 1 | Building an AI Agent Org Chart | Working multi-agent setup: agent definitions, wiki pages, Mermaid org chart, `claude --agent` invocation | Draft |
-| 2 | AI SEO Agent That Audits Your Blog | SEO subagent that connects to GA4, crawls the site, produces a real audit with fixes | Planned |
-| 3 | What Does AI Actually Cost? Build a Spend Tracker | Cost-tracker subagent with real OpenRouter spend reports and anomaly detection | Planned |
-| 4 | Automated Project Status from Linear + Git | CTO status report: what shipped, what's stuck, pulled from real Linear and git data | Planned |
-| 5 | Multi-Model Content Pipeline | End-to-end researcher/writer/fact-checker/reviewer chain that produces an actual blog post | Planned |
+No shared wiki layer, no event log, no separate task tracker for
+agents. Keep it simple.
 
 ## Roles
 
-| Role | Goal | Page |
-|------|------|------|
-| Pai | Orchestrate multi-agent workflows | [Pai](/wiki/projects/agent-team/pai.html) |
-| CMO | Grow readership via analytics and SEO | [CMO](/wiki/projects/agent-team/cmo.html) |
-| CFO | Optimize AI token spend | [CFO](/wiki/projects/agent-team/cfo.html) |
-| CTO | Track delivery, flag blockers | [CTO](/wiki/projects/agent-team/cto.html) |
-| CDO | Manage shared knowledge and wiki | [CDO](/wiki/projects/agent-team/cdo.html) |
-| CSO | Security and privacy | [CSO](/wiki/projects/agent-team/cso.html) |
-| AR | Agent onboarding and role mediation | [AR](/wiki/projects/agent-team/ar.html) |
-| Publisher | Orchestrate blog content pipeline | [Publisher](/wiki/projects/agent-team/publisher.html) |
+| Role | Model | Goal |
+|------|-------|------|
+| Publisher | Opus | Orchestrate content pipeline, write blog posts |
+| Analyst | Opus | Ingest research, validate claims, propose system improvements |
+| Synthesizer | Opus | Compare and contrast Deep Research reports |
+| Researcher | Sonnet | Gather sourced facts, return research brief |
+| Reviewer | Opus | Check style, substance, frontmatter, and sourcing |
+| QA | Sonnet | Build, render, and link verification |
+| Security Auditor | Opus | Confidential data, prompt injection, OWASP LLM checks |
 
 ## Invocation
 
-Claude Code:
 ```bash
-claude --agent pai
-claude --agent cmo
-claude --agent cfo
-claude --agent cto
-claude --agent cdo
-claude --agent cso
-claude --agent librarian
-claude --agent privacy-auditor
-claude --agent ar
 claude --agent publisher
+claude --agent analyst
+claude --agent synthesizer
 claude --agent researcher
-claude --agent writer
-claude --agent fact-checker
 claude --agent reviewer
+claude --agent qa
+claude --agent security-auditor
 ```
 
-OpenCode: use the agent picker to select from the `org/` or `blog/` group.
+## Design principles
 
-## Tools
+- **Start simple**: 7 agents, not 17. Add agents only when the
+  workload clearly requires it.
+- **Deny-by-default**: agents are read-only unless they need to write.
+  Publisher (writes posts), QA (runs builds), and Synthesizer (appends
+  synthesis to wiki) have write/execute tools. The rest are read-only.
+- **Route by risk**: Opus for judgment (review, security, editorial),
+  Sonnet for mechanical work (research, QA).
+- **Artifacts not pass-through**: files as intermediate state between
+  agents, not large context passed through prompts.
 
-Each agent connects to real MCP servers and tools. No mocks.
+## History
 
-**Coordination:**
-- **Bot-Wiki** — shared knowledge base for learnings, decisions, plans
-- **Linear MCP** — scoped tasks and project tracking
-
-**Data:**
-- **GA4 Analytics MCP** — traffic data for CMO/SEO
-- **OpenRouter MCP** — usage and pricing data for CFO
-- **Playwright MCP** — browser verification (Publisher pipeline)
+See [History](/wiki/history.html) for the changelog of architectural
+transitions, including the v1 → v2 migration rationale.

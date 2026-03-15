@@ -6,6 +6,11 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/../blog"
 
+if curl -s -o /dev/null http://localhost:3000 2>/dev/null; then
+  echo "Dev server already running at http://localhost:3000"
+  exit 0
+fi
+
 npm run dev &
 DEV_PID=$!
 

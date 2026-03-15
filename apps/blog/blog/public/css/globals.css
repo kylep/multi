@@ -53,6 +53,7 @@ td {
   font-family: monospace;
   font-size: 14px;
   user-select: none;
+  white-space: pre;
 }
 
 /* round buttons linking to things like reddit and twitter */
