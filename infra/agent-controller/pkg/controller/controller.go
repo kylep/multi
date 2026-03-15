@@ -227,7 +227,7 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 							Name:    "git-sync",
 							Image:   "alpine/git:latest",
 							Command: []string{"sh", "-c"},
-							Args:    []string{"cd /workspace/repo && git pull --ff-only || git clone $REPO_URL /workspace/repo"},
+							Args:    []string{"cd /workspace/repo && git pull --ff-only || git clone -b ${REPO_BRANCH:-main} $REPO_URL /workspace/repo"},
 							EnvFrom: []corev1.EnvFromSource{
 								{
 									SecretRef: &corev1.SecretEnvSource{
