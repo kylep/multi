@@ -7,6 +7,7 @@ slug: using-agents-better
 category: dev
 tags: Claude-Code, AI-Agents, MCP
 date: 2026-03-15
+modified: 2026-03-15
 status: published
 image: using-agents-better.png
 thumbnail: using-agents-better-thumb.png

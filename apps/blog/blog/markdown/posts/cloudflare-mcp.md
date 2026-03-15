@@ -7,6 +7,7 @@ slug: cloudflare-mcp
 category: dev
 tags: Cloudflare, MCP, Claude-Code, DNS
 date: 2026-03-12
+modified: 2026-03-15
 status: published
 image: cloudflare-mcp.png
 thumbnail: cloudflare-mcp-thumb.png

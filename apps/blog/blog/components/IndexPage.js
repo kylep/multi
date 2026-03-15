@@ -99,7 +99,7 @@ function BlogPostIndexSummary({ file }) {
           <Link underline="hover" href={`/${file.slug}.html`}>
             <IndexPostTitle>{file.title}</IndexPostTitle>
           </Link>
-          <DateStamp>Created: {file.date}, Modified: {file.modified}</DateStamp>
+          <DateStamp>Created: {file.date}{file.modified ? `, Modified: ${file.modified}` : ''}</DateStamp>
           <IndexPostSummary>{file.summary}</IndexPostSummary>
         </IndexPostTextContainer>
     </IndexRowContainer>
