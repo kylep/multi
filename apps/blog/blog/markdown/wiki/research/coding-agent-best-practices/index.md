@@ -77,6 +77,7 @@ Below is a structured comparison of their findings.
 - **Haiku as a cost-effective router/classifier** — Use Haiku for routing and classification tasks where it performs within 2-5% of Sonnet accuracy at a fraction of the cost. (chatgpt, claude, gemini)
 - **Effort parameter for reasoning density control** — Opus at medium effort matches Sonnet performance while using 76% fewer tokens. This prevents overinvestment in simple queries. (chatgpt, claude, gemini)
 - **Parallel bash/process agents for specific use cases** — Reserve parallel bash scripts for process-level isolation, CI fan-out, heterogeneous runtimes, or long-running autonomous work exceeding single-session limits. (chatgpt, claude, gemini)
+- **SWE-bench as the primary coding agent benchmark** — All sources referencing benchmarks identify SWE-bench Verified as the gold standard, though they note it has limitations (Python-only, may not reflect proprietary multi-language codebases). (chatgpt, claude, gemini)
 
 #### Two sources
 
@@ -97,7 +98,6 @@ Below is a structured comparison of their findings.
 - **Five workflow patterns (chaining, routing, parallelization, orchestrator-worker, evaluator-optimizer)** — Anthropic's "Building Effective Agents" post defines these five as composable building blocks. (chatgpt, claude)
 - **Three-layer memory architecture (short-term, long-term, derived/workflow)** — Effective agent memory separates ephemeral context, persistent cross-session storage, and derived/compressed knowledge. (chatgpt, gemini)
 - **Transparent/file-based memory for developer trust** — Treating agent memory as editable files in the workspace (PROGRESS.md, CLAUDE.md) is superior for auditability because developers can review and correct the agent's internal state. (claude, gemini)
-- **SWE-bench as the primary coding agent benchmark** — All sources referencing benchmarks identify SWE-bench Verified as the gold standard, though they note it has limitations (Python-only, may not reflect proprietary multi-language codebases). (chatgpt, claude, gemini)
 - **Hierarchical supervision degrades sequential reasoning** — The communication overhead between supervisor and worker layers can degrade performance by 39-70% on purely sequential reasoning tasks. (gemini, claude)
 - **Agent teams (swarms) for collaborative/adversarial reasoning** — Agent teams with peer-to-peer messaging enable adversarial debugging and competing-hypothesis investigation, but cost significantly more tokens. (chatgpt, gemini)
 - **Prefer raw API/SDK over frameworks** — Anthropic recommends building on raw API first, understanding what frameworks do under the hood, and only adopting frameworks when specific capabilities (stateful routing, built-in observability) are needed. (chatgpt, claude)

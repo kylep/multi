@@ -53,8 +53,9 @@ With all extractions in hand, categorize every point:
 
 ### 4. Write output
 
-Append the synthesis to the existing `index.md`, after the Reports
-section. Use this structure:
+Write the synthesis to the existing `index.md`. If a
+`## Cross-Source Synthesis` section already exists, replace it.
+Otherwise append after the Reports section. Use this structure:
 
 ```markdown
 ---

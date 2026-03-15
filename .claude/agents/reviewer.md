@@ -143,7 +143,7 @@ Required fields:
 
 ### Sourcing (merged from fact-checking)
 - Every factual claim should have a source (URL, repo path, or doc
-  reference) either inline or in the research brief
+  reference) visible in the draft itself
 - Flag unsourced assertions — especially version numbers, release
   dates, API details, pricing, and feature comparisons
 - Claims without findable sources should be flagged as UNSOURCED

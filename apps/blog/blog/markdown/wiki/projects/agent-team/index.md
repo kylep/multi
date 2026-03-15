@@ -93,8 +93,8 @@ claude --agent security-auditor
 - **Start simple**: 7 agents, not 17. Add agents only when the
   workload clearly requires it.
 - **Deny-by-default**: agents are read-only unless they need to write.
-  Only Publisher (writes posts) and QA (runs builds) have write/execute
-  tools.
+  Publisher (writes posts), QA (runs builds), and Synthesizer (appends
+  synthesis to wiki) have write/execute tools. The rest are read-only.
 - **Route by risk**: Opus for judgment (review, security, editorial),
   Sonnet for mechanical work (research, QA).
 - **Artifacts not pass-through**: files as intermediate state between

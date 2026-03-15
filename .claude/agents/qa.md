@@ -27,7 +27,8 @@ Read the post file and confirm:
 - `date` field present and in `YYYY-MM-DD` format
 - `slug` field present, lowercase, hyphen-separated, no spaces
 - No unknown or misspelled frontmatter keys (compare against known
-  valid fields: title, date, slug, summary, tags, draft)
+  valid fields: title, date, modified, slug, summary, category, tags,
+  status, draft, image, thumbnail, imgprompt)
 
 ### 2. Build verification
 

@@ -1,6 +1,6 @@
 
 
-<!-- Source: .ruler/agents.md -->
+<!-- Agent definitions in .claude/agents/*.md -->
 
 # Agent Team
 

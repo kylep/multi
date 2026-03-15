@@ -117,7 +117,7 @@ The pipeline has three steps:
 ### Manual deploy
 
 `bin/prod-deploy.sh` does the same `gsutil rsync` from a local build.
-It checks that `blog/out/index1.html` exists first, runs a dry-run to
+It checks that `blog/out/index.html` exists first, runs a dry-run to
 identify changed files, syncs them, then sets `Cache-Control:
 no-cache,no-store,must-revalidate` on changed files so Cloudflare
 picks up updates immediately.
