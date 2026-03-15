@@ -25,7 +25,7 @@ blog post.
 > Create a report on the current research-based best practices around
 > defining and structuring coding agents. Interested in general
 > guidance but my specific use-case is Claude agents that use Open,
-> Sonet, and Haiku currently. Interested in subagents vs calling
+> Sonnet, and Haiku currently. Interested in subagents vs calling
 > parallel agents with bash scripts, current standards for
 > orchestrating agents, what's most effective for having them maintain
 > state and knowledge, how to best manage their context, and similar

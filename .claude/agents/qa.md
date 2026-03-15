@@ -74,7 +74,7 @@ Report any link missing `.html` or pointing to a nonexistent file.
 For external links, use curl to do a HEAD request:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" --max-time 10 -L "<url>"
+curl -s -o /dev/null -w "%{http_code}" --max-time 10 -I -L "<url>"
 ```
 
 Flag 4xx or 5xx. Timeouts are not failures — note them but don't
