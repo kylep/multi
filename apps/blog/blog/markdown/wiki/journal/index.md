@@ -9,7 +9,6 @@ keywords:
   - autonomous
 related:
   - wiki/devops/agent-controller
-  - wiki/ai-tools
 scope: "Index of journal entries organized by date. Does not contain the entries themselves."
 last_verified: 2026-03-15
 ---
