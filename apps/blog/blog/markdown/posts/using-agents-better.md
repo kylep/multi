@@ -116,15 +116,15 @@ load the deep research synthesis, I extracted the best practices
 that applied, and I updated the agent definitions with specific,
 traceable changes.
 
-| Agent | Model | Role |
-|-------|-------|------|
-| Publisher | Opus | Orchestrate content pipeline, write posts |
-| Analyst | Opus | Ingest research, propose system improvements |
-| Synthesizer | Opus | Compare/contrast Deep Research reports |
-| Researcher | Sonnet | Gather sourced facts, return research brief |
-| Reviewer | Opus | Check style, substance, sourcing |
-| QA | Sonnet | Build, render, link verification |
-| Security Auditor | Opus | Confidential data, prompt injection, OWASP |
+| Agent | Model | Role & Applied Research |
+|-------|-------|------------------------|
+| [Publisher](https://github.com/kylep/multi/blob/main/.claude/agents/publisher.md) | Opus | Content pipeline orchestration, writing. [Delegation specs](https://www.anthropic.com/engineering/multi-agent-research-system), trigger phrase. |
+| [Analyst](https://github.com/kylep/multi/blob/main/.claude/agents/analyst.md) | Opus | Research ingestion, system improvements. Trigger phrase. |
+| [Synthesizer](https://github.com/kylep/multi/blob/main/.claude/agents/synthesizer.md) | Opus | Compare/contrast Deep Research reports. No changes needed. |
+| [Researcher](https://github.com/kylep/multi/blob/main/.claude/agents/researcher.md) | Sonnet | Sourced facts, research briefs. [Start wide, then narrow](/wiki/research/coding-agent-best-practices.html) search strategy, trigger phrase. |
+| [Reviewer](https://github.com/kylep/multi/blob/main/.claude/agents/reviewer.md) | Opus | Style, substance, sourcing. [Context isolation](https://www.anthropic.com/research/building-effective-agents) from producer. |
+| [QA](https://github.com/kylep/multi/blob/main/.claude/agents/qa.md) | Sonnet | Build, render, links via [Playwright](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents). Trigger phrase. |
+| [Security Auditor](https://github.com/kylep/multi/blob/main/.claude/agents/security-auditor.md) | Opus | [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/), confidential data. Added LLM05 check. |
 
 ```mermaid
 graph TD
@@ -179,9 +179,10 @@ them from the file system.
 starts Claude with the Publisher's system prompt as the main
 thread. Publisher then orchestrates the entire content
 pipeline: research, substance gate, write, review, QA,
-security audit. It calls each subagent via
-`bin/invoke-agent.sh` and reads their file-based reports.
-This is the heavy path for writing a full post from scratch.
+security audit. It spawns each subagent natively using Claude
+Code's Agent tool, not CLI calls. Independent stages (QA and
+security audit) run in parallel. This is the heavy path for
+writing a full post from scratch.
 
 Claude Code enforces a single-level subagent hierarchy.
 Publisher can spawn subagents, but those subagents can't
@@ -190,103 +191,3 @@ Researcher. It reports back to Publisher, which decides
 what to do next.
 
 
-## Publisher
-
-Orchestrates the content pipeline: research, substance gate,
-write, review, QA, security audit. Does the writing itself.
-
-Definition: [`.claude/agents/publisher.md`](https://github.com/kylep/multi/blob/main/.claude/agents/publisher.md)
-
-**Applied research:**
-
-- Added explicit delegation specs for every subagent call:
-  objective, output format, tool/source guidance, task
-  boundaries. Without these four things, agents duplicate work
-  or leave gaps. (Anthropic's
-  [Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system):
-  "teach delegation")
-- Added trigger phrase to description: "MUST BE USED when
-  writing or editing blog posts." The deep research reports
-  (stored in the
-  [wiki](/wiki/research/coding-agent-best-practices.html))
-  found that action-oriented subagent descriptions improve
-  auto-delegation reliability.
-
-
-## Researcher
-
-Gathers sourced facts and returns a structured research brief.
-Read-only, Sonnet model.
-
-Definition: [`.claude/agents/researcher.md`](https://github.com/kylep/multi/blob/main/.claude/agents/researcher.md)
-
-**Applied research:**
-
-- Added "start wide, then narrow" search strategy: begin with
-  broad queries to understand what exists before drilling into
-  specifics. Agents default to overly specific queries in
-  unfamiliar territory. (From the Gemini deep research report
-  in the
-  [wiki](/wiki/research/coding-agent-best-practices.html).)
-- Added trigger phrase: "MUST BE USED when gathering facts for
-  blog posts or validating claims."
-
-
-## Reviewer
-
-Checks style, substance, frontmatter, and sourcing against the
-style guide. Read-only, Opus model.
-
-Definition: [`.claude/agents/reviewer.md`](https://github.com/kylep/multi/blob/main/.claude/agents/reviewer.md)
-
-**Applied research:**
-
-- Added explicit context isolation principle: the reviewer must
-  not share context with the producer and must score
-  independently. If the evaluator shares too much context with
-  the producer, it becomes "another participant in collective
-  delusion." This applies the evaluator-optimizer pattern from
-  Anthropic's
-  [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents),
-  reinforced by the Claude deep research
-  [synthesis](/wiki/research/coding-agent-best-practices.html).
-- In practice: the reviewer reads only the draft and the style
-  guide. Not the research brief, not the editorial brief, not
-  prior conversation.
-
-
-## Security Auditor
-
-Scans for confidential data leaks, prompt injection risks, and
-OWASP LLM Top 10 concerns. Read-only, Opus model.
-
-Definition: [`.claude/agents/security-auditor.md`](https://github.com/kylep/multi/blob/main/.claude/agents/security-auditor.md)
-
-**Applied research:**
-
-- Added LLM05 (Improper Output Handling) check: flag
-  agent-generated shell commands executed without review. If an
-  agent generates a shell command and you pipe it to `bash`,
-  you've turned a prompt injection into arbitrary code execution.
-  (All three deep research reports recommend
-  [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/)
-  as baseline)
-- Added OWASP LLM Top 10 reference link in the agent definition.
-
-
-## QA, Analyst, Synthesizer
-
-These three were already well-designed. The main change was
-adding trigger phrases to QA and Analyst so Claude
-auto-delegates to them more reliably.
-
-| Agent | Role | Change |
-|-------|------|--------|
-| QA | Build, render, link checks via Playwright | Trigger phrase. Already had browser automation, matching [Effective Harnesses](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) finding that agents without it ship half-working features. |
-| Analyst | Ingest research, validate claims, propose changes | Trigger phrase. Self-review step already mapped to evaluation-driven development. |
-| Synthesizer | Compare/contrast Deep Research reports | No changes. Already had trigger phrase and parallel extraction. |
-
-Definitions:
-[`.claude/agents/qa.md`](https://github.com/kylep/multi/blob/main/.claude/agents/qa.md),
-[`.claude/agents/analyst.md`](https://github.com/kylep/multi/blob/main/.claude/agents/analyst.md),
-[`.claude/agents/synthesizer.md`](https://github.com/kylep/multi/blob/main/.claude/agents/synthesizer.md)

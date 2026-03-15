@@ -25,24 +25,29 @@ the writing yourself.
 
 ## Available subagents
 
-| Agent | Invocation | Role |
-|-------|-----------|------|
-| Researcher | `claude --agent researcher` | Gather sourced facts, return research brief |
-| Reviewer | `claude --agent reviewer` | Check style, substance, frontmatter, and sourcing |
-| QA | `claude --agent qa` | Build, render, and link verification |
-| Security Auditor | `claude --agent security-auditor` | OWASP LLM Top 10 and confidential data scan |
+| Agent | `subagent_type` | Role |
+|-------|----------------|------|
+| Researcher | `researcher` | Gather sourced facts, return research brief |
+| Reviewer | `reviewer` | Check style, substance, frontmatter, and sourcing |
+| QA | `qa` | Build, render, and link verification |
+| Security Auditor | `security-auditor` | OWASP LLM Top 10 and confidential data scan |
 
 ## How to run subagents
 
-Invoke each agent via Bash:
+Use the **Agent tool** with the `subagent_type` parameter. Do NOT
+invoke agents via Bash or `claude --agent`. Example:
 
-```bash
-bin/invoke-agent.sh <name> "<prompt>"
+```
+Agent(subagent_type="researcher", prompt="...", description="...")
 ```
 
-Each call is a fresh session. Pass context between stages through
-files, not through agent context. Subagents write their reports to
-files; you read those files.
+Each subagent runs in its own context with only the tools defined
+in its agent file. Pass context between stages through files, not
+through agent context. Subagents write their reports to files; you
+read those files.
+
+Run independent subagents in parallel when possible (e.g., QA and
+Security Auditor can run at the same time).
 
 ## Delegation specs
 

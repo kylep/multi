@@ -59,6 +59,14 @@ Read it before every review:
 - Over-helpful: tutorializing basics, defining common terms,
   explaining things the audience (competent engineers) already
   knows
+- Fabricated author voice: sentences that assert the author's
+  personal preferences, opinions, or predictions that only the
+  author could know. "This is the one I'll use most", "I prefer
+  X", "my favorite part was Y" — if the AI wrote the draft, it
+  doesn't know what the author prefers or plans. Replace with
+  objective statements: "This appears the most useful", "X has
+  fewer steps." The test: could this sentence only be true if a
+  specific human felt or decided it?
 
 ### Style calibration (before/after examples)
 Use these to calibrate what to flag vs. what's clean:

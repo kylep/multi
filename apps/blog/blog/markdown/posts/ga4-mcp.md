@@ -207,7 +207,8 @@ using it in an ideation loop. Some sort of PM agent that adds potential tickets 
 Jira or Linear board and uses this data as an input.
 
 I'm also just starting to love being back in tmux and not having to operate websites
-as much.
+as much. I set up the [Cloudflare MCP server](/cloudflare-mcp.html)
+next for the same reason.
 
 Lastly I figure I can hook this up to voice commands somehow for a really custom voice
 assistant.

@@ -105,16 +105,16 @@ export function WikiPage({ wikiContent }) {
 					<Typography variant="blogPostGreySubtitle">Last verified: {metaData.last_verified}</Typography>
 				)}
 			</Box>
+			{/* Page content */}
+			{/* nosemgrep: react-dangerouslysetinnerhtml -- SSG, HTML from own markdown */}
+			<Box dangerouslySetInnerHTML={{ __html: contentHtml }} />
 			{/* Child tree for index/section pages */}
 			{childTreeHtml && (
-				<Box sx={{ marginBottom: '30px' }} data-testid="wiki-tree">
+				<Box sx={{ marginTop: '30px' }} data-testid="wiki-tree">
 					{/* nosemgrep: react-dangerouslysetinnerhtml -- SSG, HTML from own build */}
 					<Box dangerouslySetInnerHTML={{ __html: childTreeHtml }} />
 				</Box>
 			)}
-			{/* Page content */}
-			{/* nosemgrep: react-dangerouslysetinnerhtml -- SSG, HTML from own markdown */}
-			<Box dangerouslySetInnerHTML={{ __html: contentHtml }} />
 			{/* Related links */}
 			{related.length > 0 && (
 				<Box sx={{ marginTop: '30px', paddingTop: '15px', borderTop: '1px solid #eee' }}>
