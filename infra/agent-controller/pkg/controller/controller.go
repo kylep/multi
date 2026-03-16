@@ -227,7 +227,7 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 							Name:    "git-sync",
 							Image:   "alpine/git:latest",
 							Command: []string{"sh", "-c"},
-							Args:    []string{"cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git pull --ff-only || git clone -b ${REPO_BRANCH:-main} $REPO_URL /workspace/repo; chown -R 1000:1000 /workspace/repo"},
+							Args:    []string{"git config --global --add safe.directory /workspace/repo && cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} $REPO_URL /workspace/repo; chown -R 1000:1000 /workspace/repo"},
 							EnvFrom: []corev1.EnvFromSource{
 								{
 									SecretRef: &corev1.SecretEnvSource{
@@ -297,9 +297,16 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 
 	switch runtime {
 	case "opencode":
-		return fmt.Sprintf(`opencode -a %s -p "%s"`, task.Spec.Agent, task.Spec.Prompt)
+		escapedPrompt := strings.ReplaceAll(task.Spec.Prompt, "'", "'\\''")
+		return fmt.Sprintf(`opencode -a %s -p '%s'`, task.Spec.Agent, escapedPrompt)
 	default:
-		cmd := fmt.Sprintf(`claude --agent %s -p "%s" --output-format text`, task.Spec.Agent, task.Spec.Prompt)
+		// Write MCP server config so Claude Code can discover MCP tools.
+		// Env vars (DISCORD_BOT_TOKEN etc.) are injected by the Secret.
+		// Uses --mcp-config to explicitly point Claude Code at the config file.
+		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
+		// Shell-escape single quotes in prompt: replace ' with '\''
+		escapedPrompt := strings.ReplaceAll(task.Spec.Prompt, "'", "'\\''")
+		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent %s -p '%s' --output-format text`, mcpConfig, task.Spec.Agent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
 			// --allowedTools takes space-separated quoted tool patterns
 			tools := strings.Split(task.Spec.AllowedTools, ",")

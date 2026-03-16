@@ -20,4 +20,5 @@ spec:
   allowedTools: >-
     WebSearch,WebFetch,Read,Glob,Grep,
     Write(apps/blog/blog/markdown/wiki/journal/**),
-    Bash(mkdir *),Bash(git add *),Bash(git commit *),Bash(date *)
+    Bash(mkdir *),Bash(git add *),Bash(git commit *),Bash(date *),
+    mcp__discord__send_message,mcp__discord__list_channels

@@ -31,8 +31,8 @@ The system has two images:
 
 | Image | Purpose | Source |
 |-------|---------|--------|
-| `kpericak/ai-agent-runtime:0.1` | Claude Code + OpenCode CLI | `infra/ai-agent-runtime/` |
-| `kpericak/agent-controller:0.1` | Go controller binary | `infra/agent-controller/` |
+| `kpericak/ai-agent-runtime:0.2` | Claude Code + OpenCode CLI + MCP deps | `infra/ai-agent-runtime/` |
+| `kpericak/agent-controller:0.2` | Go controller binary | `infra/agent-controller/` |
 
 The controller runs as a Deployment, watching `AgentTask` resources.
 When a task is due, it creates a Job with an init container that does
@@ -86,11 +86,33 @@ helm install agent-controller ./helm \
 Uses a hostPath PV on single-node Rancher Desktop. Not suitable for
 multi-node clusters.
 
+## MCP Servers
+
+The controller writes `/tmp/mcp.json` before each Claude run and
+passes `--mcp-config /tmp/mcp.json` so Claude Code can discover
+MCP tools. Currently configured: Discord MCP server (`python3
+apps/mcp-servers/discord/server.py`). The `DISCORD_BOT_TOKEN` and
+`DISCORD_GUILD_ID` env vars are injected via the `agent-secrets`
+Secret.
+
+MCP servers must be committed to git — the init container clones
+the repo, so untracked files won't exist in the container.
+
 ## Shared Volume
 
 All agent Jobs mount the same PVC at `/workspace`. The init container
-runs `git pull` before each agent run. Agents commit locally but do
-not push. The user reviews and pushes from outside the cluster.
+runs `git fetch` + `git reset --hard origin/<branch>` before each
+agent run. This replaces `git pull --ff-only` which fails when
+branches diverge (e.g. an agent committed locally but the remote
+also advanced).
+
+**safe.directory:** Git refuses to operate on `/workspace/repo`
+when the init container (root) owns files but git runs as a
+different user. The init container runs
+`git config --global --add safe.directory /workspace/repo` first.
+
+Agents commit locally but do not push. The user reviews and pushes
+from outside the cluster.
 
 ## Key Files
 
@@ -105,5 +127,5 @@ not push. The user reviews and pushes from outside the cluster.
 
 ## Related Blog Posts
 
-- [Daily AI News Digest in K8s](/k8s-autonomous-agents-mvp.html):
+- [Daily AI News Digest in K8s](/cron-event-triggered-ai-agents-k8s.html):
   build walkthrough and architecture decisions
