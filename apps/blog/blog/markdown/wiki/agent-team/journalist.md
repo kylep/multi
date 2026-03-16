@@ -29,7 +29,7 @@ a wiki page per day.
 
 ## Schedule
 
-Daily at 8am UTC (intended — not yet automated).
+Daily at 08:00 UTC via cron schedule `0 8 * * *`.
 
 ## Output
 

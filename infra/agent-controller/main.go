@@ -105,14 +105,17 @@ func startWebhookServer(crdClient rest.Interface, namespace string, webhookToken
 			return
 		}
 
-		if webhookToken != "" {
-			auth := r.Header.Get("Authorization")
-			if auth != "Bearer "+webhookToken {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
-				return
-			}
+		if webhookToken == "" {
+			http.Error(w, "webhook auth not configured", http.StatusServiceUnavailable)
+			return
+		}
+		auth := r.Header.Get("Authorization")
+		if auth != "Bearer "+webhookToken {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
 		}
 
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB limit
 		var req webhookRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid JSON: "+err.Error(), http.StatusBadRequest)
@@ -173,6 +176,9 @@ func startWebhookServer(crdClient rest.Interface, namespace string, webhookToken
 		Addr:              ":8080",
 		Handler:           mux,
 		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
 	}
 	log.Println("Webhook server listening on :8080")
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

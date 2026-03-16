@@ -51,7 +51,7 @@ no compiled code.
 
 ## Setup
 
-The skill file is a markdown document that agents read directly.
+The skill file is a Markdown document that agents read directly.
 No installation or build step required — just ensure the env var
 is set and the skill file is accessible.
 

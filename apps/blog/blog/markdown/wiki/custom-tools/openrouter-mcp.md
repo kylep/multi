@@ -61,7 +61,7 @@ Add to `~/.claude.json` under `mcpServers`:
     "type": "stdio",
     "command": "node",
     "args": [
-      "/Users/kp/gh/multi/apps/mcp-servers/openrouter/build/index.js"
+      "<absolute-path-to-repo>/apps/mcp-servers/openrouter/build/index.js"
     ],
     "env": {
       "OPENROUTER_API_KEY": "your-key-here"

@@ -20,6 +20,6 @@ spec:
   allowedTools: >-
     WebSearch,WebFetch,Read,Glob,Grep,
     Write(apps/blog/blog/markdown/wiki/journal/**),
-    Bash(mkdir *),Bash(git add *),Bash(git commit *),Bash(date *),
+    Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git commit *),Bash(date *),
     mcp__discord__send_message,mcp__discord__list_channels,
     mcp__google-news__search_news,mcp__google-news__top_headlines

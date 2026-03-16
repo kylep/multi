@@ -295,23 +295,26 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 		runtime = "claude"
 	}
 
+	escapeShellArg := func(s string) string {
+		return strings.ReplaceAll(s, "'", "'\\''")
+	}
+	escapedAgent := escapeShellArg(task.Spec.Agent)
+
 	switch runtime {
 	case "opencode":
-		escapedPrompt := strings.ReplaceAll(task.Spec.Prompt, "'", "'\\''")
-		return fmt.Sprintf(`opencode -a %s -p '%s'`, task.Spec.Agent, escapedPrompt)
+		escapedPrompt := escapeShellArg(task.Spec.Prompt)
+		return fmt.Sprintf(`opencode -a '%s' -p '%s'`, escapedAgent, escapedPrompt)
 	default:
 		// Write MCP server config so Claude Code can discover MCP tools.
 		// Env vars (DISCORD_BOT_TOKEN etc.) are injected by the Secret.
 		// Uses --mcp-config to explicitly point Claude Code at the config file.
 		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
-		// Shell-escape single quotes in prompt: replace ' with '\''
-		escapedPrompt := strings.ReplaceAll(task.Spec.Prompt, "'", "'\\''")
-		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent %s -p '%s' --output-format text`, mcpConfig, task.Spec.Agent, escapedPrompt)
+		escapedPrompt := escapeShellArg(task.Spec.Prompt)
+		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format text`, mcpConfig, escapedAgent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
-			// --allowedTools takes space-separated quoted tool patterns
 			tools := strings.Split(task.Spec.AllowedTools, ",")
 			for _, tool := range tools {
-				cmd += fmt.Sprintf(` --allowedTools '%s'`, strings.TrimSpace(tool))
+				cmd += fmt.Sprintf(` --allowedTools '%s'`, escapeShellArg(strings.TrimSpace(tool)))
 			}
 		}
 		return cmd

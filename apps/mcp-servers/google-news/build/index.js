@@ -34,8 +34,7 @@ function truncate(text, max) {
     return text.slice(0, max) + "...";
 }
 async function apiFetch(endpoint, params) {
-    params.apikey = getApiKey();
-    const qs = new URLSearchParams(params).toString();
+    const qs = new URLSearchParams({ ...params, apikey: getApiKey() }).toString();
     const url = `${API_BASE}/${endpoint}?${qs}`;
     const res = await fetch(url);
     if (!res.ok) {
@@ -60,7 +59,7 @@ function formatArticles(articles) {
             lines.push(`   ${truncate(sanitize(a.content), MAX_CONTENT_LENGTH)}`);
         }
         lines.push(`   Source: ${sanitize(a.source.name)} | ${date}`);
-        lines.push(`   ${a.url}`);
+        lines.push(`   ${sanitize(a.url)}`);
         return lines.join("\n");
     })
         .join("\n\n");
