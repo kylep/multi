@@ -308,7 +308,7 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 		// Write MCP server config so Claude Code can discover MCP tools.
 		// Env vars (DISCORD_BOT_TOKEN etc.) are injected by the Secret.
 		// Uses --mcp-config to explicitly point Claude Code at the config file.
-		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
+		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"google-news":{"type":"stdio","command":"node","args":["apps/mcp-servers/google-news/build/index.js"]}}}' > /tmp/mcp.json`
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
 		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format text`, mcpConfig, escapedAgent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
