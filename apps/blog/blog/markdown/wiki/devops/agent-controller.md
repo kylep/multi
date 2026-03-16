@@ -26,7 +26,7 @@ Custom K8s controller that watches `AgentTask` CRDs and creates Jobs
 to run AI agents. Lives in `infra/agent-controller/`.
 
 Primary use case: daily AI news digest written to the wiki journal
-by the `journalist` agent at 9am ET (14:45 UTC).
+by the `journalist` agent at 11:20am ET (15:20 UTC).
 
 ## Architecture
 
@@ -54,7 +54,7 @@ spec:
   agent: journalist
   runtime: claude
   prompt: "Search for yesterday's AI news..."
-  schedule: "45 14 * * *"    # cron in UTC
+  schedule: "20 15 * * *"    # cron in UTC
   trigger: scheduled          # scheduled | manual | webhook
   readOnly: false
   allowedTools: "WebSearch,WebFetch,Read,Write,Bash(git commit *)"
@@ -125,12 +125,31 @@ If `AI_WEBHOOK_TOKEN` is empty (local dev), auth is skipped.
 ```bash
 helm install agent-controller ./helm \
   -n ai-agents --create-namespace \
-  --set secrets.anthropicApiKey=sk-ant-... \
-  --set secrets.openrouterApiKey=sk-or-...
+  --set secrets.openrouterApiKey=sk-or-... \
+  --set secrets.discordBotToken=... \
+  --set secrets.discordGuildId=... \
+  --set secrets.webhookToken=...
 ```
 
 Uses a hostPath PV on single-node Rancher Desktop. Not suitable for
 multi-node clusters.
+
+### Secrets
+
+The helm chart's `secret.yaml` uses `lookup` to preserve existing
+secret values on `helm upgrade`. Only a fresh `helm install` reads
+from `values.yaml`. This prevents `helm upgrade` from wiping
+credentials with empty defaults.
+
+To set or rotate a secret after initial install, patch directly:
+
+```bash
+kubectl patch secret agent-secrets -n ai-agents --type=merge \
+  -p "{\"data\":{\"ANTHROPIC_AUTH_TOKEN\":\"$(echo -n $OPENROUTER_API_KEY | base64)\",\"OPENROUTER_API_KEY\":\"$(echo -n $OPENROUTER_API_KEY | base64)\",\"DISCORD_BOT_TOKEN\":\"$(echo -n $DISCORD_BOT_TOKEN | base64)\",\"DISCORD_GUILD_ID\":\"$(echo -n $DISCORD_GUILD_ID | base64)\",\"AI_WEBHOOK_TOKEN\":\"$(echo -n $AI_WEBHOOK_TOKEN | base64)\"}}"
+```
+
+Required env vars for this command: `OPENROUTER_API_KEY`,
+`DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`, `AI_WEBHOOK_TOKEN`.
 
 ## Shared Volume
 
