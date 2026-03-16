@@ -1,0 +1,38 @@
+controller:
+  image:
+    repository: kpericak/agent-controller
+    tag: "0.3"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+runtime:
+  image:
+    repository: kpericak/ai-agent-runtime
+    tag: "0.2"
+
+repo:
+  url: "https://github.com/kylep/multi.git"
+  branch: main
+
+storage:
+  size: 5Gi
+  # hostPath for single-node Rancher Desktop
+  hostPath: /tmp/agent-workspace
+
+secrets:
+  # OpenRouter key routes Claude Code through OpenRouter
+  openrouterApiKey: ""
+  repoUrl: ""
+  # Discord bot credentials for MCP server
+  discordBotToken: ""
+  discordGuildId: ""
+  # Bearer token for webhook endpoint (leave empty to disable auth)
+  webhookToken: ""
+
+namespace: ai-agents

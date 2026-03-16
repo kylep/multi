@@ -1,0 +1,29 @@
+apiVersion: agents.kyle.pericak.com/v1alpha1
+kind: AgentTask
+metadata:
+  name: daily-ai-news
+  namespace: ai-agents
+spec:
+  agent: journalist
+  runtime: claude
+  prompt: >-
+    Search for yesterday's most notable AI news, announcements, and
+    releases. Write a digest to the wiki journal. Determine today's
+    date, create the directory
+    apps/blog/blog/markdown/wiki/journal/YYYY-MM-DD/, and write
+    ai-news.md there with proper wiki frontmatter. Include source
+    URLs for every item. Commit with message
+    'journal: AI news digest for YYYY-MM-DD'. After committing,
+    post a Discord message to #news using the Discord output format
+    defined in your agent instructions. Include 2-6 stories (up to
+    7 only if each is genuinely unique and noteworthy). Start with
+    the overview line — keep it witty, one sentence, no emojis.
+  schedule: "0 8 * * *"
+  trigger: scheduled
+  readOnly: false
+  allowedTools: >-
+    WebSearch,WebFetch,Read,Glob,Grep,
+    Write(apps/blog/blog/markdown/wiki/journal/**),
+    Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git commit *),Bash(date *),
+    mcp__discord__send_message,mcp__discord__list_channels,
+    mcp__google-news__search_news,mcp__google-news__top_headlines

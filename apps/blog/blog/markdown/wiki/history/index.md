@@ -6,7 +6,7 @@ keywords:
   - changelog
   - architecture-decisions
 related:
-  - wiki/projects/agent-team
+  - wiki/agent-team
 scope: "Top-level index of history entries. Links to topic-specific changelogs."
 last_verified: 2026-03-15
 ---

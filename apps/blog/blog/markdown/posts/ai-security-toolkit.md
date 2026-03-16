@@ -154,19 +154,17 @@ so the hooks run automatically on every commit.
     -c "semgrep scan --config auto --error /workspace"'
   language: system
   stages: ["pre-commit", "pre-push"]
-- id: gitleaks
-  name: Gitleaks
-  description: Scan for leaked secrets using the security toolkit image.
-  entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm
-    kpericak/ai-security-toolkit-1:0.2
-    -c "cd /workspace && gitleaks detect --source ."'
-  language: system
-  stages: ["pre-commit", "pre-push"]
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.30.0
+  hooks:
+    - id: gitleaks
+      stages: ["pre-commit", "pre-push"]
 ```
 
 The `--error` flag on semgrep makes it exit non-zero on findings,
-which blocks the commit. Gitleaks catches patterns like API keys,
-tokens, and credentials.
+which blocks the commit. Gitleaks uses its official pre-commit
+hook, which pre-commit installs via Go. It scans staged files
+directly. Use `gitleaks detect` for full repo scans.
 
 
 # Running the scans

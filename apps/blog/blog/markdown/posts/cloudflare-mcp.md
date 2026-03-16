@@ -1,5 +1,5 @@
 ---
-title: "Cloudflare MCP: Query DNS and the Full API from the Terminal"
+title: "Cloudflare MCP: Query DNS and the Full API"
 summary: Connecting Cloudflare's remote MCP server to Claude Code so it can
   query DNS records, zone configs, and the full Cloudflare API from the
   terminal.

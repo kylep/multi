@@ -8,7 +8,7 @@ keywords:
   - architecture-decisions
 related:
   - wiki/history
-  - wiki/projects/agent-team
+  - wiki/agent-team
 scope: "Index of agent ecosystem version history. Links to individual transition records."
 last_verified: 2026-03-15
 ---

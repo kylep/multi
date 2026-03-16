@@ -283,22 +283,17 @@ repos:
         --error /workspace"'
       language: system
       stages: ["pre-commit", "pre-push"]
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.30.0
+  hooks:
     - id: gitleaks
-      name: Gitleaks
-      entry: >-
-        bash -c 'docker run
-        -v "$(pwd):/workspace:ro" --rm
-        kpericak/ai-security-toolkit-1:0.2
-        -c "cd /workspace && gitleaks detect
-        --source ."'
-      language: system
       stages: ["pre-commit", "pre-push"]
 ```
 
 Every commit now gets linted for Python and JS/TS issues,
 scanned for security bugs by semgrep, and checked for
-leaked secrets by gitleaks. Four tools, two Docker images,
-no CI server required.
+leaked secrets by gitleaks. Four tools, no CI server
+required.
 
 Hadolint and tflint aren't in the hooks. Dockerfiles and
 Terraform configs change rarely enough that running them

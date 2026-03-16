@@ -8,8 +8,6 @@ keywords:
   - cursor-rules
   - configuration
 related:
-  - wiki/ai-tools/claude-code
-  - wiki/ai-tools/opencode
   - ruler-cross-tool-ai-rules
 scope: "Covers Ruler setup, rule authoring, and current rule inventory. Does not cover individual tool configuration formats."
 last_verified: 2026-03-11

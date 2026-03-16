@@ -9,7 +9,6 @@ keywords:
   - static-generation
 related:
   - wiki/blog-architecture
-  - wiki/blog-architecture/playwright-testing
 scope: "Covers the MarkdownService build pipeline. Does not cover wiki processing (WikiService) or image generation."
 last_verified: 2026-03-10
 ---

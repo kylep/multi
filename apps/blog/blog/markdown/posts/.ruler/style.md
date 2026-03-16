@@ -71,7 +71,7 @@ evolving", "in the current landscape", "tapestry", "landscape"
 "innovative", "crucial", "vibrant", "embark", "unpack",
 "revolutionary", "game-changing", "stands as testament to",
 "plays crucial role", "generally speaking", "I should note
-that". "Just" when used as a minimizer ("just run", "just
+that", "nail" (as in "nail the implementation"). "Just" when used as a minimizer ("just run", "just
 add", "just use") but not as a temporal marker ("I just
 found out"). Prefer concrete verbs and nouns over evaluative
 adjectives.
