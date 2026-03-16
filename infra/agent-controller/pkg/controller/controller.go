@@ -313,7 +313,7 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 	default:
 		// Install MCP server deps, write MCP config, then run Claude Code.
 		// Env vars (DISCORD_BOT_TOKEN etc.) are injected by the Secret.
-		mcpSetup := `cd apps/mcp-servers/google-news && npm install --omit=dev --silent 2>/dev/null && cd /workspace/repo`
+		mcpSetup := `cd apps/mcp-servers/google-news && npm ci --ignore-scripts 2>/dev/null && cd /workspace/repo`
 		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"google-news":{"type":"stdio","command":"node","args":["apps/mcp-servers/google-news/build/index.js"]}}}' > /tmp/mcp.json`
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
 		cmd := fmt.Sprintf(`%s && %s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format text`, mcpSetup, mcpConfig, escapedAgent, escapedPrompt)
