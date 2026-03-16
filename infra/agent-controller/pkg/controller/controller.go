@@ -10,6 +10,7 @@ import (
 	"github.com/kylep/multi/infra/agent-controller/pkg/crd"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -146,6 +147,11 @@ func (c *Controller) reconcileRunning(ctx context.Context, task *crd.AgentTask) 
 
 	job, err := c.clientset.BatchV1().Jobs(c.namespace).Get(ctx, task.Status.JobName, metav1.GetOptions{})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			log.Printf("Job %s no longer exists for %s, marking as Failed", task.Status.JobName, task.Name)
+			c.updateStatus(ctx, task, "Failed", task.Status.JobName)
+			return
+		}
 		log.Printf("Failed to get job %s: %v", task.Status.JobName, err)
 		return
 	}
