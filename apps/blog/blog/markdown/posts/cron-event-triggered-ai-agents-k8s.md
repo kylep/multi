@@ -21,7 +21,7 @@ imgprompt: A cute robot crab with clocks for eyes and the
 
 - [The goal](#the-goal)
 - [The journalist agent](#the-journalist-agent)
-- [Architecture](#architecture)
+- [How the pieces connect](#how-the-pieces-connect)
 - [The runtime image](#the-runtime-image)
 - [AgentTask CRD](#agenttask-crd)
 - [The Go controller](#the-go-controller)
@@ -29,6 +29,9 @@ imgprompt: A cute robot crab with clocks for eyes and the
 - [Permissions with allowedTools](#permissions-with-allowedtools)
 - [Webhook: trigger on demand](#webhook-trigger-on-demand)
 - [Helm chart and deployment](#helm-chart-and-deployment)
+- [MCP servers in containers](#mcp-servers-in-containers)
+- [Problems I hit](#problems-i-hit)
+- [What's missing](#whats-missing)
 
 
 
@@ -74,16 +77,17 @@ so the agent posts its digest to the `#news` channel in my
 Discord bot server.
 
 
-## Architecture
+## How the pieces connect
 
 ```mermaid
 graph TD
     AT[daily-ai-news AgentTask] -->|watched by| CTRL[Controller]
     CTRL -->|8am cron| JOB[K8s Job]
-    JOB -->|init| GIT[git pull + chown]
+    JOB -->|init| GIT[git fetch + reset]
     GIT -->|then| AGENT[Journalist Agent]
     AGENT -->|writes| WIKI[wiki/journal/YYYY-MM-DD/ai-news.md]
     AGENT -->|commits| PVC[Shared PVC]
+    AGENT -->|posts via MCP| DISCORD[Discord #news]
     WH[Webhook :8080] -->|creates| AT
 ```
 
@@ -92,11 +96,12 @@ The controller is a Go binary running as a Deployment. It watches
 
 Each Job has two containers:
 
-1. **Init container** (`alpine/git`): fetches the repo, checks
-   out the configured branch, pulls latest, then `chown`s the
-   workspace to uid 1000 (the agent user).
-2. **Main container** (`ai-agent-runtime`): runs
-   `claude --agent journalist -p "..." --allowedTools ...`
+1. **Init container** (`alpine/git`): fetches the repo, resets
+   to the configured branch, then `chown`s the workspace to
+   uid 1000 (the agent user).
+2. **Main container** (`ai-agent-runtime`): writes MCP config,
+   then runs `claude --mcp-config ... --agent journalist -p
+   "..." --allowedTools ...`
 
 
 ## The runtime image
@@ -108,13 +113,10 @@ command as Job args.
 ```dockerfile
 FROM node:22-alpine
 RUN apk upgrade --no-cache && apk add --no-cache \
-    git python3 bash curl openssh-client
+    git python3 py3-pip bash curl openssh-client
 RUN npm install -g @anthropic-ai/claude-code
-ARG OPENCODE_VERSION=0.0.55
-RUN curl -fsSL \
-    "https://github.com/opencode-ai/opencode/releases/download/\
-v${OPENCODE_VERSION}/opencode-linux-x86_64.tar.gz" \
-    | tar -xz -C /usr/local/bin opencode
+RUN pip install --no-cache-dir --break-system-packages \
+    "mcp[cli]>=1.2.0" "httpx>=0.27.0"
 ```
 
 Runs as the `node` user (uid 1000) from the base image.
@@ -282,7 +284,95 @@ Use a values file instead:
 
 ```yaml
 secrets:
-  openrouterApiKey: "sk-or-v1-..."
+  openrouterApiKey: "<your-openrouter-key>"
+  discordBotToken: "<your-discord-bot-token>"
+  discordGuildId: "<your-guild-id>"
 repo:
   branch: kyle/blog-k8s-autonomous-agents-mvp
 ```
+
+
+## MCP servers in containers
+
+Claude Code discovers MCP servers via a `.mcp.json` config
+file. Locally, this file points to paths on my Mac. In a
+container, those paths don't exist.
+
+The controller writes a container-specific MCP config to
+`/tmp/mcp.json` before each run and passes `--mcp-config`:
+
+```go
+mcpConfig := `printf '{"mcpServers":{"discord":{
+  "type":"stdio","command":"python3",
+  "args":["apps/mcp-servers/discord/server.py"]
+}}}' > /tmp/mcp.json`
+
+cmd := fmt.Sprintf(
+    `%s && claude --mcp-config /tmp/mcp.json --agent %s ...`,
+    mcpConfig, task.Spec.Agent)
+```
+
+The MCP server's Python deps (`mcp`, `httpx`) are baked into
+the runtime image. The server script itself lives in the repo,
+so it shows up after the git-sync init container pulls.
+
+The `DISCORD_BOT_TOKEN` env var is injected from the K8s
+Secret. The MCP server reads it at runtime.
+
+
+## Problems I hit
+
+**File permissions on the shared volume.** The init container
+runs as root (default for `alpine/git`) and creates the repo
+directory owned by root. The agent container runs as uid 1000
+and can't write. Fix: `chown -R 1000:1000 /workspace/repo`
+at the end of the init container.
+
+**safe.directory.** Git refuses to operate on a repo owned by
+a different user. The PVC is owned by root after the init
+container writes to it. Fix: `git config --global --add
+safe.directory /workspace/repo` at the start of init.
+
+**Branch divergence.** The init container used
+`git pull --ff-only`, which fails when branches diverge. This
+happens when an agent commits locally and the remote also
+advances. Fix: `git reset --hard origin/<branch>` instead.
+The agent's local commits are disposable since I review and
+push from outside the cluster.
+
+**Shell quoting.** The controller builds a shell command as a
+string. Prompts with quotes break the command. Fix: wrap the
+prompt in single quotes and escape any embedded single quotes.
+
+**MCP discovery.** Claude Code didn't automatically find the
+`.mcp.json` written to the working directory. Passing
+`--mcp-config /tmp/mcp.json` explicitly fixed it.
+
+**Haiku can't use MCP tools headless.** The journalist agent
+started on Haiku to save cost. Haiku consistently failed to
+use MCP tools in the container, just returning a greeting.
+Switching to Sonnet fixed it.
+
+**Helm --set drops API keys.** The OpenRouter key contains
+characters that `helm --set` interprets. The key appears empty
+in the deployed Secret. Fix: use `helm -f values.yaml` with
+a values file instead.
+
+**Write path scoping.** `Write(apps/blog/.../journal/**)`
+works locally but not in the container where the working
+directory is `/workspace/repo`. Didn't resolve this yet.
+Using unrestricted `Write` for now.
+
+
+## What's missing
+
+**No auth on the webhook.** Anyone on the network can trigger
+agent runs.
+
+**hostPath storage.** Single node only.
+
+**No spending limits.** An agent Job can burn as many tokens
+as it wants.
+
+**Write path scoping.** Need to figure out why the path
+pattern doesn't match in the container.
