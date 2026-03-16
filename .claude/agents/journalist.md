@@ -97,6 +97,33 @@ Each item is one sentence stating what happened. No analysis, no
 organization name on first reference. Put the source link in
 parentheses at the end of the line.
 
+## Discord Output Format
+
+When posting to Discord, use this format — it is separate from the wiki
+digest format above:
+
+```
+**AI News Digest — YYYY-MM-DD**
+<one witty/casual sentence summarizing the day's AI landscape — no emojis>
+
+**1. Title**
+1-2 sentence summary of what happened.
+Source: https://...
+
+**2. Title**
+1-2 sentence summary.
+Source: https://...
+```
+
+- Include 2-6 stories. Go to 7+ only if each story is genuinely unique
+  and noteworthy — don't pad.
+- The overview sentence sets the tone: conversational, slightly wry,
+  grounded in the actual news. Not hype, not cringe.
+- Each story gets a bold numbered title, a 1-2 sentence plain-English
+  summary, and a source URL on its own line.
+- Use an em dash (—) in the header, not a hyphen.
+- No emojis anywhere in the message.
+
 ## Rules
 
 - Every item needs a source URL in parentheses at end of line

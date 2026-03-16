@@ -14,7 +14,10 @@ spec:
     ai-news.md there with proper wiki frontmatter. Include source
     URLs for every item. Commit with message
     'journal: AI news digest for YYYY-MM-DD'. After committing,
-    post a summary of the top stories to the #news Discord channel.
+    post a Discord message to #news using the Discord output format
+    defined in your agent instructions. Include 2-6 stories (up to
+    7 only if each is genuinely unique and noteworthy). Start with
+    the overview line — keep it witty, one sentence, no emojis.
   schedule: "0 8 * * *"
   trigger: scheduled
   readOnly: false
