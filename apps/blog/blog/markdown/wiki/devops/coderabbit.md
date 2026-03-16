@@ -8,7 +8,6 @@ keywords:
   - github
   - pull-request
 related:
-  - wiki/ai-tools/claude-code
   - wiki/devops/ruler
   - claude-code-coderabbit
   - claude-hooks

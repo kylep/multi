@@ -28,6 +28,11 @@ spec:
               value: {{ .Values.namespace }}
             - name: RUNTIME_IMAGE
               value: "{{ .Values.runtime.image.repository }}:{{ .Values.runtime.image.tag }}"
+            - name: AI_WEBHOOK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: AI_WEBHOOK_TOKEN
           ports:
             - name: webhook
               containerPort: 8080

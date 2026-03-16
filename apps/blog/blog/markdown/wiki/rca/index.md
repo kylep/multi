@@ -17,4 +17,4 @@ or produces output below the quality bar, we write it up here.
 
 | Date | Incident | Status |
 |------|----------|--------|
-| 2026-03-12 | [seo-agent.md — boring, no image, narrated log](seo-agent-post-2026-03-12.html) | Closed — fixes implemented |
+| | | |

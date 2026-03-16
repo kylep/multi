@@ -79,7 +79,11 @@ func main() {
 	}()
 
 	// Start webhook server
-	go startWebhookServer(crdClient, namespace)
+	webhookToken := os.Getenv("AI_WEBHOOK_TOKEN")
+	if webhookToken == "" {
+		log.Println("WARNING: AI_WEBHOOK_TOKEN not set — webhook auth disabled")
+	}
+	go startWebhookServer(crdClient, namespace, webhookToken)
 
 	// Run controller loop
 	log.Printf("Starting agent controller in namespace %s", namespace)
@@ -93,12 +97,20 @@ type webhookRequest struct {
 	AllowedTools string `json:"allowedTools,omitempty"`
 }
 
-func startWebhookServer(crdClient rest.Interface, namespace string) {
+func startWebhookServer(crdClient rest.Interface, namespace string, webhookToken string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "POST only", http.StatusMethodNotAllowed)
 			return
+		}
+
+		if webhookToken != "" {
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer "+webhookToken {
+				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				return
+			}
 		}
 
 		var req webhookRequest

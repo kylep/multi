@@ -32,5 +32,7 @@ secrets:
   # Discord bot credentials for MCP server
   discordBotToken: ""
   discordGuildId: ""
+  # Bearer token for webhook endpoint (leave empty to disable auth)
+  webhookToken: ""
 
 namespace: ai-agents

@@ -12,6 +12,7 @@ Agent Controller deployed to namespace {{ .Values.namespace }}.
 4. Trigger via webhook:
    kubectl port-forward -n {{ .Values.namespace }} svc/{{ include "agent-controller.fullname" . }} 8080:8080
    curl -X POST http://localhost:8080/webhook \
+     -H "Authorization: Bearer $AI_WEBHOOK_TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"agent":"analyst","prompt":"list wiki pages"}'
 

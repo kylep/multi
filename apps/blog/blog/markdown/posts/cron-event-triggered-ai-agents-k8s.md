@@ -22,16 +22,13 @@ imgprompt: A cute robot crab with clocks for eyes and the
 - [The goal](#the-goal)
 - [The journalist agent](#the-journalist-agent)
 - [How the pieces connect](#how-the-pieces-connect)
-- [The runtime image](#the-runtime-image)
+- [Controller and runtime](#controller-and-runtime)
 - [AgentTask CRD](#agenttask-crd)
-- [The Go controller](#the-go-controller)
 - [OpenRouter for API auth](#openrouter-for-api-auth)
 - [Permissions with allowedTools](#permissions-with-allowedtools)
 - [Webhook: trigger on demand](#webhook-trigger-on-demand)
 - [Helm chart and deployment](#helm-chart-and-deployment)
 - [MCP servers in containers](#mcp-servers-in-containers)
-- [Problems I hit](#problems-i-hit)
-- [What's missing](#whats-missing)
 
 
 
@@ -104,24 +101,18 @@ Each Job has two containers:
    "..." --allowedTools ...`
 
 
-## The runtime image
+## Controller and runtime
 
-Alpine container with Claude Code (npm) and OpenCode (binary).
-The entrypoint is `sh` so the controller injects the actual
-command as Job args.
+The
+[controller](https://github.com/kylep/multi/tree/main/infra/agent-controller/pkg/controller)
+is a Go reconcile loop that lists all AgentTasks every 30 seconds.
+For scheduled tasks, it compares `lastRunTime` against the cron
+expression and creates a Job when due. For manual and webhook
+tasks, it creates a Job immediately when phase is `Pending`.
 
-```dockerfile
-FROM node:22-alpine
-RUN apk upgrade --no-cache && apk add --no-cache \
-    git python3 py3-pip bash curl openssh-client
-RUN npm install -g @anthropic-ai/claude-code
-RUN pip install --no-cache-dir --break-system-packages \
-    "mcp[cli]>=1.2.0" "httpx>=0.27.0"
-```
-
-Runs as the `node` user (uid 1000) from the base image.
-
-Source: `infra/ai-agent-runtime/Dockerfile`
+The runtime image is an Alpine container with Claude Code and
+OpenCode baked in (`infra/ai-agent-runtime/Dockerfile`). Runs
+as uid 1000.
 
 
 ## AgentTask CRD
@@ -148,10 +139,10 @@ spec:
     Bash(git commit *),Bash(date *)
 ```
 
-The `allowedTools` field is new. The controller splits it on
-commas and passes each one as a separate `--allowedTools` flag
-to Claude Code. This is how you run Claude Code autonomously
-without `--dangerously-skip-permissions`.
+The controller splits `allowedTools` on commas and passes each
+one as a separate `--allowedTools` flag to Claude Code. This is
+how you run Claude Code autonomously without
+`--dangerously-skip-permissions`.
 
 | Field | Purpose |
 |-------|---------|
@@ -162,34 +153,6 @@ without `--dangerously-skip-permissions`.
 | `trigger` | `manual`, `scheduled`, or `webhook` |
 | `readOnly` | Whether this agent modifies the repo |
 | `allowedTools` | Comma-separated tool permissions |
-
-
-## The Go controller
-
-The
-[controller](https://github.com/kylep/multi/tree/main/infra/agent-controller/pkg/controller)
-is a reconcile loop that lists all AgentTasks every 30 seconds.
-For scheduled tasks, it compares `lastRunTime` against the cron
-expression and creates a Job when due. For manual and webhook
-tasks, it creates a Job immediately when phase is `Pending`.
-
-Write agents (publisher, qa, journalist) are serialized so two
-don't commit at the same time. Read-only agents run concurrently.
-
-The controller builds the Claude Code command with each
-allowedTools entry as a separate flag:
-
-```go
-tools := strings.Split(task.Spec.AllowedTools, ",")
-for _, tool := range tools {
-    cmd += fmt.Sprintf(
-        ` --allowedTools '%s'`, strings.TrimSpace(tool))
-}
-```
-
-Single quotes around each tool pattern prevent the shell from
-expanding parentheses and globs in patterns like
-`Bash(mkdir *)`.
 
 
 ## OpenRouter for API auth
@@ -250,10 +213,13 @@ constrain what gets written.
 
 ## Webhook: trigger on demand
 
-The controller exposes `:8080/webhook` for on-demand runs:
+The controller exposes `:8080/webhook` for on-demand runs.
+Requires a bearer token via `AI_WEBHOOK_TOKEN` env var (skipped
+if empty for local dev):
 
 ```bash
 curl -X POST http://localhost:8080/webhook \
+  -H "Authorization: Bearer $AI_WEBHOOK_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "agent": "journalist",
@@ -263,7 +229,7 @@ curl -X POST http://localhost:8080/webhook \
 ```
 
 The handler creates an AgentTask CR with the allowedTools, and
-the reconcile loop picks it up. No authentication for MVP.
+the reconcile loop picks it up.
 
 
 ## Helm chart and deployment
@@ -320,59 +286,3 @@ The `DISCORD_BOT_TOKEN` env var is injected from the K8s
 Secret. The MCP server reads it at runtime.
 
 
-## Problems I hit
-
-**File permissions on the shared volume.** The init container
-runs as root (default for `alpine/git`) and creates the repo
-directory owned by root. The agent container runs as uid 1000
-and can't write. Fix: `chown -R 1000:1000 /workspace/repo`
-at the end of the init container.
-
-**safe.directory.** Git refuses to operate on a repo owned by
-a different user. The PVC is owned by root after the init
-container writes to it. Fix: `git config --global --add
-safe.directory /workspace/repo` at the start of init.
-
-**Branch divergence.** The init container used
-`git pull --ff-only`, which fails when branches diverge. This
-happens when an agent commits locally and the remote also
-advances. Fix: `git reset --hard origin/<branch>` instead.
-The agent's local commits are disposable since I review and
-push from outside the cluster.
-
-**Shell quoting.** The controller builds a shell command as a
-string. Prompts with quotes break the command. Fix: wrap the
-prompt in single quotes and escape any embedded single quotes.
-
-**MCP discovery.** Claude Code didn't automatically find the
-`.mcp.json` written to the working directory. Passing
-`--mcp-config /tmp/mcp.json` explicitly fixed it.
-
-**Haiku can't use MCP tools headless.** The journalist agent
-started on Haiku to save cost. Haiku consistently failed to
-use MCP tools in the container, just returning a greeting.
-Switching to Sonnet fixed it.
-
-**Helm --set drops API keys.** The OpenRouter key contains
-characters that `helm --set` interprets. The key appears empty
-in the deployed Secret. Fix: use `helm -f values.yaml` with
-a values file instead.
-
-**Write path scoping.** `Write(apps/blog/.../journal/**)`
-works locally but not in the container where the working
-directory is `/workspace/repo`. Didn't resolve this yet.
-Using unrestricted `Write` for now.
-
-
-## What's missing
-
-**No auth on the webhook.** Anyone on the network can trigger
-agent runs.
-
-**hostPath storage.** Single node only.
-
-**No spending limits.** An agent Job can burn as many tokens
-as it wants.
-
-**Write path scoping.** Need to figure out why the path
-pattern doesn't match in the container.

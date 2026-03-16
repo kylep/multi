@@ -8,7 +8,7 @@ keywords:
   - claude
   - research-reports
 related:
-  - wiki/projects/agent-team
+  - wiki/agent-team
   - wiki/history
 scope: "Index of Deep Research reports. Each report includes the provider, prompt, and date generated."
 last_verified: 2026-03-15

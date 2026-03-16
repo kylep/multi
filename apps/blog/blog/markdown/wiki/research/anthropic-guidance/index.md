@@ -11,7 +11,7 @@ keywords:
 related:
   - wiki/research
   - wiki/research/coding-agent-best-practices
-  - wiki/projects/agent-team
+  - wiki/agent-team
 scope: "Extracted findings from Anthropic's published guidance on building effective agents. One section per source page."
 last_verified: 2026-03-15
 ---

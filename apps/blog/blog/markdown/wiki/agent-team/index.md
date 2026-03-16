@@ -1,6 +1,6 @@
 ---
 title: "Agent Team"
-summary: "AI agent team with 7 focused roles: Publisher, Analyst, Synthesizer, Researcher, Reviewer, QA, and Security Auditor."
+summary: "AI agent team with 8 roles defined in .claude/agents/."
 keywords:
   - agent-team
   - ai-agents
@@ -10,71 +10,34 @@ keywords:
   - qa
   - security-auditor
   - analyst
-  - content-pipeline
+  - journalist
+  - synthesizer
 related:
-  - wiki/ai-tools/claude-code
-  - wiki/mcp
-  - wiki/projects
   - wiki/history
-scope: "Overview of the agent team: mission, org chart, coordination model, and invocation."
-last_verified: 2026-03-13
+scope: "Source of truth for the agent team: roles, models, tools, coordination, and invocation."
+last_verified: 2026-03-15
 ---
 
-An AI agent team with 7 focused roles, each backed by real tools
-and invocable on demand via Claude Code.
-
-## Mission
-
-Help Kyle and the online community learn interesting and useful things.
-
-## Org Chart
-
-```mermaid
-graph TD
-    Kyle["Kyle"]
-    Publisher["Publisher — Content Pipeline (Opus)"]
-    Analyst["Analyst — Research Ingestion + System Improvement (Opus)"]
-    Synthesizer["Synthesizer — Cross-Source Synthesis (Opus)"]
-    Researcher["Researcher — Sourced Facts (Sonnet)"]
-    Reviewer["Reviewer — Style + Substance + Sourcing (Opus)"]
-    QA["QA — Build + Render + Links (Sonnet)"]
-    Security["Security Auditor — OWASP + Privacy (Opus)"]
-
-    Kyle --> Publisher
-    Kyle --> Analyst
-    Kyle --> Synthesizer
-    Publisher --> Researcher
-    Publisher --> Reviewer
-    Publisher --> QA
-    Publisher --> Security
-```
-
-See the dedicated [Org Chart](/wiki/projects/agent-team/org-chart.html)
-page for a bot-friendly YAML version.
-
-## Coordination
-
-Agents coordinate through two existing systems:
-
-- **Git** — shared state. Subagents write reports to files; the
-  publisher reads those files. All artifacts live in the repo.
-- **Claude Code memory** — cross-session context. Persistent notes
-  about user preferences, project state, and feedback.
-
-No shared wiki layer, no event log, no separate task tracker for
-agents. Keep it simple.
+Eight Claude Code agents defined in `.claude/agents/`.
 
 ## Roles
 
-| Role | Model | Goal |
-|------|-------|------|
-| Publisher | Opus | Orchestrate content pipeline, write blog posts |
-| Analyst | Opus | Ingest research, validate claims, propose system improvements |
-| Synthesizer | Opus | Compare and contrast Deep Research reports |
-| Researcher | Sonnet | Gather sourced facts, return research brief |
-| Reviewer | Opus | Check style, substance, frontmatter, and sourcing |
-| QA | Sonnet | Build, render, and link verification |
-| Security Auditor | Opus | Confidential data, prompt injection, OWASP LLM checks |
+| Role | Model | Tools | Purpose |
+|------|-------|-------|---------|
+| [Publisher](/wiki/agent-team/publisher.html) | Opus | Read, Write, Edit, Bash, Glob, Grep, Agent | Orchestrate content pipeline, write blog posts |
+| [Analyst](/wiki/agent-team/analyst.html) | Opus | Read, Glob, Grep, WebSearch, WebFetch | Ingest research, validate claims, propose system improvements |
+| [Synthesizer](/wiki/agent-team/synthesizer.html) | Opus | Read, Edit, Glob, Grep, Agent | Compare and contrast Deep Research reports |
+| [Journalist](/wiki/agent-team/journalist.html) | Haiku | Read, Write, Bash, Glob, Grep, WebFetch, WebSearch | Daily AI news digests to wiki journal |
+| [Researcher](/wiki/agent-team/researcher.html) | Sonnet | Read, Glob, Grep, WebFetch, WebSearch | Gather sourced facts, return research brief |
+| [Reviewer](/wiki/agent-team/reviewer.html) | Opus | Read, Glob, Grep | Check style, substance, frontmatter, sourcing |
+| [QA](/wiki/agent-team/qa.html) | Sonnet | Bash, Read, Glob, Grep, Playwright MCP | Build, render, and link verification |
+| [Security Auditor](/wiki/agent-team/security-auditor.html) | Opus | Read, Glob, Grep | Confidential data, prompt injection, OWASP LLM checks |
+
+## Top-level vs subagent
+
+Publisher, Analyst, Synthesizer, and Journalist are invoked directly.
+Researcher, Reviewer, QA, and Security Auditor are subagents called
+by Publisher during its pipeline.
 
 ## Invocation
 
@@ -82,25 +45,25 @@ agents. Keep it simple.
 claude --agent publisher
 claude --agent analyst
 claude --agent synthesizer
-claude --agent researcher
-claude --agent reviewer
-claude --agent qa
-claude --agent security-auditor
+claude --agent journalist
 ```
+
+## Coordination
+
+- **Git** — shared state. Subagents write reports to files; the
+  publisher reads those files. All artifacts live in the repo.
+- **Claude Code memory** — cross-session context. Persistent notes
+  about user preferences, project state, and feedback.
 
 ## Design principles
 
-- **Start simple**: 7 agents, not 17. Add agents only when the
-  workload clearly requires it.
 - **Deny-by-default**: agents are read-only unless they need to write.
-  Publisher (writes posts), QA (runs builds), and Synthesizer (appends
-  synthesis to wiki) have write/execute tools. The rest are read-only.
-- **Route by risk**: Opus for judgment (review, security, editorial),
-  Sonnet for mechanical work (research, QA).
+- **Route by risk**: Opus for judgment, Sonnet for mechanical work,
+  Haiku for high-frequency low-complexity tasks.
 - **Artifacts not pass-through**: files as intermediate state between
   agents, not large context passed through prompts.
 
 ## History
 
 See [History](/wiki/history.html) for the changelog of architectural
-transitions, including the v1 → v2 migration rationale.
+transitions.

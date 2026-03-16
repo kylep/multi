@@ -72,7 +72,18 @@ The controller exposes `POST :8080/webhook` accepting:
 ```
 
 This creates an AgentTask CRD, which the reconcile loop picks up.
-No auth for MVP.
+
+Requires a bearer token when `AI_WEBHOOK_TOKEN` is set:
+
+```bash
+curl -X POST :8080/webhook \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"agent": "journalist", "prompt": "Write a news digest"}'
+```
+
+If `AI_WEBHOOK_TOKEN` is empty (local dev), auth is skipped.
+`/healthz` is always unauthenticated.
 
 ## Deployment
 

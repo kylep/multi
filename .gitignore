@@ -38,6 +38,9 @@ postgres-data/
 agent-events.log
 pai-log-*.md
 
+# MCP config (contains tokens/secrets)
+.mcp.json
+
 # Playwright
 **/.playwright-mcp/
 **/test-results/

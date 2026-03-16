@@ -9,9 +9,8 @@ keywords:
   - markdown
 related:
   - wiki/devops
-  - wiki/mcp/playwright
 scope: "Covers the blog's technical implementation. Does not cover blog content or writing style."
-last_verified: 2026-03-10
+last_verified: 2026-03-15
 ---
 
 
@@ -19,14 +18,9 @@ kyle.pericak.com is a statically exported Next.js 14 site. Markdown
 files are processed at build time into HTML pages. The site is deployed
 as static files with no server-side rendering at runtime.
 
-## Key Characteristics
+## Pages
 
-- Static HTML export (no Node.js server in production)
-- All internal links end in `.html`
-- Material-UI (MUI) for components and responsive layout
-- Responsive breakpoint at 600px (mobile/desktop)
-- Sidebar with categories and tags on desktop, below content on mobile
-
+- [Markdown Pipeline](/wiki/blog-architecture/markdown-pipeline.html) — Remark chain, frontmatter field reference
 
 ## Hosting
 

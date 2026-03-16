@@ -6,7 +6,7 @@ keywords:
   - agent-roles
   - invocation
 related:
-  - wiki/projects/agent-team
+  - wiki/agent-team
   - wiki/history
 scope: "Canonical org chart: who reports to whom, invocation commands, and role summaries."
 last_verified: 2026-03-13
