@@ -26,7 +26,7 @@ Custom K8s controller that watches `AgentTask` CRDs and creates Jobs
 to run AI agents. Lives in `infra/agent-controller/`.
 
 Primary use case: daily AI news digest written to the wiki journal
-by the `journalist` agent at 11:20am ET (15:20 UTC).
+by the `journalist` agent at 8am ET (12:00 UTC).
 
 ## Architecture
 
@@ -54,7 +54,7 @@ spec:
   agent: journalist
   runtime: claude
   prompt: "Search for yesterday's AI news..."
-  schedule: "20 15 * * *"    # cron in UTC
+  schedule: "0 12 * * *"     # cron in UTC (8am ET)
   trigger: scheduled          # scheduled | manual | webhook
   readOnly: false
   allowedTools: "WebSearch,WebFetch,Read,Write,Bash(git commit *)"
