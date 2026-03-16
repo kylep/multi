@@ -33,3 +33,7 @@ used and links to the individual provider reports.
   Three reports on suppressing AI writing tells and matching a
   specific author voice (tell taxonomy, prompt strategies, reviewer
   prompts). March 2026.
+- [AI-Augmented PRDs and AI-Native SDLC](/wiki/research/ai-augmented-prds.html) —
+  Three reports on PRD template structure, AI-augmented workflows,
+  acceptance criteria, failure modes, and AI-native development
+  lifecycles. March 2026.

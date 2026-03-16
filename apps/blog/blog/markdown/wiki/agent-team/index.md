@@ -1,6 +1,6 @@
 ---
 title: "Agent Team"
-summary: "AI agent team with 8 roles defined in .claude/agents/."
+summary: "AI agent team with 9 roles defined in .claude/agents/."
 keywords:
   - agent-team
   - ai-agents
@@ -12,13 +12,14 @@ keywords:
   - analyst
   - journalist
   - synthesizer
+  - prd-writer
 related:
   - wiki/history
 scope: "Source of truth for the agent team: roles, models, tools, coordination, and invocation."
-last_verified: 2026-03-15
+last_verified: 2026-03-16
 ---
 
-Eight Claude Code agents defined in `.claude/agents/`.
+Nine Claude Code agents defined in `.claude/agents/`.
 
 ## Roles
 
@@ -27,6 +28,7 @@ Eight Claude Code agents defined in `.claude/agents/`.
 | [Publisher](/wiki/agent-team/publisher.html) | Opus | Read, Write, Edit, Bash, Glob, Grep, Agent | Orchestrate content pipeline, write blog posts |
 | [Analyst](/wiki/agent-team/analyst.html) | Opus | Read, Glob, Grep, WebSearch, WebFetch | Ingest research, validate claims, propose system improvements |
 | [Synthesizer](/wiki/agent-team/synthesizer.html) | Opus | Read, Edit, Glob, Grep, Agent | Compare and contrast Deep Research reports |
+| [PRD Writer](/wiki/agent-team/prd-writer.html) | Opus | Read, Write, Edit, Glob, Grep, WebSearch, WebFetch, Agent | Interview, research, write PRDs |
 | [Journalist](/wiki/agent-team/journalist.html) | Haiku | Read, Write, Bash, Glob, Grep, WebFetch, WebSearch | Daily AI news digests to wiki journal |
 | [Researcher](/wiki/agent-team/researcher.html) | Sonnet | Read, Glob, Grep, WebFetch, WebSearch | Gather sourced facts, return research brief |
 | [Reviewer](/wiki/agent-team/reviewer.html) | Opus | Read, Glob, Grep | Check style, substance, frontmatter, sourcing |
@@ -35,9 +37,9 @@ Eight Claude Code agents defined in `.claude/agents/`.
 
 ## Top-level vs subagent
 
-Publisher, Analyst, Synthesizer, and Journalist are invoked directly.
-Researcher, Reviewer, QA, and Security Auditor are subagents called
-by Publisher during its pipeline.
+Publisher, Analyst, Synthesizer, Journalist, and PRD Writer are invoked
+directly. Researcher, Reviewer, QA, and Security Auditor are subagents
+called by Publisher during its pipeline.
 
 ## Invocation
 
@@ -46,6 +48,7 @@ claude --agent publisher
 claude --agent analyst
 claude --agent synthesizer
 claude --agent journalist
+claude --agent prd-writer
 ```
 
 ## Coordination
