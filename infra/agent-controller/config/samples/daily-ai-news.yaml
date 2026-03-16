@@ -18,12 +18,13 @@ spec:
     defined in your agent instructions. Include 2-6 stories (up to
     7 only if each is genuinely unique and noteworthy). Start with
     the overview line — keep it witty, one sentence, no emojis.
-  schedule: "30 12 * * *"
+  schedule: "0 13 * * *"
   trigger: scheduled
   readOnly: false
   allowedTools: >-
-    WebSearch,WebFetch,Read,Glob,Grep,
-    Write(apps/blog/blog/markdown/wiki/journal/**),
-    Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git commit *),Bash(date *),
+    WebSearch,WebFetch,Read,Glob,Grep,Write,
+    Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/*),
+    Bash(git add apps/blog/blog/markdown/wiki/journal/*),
+    Bash(git config *),Bash(git commit *),Bash(date *),
     mcp__discord__send_message,mcp__discord__list_channels,
     mcp__google-news__search_news,mcp__google-news__top_headlines
