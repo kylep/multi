@@ -28,7 +28,6 @@ imgprompt: A cute robot crab with clocks for eyes and the
 - [Permissions with allowedTools](#permissions-with-allowedtools)
 - [Webhook: trigger on demand](#webhook-trigger-on-demand)
 - [Helm chart and deployment](#helm-chart-and-deployment)
-- [MCP servers in containers](#mcp-servers-in-containers)
 
 
 
@@ -256,33 +255,5 @@ secrets:
 repo:
   branch: kyle/blog-k8s-autonomous-agents-mvp
 ```
-
-
-## MCP servers in containers
-
-Claude Code discovers MCP servers via a `.mcp.json` config
-file. Locally, this file points to paths on my Mac. In a
-container, those paths don't exist.
-
-The controller writes a container-specific MCP config to
-`/tmp/mcp.json` before each run and passes `--mcp-config`:
-
-```go
-mcpConfig := `printf '{"mcpServers":{"discord":{
-  "type":"stdio","command":"python3",
-  "args":["apps/mcp-servers/discord/server.py"]
-}}}' > /tmp/mcp.json`
-
-cmd := fmt.Sprintf(
-    `%s && claude --mcp-config /tmp/mcp.json --agent %s ...`,
-    mcpConfig, task.Spec.Agent)
-```
-
-The MCP server's Python deps (`mcp`, `httpx`) are baked into
-the runtime image. The server script itself lives in the repo,
-so it shows up after the git-sync init container pulls.
-
-The `DISCORD_BOT_TOKEN` env var is injected from the K8s
-Secret. The MCP server reads it at runtime.
 
 
