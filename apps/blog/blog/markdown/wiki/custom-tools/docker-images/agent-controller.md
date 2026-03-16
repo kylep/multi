@@ -13,7 +13,7 @@ scope: "agent-controller Docker image: build, contents, and deployment."
 last_verified: 2026-03-15
 ---
 
-**Image:** `kpericak/agent-controller:0.1`
+**Image:** `kpericak/agent-controller:0.5`
 **Source:** `infra/agent-controller/`
 **Base:** Alpine 3.21
 

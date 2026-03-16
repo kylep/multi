@@ -1,7 +1,7 @@
 controller:
   image:
     repository: kpericak/agent-controller
-    tag: "0.4"
+    tag: "0.5"
     pullPolicy: IfNotPresent
   resources:
     requests:
