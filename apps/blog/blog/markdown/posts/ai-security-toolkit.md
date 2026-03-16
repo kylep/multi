@@ -159,14 +159,15 @@ so the hooks run automatically on every commit.
   description: Scan for leaked secrets using the security toolkit image.
   entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm
     kpericak/ai-security-toolkit-1:0.2
-    -c "cd /workspace && gitleaks detect --source ."'
+    -c "cd /workspace && gitleaks protect --staged"'
   language: system
   stages: ["pre-commit", "pre-push"]
 ```
 
 The `--error` flag on semgrep makes it exit non-zero on findings,
-which blocks the commit. Gitleaks catches patterns like API keys,
-tokens, and credentials.
+which blocks the commit. Gitleaks `protect --staged` scans the
+files being committed, not git history. This catches secrets
+before they land. Use `gitleaks detect` for full repo scans.
 
 
 # Running the scans

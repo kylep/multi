@@ -289,8 +289,8 @@ repos:
         bash -c 'docker run
         -v "$(pwd):/workspace:ro" --rm
         kpericak/ai-security-toolkit-1:0.2
-        -c "cd /workspace && gitleaks detect
-        --source ."'
+        -c "cd /workspace && gitleaks protect
+        --staged"'
       language: system
       stages: ["pre-commit", "pre-push"]
 ```
