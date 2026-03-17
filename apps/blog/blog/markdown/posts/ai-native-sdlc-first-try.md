@@ -365,14 +365,13 @@ journalist agent worked fine with WebSearch. The design doc
 stopped being a static spec and started being a changelog of
 decisions made under pressure.
 
-The pipeline needs a fourth stage. PRD to design doc to code
-works for the "known" part, the work you can anticipate from a
-desk. Deployment and integration is different. It's reactive:
-something breaks, you diagnose it, you fix it, you document
-what you learned. A task breakdown doesn't help because you
-can't enumerate the tasks in advance. What helps is a runbook
-format: a checklist of verification steps, not implementation
-steps. I don't have that agent yet.
+The three-stage pipeline didn't need a fourth stage. Child
+documents under the design doc captured per-task completion
+notes and a deploy runbook. When the OOMKill bug hit, the
+TASK-001 completion note already had the memory limits I'd
+tested, so the fix was a one-line edit instead of a fresh
+investigation. The design doc earned its keep during
+deployment, not before it.
 
 
 [yien]: https://docs.google.com/document/d/1mEMDcHmtQ6twzNlpvF-9maNlAcezpWDtCnyIqWkODZs/edit

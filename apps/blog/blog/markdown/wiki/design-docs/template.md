@@ -101,9 +101,10 @@ testable in isolation. Mark parallelizable tasks with `[P]`.
 
 ## Implementation Additions
 
-Changes made during implementation that weren't in the original design.
-Add entries here when the design diverges during build-out so the doc
-stays accurate without a full rewrite.
+Scope drifts during implementation. That's expected. Document
+divergences here as they happen so the design doc stays accurate
+without a full rewrite. Each entry should state what changed and
+why the original design was wrong or incomplete.
 
 - **Addition:** What changed and why.
 
