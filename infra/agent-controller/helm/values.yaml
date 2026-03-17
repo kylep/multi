@@ -24,6 +24,9 @@ storage:
   size: 5Gi
   # hostPath for single-node Rancher Desktop
   hostPath: /tmp/agent-workspace
+  # Per-branch workspace settings (write agents get isolated PVCs)
+  branchHostPathBase: /tmp/agent-workspace/branches
+  branchSize: 5Gi
 
 secrets:
   # OpenRouter key routes Claude Code through OpenRouter
@@ -40,5 +43,9 @@ secrets:
   githubToken: ""
   # Discord #log channel ID for controller logging
   discordLogChannelId: "1483433712296398942"
+  # GitHub App credentials (PericakAI) for git push and PR creation
+  githubAppId: ""
+  githubAppPrivateKey: ""
+  githubInstallId: ""
 
 namespace: ai-agents

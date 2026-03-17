@@ -86,12 +86,12 @@ not what the agent imagines.
 
 ## Phase 3: Write
 
-It writes the PRD to the wiki using a standard template. The
+It writes the PRD to the wiki using a standard [template](/wiki/prds/template.html). The
 template has the sections that all three research reports agreed
 on: problem, goal, success metrics, non-goals, user stories with
 acceptance criteria, scope, open questions, and risks.
 
-- **Non-goals come before scope.** Kevin Yien's
+- **Non-goals come before scope.** [Kevin Yien](https://kevinyien.com/)'s
   ["perimeter of the solution space"][yien] pattern. Draw
   the boundary first, then fill it in. This
   matters more for a solo dev than a team because there's no
@@ -326,5 +326,53 @@ claude --agent design-doc-writer
 
 Or describe what you want and Claude will auto-delegate based
 on the agent's description field.
+
+
+# What happened when the design doc hit reality
+
+The task breakdown held up for the known work. TASK-001 through
+TASK-008 executed mostly as written. Dependency ordering meant
+clear starting points: validate OAuth first, build the image
+second, wire up the controller third. Each task had explicit
+acceptance criteria with checkboxes. An agent could pick up
+TASK-003 without reading the whole doc because its inputs,
+outputs, and dependencies were declared.
+
+For these eight tasks, implementation was boring. That's the
+point.
+
+TASK-009, the deployment and end-to-end test, broke the plan.
+Ten issues surfaced that the design doc couldn't have predicted:
+
+- UID 1001 in the new runtime image vs UID 1000 on the workspace
+- Helm's field manager fighting kubectl patch over secret ownership
+- The QA subagent starting `next dev` in a pod with 1.5GB
+  available, hanging until OOMKill after 37 minutes
+- An import of `RemarkMermaid.js` that worked on macOS
+  (case-insensitive) and failed on Linux (case-sensitive)
+
+These were integration bugs. The design doc told you what to
+build, not what would go wrong when you plugged it all together.
+
+The design doc became a living document during deployment. An
+"Implementation Additions" section appeared, documenting changes
+that weren't in the original plan.
+
+Per-branch PVCs replaced the shared workspace after stale state
+leaked between runs. GitHub App auth replaced the placeholder
+PAT. The google-news MCP server got dropped because the
+journalist agent worked fine with WebSearch. The design doc
+stopped being a static spec and started being a changelog of
+decisions made under pressure.
+
+The pipeline needs a fourth stage. PRD to design doc to code
+works for the "known" part, the work you can anticipate from a
+desk. Deployment and integration is different. It's reactive:
+something breaks, you diagnose it, you fix it, you document
+what you learned. A task breakdown doesn't help because you
+can't enumerate the tasks in advance. What helps is a runbook
+format: a checklist of verification steps, not implementation
+steps. I don't have that agent yet.
+
 
 [yien]: https://docs.google.com/document/d/1mEMDcHmtQ6twzNlpvF-9maNlAcezpWDtCnyIqWkODZs/edit

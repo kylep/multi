@@ -32,3 +32,25 @@ if [ "$CLAUDE_EXIT" -ne 0 ]; then
 fi
 
 echo "Publisher completed on branch $BRANCH"
+
+# Push branch and create PR if GITHUB_TOKEN is available
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  echo "Pushing branch $BRANCH to origin..."
+  git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git"
+  git push -u origin "$BRANCH"
+
+  # Extract a short title from the prompt (first 60 chars)
+  PR_TITLE="Publisher: ${PROMPT:0:60}"
+  if [ ${#PROMPT} -gt 60 ]; then
+    PR_TITLE="${PR_TITLE}..."
+  fi
+
+  echo "Creating PR..."
+  PR_URL=$(gh pr create --base main --title "$PR_TITLE" --body "Autonomous publisher run.
+
+Prompt: $PROMPT
+Branch: $BRANCH")
+  echo "PR created: $PR_URL"
+else
+  echo "GITHUB_TOKEN not set — skipping push and PR creation"
+fi

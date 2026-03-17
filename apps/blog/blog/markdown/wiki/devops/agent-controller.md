@@ -101,7 +101,8 @@ The publisher uses `apps/blog/bin/run-publisher.sh` as its entrypoint:
 1. Creates branch `agent/publisher-<timestamp>`
 2. Unsets OpenRouter env vars (prevents auth conflict with OAuth)
 3. Runs `claude --agent publisher` with stream-json output
-4. Branch stays on PVC — Kyle reviews from the filesystem
+4. On success: pushes branch, creates PR via `gh pr create`
+5. Falls back to local-only if `GITHUB_TOKEN` is not set
 
 The controller detects `agent == "publisher"` and routes to the
 entrypoint script instead of inline command construction. It also
@@ -117,11 +118,62 @@ The controller configures MCP servers per agent type:
 
 Google-news MCP server was removed — agents use WebSearch instead.
 
-## Write Serialization
+## Per-Branch PVCs
 
-Agents that modify the repo (`publisher`, `qa`, `journalist`) are
-serialized. Only one write-agent Job runs at a time. Read-only
-agents run concurrently.
+Write agents (`publisher`, `qa`, `journalist`) get dedicated PV/PVC
+pairs per job run (`agent-ws-<jobName>`) instead of sharing a single
+PVC. This eliminates stale state leakage between runs and enables
+parallel write-agent execution.
+
+- **PV/PVC name:** `agent-ws-<jobName>` (jobName = `<taskName>-<timestamp>`)
+- **hostPath:** `/tmp/agent-workspace/branches/<jobName>/`
+- **Cleanup:** controller deletes PV+PVC after job completes or fails
+- **Read-only agents** still use the shared `agent-workspace` PVC
+
+The previous `canRunWrite()` serialization was removed since
+per-branch PVCs eliminate the need for write serialization.
+
+## GitHub App Auth
+
+The `PericakAI` GitHub App (ID 3100834, installed on kylep/multi
+only) provides scoped auth for write agents. The controller:
+
+1. Generates a JWT signed with the App's private key
+2. Exchanges it for a short-lived installation token (1hr)
+3. Injects it as `GITHUB_TOKEN` on write agent pods
+
+The git-sync init container uses the token-authenticated URL for
+clone. `run-publisher.sh` uses the same token for `git push` and
+`gh pr create`.
+
+**Setup:**
+1. Get installation ID from https://github.com/settings/installations
+2. Patch secrets (see Secrets section below or use `setup.sh`)
+3. Required App permissions: Contents (R/W) + Pull requests (R/W)
+4. Create branch protection ruleset on main (prevent direct pushes)
+
+## Setup from Scratch
+
+Use the bootstrap script to deploy from a fresh cluster:
+
+```bash
+# 1. Copy and populate secrets
+cp secrets/export-agent-controller.sh.SAMPLE secrets/export-agent-controller.sh
+# edit the file, fill in values
+
+# 2. Run setup (optionally build images first)
+infra/agent-controller/bin/setup.sh --build-images
+
+# Or without building images (if they're already pushed):
+infra/agent-controller/bin/setup.sh
+```
+
+**Prerequisites:** kubectl, helm, docker on PATH; cluster reachable
+via `kubectl cluster-info`.
+
+The script handles namespace creation, helm install, and secret
+patching. See `secrets/export-agent-controller.sh.SAMPLE` for the
+full list of required env vars.
 
 ## Webhook
 
@@ -195,11 +247,14 @@ helm upgrade agent-controller infra/agent-controller/helm/ \
 # Then re-patch secrets as above
 ```
 
-## Shared Volume
+## Workspace Volumes
 
-All agent Jobs mount the same PVC at `/workspace`. The init container
-runs `git fetch` + `git reset --hard origin/<branch>` before each
-run, then `chown -R 1001:1001 /workspace/repo`.
+Write agents get per-branch PVCs (see above). Read-only agents share
+a single `agent-workspace` PVC at `/workspace`.
+
+The init container runs `git clone` (per-branch) or `git fetch` +
+`git reset --hard` (shared) before each run, then
+`chown -R 1001:1001 /workspace/repo`.
 
 **UID 1001:** The Playwright-based runtime image runs as `pwuser`
 (UID 1001). All agents use this UID regardless of type.

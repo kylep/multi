@@ -70,7 +70,20 @@ func main() {
 		log.Println("Discord logging enabled")
 	}
 
-	ctrl := controller.New(clientset, crdClient, namespace, runtimeImage, disc)
+	branchHostPath := os.Getenv("BRANCH_HOSTPATH_BASE")
+	if branchHostPath == "" {
+		branchHostPath = "/tmp/agent-workspace/branches"
+	}
+	branchPVCSize := os.Getenv("BRANCH_PVC_SIZE")
+	if branchPVCSize == "" {
+		branchPVCSize = "5Gi"
+	}
+
+	githubAppID := os.Getenv("GITHUB_APP_ID")
+	githubInstallID := os.Getenv("GITHUB_INSTALL_ID")
+	githubAppKey := []byte(os.Getenv("GITHUB_APP_PRIVATE_KEY"))
+
+	ctrl := controller.New(clientset, crdClient, namespace, runtimeImage, disc, branchHostPath, branchPVCSize, githubAppID, githubInstallID, githubAppKey)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

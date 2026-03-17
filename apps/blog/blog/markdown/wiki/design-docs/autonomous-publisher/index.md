@@ -47,7 +47,8 @@ glibc, and the current `node:22-alpine` base uses musl.
 
 - No auto-merge or production deployment (Kyle reviews and merges)
 - No auto-topic selection (Kyle triggers manually in v1)
-- No multi-pipeline concurrency (existing write-serialization remains)
+- No multi-pipeline concurrency in v1 (per-branch PVCs enable it but
+  not yet tested with concurrent runs)
 - No OpenRouter fallback -- commit fully to Max auth
 - No database migration or new CRD fields beyond what exists
 - No cloud K8s migration (stays on local Rancher Desktop)
@@ -76,7 +77,7 @@ graph TD
             CC -->|MCP| DISC[Discord Notification]
         end
 
-        JOB --> PVC[(Shared PVC<br/>/workspace)]
+        JOB --> PVC[(Per-Branch PVC<br/>/workspace)]
         NP[NetworkPolicy] -.->|allow non-RFC1918<br/>block LAN| JOB
     end
 
@@ -145,6 +146,13 @@ OAuth token injection, and `gh` CLI auth.
 - Job pod spec adds `/dev/shm` emptyDir volume (required for Chromium)
 - Job pod spec adds `--init` equivalent via `shareProcessNamespace`
   or a proper init process
+- Per-branch PVC lifecycle: write agents get isolated PV/PVC pairs
+  (`createBranchPVC`), cleaned up after job completion
+  (`cleanupBranchPVCs`). Read-only agents continue using the shared PVC.
+- `canRunWrite()` serialization removed — per-branch PVCs eliminate
+  the need for write serialization
+- GitHub App installation token generation (`getInstallationToken`)
+  provides scoped auth for git push and PR creation
 
 #### 4. Secret Changes
 
@@ -281,6 +289,22 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 | Entrypoint script in repo (`bin/run-publisher.sh`) | Logic lives in repo (not Go or agent def), easy to iterate, handles git + PR + notification in one place | Extra file to maintain | **Chosen** -- Kyle's preference. Keeps controller simple, keeps agent definition unchanged. |
 | Controller creates branch in Go | Centralized, works for any agent | Couples controller to git branching, Go code bloat | Rejected -- controller should stay generic |
 | Agent creates branch | No new scripts | Agent definition would need git-specific instructions that diverge from interactive use | Rejected -- divergent behavior between interactive and autonomous |
+
+### Decision: Branch workspace isolation
+
+| Option | Pros | Cons | Verdict |
+|--------|------|------|---------|
+| Per-branch PV/PVC (hostPath) | Full isolation between runs, enables parallelism, no stale state leakage, cleanup is simple (delete PV+PVC) | More PV/PVC churn, controller manages lifecycle | **Chosen** -- OOMKill from parallel resource contention and stale state leaking between runs motivated the switch. `/tmp` is ephemeral on Rancher Desktop so no manual hostPath cleanup needed. |
+| Shared PVC with write serialization | Simple, already implemented | Prevents parallelism, stale state leaks between runs, caused OOMKill when two agents competed for resources | Rejected -- was the v1 approach but caused real problems |
+| emptyDir per pod | Zero PV management, automatic cleanup | Data lost immediately on pod termination (can't inspect failed runs), size limited by node tmpfs | Rejected -- need to inspect workspace after failures for debugging |
+
+### Decision: GitHub auth for agent push/PR
+
+| Option | Pros | Cons | Verdict |
+|--------|------|------|---------|
+| GitHub App installation tokens | Scoped to specific repo, short-lived (1hr), no PAT to rotate, branch protection respected | Requires JWT generation in controller, needs App setup | **Chosen** -- installation tokens are scoped to kylep/multi only, expire in 1hr, and branch protection prevents direct pushes to main |
+| Personal Access Token (PAT) | Simple, already partially implemented | Long-lived, broad scope, must rotate manually | Rejected -- too broad for autonomous agents |
+| Deploy keys | Repo-scoped | Write deploy keys can push to any branch including main, no PR creation | Rejected -- no branch protection enforcement |
 
 ### Decision: QA verification in container
 
@@ -445,6 +469,42 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
   - [ ] Journalist agent still works (regression test)
   - [ ] Network policy is active (verify with curl test from debug pod)
 
+### TASK-011: Per-branch PVCs for write agents
+
+- **Requirement:** Eliminate stale state leakage and enable parallel runs
+- **Files:** `infra/agent-controller/pkg/controller/controller.go`,
+  `infra/agent-controller/main.go`,
+  `infra/agent-controller/helm/templates/rbac.yaml`,
+  `infra/agent-controller/helm/templates/deployment.yaml`,
+  `infra/agent-controller/helm/values.yaml`
+- **Dependencies:** TASK-009
+- **Acceptance criteria:**
+  - [ ] Write agents get dedicated PV/PVC (`agent-ws-<jobName>`)
+  - [ ] Read-only agents continue using shared `agent-workspace` PVC
+  - [ ] `canRunWrite()` serialization removed
+  - [ ] PV/PVC cleaned up after job completes or fails
+  - [ ] RBAC includes PVC verbs (namespaced) and PV ClusterRole (cluster-scoped)
+  - [ ] Two simultaneous publisher runs both start (not serialized)
+  - [ ] `go build` and `helm template` pass
+
+### TASK-012: GitHub App auth for git push and PR creation
+
+- **Requirement:** Agents push branches and create PRs autonomously
+- **Files:** `infra/agent-controller/pkg/controller/controller.go`,
+  `infra/agent-controller/main.go`,
+  `infra/agent-controller/helm/templates/secret.yaml`,
+  `infra/agent-controller/helm/templates/deployment.yaml`,
+  `infra/agent-controller/helm/values.yaml`,
+  `apps/blog/bin/run-publisher.sh`
+- **Dependencies:** TASK-011, GitHub App setup (manual)
+- **Acceptance criteria:**
+  - [ ] Controller generates JWT and exchanges for installation token
+  - [ ] `GITHUB_TOKEN` injected into write agent pods
+  - [ ] git-sync uses token-authenticated URL for clone
+  - [ ] `run-publisher.sh` pushes branch and creates PR
+  - [ ] Branch protection prevents direct push to main
+  - [ ] Secrets template includes `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_INSTALL_ID`
+
 ### TASK-010: Update wiki documentation
 
 - **Requirement:** PRD acceptance criterion "documented procedure to
@@ -481,6 +541,23 @@ Changes made during TASK-009 deployment that weren't in the original design.
   and on job completion/failure. Uses the Discord bot API directly from
   Go, not MCP.
 
+- **Per-branch PVCs for write agents.** The shared PVC caused two
+  problems: stale state leaking between runs (git worktree artifacts,
+  node_modules from previous runs) and OOMKill when parallel resource
+  contention occurred. Write agents now get isolated PV/PVC pairs
+  (`agent-ws-<jobName>`) with hostPath under
+  `/tmp/agent-workspace/branches/`. Read-only agents keep the shared PVC.
+  The `canRunWrite()` serialization was removed since per-branch PVCs
+  eliminate the need for write serialization.
+
+- **GitHub App auth for git push and PR creation.** The `PericakAI`
+  GitHub App (ID 3100834, installed on kylep/multi only) provides
+  scoped auth. The controller generates a JWT, exchanges it for a
+  short-lived installation token (1hr), and injects it as
+  `GITHUB_TOKEN` on write agent pods. `run-publisher.sh` uses this
+  token for `git push` and `gh pr create`. Branch protection on main
+  prevents direct pushes — agents can only create branches and PRs.
+
 - **Switched `--output-format text` to `--output-format stream-json`.**
   Enables streaming structured output to pod logs for real-time
   monitoring via `kubectl logs -f`.
@@ -489,6 +566,24 @@ Changes made during TASK-009 deployment that weren't in the original design.
   that Claude Code in headless mode (`-p` flag) blocks all tool use
   unless `--allowedTools` is explicitly passed. The journalist CRD
   already had this; webhook-triggered tasks must include it too.
+
+## Portability
+
+The agent controller now has a reproducible setup path:
+
+- **`secrets/export-agent-controller.sh.SAMPLE`** lists every env var
+  the controller needs, with comments on where to get each value.
+- **`infra/agent-controller/bin/setup.sh`** bootstraps from scratch:
+  checks prereqs, sources secrets, runs helm install, patches the K8s
+  secret. Optional `--build-images` flag builds and pushes both Docker
+  images first.
+
+What's automated: namespace creation, helm install/upgrade, secret
+patching (including base64-encoding the PEM key).
+
+What's manual: populating the exports file, GitHub App setup
+(creating the App, noting the install ID), and branch protection
+rulesets on main.
 
 ## Open Questions
 

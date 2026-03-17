@@ -6,6 +6,10 @@ date: 2026-03-17
 
 # TASK-009: Build, Deploy, and End-to-End Test
 
+**For fresh installs**, use `infra/agent-controller/bin/setup.sh`
+instead of following this runbook manually. See the
+[design doc portability section](index.md#portability).
+
 Status: **In progress** — publisher running with full observability
 
 ## What was deployed
@@ -128,6 +132,39 @@ case-sensitive and the build fails with "Module not found."
    to Discord #log (Write, Edit, Bash, Agent, MCP)
 4. **30-min activeDeadlineSeconds:** Hard ceiling on all jobs
 
+## Per-branch PVCs (TASK-011)
+
+Write agents (publisher, qa, journalist) now get dedicated PV/PVC pairs
+instead of the shared `agent-workspace` PVC. This eliminates stale state
+leakage between runs and removes the `canRunWrite()` serialization that
+prevented parallel runs.
+
+- PV/PVC name: `agent-ws-<jobName>` (jobName is `<taskName>-<timestamp>`)
+- hostPath: `/tmp/agent-workspace/branches/<jobName>/`
+- Cleanup: controller deletes PV+PVC after job completes or fails
+- Read-only agents still use the shared `agent-workspace` PVC
+
+RBAC changes: PVC verbs added to namespaced Role, new ClusterRole +
+ClusterRoleBinding for cluster-scoped PV management.
+
+## GitHub App auth (TASK-012)
+
+The `PericakAI` GitHub App provides scoped git auth for write agents.
+The controller generates a JWT signed with the App's private key,
+exchanges it for a short-lived installation token (1hr), and injects
+it as `GITHUB_TOKEN` on write agent pods.
+
+Setup steps:
+1. Patch secrets with App credentials:
+   ```bash
+   kubectl -n ai-agents patch secret agent-secrets --type merge -p \
+     "{\"data\":{\"GITHUB_APP_PRIVATE_KEY\":\"$(base64 < secrets/pericakai.private-key.pem)\",\"GITHUB_APP_ID\":\"$(echo -n 3100834 | base64)\",\"GITHUB_INSTALL_ID\":\"$(echo -n <INSTALL_ID> | base64)\"}}"
+   ```
+2. Get installation ID: check https://github.com/settings/installations
+   and note the ID from the URL.
+3. Verify App permissions: Contents (R/W) + Pull requests (R/W)
+4. Create branch protection ruleset on main (prevent App from pushing directly)
+
 ## Verification checklist
 
 - [x] Runtime image 0.4 built and pushed
@@ -140,3 +177,7 @@ case-sensitive and the build fails with "Module not found."
 - [ ] Blog post written on branch
 - [ ] Claude.ai usage dashboard shows Max billing
 - [ ] Network policy verified
+- [ ] Per-branch PVC created for write agent run
+- [ ] PVC cleaned up after job completion
+- [ ] Branch pushed to GitHub via App token
+- [ ] PR created automatically
