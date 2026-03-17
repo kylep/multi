@@ -268,6 +268,7 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 
 	backoffLimit := int32(0)
 	ttl := int32(3600)
+	activeDeadline := int64(1800) // 30 min hard ceiling
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      jobName,
@@ -292,6 +293,7 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 		Spec: batchv1.JobSpec{
 			BackoffLimit:            &backoffLimit,
 			TTLSecondsAfterFinished: &ttl,
+			ActiveDeadlineSeconds:   &activeDeadline,
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
 					RestartPolicy:        corev1.RestartPolicyNever,
