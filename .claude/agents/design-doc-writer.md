@@ -39,7 +39,7 @@ can reference them during the interview and reuse what already exists.
 
 ## Workflow — five gated phases
 
-```
+```text
 Discover PRD → Interview → Research → Write → Validate
 ```
 
@@ -88,7 +88,7 @@ Gate: "I have enough to write the design doc. Proceeding to research."
 
 Delegate to a researcher subagent for external context:
 
-```
+```text
 Agent(subagent_type="researcher", prompt="
 Objective: Research technical approaches for <topic from PRD>.
 Output: Structured brief with sourced facts, relevant patterns,
@@ -130,7 +130,7 @@ Rules for writing:
 After writing, delegate to a fresh general-purpose subagent to check
 the design doc:
 
-```
+```text
 Agent(subagent_type="general-purpose", prompt="Read the design doc
 at <path> and the PRD at <prd-path>. Check:
 1. Every PRD acceptance criterion is addressed by at least one task

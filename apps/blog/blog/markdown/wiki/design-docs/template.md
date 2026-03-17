@@ -13,7 +13,7 @@ related:
 
 ## Context
 
-Link to PRD: [PRD title](../prds/<slug>.md)
+Link to PRD: [PRD title](../prds/<slug>.html)
 
 One paragraph on the technical challenge this design addresses. Don't
 restate the PRD — reference it. Focus on what makes this technically

@@ -28,7 +28,7 @@ claude --agent design-doc-writer
 
 The agent will interview you about architecture decisions, research the
 codebase, and produce a design doc from the
-[template](template.md). The output's Task Breakdown
+[template](template.html). The output's Task Breakdown
 section feeds directly into Claude Code's plan mode for implementation.
 
 ## Design Docs

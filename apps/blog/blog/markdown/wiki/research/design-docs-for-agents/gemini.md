@@ -114,7 +114,7 @@ By documenting these rationale, engineers create a "Compressed Decision Record" 
 While an RFC is a proposal for change, an Architecture Decision Record (ADR) is the final documentation of what was decided and why.25 ADRs are lightweight, text-based documents stored in the repository that fill the gap between high-level architecture docs and low-level designs.26 AI agents are now capable of automatically generating these ADRs by scanning a codebase for architectural shifts, ensuring that the "why" behind a change is captured while the context is still fresh.27
 An ADR template for agents typically includes:
 
-* **Status**: Draft, Accepted, Superceded, or Rejected.26
+* **Status**: Draft, Accepted, Superseded, or Rejected.26
 * **Kernel of Truth**: A short, one-sentence summary of the decision.26
 * **Consequences**: The documented impact of the decision on future maintenance.27
 * **Guardrails**: Explicit instructions for the agent (e.g., "References MUST exist—check each link").26

@@ -35,7 +35,7 @@ interview and avoid proposing something that duplicates existing work.
 
 ## Workflow — four gated phases
 
-```
+```text
 Interview → Research → Write → Validate
 ```
 
@@ -74,7 +74,7 @@ Gate: When you have enough to write the PRD, say explicitly:
 
 Delegate to a researcher subagent to gather facts on the problem space:
 
-```
+```text
 Agent(subagent_type="researcher", prompt="<specific research brief>")
 ```
 
@@ -106,7 +106,7 @@ Rules for writing:
 After writing, delegate to a fresh subagent to check the PRD
 against the interview answers:
 
-```
+```text
 Agent(subagent_type="general-purpose", prompt="Read the PRD
 at <path>. Check: (1) every acceptance criterion is testable,
 (2) non-goals actually exclude something, (3) no implementation
