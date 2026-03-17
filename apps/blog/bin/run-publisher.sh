@@ -3,7 +3,7 @@ set -euo pipefail
 
 PROMPT="${1:?Usage: run-publisher.sh '<prompt>'}"
 BRANCH="agent/publisher-$(date +%s)"
-MAX_IDLE=120  # Kill if no output for 2 minutes (likely permission prompt)
+MAX_IDLE=600  # Kill if no output for 10 minutes (subagent calls can take several minutes)
 
 # Validate required env vars
 : "${CLAUDE_CODE_OAUTH_TOKEN:?CLAUDE_CODE_OAUTH_TOKEN is required}"
