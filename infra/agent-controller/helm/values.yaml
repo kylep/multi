@@ -14,7 +14,7 @@ controller:
 runtime:
   image:
     repository: kpericak/ai-agent-runtime
-    tag: "0.3"
+    tag: "0.4"
 
 repo:
   url: "https://github.com/kylep/multi.git"

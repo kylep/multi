@@ -23,7 +23,7 @@ unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN ANTHROPIC_BASE_URL
 # the hard ceiling. Permission prompts are visible in the stream as
 # "type":"permission_request" events.
 claude --mcp-config /tmp/mcp.json --agent publisher \
-  -p "$PROMPT" --output-format stream-json --verbose 2>&1
+  -p "$PROMPT" --output-format stream-json --verbose --include-partial-messages 2>&1
 CLAUDE_EXIT=$?
 
 if [ "$CLAUDE_EXIT" -ne 0 ]; then

@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     bash \
     curl \
+    jq \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
@@ -32,9 +33,12 @@ RUN curl -fsSL "https://github.com/opencode-ai/opencode/releases/download/v${OPE
 # Use pwuser (UID 1000) from Playwright base image
 RUN mkdir -p /workspace && chown pwuser:pwuser /workspace
 
-# Bake in onboarding bypass for headless Claude Code execution
-RUN mkdir -p /home/pwuser/.claude && \
-    echo '{"hasCompletedOnboarding":true}' > /home/pwuser/.claude.json && \
+# Bake in onboarding bypass, hook scripts, and permissions for headless execution
+RUN mkdir -p /home/pwuser/.claude/hooks && \
+    echo '{"hasCompletedOnboarding":true}' > /home/pwuser/.claude.json
+COPY hooks/discord-log.sh /home/pwuser/.claude/hooks/discord-log.sh
+COPY claude-settings.json /home/pwuser/.claude/settings.json
+RUN chmod +x /home/pwuser/.claude/hooks/discord-log.sh && \
     chown -R pwuser:pwuser /home/pwuser/.claude /home/pwuser/.claude.json
 
 WORKDIR /workspace

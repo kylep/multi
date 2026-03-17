@@ -62,7 +62,7 @@ func main() {
 
 	runtimeImage := os.Getenv("RUNTIME_IMAGE")
 	if runtimeImage == "" {
-		runtimeImage = "kpericak/ai-agent-runtime:0.3"
+		runtimeImage = "kpericak/ai-agent-runtime:0.4"
 	}
 
 	disc := discord.New(os.Getenv("DISCORD_BOT_TOKEN"), os.Getenv("DISCORD_LOG_CHANNEL_ID"))
