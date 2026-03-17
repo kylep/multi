@@ -26,7 +26,7 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # Allow HTTP/HTTPS to non-RFC1918 addresses
+    # Allow HTTP/HTTPS to non-RFC1918 and non-link-local addresses
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
@@ -34,6 +34,7 @@ spec:
               - 10.0.0.0/8
               - 172.16.0.0/12
               - 192.168.0.0/16
+              - 169.254.0.0/16
       ports:
         - protocol: TCP
           port: 80

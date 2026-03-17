@@ -15,7 +15,7 @@ related:
 
 ## Context
 
-Link to PRD: [Autonomous Publisher Pipeline](../prds/autonomous-publisher.md)
+Link to PRD: [Autonomous Publisher Pipeline](../../prds/autonomous-publisher.md)
 
 The publisher pipeline (research, write, review, QA, security audit) has
 only ever run interactively on Kyle's MacBook. Moving it to K8s requires
@@ -89,7 +89,7 @@ graph TD
 
 ### Component Details
 
-#### 1. Runtime Image (`ai-agent-runtime:0.3`)
+#### 1. Runtime Image (`ai-agent-runtime:0.4`)
 
 **Responsibility:** Provide Claude Code CLI, Playwright, Chromium, and
 all MCP server dependencies in a single image.

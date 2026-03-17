@@ -18,7 +18,7 @@ invocation, git push, PR creation, and Discord notification.
 
 ## Script flow
 
-1. Validate `CLAUDE_CODE_OAUTH_TOKEN` and `GITHUB_TOKEN` env vars
+1. Validate `CLAUDE_CODE_OAUTH_TOKEN` (required); `GITHUB_TOKEN` is optional — skips push and PR if unset
 2. Set git identity (`publisher-agent`) if not already configured
 3. Create branch `agent/publisher-$(date +%s)`
 4. Unset `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_BASE_URL`

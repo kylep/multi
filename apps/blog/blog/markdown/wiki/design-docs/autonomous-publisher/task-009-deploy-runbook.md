@@ -158,7 +158,7 @@ Setup steps:
 1. Patch secrets with App credentials:
    ```bash
    kubectl -n ai-agents patch secret agent-secrets --type merge -p \
-     "{\"data\":{\"GITHUB_APP_PRIVATE_KEY\":\"$(base64 < secrets/pericakai.private-key.pem)\",\"GITHUB_APP_ID\":\"$(echo -n 3100834 | base64)\",\"GITHUB_INSTALL_ID\":\"$(echo -n <INSTALL_ID> | base64)\"}}"
+     "{\"data\":{\"GITHUB_APP_PRIVATE_KEY\":\"$(base64 -w 0 < secrets/pericakai.private-key.pem)\",\"GITHUB_APP_ID\":\"$(echo -n 3100834 | base64 -w 0)\",\"GITHUB_INSTALL_ID\":\"$(echo -n <INSTALL_ID> | base64 -w 0)\"}}"
    ```
 2. Get installation ID: check https://github.com/settings/installations
    and note the ID from the URL.

@@ -139,7 +139,7 @@ The `PericakAI` GitHub App (ID 3100834, installed on kylep/multi
 only) provides scoped auth for write agents. The controller:
 
 1. Generates a JWT signed with the App's private key
-2. Exchanges it for a short-lived installation token (1hr)
+2. Exchanges it for a short-lived installation token (1 hour)
 3. Injects it as `GITHUB_TOKEN` on write agent pods
 
 The git-sync init container uses the token-authenticated URL for

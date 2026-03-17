@@ -364,7 +364,8 @@ func (c *Controller) getInstallationToken() (string, error) {
 	req.Header.Set("Authorization", "Bearer "+jwt)
 	req.Header.Set("Accept", "application/vnd.github+json")
 
-	resp, err := http.DefaultClient.Do(req)
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("requesting installation token: %w", err)
 	}
@@ -524,7 +525,7 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 					InitContainers: []corev1.Container{
 						{
 							Name:    "git-sync",
-							Image:   "alpine/git:latest",
+							Image:   "alpine/git:v2.52.0",
 							Command: []string{"sh", "-c"},
 							Args:    []string{gitSyncArgs},
 							EnvFrom: []corev1.EnvFromSource{
