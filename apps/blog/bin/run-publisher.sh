@@ -25,7 +25,7 @@ PIPE=$(mktemp -u)
 mkfifo "$PIPE"
 
 claude --mcp-config /tmp/mcp.json --agent publisher \
-  -p "$PROMPT" --output-format stream-json > "$PIPE" 2>&1 &
+  -p "$PROMPT" --output-format stream-json --verbose > "$PIPE" 2>&1 &
 CLAUDE_PID=$!
 
 LAST_OUTPUT=$SECONDS

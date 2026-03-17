@@ -390,7 +390,7 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 		// Default: journalist and other agents
 		// Discord MCP for posting notifications; agents use WebSearch for news lookup.
 		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
-		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json`, mcpConfig, escapedAgent, escapedPrompt)
+		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json --verbose`, mcpConfig, escapedAgent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
 			tools := strings.Split(task.Spec.AllowedTools, ",")
 			for _, tool := range tools {
