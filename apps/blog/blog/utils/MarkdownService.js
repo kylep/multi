@@ -7,7 +7,7 @@ import remarkHtml from 'remark-html'
 import remarkToc from 'remark-toc';
 // GitHub Flavored Markdown: autolink literals, footnotes, strikethrough, tables, tasklists
 import remarkGfm from 'remark-gfm';
-import remarkMermaidToHtml from './RemarkMermaid.js';
+import remarkMermaidToHtml from './remarkMermaid.js';
 import { visit } from 'unist-util-visit';
 import { toString as mdastToString } from 'mdast-util-to-string';
 import GithubSlugger from 'github-slugger';
