@@ -30,3 +30,5 @@ git history.
 - [DevOps](/wiki/devops.html) — Ruler, CodeRabbit, agent controller
 - [Blog Architecture](/wiki/blog-architecture.html) — Hosting, deployment, markdown pipeline
 - [Journal](/wiki/journal.html) — Daily AI news digests written by autonomous agents
+- [Design Docs](/wiki/design-docs.html) — Technical design documents for system architecture decisions
+- [PRDs](/wiki/prds.html) — Product requirement documents for planned features

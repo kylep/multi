@@ -52,6 +52,7 @@ const AGENT_SUBJECTS = {
   reviewer:         'a hawk with piercing eyes, perched with a red pen in its talon',
   qa:               'a beaver with square teeth, building with tiny blocks',
   'security-auditor': 'a pangolin curled into a defensive ball, with a small shield emblem',
+  'prd-writer':       'a bowerbird arranging colorful geometric objects into a precise pattern',
 };
 
 function buildPrompt(agentName) {

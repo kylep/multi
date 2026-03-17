@@ -56,6 +56,7 @@ accent colors. The animals are chosen to reflect each agent's role.
 | Publisher | Lion | Authority, leadership, commanding presence |
 | Analyst | Fox | Curiosity, sharp analysis, cunning |
 | Synthesizer | Octopus | Multi-armed, connects many sources at once |
+| PRD Writer | Bowerbird | Builds elaborate, purposeful structures to align |
 | Researcher | Bloodhound | Relentless pursuit, nose for details |
 | Reviewer | Hawk | Piercing eye, catches what others miss |
 | QA | Beaver | Meticulous builder, structural integrity |
