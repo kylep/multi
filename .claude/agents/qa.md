@@ -43,11 +43,20 @@ failure.
 
 ### 3. Dev server and visual render
 
-Start the dev server if it isn't already running:
+Start a server if one isn't already running. Choose based on environment:
 
-```bash
-cd apps/blog && bin/start-dev-bg.sh
-```
+- **Container / headless** (no display, e.g. K8s pod): build static files
+  and serve with python — `next dev` is too heavy and will OOM:
+  ```bash
+  cd apps/blog && bin/start-static-server.sh
+  ```
+- **Local / dev machine**: use the Next.js dev server:
+  ```bash
+  cd apps/blog && bin/start-dev-bg.sh
+  ```
+
+If you're unsure which environment you're in, check for `/workspace/repo`
+(container) or try `start-static-server.sh` first — it works everywhere.
 
 Navigate to the post in Playwright using the post's slug:
 `http://localhost:3000/<slug>.html`

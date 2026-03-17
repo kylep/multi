@@ -13,6 +13,7 @@ import (
 
 	"github.com/kylep/multi/infra/agent-controller/pkg/controller"
 	"github.com/kylep/multi/infra/agent-controller/pkg/crd"
+	"github.com/kylep/multi/infra/agent-controller/pkg/discord"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -61,10 +62,28 @@ func main() {
 
 	runtimeImage := os.Getenv("RUNTIME_IMAGE")
 	if runtimeImage == "" {
-		runtimeImage = "kpericak/ai-agent-runtime:0.1"
+		runtimeImage = "kpericak/ai-agent-runtime:0.4"
 	}
 
-	ctrl := controller.New(clientset, crdClient, namespace, runtimeImage)
+	disc := discord.New(os.Getenv("DISCORD_BOT_TOKEN"), os.Getenv("DISCORD_LOG_CHANNEL_ID"))
+	if disc.Enabled() {
+		log.Println("Discord logging enabled")
+	}
+
+	branchHostPath := os.Getenv("BRANCH_HOSTPATH_BASE")
+	if branchHostPath == "" {
+		branchHostPath = "/tmp/agent-workspace/branches"
+	}
+	branchPVCSize := os.Getenv("BRANCH_PVC_SIZE")
+	if branchPVCSize == "" {
+		branchPVCSize = "5Gi"
+	}
+
+	githubAppID := os.Getenv("GITHUB_APP_ID")
+	githubInstallID := os.Getenv("GITHUB_INSTALL_ID")
+	githubAppKey := []byte(os.Getenv("GITHUB_APP_PRIVATE_KEY"))
+
+	ctrl := controller.New(clientset, crdClient, namespace, runtimeImage, disc, branchHostPath, branchPVCSize, githubAppID, githubInstallID, githubAppKey)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

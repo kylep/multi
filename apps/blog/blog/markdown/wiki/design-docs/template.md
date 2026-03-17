@@ -99,6 +99,15 @@ testable in isolation. Mark parallelizable tasks with `[P]`.
 - **Acceptance criteria:**
   - [ ] Specific, testable condition
 
+## Implementation Additions
+
+Scope drifts during implementation. That's expected. Document
+divergences here as they happen so the design doc stays accurate
+without a full rewrite. Each entry should state what changed and
+why the original design was wrong or incomplete.
+
+- **Addition:** What changed and why.
+
 ## Open Questions
 
 Unresolved items. State what blocks on each.

@@ -9,6 +9,7 @@ tags: AI-Agents, SDLC, Product-Management, PRD, design-docs, Claude-Code
 date: 2026-03-16
 status: published
 image: ai-native-sdlc-first-try.png
+thumbnail: ai-native-sdlc-first-try-thumb.png
 imgprompt: "a telescope on the left zooming into a star, connected
   by a dotted line to a microscope on the right examining a circuit
   board, flat minimal vector style, dark charcoal background with
@@ -85,12 +86,12 @@ not what the agent imagines.
 
 ## Phase 3: Write
 
-It writes the PRD to the wiki using a standard template. The
+It writes the PRD to the wiki using a standard [template](/wiki/prds/template.html). The
 template has the sections that all three research reports agreed
 on: problem, goal, success metrics, non-goals, user stories with
 acceptance criteria, scope, open questions, and risks.
 
-- **Non-goals come before scope.** Kevin Yien's
+- **Non-goals come before scope.** [Kevin Yien](https://kevinyien.com/)'s
   ["perimeter of the solution space"][yien] pattern. Draw
   the boundary first, then fill it in. This
   matters more for a solo dev than a team because there's no
@@ -327,32 +328,50 @@ Or describe what you want and Claude will auto-delegate based
 on the agent's description field.
 
 
-# What's unproven
+# What happened when the design doc hit reality
 
-The Design Doc Writer was built today. It hasn't produced a
-real design doc for a real project yet. The template and
-workflow are informed by three Deep Research reports
-([synthesis](/wiki/research/design-docs-for-agents.html)) and
-practitioner accounts, but whether the Task Breakdown format
-actually improves Claude Code's implementation quality
-compared to a less structured prompt is an untested
-hypothesis.
+The task breakdown held up for the known work. TASK-001 through
+TASK-008 executed mostly as written. Dependency ordering meant
+clear starting points: validate OAuth first, build the image
+second, wire up the controller third. Each task had explicit
+acceptance criteria with checkboxes. An agent could pick up
+TASK-003 without reading the whole doc because its inputs,
+outputs, and dependencies were declared.
 
-Specific unknowns:
+For these eight tasks, implementation was boring. That's the
+point.
 
-- **Interview quality.** The PRD Writer's interview works
-  well because product questions have clear answers.
-  Architecture questions are fuzzier. I don't know yet
-  whether 12 questions is enough or whether the agent asks
-  the right ones.
-- **Task granularity.** The template says "single coherent
-  change, testable in isolation." In practice, the boundary
-  between too granular and too broad is something you learn
-  by watching an agent try to execute the tasks. That
-  learning hasn't happened yet.
-- **Validation coverage.** The Phase 4 validator checks
-  structural properties (every AC has a task, no circular
-  deps). It can't check whether the architecture is actually
-  good. That's still a human review step.
+TASK-009, the deployment and end-to-end test, broke the plan.
+Ten issues surfaced that the design doc couldn't have predicted:
+
+- UID 1001 in the new runtime image vs UID 1000 on the workspace
+- Helm's field manager fighting kubectl patch over secret ownership
+- The QA subagent starting `next dev` in a pod with 1.5GB
+  available, hanging until OOMKill after 37 minutes
+- An import of `RemarkMermaid.js` that worked on macOS
+  (case-insensitive) and failed on Linux (case-sensitive)
+
+These were integration bugs. The design doc told you what to
+build, not what would go wrong when you plugged it all together.
+
+The design doc became a living document during deployment. An
+"Implementation Additions" section appeared, documenting changes
+that weren't in the original plan.
+
+Per-branch PVCs replaced the shared workspace after stale state
+leaked between runs. GitHub App auth replaced the placeholder
+PAT. The google-news MCP server got dropped because the
+journalist agent worked fine with WebSearch. The design doc
+stopped being a static spec and started being a changelog of
+decisions made under pressure.
+
+The three-stage pipeline didn't need a fourth stage. Child
+documents under the design doc captured per-task completion
+notes and a deploy runbook. When the OOMKill bug hit, the
+TASK-001 completion note already had the memory limits I'd
+tested, so the fix was a one-line edit instead of a fresh
+investigation. The design doc earned its keep during
+deployment, not before it.
+
 
 [yien]: https://docs.google.com/document/d/1mEMDcHmtQ6twzNlpvF-9maNlAcezpWDtCnyIqWkODZs/edit

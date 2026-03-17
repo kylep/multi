@@ -2,6 +2,12 @@
 
 <!-- Agent definitions in .claude/agents/*.md -->
 
+# Bash rules
+
+Never use `sleep` commands longer than 30 seconds. If you need to wait
+for something, use `run_in_background` and check later, or poll with
+short intervals. Long sleeps block the conversation and waste time.
+
 # Agent Team
 
 This repo has 10 Claude Code agents defined in `.claude/agents/`.
