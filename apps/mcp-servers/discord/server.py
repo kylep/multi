@@ -121,7 +121,7 @@ async def send_message(channel_id: str, content: str) -> str:
     """
     if len(content) > 2000:
         return "Error: message exceeds 2000 character limit."
-    data = await _request("POST", f"/channels/{channel_id}/messages", json={"content": content})
+    data = await _request("POST", f"/channels/{channel_id}/messages", json={"content": content, "flags": 4})
     return f"Sent message {data['id']} in #{channel_id}"
 
 

@@ -55,7 +55,7 @@ echo "$NOW" > "$LOCKFILE"
 curl -s -m 5 \
   -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "$(jq -nc --arg c "$MSG" '{content: $c}')" \
+  -d "$(jq -nc --arg c "$MSG" '{content: $c, flags: 4}')" \
   "https://discord.com/api/v10/channels/$DISCORD_LOG_CHANNEL_ID/messages" \
   >/dev/null 2>&1 || true
 

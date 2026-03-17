@@ -35,7 +35,7 @@ func (n *Notifier) Send(message string) error {
 		return nil
 	}
 
-	body, _ := json.Marshal(map[string]string{"content": message})
+	body, _ := json.Marshal(map[string]interface{}{"content": message, "flags": 4})
 	url := fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", n.channelID)
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
