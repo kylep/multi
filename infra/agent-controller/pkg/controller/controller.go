@@ -11,6 +11,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -197,10 +198,51 @@ func (c *Controller) canRunWrite(ctx context.Context, task *crd.AgentTask) bool 
 	return true
 }
 
+func boolPtr(b bool) *bool { return &b }
+
 func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	jobName := fmt.Sprintf("%s-%d", task.Name, time.Now().Unix())
+	isPublisher := task.Spec.Agent == "publisher"
 
 	cmd := c.buildCommand(task)
+
+	// UID: ai-agent-runtime:0.3 uses pwuser (1001) from the Playwright base image
+	chownUID := "1001"
+	gitSyncArgs := fmt.Sprintf(
+		"git config --global --add safe.directory /workspace/repo && cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} $REPO_URL /workspace/repo; chown -R %s:%s /workspace/repo",
+		chownUID, chownUID,
+	)
+
+	volumes := []corev1.Volume{
+		{
+			Name: "workspace",
+			VolumeSource: corev1.VolumeSource{
+				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: "agent-workspace",
+				},
+			},
+		},
+	}
+	volumeMounts := []corev1.VolumeMount{
+		{Name: "workspace", MountPath: "/workspace"},
+	}
+
+	// Publisher needs /dev/shm for Chromium
+	if isPublisher {
+		shmSize := resource.MustParse("1Gi")
+		volumes = append(volumes, corev1.Volume{
+			Name: "dshm",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{
+					Medium:    corev1.StorageMediumMemory,
+					SizeLimit: &shmSize,
+				},
+			},
+		})
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name: "dshm", MountPath: "/dev/shm",
+		})
+	}
 
 	backoffLimit := int32(0)
 	ttl := int32(3600)
@@ -209,8 +251,8 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 			Name:      jobName,
 			Namespace: c.namespace,
 			Labels: map[string]string{
-				"app.kubernetes.io/managed-by": "agent-controller",
-				"agents.kyle.pericak.com/task": task.Name,
+				"app.kubernetes.io/managed-by":  "agent-controller",
+				"agents.kyle.pericak.com/task":  task.Name,
 				"agents.kyle.pericak.com/agent": task.Spec.Agent,
 			},
 			OwnerReferences: []metav1.OwnerReference{
@@ -227,13 +269,14 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 			TTLSecondsAfterFinished: &ttl,
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
-					RestartPolicy: corev1.RestartPolicyNever,
+					RestartPolicy:        corev1.RestartPolicyNever,
+					ShareProcessNamespace: boolPtr(isPublisher),
 					InitContainers: []corev1.Container{
 						{
 							Name:    "git-sync",
 							Image:   "alpine/git:latest",
 							Command: []string{"sh", "-c"},
-							Args:    []string{"git config --global --add safe.directory /workspace/repo && cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} $REPO_URL /workspace/repo; chown -R 1000:1000 /workspace/repo"},
+							Args:    []string{gitSyncArgs},
 							EnvFrom: []corev1.EnvFromSource{
 								{
 									SecretRef: &corev1.SecretEnvSource{
@@ -263,22 +306,17 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 									},
 								},
 							},
-							VolumeMounts: []corev1.VolumeMount{
-								{Name: "workspace", MountPath: "/workspace"},
-							},
-							WorkingDir: "/workspace/repo",
-						},
-					},
-					Volumes: []corev1.Volume{
-						{
-							Name: "workspace",
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: "agent-workspace",
+							VolumeMounts: volumeMounts,
+							WorkingDir:   "/workspace/repo",
+							SecurityContext: &corev1.SecurityContext{
+								AllowPrivilegeEscalation: boolPtr(false),
+								Capabilities: &corev1.Capabilities{
+									Drop: []corev1.Capability{"ALL"},
 								},
 							},
 						},
 					},
+					Volumes: volumes,
 				},
 			},
 		},
@@ -311,12 +349,21 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
 		return fmt.Sprintf(`opencode -a '%s' -p '%s'`, escapedAgent, escapedPrompt)
 	default:
-		// Install MCP server deps, write MCP config, then run Claude Code.
+		// Write MCP config and run Claude Code.
 		// Env vars (DISCORD_BOT_TOKEN etc.) are injected by the Secret.
-		mcpSetup := `cd apps/mcp-servers/google-news && npm ci --ignore-scripts 2>/dev/null && cd /workspace/repo`
-		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"google-news":{"type":"stdio","command":"node","args":["apps/mcp-servers/google-news/build/index.js"]}}}' > /tmp/mcp.json`
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
-		cmd := fmt.Sprintf(`%s && %s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format text`, mcpSetup, mcpConfig, escapedAgent, escapedPrompt)
+
+		if task.Spec.Agent == "publisher" {
+			// Publisher uses entrypoint script for branch lifecycle, git push, PR, Discord.
+			// MCP config includes Playwright for QA subagent browser verification.
+			mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"playwright":{"type":"stdio","command":"npx","args":["-y","@playwright/mcp@latest","--headless"]}}}' > /tmp/mcp.json`
+			return fmt.Sprintf(`%s && apps/blog/bin/run-publisher.sh '%s'`, mcpConfig, escapedPrompt)
+		}
+
+		// Default: journalist and other agents
+		// Discord MCP for posting notifications; agents use WebSearch for news lookup.
+		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
+		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format text`, mcpConfig, escapedAgent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
 			tools := strings.Split(task.Spec.AllowedTools, ",")
 			for _, tool := range tools {

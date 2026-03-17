@@ -1,7 +1,7 @@
 controller:
   image:
     repository: kpericak/agent-controller
-    tag: "0.5"
+    tag: "0.6"
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -14,7 +14,7 @@ controller:
 runtime:
   image:
     repository: kpericak/ai-agent-runtime
-    tag: "0.2"
+    tag: "0.3"
 
 repo:
   url: "https://github.com/kylep/multi.git"
@@ -34,5 +34,11 @@ secrets:
   discordGuildId: ""
   # Bearer token for webhook endpoint (leave empty to disable auth)
   webhookToken: ""
+  # Claude Max OAuth token (from `claude setup-token`)
+  claudeCodeOauthToken: ""
+  # GitHub PAT for `gh pr create`
+  githubToken: ""
+  # Discord webhook URL for publisher notifications
+  discordWebhookUrl: ""
 
 namespace: ai-agents

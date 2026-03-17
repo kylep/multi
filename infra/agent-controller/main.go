@@ -61,7 +61,7 @@ func main() {
 
 	runtimeImage := os.Getenv("RUNTIME_IMAGE")
 	if runtimeImage == "" {
-		runtimeImage = "kpericak/ai-agent-runtime:0.1"
+		runtimeImage = "kpericak/ai-agent-runtime:0.3"
 	}
 
 	ctrl := controller.New(clientset, crdClient, namespace, runtimeImage)

@@ -9,6 +9,7 @@ tags: AI-Agents, SDLC, Product-Management, PRD, design-docs, Claude-Code
 date: 2026-03-16
 status: published
 image: ai-native-sdlc-first-try.png
+thumbnail: ai-native-sdlc-first-try-thumb.png
 imgprompt: "a telescope on the left zooming into a star, connected
   by a dotted line to a microscope on the right examining a circuit
   board, flat minimal vector style, dark charcoal background with
@@ -325,34 +326,5 @@ claude --agent design-doc-writer
 
 Or describe what you want and Claude will auto-delegate based
 on the agent's description field.
-
-
-# What's unproven
-
-The Design Doc Writer was built today. It hasn't produced a
-real design doc for a real project yet. The template and
-workflow are informed by three Deep Research reports
-([synthesis](/wiki/research/design-docs-for-agents.html)) and
-practitioner accounts, but whether the Task Breakdown format
-actually improves Claude Code's implementation quality
-compared to a less structured prompt is an untested
-hypothesis.
-
-Specific unknowns:
-
-- **Interview quality.** The PRD Writer's interview works
-  well because product questions have clear answers.
-  Architecture questions are fuzzier. I don't know yet
-  whether 12 questions is enough or whether the agent asks
-  the right ones.
-- **Task granularity.** The template says "single coherent
-  change, testable in isolation." In practice, the boundary
-  between too granular and too broad is something you learn
-  by watching an agent try to execute the tasks. That
-  learning hasn't happened yet.
-- **Validation coverage.** The Phase 4 validator checks
-  structural properties (every AC has a task, no circular
-  deps). It can't check whether the architecture is actually
-  good. That's still a human review step.
 
 [yien]: https://docs.google.com/document/d/1mEMDcHmtQ6twzNlpvF-9maNlAcezpWDtCnyIqWkODZs/edit
