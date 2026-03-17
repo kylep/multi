@@ -320,9 +320,10 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 					},
 					Containers: []corev1.Container{
 						{
-							Name:    "agent",
-							Image:   c.runtimeImage,
-							Command: []string{"sh", "-c"},
+							Name:            "agent",
+							Image:           c.runtimeImage,
+							ImagePullPolicy: corev1.PullAlways,
+							Command:         []string{"sh", "-c"},
 							Args:    []string{cmd},
 							Env: []corev1.EnvVar{
 								{Name: "RUN_ID", Value: runID},
