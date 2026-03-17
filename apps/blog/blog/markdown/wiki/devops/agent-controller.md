@@ -11,22 +11,26 @@ keywords:
   - helm
   - automation
   - journalist
+  - publisher
   - debugging
   - runbook
+  - discord
 related:
   - wiki/agent-team
   - wiki/journal
   - wiki/security/claude-code-write-pattern-bug
+  - wiki/design-docs/autonomous-publisher/index
 scope: "Covers the agent controller architecture, CRD spec, Helm deployment, runtime image, debugging, and operational procedures. Does not cover agent definitions or blog content pipeline."
-last_verified: 2026-03-16
+last_verified: 2026-03-17
 ---
 
 
 Custom K8s controller that watches `AgentTask` CRDs and creates Jobs
 to run AI agents. Lives in `infra/agent-controller/`.
 
-Primary use case: daily AI news digest written to the wiki journal
-by the `journalist` agent at 8am ET (12:00 UTC).
+Supports two agent types:
+- **journalist** — daily AI news digest (scheduled, OpenRouter auth)
+- **publisher** — autonomous blog post pipeline (webhook-triggered, Claude Max OAuth)
 
 ## Architecture
 
@@ -34,14 +38,25 @@ The system has two images:
 
 | Image | Purpose | Source |
 |-------|---------|--------|
-| `kpericak/ai-agent-runtime:0.2` | Claude Code + OpenCode CLI + MCP deps | `infra/ai-agent-runtime/` |
-| `kpericak/agent-controller:0.5` | Go controller binary | `infra/agent-controller/` |
+| `kpericak/ai-agent-runtime:0.4` | Claude Code + Playwright + hooks | `infra/ai-agent-runtime/` |
+| `kpericak/agent-controller:0.6` | Go controller binary | `infra/agent-controller/` |
 
 The controller runs as a Deployment, watching `AgentTask` resources.
 When a task is due, it creates a Job with:
-1. **Init container** (`alpine/git`) — clones/updates the repo
-2. **Main container** (`ai-agent-runtime`) — installs MCP deps, writes
-   MCP config, runs the agent CLI
+1. **Init container** (`alpine/git`) — clones/updates the repo, chowns to UID 1001
+2. **Main container** (`ai-agent-runtime`) — writes MCP config, runs the agent CLI
+
+## Discord #log observability
+
+The controller posts to Discord #log channel on:
+- **Job start:** run ID (UUID), agent name, prompt preview
+- **Job completion/failure:** run ID, status
+
+The runtime image also has a PostToolUse hook that posts individual
+tool calls to Discord (Write, Edit, Bash, Agent, MCP calls).
+
+Stream-json with `--include-partial-messages` surfaces subagent events
+(researcher, reviewer, QA) in real time via pod logs.
 
 ## AgentTask CRD
 
@@ -68,29 +83,39 @@ Status fields: `phase` (Pending/Running/Succeeded/Failed),
 Controls which Claude Code tools the agent can use. Passed as
 individual `--allowedTools` flags to the CLI.
 
+**Important:** The runtime image's `settings.json` grants wide
+permissions (`Bash(*)`, `Edit`, `Write`, etc.) to prevent permission
+prompts in headless mode. The `allowedTools` CRD field provides
+additional granularity for the journalist; the publisher uses the
+entrypoint script which doesn't pass `--allowedTools` (relies on
+the agent definition's `tools:` frontmatter instead).
+
 **Known bug:** Path-restricted patterns like `Write(apps/**)` silently
 fail in Claude Code headless mode (`-p` flag). Use bare tool names
 instead (e.g. `Write` not `Write(path/**)`). See
 [claude-code-write-pattern-bug](/wiki/security/claude-code-write-pattern-bug.html).
 
-`Bash` patterns (e.g. `Bash(git commit *)`) work correctly.
+## Publisher pipeline
+
+The publisher uses `apps/blog/bin/run-publisher.sh` as its entrypoint:
+1. Creates branch `agent/publisher-<timestamp>`
+2. Unsets OpenRouter env vars (prevents auth conflict with OAuth)
+3. Runs `claude --agent publisher` with stream-json output
+4. Branch stays on PVC — Kyle reviews from the filesystem
+
+The controller detects `agent == "publisher"` and routes to the
+entrypoint script instead of inline command construction. It also
+adds a `/dev/shm` emptyDir volume for Chromium and enables
+`shareProcessNamespace` for zombie process cleanup.
 
 ## MCP Servers
 
-The controller configures two MCP servers for each Claude run:
+The controller configures MCP servers per agent type:
 
-| Server | Command | Deps |
-|--------|---------|------|
-| Discord | `python3 apps/mcp-servers/discord/server.py` | `mcp[cli]`, `httpx` (in runtime image) |
-| google-news | `node apps/mcp-servers/google-news/build/index.js` | `@modelcontextprotocol/sdk`, `zod` (npm install at job start) |
+**Publisher:** Discord + Playwright
+**Journalist/default:** Discord only
 
-The controller writes `/tmp/mcp.json` and passes `--mcp-config /tmp/mcp.json`
-to Claude Code. Discord Python deps are baked into the runtime image.
-Google-news Node deps are installed at job startup via
-`cd apps/mcp-servers/google-news && npm install --omit=dev`.
-
-MCP servers must be committed to git — the init container clones
-the repo, so untracked files won't exist in the container.
+Google-news MCP server was removed — agents use WebSearch instead.
 
 ## Write Serialization
 
@@ -103,32 +128,32 @@ agents run concurrently.
 The controller exposes `POST :8080/webhook` accepting:
 
 ```json
-{"agent": "journalist", "prompt": "Write a news digest", "runtime": "claude"}
+{
+  "agent": "publisher",
+  "prompt": "Write a blog post about ...",
+  "runtime": "claude",
+  "allowedTools": "WebSearch,Read,Write,..."
+}
 ```
 
-This creates an AgentTask CRD, which the reconcile loop picks up.
+This creates an AgentTask CRD, which the reconcile loop picks up
+(30-second poll interval).
 
 Requires a bearer token when `AI_WEBHOOK_TOKEN` is set:
 
 ```bash
-curl -X POST :8080/webhook \
+kubectl port-forward -n ai-agents deployment/agent-controller 8080:8080
+curl -X POST http://localhost:8080/webhook \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
-  -d '{"agent": "journalist", "prompt": "Write a news digest"}'
+  -d '{"agent": "publisher", "prompt": "Write a blog post about ..."}'
 ```
-
-If `AI_WEBHOOK_TOKEN` is empty (local dev), auth is skipped.
-`/healthz` is always unauthenticated.
 
 ## Deployment
 
 ```bash
-helm install agent-controller ./helm \
-  -n ai-agents --create-namespace \
-  --set secrets.openrouterApiKey=sk-or-... \
-  --set secrets.discordBotToken=... \
-  --set secrets.discordGuildId=... \
-  --set secrets.webhookToken=...
+helm upgrade agent-controller infra/agent-controller/helm/ \
+  -n ai-agents -f infra/agent-controller/helm/values.yaml
 ```
 
 Uses a hostPath PV on single-node Rancher Desktop. Not suitable for
@@ -137,43 +162,67 @@ multi-node clusters.
 ### Secrets
 
 The helm chart's `secret.yaml` uses `lookup` to preserve existing
-secret values on `helm upgrade`. Only a fresh `helm install` reads
-from `values.yaml`. This prevents `helm upgrade` from wiping
-credentials with empty defaults.
+secret values on `helm upgrade`.
 
-To set or rotate a secret after initial install, patch directly:
+**Gotcha:** `helm upgrade` with explicit `-f values.yaml` will reset
+secret values to empty defaults if the secret was previously deleted
+(field manager conflicts). Always restore secrets after a
+delete-and-recreate cycle:
 
 ```bash
-kubectl patch secret agent-secrets -n ai-agents --type=merge \
-  -p "{\"data\":{\"ANTHROPIC_AUTH_TOKEN\":\"$(echo -n $OPENROUTER_API_KEY | base64)\",\"OPENROUTER_API_KEY\":\"$(echo -n $OPENROUTER_API_KEY | base64)\",\"DISCORD_BOT_TOKEN\":\"$(echo -n $DISCORD_BOT_TOKEN | base64)\",\"DISCORD_GUILD_ID\":\"$(echo -n $DISCORD_GUILD_ID | base64)\",\"AI_WEBHOOK_TOKEN\":\"$(echo -n $AI_WEBHOOK_TOKEN | base64)\"}}"
+# Source the OAuth token
+source apps/blog/exports.sh
+
+# Patch secrets
+kubectl -n ai-agents patch secret agent-secrets --type merge -p "{
+  \"stringData\": {
+    \"CLAUDE_CODE_OAUTH_TOKEN\": \"$CLAUDE_CODE_OAUTH_TOKEN\",
+    \"DISCORD_LOG_CHANNEL_ID\": \"1483433712296398942\",
+    \"REPO_BRANCH\": \"main\"
+  }
+}"
 ```
 
-Required env vars for this command: `OPENROUTER_API_KEY`,
-`DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`, `AI_WEBHOOK_TOKEN`.
+### Field manager conflicts
+
+If `helm upgrade` fails with "conflicts with kubectl-patch", delete
+the secret and re-create via helm, then re-patch values:
+
+```bash
+kubectl -n ai-agents delete secret agent-secrets
+helm upgrade agent-controller infra/agent-controller/helm/ \
+  -n ai-agents -f infra/agent-controller/helm/values.yaml
+# Then re-patch secrets as above
+```
 
 ## Shared Volume
 
 All agent Jobs mount the same PVC at `/workspace`. The init container
 runs `git fetch` + `git reset --hard origin/<branch>` before each
-agent run. This replaces `git pull --ff-only` which fails when
-branches diverge (e.g. an agent committed locally but the remote
-also advanced).
+run, then `chown -R 1001:1001 /workspace/repo`.
 
-**safe.directory:** Git refuses to operate on `/workspace/repo`
-when the init container (root) owns files but git runs as a
-different user. The init container runs
-`git config --global --add safe.directory /workspace/repo` first.
+**UID 1001:** The Playwright-based runtime image runs as `pwuser`
+(UID 1001). All agents use this UID regardless of type.
 
-Agents commit locally but do not push. The user reviews and pushes
-from outside the cluster.
+## Job limits
+
+- **activeDeadlineSeconds: 1800** — 30 minute hard ceiling on all jobs
+- **backoffLimit: 0** — no retries on failure
+- **TTLSecondsAfterFinished: 3600** — auto-cleanup after 1 hour
 
 ## Operations
 
-### Force a re-trigger
+### Watch a run in real time
 
-The controller fires a scheduled job when `lastRunTime` is before
-the most recent scheduled time. To force an immediate trigger, backdate
-`lastRunTime` and set phase to `Pending`:
+```bash
+kubectl -n ai-agents logs -f <pod-name> -c agent
+```
+
+With `stream-json --include-partial-messages`, you'll see every tool
+call from both the parent agent and its subagents. Subagent events
+have `parent_tool_use_id` set.
+
+### Force a re-trigger
 
 ```bash
 kubectl patch agenttask daily-ai-news -n ai-agents \
@@ -181,155 +230,44 @@ kubectl patch agenttask daily-ai-news -n ai-agents \
   -p '{"status":{"phase":"Pending","lastRunTime":"2025-01-01T00:00:00Z","jobName":""}}'
 ```
 
-The controller reconciles every ~1-2 minutes and will create a new Job
-on the next pass if the schedule says it's time.
-
-### Temporarily change the schedule
-
-Edit the YAML and apply. No controller restart needed — the reconcile
-loop reads the schedule from the CRD each cycle.
-
-```bash
-# Edit schedule field, then:
-kubectl apply -f infra/agent-controller/config/samples/daily-ai-news.yaml
-```
-
 ### Kill a stuck job
 
 ```bash
-# Find the job name
-kubectl get jobs -n ai-agents
-
-# Delete it — controller will mark the AgentTask as Failed
-kubectl delete job <job-name> -n ai-agents
+kubectl -n ai-agents delete job <job-name>
 ```
 
-### Rebuild and deploy the controller
+The controller marks the AgentTask as Failed on next reconcile.
+
+### Clean up old tasks
 
 ```bash
-cd infra/agent-controller
-docker build -t kpericak/agent-controller:0.X .
-docker push kpericak/agent-controller:0.X
-
-# Update helm/values.yaml with new tag, then:
-helm upgrade agent-controller ./helm -n ai-agents -f ./helm/values.yaml
+kubectl -n ai-agents delete agenttask <name1> <name2> ...
 ```
-
-If helm upgrade fails with a Secret conflict:
-```bash
-kubectl get secret agent-secrets -n ai-agents -o jsonpath='{.metadata.managedFields[*].manager}'
-# Remove the conflicting manager (usually kubectl-patch):
-kubectl patch secret agent-secrets -n ai-agents --type=json \
-  -p='[{"op":"remove","path":"/metadata/managedFields/1"}]'
-# Retry helm upgrade
-```
-
-## Debugging
-
-### Zero logs from agent pod
-
-Claude Code with `--output-format text` buffers all output until
-completion. Zero logs does NOT mean the agent is stuck — it may be
-actively working. Check for activity:
-
-```bash
-# Check if claude process is running
-kubectl exec -n ai-agents <pod> -c agent -- ps aux
-
-# Check conversation log size (grows as agent works)
-kubectl exec -n ai-agents <pod> -c agent -- \
-  find /home/node/.claude/projects -name "*.jsonl" -exec wc -l {} \;
-
-# Check which tools are being called
-kubectl exec -n ai-agents <pod> -c agent -- \
-  grep -o '"name":"[^"]*"' /home/node/.claude/projects/-workspace-repo/*.jsonl \
-  | sort | uniq -c | sort -rn
-```
-
-### Check for permission denials
-
-```bash
-kubectl exec -n ai-agents <pod> -c agent -- \
-  grep 'is_error.*true' /home/node/.claude/projects/-workspace-repo/*.jsonl
-```
-
-Common errors:
-- `"Claude requested permissions to write..."` — allowedTools pattern
-  not matching. Use bare `Write` not `Write(path/**)`
-  ([known bug](/wiki/security/claude-code-write-pattern-bug.html))
-- `"No such tool available: mcp__google-news__..."` — MCP server
-  failed to start. Check if npm deps are installed (see below)
 
 ### Debug pod on workspace PVC
 
-When the agent pod is gone (completed/deleted), use a debug pod to
-inspect the workspace:
-
 ```bash
-kubectl run debug-agent --image=kpericak/ai-agent-runtime:0.2 \
-  -n ai-agents \
-  --overrides='{
-    "spec":{
-      "containers":[{
-        "name":"debug",
-        "image":"kpericak/ai-agent-runtime:0.2",
-        "command":["tail","-f","/dev/null"],
-        "workingDir":"/workspace/repo",
-        "volumeMounts":[{"name":"workspace","mountPath":"/workspace"}]
-      }],
-      "volumes":[{
-        "name":"workspace",
-        "persistentVolumeClaim":{"claimName":"agent-workspace"}
-      }]
-    }
-  }'
-
-# Inspect workspace
-kubectl exec -n ai-agents debug-agent -- git -C /workspace/repo log --oneline -5
-kubectl exec -n ai-agents debug-agent -- ls /workspace/repo/apps/blog/blog/markdown/wiki/journal/
-
-# Test MCP server startup
-kubectl exec -n ai-agents debug-agent -- node /workspace/repo/apps/mcp-servers/google-news/build/index.js
-kubectl exec -n ai-agents debug-agent -- python3 /workspace/repo/apps/mcp-servers/discord/server.py
-
-# Clean up
-kubectl delete pod debug-agent -n ai-agents
+kubectl -n ai-agents run debug --rm -it --restart=Never \
+  --image=kpericak/ai-agent-runtime:0.4 \
+  --overrides='{"spec":{"containers":[{
+    "name":"debug",
+    "image":"kpericak/ai-agent-runtime:0.4",
+    "command":["tail","-f","/dev/null"],
+    "workingDir":"/workspace/repo",
+    "volumeMounts":[{"name":"ws","mountPath":"/workspace"}]
+  }],"volumes":[{
+    "name":"ws",
+    "persistentVolumeClaim":{"claimName":"agent-workspace"}
+  }]}}' -- unused
 ```
-
-Note: Claude's conversation logs live in `/home/node/.claude/projects/`
-which is on the container's ephemeral filesystem, NOT the PVC. Logs are
-lost when the pod is deleted.
-
-### Verify a run succeeded
-
-Checklist after a job completes:
-
-1. **Journal file exists:**
-   `kubectl exec debug-agent -- ls /workspace/repo/apps/blog/blog/markdown/wiki/journal/YYYY-MM-DD/`
-
-2. **Commit was made:**
-   `kubectl exec debug-agent -- git -C /workspace/repo log --oneline -3`
-
-3. **Discord message posted:**
-   Check `#news` channel — the journalist posts a formatted digest
-
-4. **Controller logged completion:**
-   `kubectl logs -n ai-agents -l app.kubernetes.io/name=agent-controller --tail=20`
 
 ## Key Files
 
 - `infra/agent-controller/main.go` — Controller entrypoint + webhook
-- `infra/agent-controller/pkg/controller/controller.go` — Reconcile loop + job creation + command building
+- `infra/agent-controller/pkg/controller/controller.go` — Reconcile loop + job creation
+- `infra/agent-controller/pkg/discord/discord.go` — Discord #log notifier
 - `infra/agent-controller/pkg/crd/types.go` — AgentTask Go types
-- `infra/agent-controller/config/crd/agenttask.yaml` — CRD definition
-- `infra/agent-controller/config/samples/daily-ai-news.yaml` — Primary scheduled task
-- `infra/agent-controller/helm/` — Helm chart (values.yaml has image tags)
-- `infra/ai-agent-runtime/Dockerfile` — Runtime image
+- `infra/agent-controller/helm/` — Helm chart
+- `apps/blog/bin/run-publisher.sh` — Publisher entrypoint script
+- `.claude/agents/publisher.md` — Publisher agent definition
 - `.claude/agents/journalist.md` — Journalist agent definition
-
-## Related
-
-- [Daily AI News Digest in K8s](/cron-event-triggered-ai-agents-k8s.html):
-  build walkthrough and architecture decisions
-- [Write pattern bug](/wiki/security/claude-code-write-pattern-bug.html):
-  upstream Claude Code bug affecting headless permissions

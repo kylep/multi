@@ -1,79 +1,115 @@
 ---
 title: "TASK-009: Build, Deploy, and End-to-End Test"
-status: draft
+status: in-progress
 date: 2026-03-17
 ---
 
 # TASK-009: Build, Deploy, and End-to-End Test
 
-Status: **Ready for deployment**
+Status: **In progress** — publisher running with full observability
 
-All code changes from TASK-001 through TASK-008 are complete. This runbook covers building, pushing, deploying, and verifying the autonomous publisher system.
+## What was deployed
 
-## Step 1: Build and push runtime image
+| Component | Version | Status |
+|-----------|---------|--------|
+| ai-agent-runtime | 0.4 | Pushed, includes hooks + Playwright + jq |
+| agent-controller | 0.6 | Pushed, Discord #log + RUN_ID + stream-json |
+| Helm revision | 33 | Deployed |
 
-```bash
-cd infra/ai-agent-runtime
-docker build -t kpericak/ai-agent-runtime:0.3 .
-docker push kpericak/ai-agent-runtime:0.3
-```
+## Issues found and fixed during deployment
 
-## Step 2: Build and push controller image
+### 1. Workspace file ownership (UID mismatch)
 
-```bash
-cd infra/agent-controller
-docker build -t kpericak/agent-controller:0.6 .
-docker push kpericak/agent-controller:0.6
-```
+**Problem:** Previous runtime (0.2) ran as UID 1000. New Playwright
+base runs as UID 1001 (pwuser). `npm ci` failed with EACCES on
+`node_modules` owned by the old UID.
 
-## Step 3: Update controller image tag in values.yaml
+**Fix:** Controller now chowns to 1001 for all agents, not just
+publisher.
 
-Bump `controller.image.tag` from `"0.5"` to `"0.6"` in `infra/agent-controller/helm/values.yaml`.
+### 2. Helm field manager conflicts
 
-## Step 4: Patch secrets
+**Problem:** `kubectl patch` and Helm both claim ownership of secret
+fields. `helm upgrade` fails with "conflicts with kubectl-patch".
 
-```bash
-kubectl -n ai-agents patch secret agent-secrets --type merge -p '{
-  "stringData": {
-    "CLAUDE_CODE_OAUTH_TOKEN": "<token>",
-    "GITHUB_TOKEN": "<pat>",
-    "DISCORD_WEBHOOK_URL": "<url>"
-  }
-}'
-```
+**Fix:** Delete secret, let helm recreate it, then re-patch values.
+Documented in agent-controller wiki.
 
-## Step 5: Helm upgrade
+### 3. Secrets wiped by helm upgrade
 
-```bash
-helm upgrade agent-controller infra/agent-controller/helm/ -n ai-agents
-```
+**Problem:** `helm upgrade -f values.yaml` resets secrets to empty
+defaults. The `lookup` pattern only preserves existing values when the
+secret already exists — but after a delete-and-recreate, everything
+starts empty.
 
-## Step 6: Verify controller is running
+**Fix:** Always re-patch secrets after helm operations. OAuth token
+lives in `apps/blog/exports.sh`.
 
-```bash
-kubectl -n ai-agents rollout status deployment/agent-controller
-kubectl -n ai-agents logs -l app.kubernetes.io/name=agent-controller --tail=20
-```
+### 4. `--allowedTools` required for headless mode
 
-## Step 7: Journalist regression test
+**Problem:** Claude Code in headless mode (`-p` flag) blocks all tool
+use unless `--allowedTools` is explicitly passed or the agent
+definition has `tools:` in frontmatter. The journalist agent has both
+but was missing WebSearch/WebFetch in the CRD. The publisher agent's
+frontmatter grants tools directly.
 
-Trigger a journalist run and confirm it still works with the new image and network policy.
+**Fix:** Journalist CRD updated with WebSearch/WebFetch. Runtime image
+now includes `settings.json` with wide permissions to prevent prompts.
 
-## Step 8: Publisher end-to-end test
+### 5. Zero output during subagent calls
 
-```bash
-curl -X POST http://localhost:8080/webhook \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"agent":"publisher","prompt":"Write a blog post about autonomous AI agent pipelines in Kubernetes","runtime":"claude"}'
-```
+**Problem:** `--output-format stream-json` does not include subagent
+events by default. Publisher subagent calls (researcher, reviewer, QA)
+produced 5-10 minutes of complete silence.
 
-## Step 9: Verification checklist
+**Fix:** Added `--include-partial-messages` flag. Subagent events now
+appear in the parent stream with `parent_tool_use_id` populated. Full
+real-time visibility via `kubectl logs -f`.
 
-- [ ] Job pod created in ai-agents namespace
-- [ ] Publisher run completes (job succeeds)
-- [ ] Branch pushed, PR created on GitHub
-- [ ] Discord notification received
-- [ ] Blog post builds and renders (check PR)
+### 6. `stream-json` requires `--verbose` with `-p`
+
+**Problem:** `--output-format stream-json` exits with error
+"stream-json requires --verbose" when used with `-p` (print mode).
+
+**Fix:** Added `--verbose` flag to all claude invocations.
+
+### 7. google-news MCP removed
+
+**Problem:** `npm ci` for google-news MCP server failed due to
+UID mismatch on cached `node_modules`. The journalist agent doesn't
+need it — WebSearch works.
+
+**Fix:** Removed google-news MCP from controller command building.
+Journalist uses WebSearch/WebFetch.
+
+### 8. Discord webhook URL not needed
+
+**Problem:** Design doc specified Discord webhook URL for publisher
+notifications.
+
+**Fix:** Publisher notifications handled by Discord MCP bot (same as
+journalist). Removed DISCORD_WEBHOOK_URL, GITHUB_TOKEN, and git
+push/PR from run-publisher.sh. Agent writes to local PVC branch.
+
+## Observability stack (added during deployment)
+
+1. **Controller → Discord #log:** Posts job start (UUID, agent, prompt)
+   and completion/failure
+2. **stream-json + --include-partial-messages:** Streams all events
+   (parent + subagent) to pod logs
+3. **PostToolUse hook:** Baked into runtime image, posts tool calls
+   to Discord #log (Write, Edit, Bash, Agent, MCP)
+4. **30-min activeDeadlineSeconds:** Hard ceiling on all jobs
+
+## Verification checklist
+
+- [x] Runtime image 0.4 built and pushed
+- [x] Controller 0.6 built and pushed
+- [x] Helm upgraded (revision 33)
+- [x] Journalist regression test — ran, created wiki file, no crash
+- [x] Discord #log messages — start/stop messages confirmed
+- [x] Subagent events in stream — confirmed via --include-partial-messages
+- [ ] Publisher run completes end-to-end
+- [ ] Blog post written on branch
 - [ ] Claude.ai usage dashboard shows Max billing
-- [ ] Network policy active (from debug pod: `curl -s https://api.anthropic.com` works, `curl -s http://192.168.1.1` blocked)
+- [ ] Network policy verified
