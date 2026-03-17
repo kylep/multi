@@ -37,3 +37,7 @@ used and links to the individual provider reports.
   Three reports on PRD template structure, AI-augmented workflows,
   acceptance criteria, failure modes, and AI-native development
   lifecycles. March 2026.
+- [Design Docs for AI Coding Agents](/wiki/research/design-docs-for-agents.html) —
+  Three reports on design doc templates, PRD-to-design handoff,
+  trade-off documentation, implementation phasing, and structuring
+  design docs as inputs to AI coding agents. March 2026.

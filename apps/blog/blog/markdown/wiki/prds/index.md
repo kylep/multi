@@ -17,3 +17,7 @@ Product requirement documents for planned features and initiatives.
 Each PRD defines the problem, target user, functional requirements,
 non-functional requirements, and success criteria. PRDs are written
 before design docs.
+
+## PRDs
+
+- [Autonomous Publisher Pipeline](/wiki/prds/autonomous-publisher.html) — Run the full publisher pipeline autonomously in K8s using Claude Max tokens, with self-verification and network isolation. *(draft)*

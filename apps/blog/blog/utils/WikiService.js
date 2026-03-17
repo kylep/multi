@@ -36,6 +36,7 @@ class WikiService {
 		if (fs.existsSync(indexPath)) {
 			const raw = fs.readFileSync(indexPath, 'utf8');
 			const { props } = await MarkdownService.getRenderedMarkdownAndProps(raw);
+			if (props.metaData.hidden) return node; // hidden pages are excluded from the site
 			const slugParts = path.relative('markdown', dirPath).split(path.sep);
 			node.slug = slugParts.join('/');
 			node.title = props.metaData.title || slugParts[slugParts.length - 1];
@@ -64,6 +65,7 @@ class WikiService {
 			const raw = fs.readFileSync(filePath, 'utf8');
 			if (!raw.trimStart().startsWith('---')) continue;
 			const { props } = await MarkdownService.getRenderedMarkdownAndProps(raw);
+			if (props.metaData.hidden) continue; // hidden pages are excluded from the site
 			const slugParts = path.relative('markdown', filePath).replace('.md', '').split(path.sep);
 			const leafSlug = slugParts.join('/');
 			const leafTitle = props.metaData.title || file.name.replace('.md', '');

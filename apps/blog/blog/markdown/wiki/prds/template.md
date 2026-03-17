@@ -4,6 +4,7 @@ summary: "<One-liner>"
 status: draft | approved | in-progress | done
 owner: kyle
 date: YYYY-MM-DD
+hidden: false
 related:
   - wiki/design-docs/<slug>
   - <linear-issue-url>
