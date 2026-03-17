@@ -111,8 +111,23 @@ The controller injects these via a K8s Secret:
 | `REPO_URL` | Git repo URL for init container |
 | `REPO_BRANCH` | Branch to checkout (default: `main`) |
 
+## QA in containers: static server, not next dev
+
+The QA subagent needs a running web server to verify blog post rendering
+with Playwright. `next dev` compiles pages on first request and is too
+resource-heavy for K8s pods (hangs or OOMKills on a 4GB node).
+
+Instead, the QA agent uses `apps/blog/bin/start-static-server.sh`:
+1. Builds static files via `bin/build-blog-files.sh` (`next build` → `out/`)
+2. Serves `out/` with `python3 -m http.server 3000`
+3. Responds instantly (0.005s vs never for `next dev`)
+
+The `qa.md` agent definition includes instructions to detect the
+container environment and choose the right server.
+
 ## Key files
 
 - `infra/ai-agent-runtime/Dockerfile`
 - `infra/ai-agent-runtime/hooks/discord-log.sh` — PostToolUse hook
 - `infra/ai-agent-runtime/claude-settings.json` — Permissions + hook config
+- `apps/blog/bin/start-static-server.sh` — Container-friendly QA server

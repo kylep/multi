@@ -91,6 +91,33 @@ notifications.
 journalist). Removed DISCORD_WEBHOOK_URL, GITHUB_TOKEN, and git
 push/PR from run-publisher.sh. Agent writes to local PVC branch.
 
+### 9. QA subagent OOMKill — next dev too heavy
+
+**Problem:** The QA subagent starts `next dev` to verify blog post
+rendering. In a K8s pod (4GB node, ~1.5GB available), Next.js page
+compilation on first request either hangs indefinitely or triggers an
+OOMKill. The first publisher run ended in OOMKilled status after 37
+minutes, during the QA phase.
+
+**Diagnosis:** Debug pod tests confirmed:
+- `next dev`: TCP connects but HTTP response never arrives (compilation hangs)
+- `python3 -m http.server` on static files: HTTP 200 in 0.005s
+- Networking is fine; the issue is purely Next.js resource consumption
+
+**Fix:** Added `apps/blog/bin/start-static-server.sh` — builds static
+files with `bin/build-blog-files.sh`, then serves `out/` with
+`python3 -m http.server 3000`. Updated `qa.md` to use this in container
+environments.
+
+### 10. Case-sensitive import breaks Linux build
+
+**Problem:** `MarkdownService.js` imports `./RemarkMermaid.js` but the
+file on disk is `remarkMermaid.js` (lowercase r). macOS is
+case-insensitive so this works locally, but Linux containers are
+case-sensitive and the build fails with "Module not found."
+
+**Fix:** Changed import to `./remarkMermaid.js`.
+
 ## Observability stack (added during deployment)
 
 1. **Controller → Discord #log:** Posts job start (UUID, agent, prompt)
