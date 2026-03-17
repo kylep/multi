@@ -19,7 +19,7 @@ unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN ANTHROPIC_BASE_URL
 
 # Run publisher pipeline
 claude --mcp-config /tmp/mcp.json --agent publisher \
-  -p "$PROMPT" --output-format text 2>&1 || CLAUDE_EXIT=$?
+  -p "$PROMPT" --output-format stream-json 2>&1 || CLAUDE_EXIT=$?
 CLAUDE_EXIT=${CLAUDE_EXIT:-0}
 
 if [ "$CLAUDE_EXIT" -ne 0 ]; then

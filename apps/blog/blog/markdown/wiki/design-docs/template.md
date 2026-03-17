@@ -99,6 +99,14 @@ testable in isolation. Mark parallelizable tasks with `[P]`.
 - **Acceptance criteria:**
   - [ ] Specific, testable condition
 
+## Implementation Additions
+
+Changes made during implementation that weren't in the original design.
+Add entries here when the design diverges during build-out so the doc
+stays accurate without a full rewrite.
+
+- **Addition:** What changed and why.
+
 ## Open Questions
 
 Unresolved items. State what blocks on each.

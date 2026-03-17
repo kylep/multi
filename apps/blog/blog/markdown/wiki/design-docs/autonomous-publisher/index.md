@@ -456,6 +456,40 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
   - [ ] Runtime image wiki documents: new base image, Playwright inclusion, version 0.3
   - [ ] Credential rotation procedure: step-by-step for regenerating `CLAUDE_CODE_OAUTH_TOKEN` via `claude setup-token` and patching the K8s secret
 
+## Implementation Additions
+
+Changes made during TASK-009 deployment that weren't in the original design.
+
+- **Dropped google-news MCP from controller.** The journalist agent
+  uses WebSearch/WebFetch instead of the custom google-news MCP server.
+  Removes the `npm ci` setup step from the agent command, simplifying
+  startup and eliminating a permission issue (node_modules owned by
+  wrong UID).
+
+- **UID unified to 1001 for all agents.** The design specified UID 1000
+  for non-publisher agents and 1001 for publisher. Since all agents now
+  use the Playwright-based runtime image (pwuser=1001), the controller
+  chowns to 1001 for all agents.
+
+- **Dropped git push, PR creation, and Discord webhook from
+  run-publisher.sh.** The agent writes to a local branch on the PVC.
+  Kyle reviews from the filesystem. GitHub App integration for
+  push/PR will come later.
+
+- **Discord #log channel for controller observability.** The controller
+  posts to Discord #log on job start (with UUID, agent, prompt preview)
+  and on job completion/failure. Uses the Discord bot API directly from
+  Go, not MCP.
+
+- **Switched `--output-format text` to `--output-format stream-json`.**
+  Enables streaming structured output to pod logs for real-time
+  monitoring via `kubectl logs -f`.
+
+- **`--allowedTools` required for headless Claude Code.** Discovered
+  that Claude Code in headless mode (`-p` flag) blocks all tool use
+  unless `--allowedTools` is explicitly passed. The journalist CRD
+  already had this; webhook-triggered tasks must include it too.
+
 ## Open Questions
 
 - **`claude setup-token` scope regression (PRD OQ #1).** Issue #23703

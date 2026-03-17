@@ -40,6 +40,16 @@ spec:
                 secretKeyRef:
                   name: agent-secrets
                   key: AI_WEBHOOK_TOKEN
+            - name: DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: DISCORD_BOT_TOKEN
+            - name: DISCORD_LOG_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: DISCORD_LOG_CHANNEL_ID
           ports:
             - name: webhook
               containerPort: 8080

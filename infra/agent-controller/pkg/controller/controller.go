@@ -7,7 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/kylep/multi/infra/agent-controller/pkg/crd"
+	"github.com/kylep/multi/infra/agent-controller/pkg/discord"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -32,15 +34,17 @@ type Controller struct {
 	crdClient    rest.Interface
 	namespace    string
 	runtimeImage string
+	discord      *discord.Notifier
 }
 
 // New creates a new Controller.
-func New(clientset kubernetes.Interface, crdClient rest.Interface, namespace, runtimeImage string) *Controller {
+func New(clientset kubernetes.Interface, crdClient rest.Interface, namespace, runtimeImage string, disc *discord.Notifier) *Controller {
 	return &Controller{
 		clientset:    clientset,
 		crdClient:    crdClient,
 		namespace:    namespace,
 		runtimeImage: runtimeImage,
+		discord:      disc,
 	}
 }
 
@@ -157,14 +161,22 @@ func (c *Controller) reconcileRunning(ctx context.Context, task *crd.AgentTask) 
 		return
 	}
 
+	runID := job.Annotations["agents.kyle.pericak.com/run-id"]
+
 	for _, cond := range job.Status.Conditions {
 		if cond.Type == batchv1.JobComplete && cond.Status == corev1.ConditionTrue {
 			log.Printf("Job %s completed for %s", task.Status.JobName, task.Name)
+			if err := c.discord.Send(fmt.Sprintf("✓ `%s` | agent=**%s** | **completed**", runID, task.Spec.Agent)); err != nil {
+				log.Printf("Discord log failed: %v", err)
+			}
 			c.updateStatus(ctx, task, "Succeeded", task.Status.JobName)
 			return
 		}
 		if cond.Type == batchv1.JobFailed && cond.Status == corev1.ConditionTrue {
 			log.Printf("Job %s failed for %s", task.Status.JobName, task.Name)
+			if err := c.discord.Send(fmt.Sprintf("✗ `%s` | agent=**%s** | **failed**", runID, task.Spec.Agent)); err != nil {
+				log.Printf("Discord log failed: %v", err)
+			}
 			c.updateStatus(ctx, task, "Failed", task.Status.JobName)
 			return
 		}
@@ -202,9 +214,19 @@ func boolPtr(b bool) *bool { return &b }
 
 func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	jobName := fmt.Sprintf("%s-%d", task.Name, time.Now().Unix())
+	runID := uuid.New().String()[:8]
 	isPublisher := task.Spec.Agent == "publisher"
 
 	cmd := c.buildCommand(task)
+
+	// Log to Discord #log
+	promptPreview := task.Spec.Prompt
+	if len(promptPreview) > 100 {
+		promptPreview = promptPreview[:100] + "..."
+	}
+	if err := c.discord.Send(fmt.Sprintf("▶ `%s` | agent=**%s** | job=`%s`\n> %s", runID, task.Spec.Agent, jobName, promptPreview)); err != nil {
+		log.Printf("Discord log failed: %v", err)
+	}
 
 	// UID: ai-agent-runtime:0.3 uses pwuser (1001) from the Playwright base image
 	chownUID := "1001"
@@ -254,6 +276,9 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 				"app.kubernetes.io/managed-by":  "agent-controller",
 				"agents.kyle.pericak.com/task":  task.Name,
 				"agents.kyle.pericak.com/agent": task.Spec.Agent,
+			},
+			Annotations: map[string]string{
+				"agents.kyle.pericak.com/run-id": runID,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -363,7 +388,7 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 		// Default: journalist and other agents
 		// Discord MCP for posting notifications; agents use WebSearch for news lookup.
 		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
-		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format text`, mcpConfig, escapedAgent, escapedPrompt)
+		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json`, mcpConfig, escapedAgent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
 			tools := strings.Split(task.Spec.AllowedTools, ",")
 			for _, tool := range tools {

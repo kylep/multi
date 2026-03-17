@@ -13,6 +13,7 @@ import (
 
 	"github.com/kylep/multi/infra/agent-controller/pkg/controller"
 	"github.com/kylep/multi/infra/agent-controller/pkg/crd"
+	"github.com/kylep/multi/infra/agent-controller/pkg/discord"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -64,7 +65,12 @@ func main() {
 		runtimeImage = "kpericak/ai-agent-runtime:0.3"
 	}
 
-	ctrl := controller.New(clientset, crdClient, namespace, runtimeImage)
+	disc := discord.New(os.Getenv("DISCORD_BOT_TOKEN"), os.Getenv("DISCORD_LOG_CHANNEL_ID"))
+	if disc.Enabled() {
+		log.Println("Discord logging enabled")
+	}
+
+	ctrl := controller.New(clientset, crdClient, namespace, runtimeImage, disc)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

@@ -38,7 +38,7 @@ secrets:
   claudeCodeOauthToken: ""
   # GitHub PAT for `gh pr create`
   githubToken: ""
-  # Discord webhook URL for publisher notifications
-  discordWebhookUrl: ""
+  # Discord #log channel ID for controller logging
+  discordLogChannelId: "1483433712296398942"
 
 namespace: ai-agents
