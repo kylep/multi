@@ -27,7 +27,7 @@ Before starting the interview, read these for context on the current system:
 - `CLAUDE.md` (repo root)
 - `apps/blog/blog/markdown/wiki/index.md`
 - `apps/blog/blog/markdown/wiki/prds/index.md`
-- All existing PRDs: `apps/blog/blog/markdown/wiki/prds/*.md`
+- All existing PRDs: `apps/blog/blog/markdown/wiki/prds/*.md` (exclude `index.md` and `template.md`)
 - All agent definitions: `.claude/agents/*.md`
 
 Take notes on what already exists so you can reference it during the

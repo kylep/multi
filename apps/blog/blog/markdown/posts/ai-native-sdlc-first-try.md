@@ -91,8 +91,8 @@ on: problem, goal, success metrics, non-goals, user stories with
 acceptance criteria, scope, open questions, and risks.
 
 - **Non-goals come before scope.** Kevin Yien's
-  ["perimeter of the solution space"](https://docs.google.com/document/d/1mEMDcHmtQ6twzNlpvF-9maNlAcezpWDtCnyIqWkODZs/edit)
-  pattern. Draw the boundary first, then fill it in. This
+  ["perimeter of the solution space"][yien] pattern. Draw
+  the boundary first, then fill it in. This
   matters more for a solo dev than a team because there's no
   one else to say "that's out of scope."
 - **Acceptance criteria live on each user story, not in a
@@ -354,3 +354,5 @@ Specific unknowns:
   structural properties (every AC has a task, no circular
   deps). It can't check whether the architecture is actually
   good. That's still a human review step.
+
+[yien]: https://docs.google.com/document/d/1mEMDcHmtQ6twzNlpvF-9maNlAcezpWDtCnyIqWkODZs/edit

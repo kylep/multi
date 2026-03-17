@@ -39,7 +39,8 @@ are covered.
 3. Gate: "I have enough to write a PRD. Proceeding to research."
 4. Research the problem space (delegate to researcher subagent + own reading)
 5. Write PRD to `wiki/prds/<slug>.md` using the standard template
-6. Self-verify: every acceptance criterion is testable, no implementation details
+6. Validate: delegate to a fresh validator subagent that checks every
+   acceptance criterion is testable and contains no implementation details
 
 ## Output
 

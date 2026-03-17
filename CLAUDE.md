@@ -4,7 +4,7 @@
 
 # Agent Team
 
-This repo has 9 Claude Code agents defined in `.claude/agents/`.
+This repo has 10 Claude Code agents defined in `.claude/agents/`.
 Use them instead of doing everything yourself.
 
 ## When to use which agent
