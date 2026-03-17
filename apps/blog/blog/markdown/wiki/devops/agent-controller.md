@@ -26,7 +26,7 @@ last_verified: 2026-03-17
 
 
 Custom K8s controller that watches `AgentTask` CRDs and creates Jobs
-to run AI agents. Lives in `infra/agent-controller/`.
+to run AI agents. Lives in `infra/ai-agents/agent-controller/`.
 
 Supports two agent types:
 - **journalist** — daily AI news digest (scheduled, OpenRouter auth)
@@ -38,13 +38,15 @@ The system has two images:
 
 | Image | Purpose | Source |
 |-------|---------|--------|
-| `kpericak/ai-agent-runtime:0.4` | Claude Code + Playwright + hooks | `infra/ai-agent-runtime/` |
-| `kpericak/agent-controller:0.6` | Go controller binary | `infra/agent-controller/` |
+| `kpericak/ai-agent-runtime:0.4` | Claude Code + Playwright + hooks | `infra/ai-agents/ai-agent-runtime/` |
+| `kpericak/agent-controller:0.7` | Go controller binary | `infra/ai-agents/agent-controller/` |
 
 The controller runs as a Deployment, watching `AgentTask` resources.
 When a task is due, it creates a Job with:
 1. **Init container** (`alpine/git`) — clones/updates the repo, chowns to UID 1001
 2. **Main container** (`ai-agent-runtime`) — writes MCP config, runs the agent CLI
+3. Both containers run PSS restricted: `seccompProfile: RuntimeDefault` (pod level),
+   `capabilities.drop: ALL`, `allowPrivilegeEscalation: false`, `runAsNonRoot: true` (UID 1001)
 
 ## Discord #log observability
 
@@ -118,20 +120,22 @@ The controller configures MCP servers per agent type:
 
 Google-news MCP server was removed — agents use WebSearch instead.
 
-## Per-Branch PVCs
+## Workspace Volumes (per agent type)
 
-Write agents (`publisher`, `qa`, `journalist`) get dedicated PV/PVC
-pairs per job run (`agent-ws-<jobName>`) instead of sharing a single
-PVC. This eliminates stale state leakage between runs and enables
-parallel write-agent execution.
+Write agents (`publisher`, `qa`, `journalist`) get a fresh `emptyDir`
+volume per job. Since write agents push all work to GitHub before the pod
+terminates, the ephemeral workspace is safe. This also satisfies PSS
+restricted — `emptyDir` is writable by UID 1001 without any hostPath
+ownership workarounds.
 
-- **PV/PVC name:** `agent-ws-<jobName>` (jobName = `<taskName>-<timestamp>`)
-- **hostPath:** `/tmp/agent-workspace/branches/<jobName>/`
-- **Cleanup:** controller deletes PV+PVC after job completes or fails
-- **Read-only agents** still use the shared `agent-workspace` PVC
+- **Write agents:** `emptyDir` (auto-cleaned when pod terminates)
+- **Read-only agents:** shared `agent-workspace` PVC at `/workspace`
+- **Shared PVC hostPath:** `/tmp/agent-workspace` on Lima VM, must be
+  mode `1777` for UID 1001 write access (set by `rdctl shell -- sudo
+  chmod 1777 /tmp/agent-workspace`)
 
-The previous `canRunWrite()` serialization was removed since
-per-branch PVCs eliminate the need for write serialization.
+The previous per-branch PV/PVC creation pattern was removed in
+controller v0.7 in favour of emptyDir for write agents.
 
 ## GitHub App Auth
 
@@ -162,10 +166,10 @@ cp secrets/export-agent-controller.sh.SAMPLE secrets/export-agent-controller.sh
 # edit the file, fill in values
 
 # 2. Run setup (optionally build images first)
-infra/agent-controller/bin/setup.sh --build-images
+infra/ai-agents/agent-controller/bin/setup.sh --build-images
 
 # Or without building images (if they're already pushed):
-infra/agent-controller/bin/setup.sh
+infra/ai-agents/agent-controller/bin/setup.sh
 ```
 
 **Prerequisites:** kubectl, helm, docker on PATH; cluster reachable
@@ -204,8 +208,8 @@ curl -X POST http://localhost:8080/webhook \
 ## Deployment
 
 ```bash
-helm upgrade agent-controller infra/agent-controller/helm/ \
-  -n ai-agents -f infra/agent-controller/helm/values.yaml
+helm upgrade agent-controller infra/ai-agents/agent-controller/helm/ \
+  -n ai-agents -f infra/ai-agents/agent-controller/helm/values.yaml
 ```
 
 Uses a hostPath PV on single-node Rancher Desktop. Not suitable for
@@ -242,19 +246,18 @@ the secret and re-create via helm, then re-patch values:
 
 ```bash
 kubectl -n ai-agents delete secret agent-secrets
-helm upgrade agent-controller infra/agent-controller/helm/ \
-  -n ai-agents -f infra/agent-controller/helm/values.yaml
+helm upgrade agent-controller infra/ai-agents/agent-controller/helm/ \
+  -n ai-agents -f infra/ai-agents/agent-controller/helm/values.yaml
 # Then re-patch secrets as above
 ```
 
 ## Workspace Volumes
 
-Write agents get per-branch PVCs (see above). Read-only agents share
-a single `agent-workspace` PVC at `/workspace`.
+See [Per-Agent Workspace Volumes](#workspace-volumes-per-agent-type) above for the full breakdown. Key points:
 
-The init container runs `git clone` (per-branch) or `git fetch` +
-`git reset --hard` (shared) before each run, then
-`chown -R 1001:1001 /workspace/repo`.
+The init container runs `git clone` (write agents, fresh emptyDir) or
+`git fetch` + `git reset --hard` (read-only agents, shared PVC) before
+each run, then `chown -R 1001:1001 /workspace/repo`.
 
 **UID 1001:** The Playwright-based runtime image runs as `pwuser`
 (UID 1001). All agents use this UID regardless of type.
@@ -301,28 +304,43 @@ kubectl -n ai-agents delete agenttask <name1> <name2> ...
 
 ### Debug pod on workspace PVC
 
+The `ai-agents` namespace enforces PSS restricted, so the debug pod must
+include a compliant security context or it will be rejected at admission.
+
 ```bash
 kubectl -n ai-agents run debug --rm -it --restart=Never \
   --image=kpericak/ai-agent-runtime:0.4 \
-  --overrides='{"spec":{"containers":[{
-    "name":"debug",
-    "image":"kpericak/ai-agent-runtime:0.4",
-    "command":["tail","-f","/dev/null"],
-    "workingDir":"/workspace/repo",
-    "volumeMounts":[{"name":"ws","mountPath":"/workspace"}]
-  }],"volumes":[{
-    "name":"ws",
-    "persistentVolumeClaim":{"claimName":"agent-workspace"}
-  }]}}' -- unused
+  --overrides='{
+    "spec": {
+      "securityContext": {
+        "runAsNonRoot": true,
+        "runAsUser": 1001,
+        "fsGroup": 1001,
+        "seccompProfile": {"type": "RuntimeDefault"}
+      },
+      "containers": [{
+        "name": "debug",
+        "image": "kpericak/ai-agent-runtime:0.4",
+        "command": ["tail", "-f", "/dev/null"],
+        "workingDir": "/workspace/repo",
+        "securityContext": {
+          "allowPrivilegeEscalation": false,
+          "capabilities": {"drop": ["ALL"]}
+        },
+        "volumeMounts": [{"name": "ws", "mountPath": "/workspace"}]
+      }],
+      "volumes": [{"name": "ws", "persistentVolumeClaim": {"claimName": "agent-workspace"}}]
+    }
+  }' -- unused
 ```
 
 ## Key Files
 
-- `infra/agent-controller/main.go` — Controller entrypoint + webhook
-- `infra/agent-controller/pkg/controller/controller.go` — Reconcile loop + job creation
-- `infra/agent-controller/pkg/discord/discord.go` — Discord #log notifier
-- `infra/agent-controller/pkg/crd/types.go` — AgentTask Go types
-- `infra/agent-controller/helm/` — Helm chart
+- `infra/ai-agents/agent-controller/main.go` — Controller entrypoint + webhook
+- `infra/ai-agents/agent-controller/pkg/controller/controller.go` — Reconcile loop + job creation
+- `infra/ai-agents/agent-controller/pkg/discord/discord.go` — Discord #log notifier
+- `infra/ai-agents/agent-controller/pkg/crd/types.go` — AgentTask Go types
+- `infra/ai-agents/agent-controller/helm/` — Helm chart
 - `apps/blog/bin/run-publisher.sh` — Publisher entrypoint script
 - `.claude/agents/publisher.md` — Publisher agent definition
 - `.claude/agents/journalist.md` — Journalist agent definition

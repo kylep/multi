@@ -1,0 +1,51 @@
+controller:
+  image:
+    repository: kpericak/agent-controller
+    tag: "0.7"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+runtime:
+  image:
+    repository: kpericak/ai-agent-runtime
+    tag: "0.4"
+
+repo:
+  url: "https://github.com/kylep/multi.git"
+  branch: main
+
+storage:
+  size: 5Gi
+  # hostPath for single-node Rancher Desktop
+  hostPath: /tmp/agent-workspace
+  # Per-branch workspace settings (write agents get isolated PVCs)
+  branchHostPathBase: /tmp/agent-workspace/branches
+  branchSize: 5Gi
+
+secrets:
+  # OpenRouter key routes Claude Code through OpenRouter
+  openrouterApiKey: ""
+  repoUrl: ""
+  # Discord bot credentials for MCP server
+  discordBotToken: ""
+  discordGuildId: ""
+  # Bearer token for webhook endpoint (leave empty to disable auth)
+  webhookToken: ""
+  # Claude Max OAuth token (from `claude setup-token`)
+  claudeCodeOauthToken: ""
+  # GitHub PAT for `gh pr create`
+  githubToken: ""
+  # Discord #log channel ID for controller logging
+  discordLogChannelId: "1483433712296398942"
+  # GitHub App credentials (PericakAI) for git push and PR creation
+  githubAppId: ""
+  githubAppPrivateKey: ""
+  githubInstallId: ""
+
+namespace: ai-agents

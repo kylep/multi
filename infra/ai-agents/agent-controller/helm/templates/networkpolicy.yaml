@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: agent-egress
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "agent-controller.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchExpressions:
+      - key: agents.kyle.pericak.com/agent
+        operator: Exists
+  policyTypes:
+    - Ingress
+    - Egress
+  # Deny all ingress
+  ingress: []
+  egress:
+    # Allow DNS to kube-system
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow HTTP/HTTPS to non-RFC1918 and non-link-local addresses
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+              - 169.254.0.0/16
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443

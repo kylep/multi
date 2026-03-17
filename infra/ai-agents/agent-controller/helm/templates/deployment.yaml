@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "agent-controller.fullname" . }}
+  labels:
+    {{- include "agent-controller.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "agent-controller.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "agent-controller.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "agent-controller.fullname" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: controller
+          image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: NAMESPACE
+              value: {{ .Values.namespace }}
+            - name: RUNTIME_IMAGE
+              value: "{{ .Values.runtime.image.repository }}:{{ .Values.runtime.image.tag }}"
+            - name: AI_WEBHOOK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: AI_WEBHOOK_TOKEN
+            - name: DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: DISCORD_BOT_TOKEN
+            - name: DISCORD_LOG_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: DISCORD_LOG_CHANNEL_ID
+            - name: BRANCH_HOSTPATH_BASE
+              value: {{ .Values.storage.branchHostPathBase | default "/tmp/agent-workspace/branches" | quote }}
+            - name: BRANCH_PVC_SIZE
+              value: {{ .Values.storage.branchSize | default "5Gi" | quote }}
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: GITHUB_APP_ID
+                  optional: true
+            - name: GITHUB_INSTALL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: GITHUB_INSTALL_ID
+                  optional: true
+            - name: GITHUB_APP_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secrets
+                  key: GITHUB_APP_PRIVATE_KEY
+                  optional: true
+          ports:
+            - name: webhook
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: webhook
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: webhook
+            initialDelaySeconds: 5
+          resources:
+            {{- toYaml .Values.controller.resources | nindent 12 }}

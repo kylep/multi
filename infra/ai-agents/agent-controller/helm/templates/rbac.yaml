@@ -1,0 +1,63 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "agent-controller.fullname" . }}
+  labels:
+    {{- include "agent-controller.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["agents.kyle.pericak.com"]
+    resources: ["agenttasks"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["agents.kyle.pericak.com"]
+    resources: ["agenttasks/status"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "create", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "agent-controller.fullname" . }}-pv
+  labels:
+    {{- include "agent-controller.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "create", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "agent-controller.fullname" . }}-pv
+  labels:
+    {{- include "agent-controller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "agent-controller.fullname" . }}-pv
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "agent-controller.fullname" . }}
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "agent-controller.fullname" . }}
+  labels:
+    {{- include "agent-controller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "agent-controller.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "agent-controller.fullname" . }}
+    namespace: {{ .Values.namespace }}
