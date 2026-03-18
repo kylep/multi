@@ -23,6 +23,8 @@
       - helmfile
       - pre-commit
       - ansible  # keep ansible managed by brew for upgrades
+      - tmux
+      - vim
     homebrew_casks:
       - rancher
     npm_global_packages:
@@ -198,6 +200,27 @@
         line: 'export PATH="$HOME/.rd/bin:$PATH"'
         create: true
         mode: "0644"
+
+    # ---------------------------------------------------------------
+    # tmux + vim configs (from kylep gists)
+    # ---------------------------------------------------------------
+    - name: Download tmux.conf from gist
+      ansible.builtin.get_url:
+        url: https://gist.githubusercontent.com/kylep/0a1b6db0c97fe34370f61d9c4064253d/raw/tmux.conf
+        dest: "{{ ansible_facts['env']['HOME'] }}/.tmux.conf"
+        mode: "0644"
+
+    - name: Download vimrc from gist
+      ansible.builtin.get_url:
+        url: https://gist.githubusercontent.com/kylep/fbef9820d7a6315cfc955d8af41b2074/raw/vimrc
+        dest: "{{ ansible_facts['env']['HOME'] }}/.vimrc"
+        mode: "0644"
+
+    - name: Create vim undo directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/.vim/undodir"
+        state: directory
+        mode: "0755"
 
     # ---------------------------------------------------------------
     # Lima VM workspace (requires Rancher Desktop running)
