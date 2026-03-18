@@ -13,12 +13,31 @@ spec:
     metadata:
       labels:
         {{- include "agent-controller.selectorLabels" . | nindent 8 }}
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "ai-agents"
+        vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/discord"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{`{{- with secret "secret/ai-agents/discord" }}
+          export DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
+          export DISCORD_LOG_CHANNEL_ID="{{ .Data.data.discord_log_channel_id }}"
+          {{ end -}}
+          {{- with secret "secret/ai-agents/webhook" }}
+          export AI_WEBHOOK_TOKEN="{{ .Data.data.webhook_token }}"
+          {{ end -}}
+          {{- with secret "secret/ai-agents/github" }}
+          export GITHUB_APP_ID="{{ .Data.data.github_app_id }}"
+          export GITHUB_APP_PRIVATE_KEY="{{ .Data.data.github_app_private_key }}"
+          export GITHUB_INSTALL_ID="{{ .Data.data.github_install_id }}"
+          {{ end -}}`}}
     spec:
       serviceAccountName: {{ include "agent-controller.fullname" . }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: controller
           image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
@@ -28,50 +47,17 @@ spec:
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
-            seccompProfile:
-              type: RuntimeDefault
+          command: ["sh", "-c"]
+          args: [". /vault/secrets/config && exec /usr/local/bin/agent-controller"]
           env:
             - name: NAMESPACE
               value: {{ .Values.namespace }}
             - name: RUNTIME_IMAGE
               value: "{{ .Values.runtime.image.repository }}:{{ .Values.runtime.image.tag }}"
-            - name: AI_WEBHOOK_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: agent-secrets
-                  key: AI_WEBHOOK_TOKEN
-            - name: DISCORD_BOT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: agent-secrets
-                  key: DISCORD_BOT_TOKEN
-            - name: DISCORD_LOG_CHANNEL_ID
-              valueFrom:
-                secretKeyRef:
-                  name: agent-secrets
-                  key: DISCORD_LOG_CHANNEL_ID
             - name: BRANCH_HOSTPATH_BASE
               value: {{ .Values.storage.branchHostPathBase | default "/tmp/agent-workspace/branches" | quote }}
             - name: BRANCH_PVC_SIZE
               value: {{ .Values.storage.branchSize | default "5Gi" | quote }}
-            - name: GITHUB_APP_ID
-              valueFrom:
-                secretKeyRef:
-                  name: agent-secrets
-                  key: GITHUB_APP_ID
-                  optional: true
-            - name: GITHUB_INSTALL_ID
-              valueFrom:
-                secretKeyRef:
-                  name: agent-secrets
-                  key: GITHUB_INSTALL_ID
-                  optional: true
-            - name: GITHUB_APP_PRIVATE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-secrets
-                  key: GITHUB_APP_PRIVATE_KEY
-                  optional: true
           ports:
             - name: webhook
               containerPort: 8080

@@ -125,9 +125,11 @@ approve it, then hand it off to the Design Doc Writer.
 
 # The Design Doc Writer
 
-The PRD answers "what and why." The next piece is a Design Doc
-Writer agent that answers "how," and produces output a coding
-agent can pick up without interpretation.
+The PRD answers "what and why." The [Design Doc Writer](/wiki/agent-team/design-doc-writer.html)
+answers "how," and produces output a coding agent can pick up
+without interpretation.
+
+![Design Doc Writer, the Nautilus](/images/agent-design-doc-writer.png)
 
 ```bash
 claude --agent design-doc-writer

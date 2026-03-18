@@ -6,7 +6,7 @@ date: 2026-03-17
 
 # TASK-009: Build, Deploy, and End-to-End Test
 
-**For fresh installs**, use `infra/agent-controller/bin/setup.sh`
+**For fresh installs**, use `infra/ai-agents/agent-controller/bin/setup.sh`
 instead of following this runbook manually. See the
 [design doc portability section](index.md#portability).
 
@@ -154,14 +154,18 @@ The controller generates a JWT signed with the App's private key,
 exchanges it for a short-lived installation token (1hr), and injects
 it as `GITHUB_TOKEN` on write agent pods.
 
-Setup steps:
-1. Patch secrets with App credentials:
-   ```bash
-   kubectl -n ai-agents patch secret agent-secrets --type merge -p \
-     "{\"data\":{\"GITHUB_APP_PRIVATE_KEY\":\"$(base64 -w 0 < secrets/pericakai.private-key.pem)\",\"GITHUB_APP_ID\":\"$(echo -n 3100834 | base64 -w 0)\",\"GITHUB_INSTALL_ID\":\"$(echo -n <INSTALL_ID> | base64 -w 0)\"}}"
-   ```
-2. Get installation ID: check https://github.com/settings/installations
-   and note the ID from the URL.
+> **Note (TASK-008):** The `kubectl patch secret agent-secrets` approach
+> below is superseded. Credentials are now stored in Vault and delivered
+> via the Vault Agent Injector. Use `bash infra/ai-agents/bin/store-secrets.sh`
+> to populate `secret/ai-agents/github` with the App ID, install ID, and
+> private key PEM file path.
+
+Setup steps (Vault-based, current):
+1. Run `bash infra/ai-agents/bin/store-secrets.sh` and provide:
+   - GitHub App ID (plain integer)
+   - GitHub App private key file path (PEM file — the script reads it with `cat`)
+   - GitHub App install ID
+2. Get installation ID: GitHub → Settings → Installations → note ID from URL
 3. Verify App permissions: Contents (R/W) + Pull requests (R/W)
 4. Create branch protection ruleset on main (prevent App from pushing directly)
 

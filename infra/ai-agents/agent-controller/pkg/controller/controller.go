@@ -18,8 +18,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kylep/multi/infra/agent-controller/pkg/crd"
-	"github.com/kylep/multi/infra/agent-controller/pkg/discord"
+	"github.com/kylep/multi/infra/ai-agents/agent-controller/pkg/crd"
+	"github.com/kylep/multi/infra/ai-agents/agent-controller/pkg/discord"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -197,6 +197,7 @@ func (c *Controller) reconcileRunning(ctx context.Context, task *crd.AgentTask) 
 }
 
 func boolPtr(b bool) *bool { return &b }
+func int64Ptr(i int64) *int64  { return &i }
 
 // createBranchPVC creates a dedicated PV + PVC for a write job.
 func (c *Controller) createBranchPVC(ctx context.Context, jobName string) (string, error) {
@@ -391,6 +392,18 @@ func base64URLEncode(data []byte) string {
 	return base64.RawURLEncoding.EncodeToString(data)
 }
 
+const vaultTemplate = `{{- with secret "secret/ai-agents/anthropic" }}
+export CLAUDE_CODE_OAUTH_TOKEN="{{ .Data.data.claude_oauth_token }}"
+{{ end -}}
+{{- with secret "secret/ai-agents/discord" }}
+export DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
+export DISCORD_GUILD_ID="{{ .Data.data.discord_guild_id }}"
+export DISCORD_LOG_CHANNEL_ID="{{ .Data.data.discord_log_channel_id }}"
+{{ end -}}
+{{- with secret "secret/ai-agents/webhook" }}
+export AI_WEBHOOK_TOKEN="{{ .Data.data.webhook_token }}"
+{{ end -}}`
+
 func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	jobName := fmt.Sprintf("%s-%d", task.Name, time.Now().Unix())
 	runID := uuid.New().String()[:8]
@@ -408,13 +421,26 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 		log.Printf("Discord log failed: %v", err)
 	}
 
-	// Determine PVC: per-branch for write agents, shared for read-only
+	// Determine workspace volume: emptyDir for write agents (fresh per-pod, writable by UID 1001),
+	// shared PVC for read-only agents (persistent across runs).
+	// Write agents push their work to GitHub before the pod terminates, so workspace loss is safe.
 	pvcName := "agent-workspace"
+	var workspaceVolume corev1.Volume
 	if isWriteAgent {
-		var err error
-		pvcName, err = c.createBranchPVC(ctx, jobName)
-		if err != nil {
-			return fmt.Errorf("creating branch PVC: %w", err)
+		workspaceVolume = corev1.Volume{
+			Name: "workspace",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		}
+	} else {
+		workspaceVolume = corev1.Volume{
+			Name: "workspace",
+			VolumeSource: corev1.VolumeSource{
+				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: pvcName,
+				},
+			},
 		}
 	}
 
@@ -431,36 +457,31 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	// UID: ai-agent-runtime:0.4 uses pwuser (1001) from the Playwright base image
 	chownUID := "1001"
 
-	// Build git-sync args: per-branch PVCs always start fresh (clone only)
+	// Build git-sync args: write agents clone fresh into emptyDir workspace;
+	// read-only agents fetch/reset on the shared PVC.
+	// Note: git-sync runs as an init container BEFORE vault-agent-init,
+	// so it cannot source /vault/secrets/config. Use hardcoded public URL
+	// for read-only agents; write agents get a GitHub App token URL.
 	var gitSyncArgs string
-	cloneURL := "$REPO_URL"
+	cloneURL := "https://github.com/kylep/multi.git"
 	if githubToken != "" {
 		cloneURL = fmt.Sprintf("https://x-access-token:%s@github.com/kylep/multi.git", githubToken)
 	}
 	if isWriteAgent {
-		// Fresh clone for per-branch PVCs
+		// Fresh clone into writable emptyDir workspace
 		gitSyncArgs = fmt.Sprintf(
 			"git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
 			cloneURL, chownUID, chownUID,
 		)
 	} else {
-		// Existing shared PVC: fetch and reset
+		// Shared PVC: fetch and reset (owned by UID 1001, no safe.directory needed)
 		gitSyncArgs = fmt.Sprintf(
-			"git config --global --add safe.directory /workspace/repo && cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
+			"{ cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; }; chown -R %s:%s /workspace/repo",
 			cloneURL, chownUID, chownUID,
 		)
 	}
 
-	volumes := []corev1.Volume{
-		{
-			Name: "workspace",
-			VolumeSource: corev1.VolumeSource{
-				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					ClaimName: pvcName,
-				},
-			},
-		},
-	}
+	volumes := []corev1.Volume{workspaceVolume}
 	volumeMounts := []corev1.VolumeMount{
 		{Name: "workspace", MountPath: "/workspace"},
 	}
@@ -519,26 +540,51 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 			TTLSecondsAfterFinished: &ttl,
 			ActiveDeadlineSeconds:   &activeDeadline,
 			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{
+						"vault.hashicorp.com/agent-inject":                 "true",
+						"vault.hashicorp.com/agent-pre-populate-only":      "true",
+						"vault.hashicorp.com/role":                         "ai-agents",
+						"vault.hashicorp.com/agent-inject-secret-config":   "secret/ai-agents/anthropic",
+						"vault.hashicorp.com/agent-inject-template-config": vaultTemplate,
+					},
+				},
 				Spec: corev1.PodSpec{
 					RestartPolicy:         corev1.RestartPolicyNever,
+					ServiceAccountName:    "agent-controller",
 					ShareProcessNamespace: boolPtr(isPublisher),
+					SecurityContext: &corev1.PodSecurityContext{
+						RunAsNonRoot: boolPtr(true),
+						RunAsUser:    int64Ptr(1001),
+						FSGroup:      int64Ptr(1001),
+						SeccompProfile: &corev1.SeccompProfile{
+							Type: corev1.SeccompProfileTypeRuntimeDefault,
+						},
+					},
 					InitContainers: []corev1.Container{
 						{
 							Name:    "git-sync",
 							Image:   "alpine/git:v2.52.0",
 							Command: []string{"sh", "-c"},
 							Args:    []string{gitSyncArgs},
-							EnvFrom: []corev1.EnvFromSource{
-								{
-									SecretRef: &corev1.SecretEnvSource{
-										LocalObjectReference: corev1.LocalObjectReference{
-											Name: "agent-secrets",
-										},
-									},
-								},
-							},
 							VolumeMounts: []corev1.VolumeMount{
 								{Name: "workspace", MountPath: "/workspace"},
+							},
+							SecurityContext: &corev1.SecurityContext{
+								AllowPrivilegeEscalation: boolPtr(false),
+								Capabilities: &corev1.Capabilities{
+									Drop: []corev1.Capability{"ALL"},
+								},
+							},
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    resource.MustParse("50m"),
+									corev1.ResourceMemory: resource.MustParse("64Mi"),
+								},
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    resource.MustParse("100m"),
+									corev1.ResourceMemory: resource.MustParse("128Mi"),
+								},
 							},
 						},
 					},
@@ -550,21 +596,22 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 							Command:         []string{"sh", "-c"},
 							Args:            []string{cmd},
 							Env:             envVars,
-							EnvFrom: []corev1.EnvFromSource{
-								{
-									SecretRef: &corev1.SecretEnvSource{
-										LocalObjectReference: corev1.LocalObjectReference{
-											Name: "agent-secrets",
-										},
-									},
-								},
-							},
 							VolumeMounts: volumeMounts,
 							WorkingDir:   "/workspace/repo",
 							SecurityContext: &corev1.SecurityContext{
 								AllowPrivilegeEscalation: boolPtr(false),
 								Capabilities: &corev1.Capabilities{
 									Drop: []corev1.Capability{"ALL"},
+								},
+							},
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    resource.MustParse("250m"),
+									corev1.ResourceMemory: resource.MustParse("512Mi"),
+								},
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    resource.MustParse("1000m"),
+									corev1.ResourceMemory: resource.MustParse("2Gi"),
 								},
 							},
 						},
@@ -580,8 +627,12 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 		return fmt.Errorf("creating job: %w", err)
 	}
 
-	log.Printf("Created job %s for task %s (agent=%s, runtime=%s, pvc=%s)",
-		jobName, task.Name, task.Spec.Agent, task.Spec.Runtime, pvcName)
+	workspace := "emptyDir"
+	if !isWriteAgent {
+		workspace = "pvc:" + pvcName
+	}
+	log.Printf("Created job %s for task %s (agent=%s, runtime=%s, workspace=%s)",
+		jobName, task.Name, task.Spec.Agent, task.Spec.Runtime, workspace)
 	c.updateStatus(ctx, task, "Running", jobName)
 	return nil
 }
@@ -600,23 +651,23 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 	switch runtime {
 	case "opencode":
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
-		return fmt.Sprintf(`opencode -a '%s' -p '%s'`, escapedAgent, escapedPrompt)
+		return fmt.Sprintf(`. /vault/secrets/config && opencode -a '%s' -p '%s'`, escapedAgent, escapedPrompt)
 	default:
 		// Write MCP config and run Claude Code.
-		// Env vars (DISCORD_BOT_TOKEN etc.) are injected by the Secret.
+		// Env vars (DISCORD_BOT_TOKEN etc.) are sourced from /vault/secrets/config.
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
 
 		if task.Spec.Agent == "publisher" {
 			// Publisher uses entrypoint script for branch lifecycle, git push, PR, Discord.
 			// MCP config includes Playwright for QA subagent browser verification.
 			mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"playwright":{"type":"stdio","command":"npx","args":["-y","@playwright/mcp@latest","--headless"]}}}' > /tmp/mcp.json`
-			return fmt.Sprintf(`%s && apps/blog/bin/run-publisher.sh '%s'`, mcpConfig, escapedPrompt)
+			return fmt.Sprintf(`. /vault/secrets/config && %s && apps/blog/bin/run-publisher.sh '%s'`, mcpConfig, escapedPrompt)
 		}
 
 		// Default: journalist and other agents
 		// Discord MCP for posting notifications; agents use WebSearch for news lookup.
 		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
-		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json --verbose --include-partial-messages`, mcpConfig, escapedAgent, escapedPrompt)
+		cmd := fmt.Sprintf(`. /vault/secrets/config && %s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json --verbose --include-partial-messages`, mcpConfig, escapedAgent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
 			tools := strings.Split(task.Spec.AllowedTools, ",")
 			for _, tool := range tools {

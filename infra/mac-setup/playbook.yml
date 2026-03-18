@@ -1,0 +1,222 @@
+---
+# Ansible playbook: factory-reset Mac → ready for K8s + Claude Code
+# Usage: ansible-playbook infra/mac-setup/playbook.yml --ask-become-pass
+#
+# Idempotent — safe to re-run.
+
+- name: Configure macOS development workstation
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    repo_dir: "{{ ansible_env.HOME }}/gh/multi"
+    homebrew_taps:
+      - homebrew/cask
+    homebrew_packages:
+      - git
+      - gh
+      - jq
+      - node
+      - python@3
+      - helm
+      - helmfile
+      - pre-commit
+      - ansible  # keep ansible managed by brew for upgrades
+    homebrew_casks:
+      - rancher
+    npm_global_packages:
+      - "@anthropic-ai/claude-code"
+
+  tasks:
+    # ---------------------------------------------------------------
+    # Homebrew packages
+    # ---------------------------------------------------------------
+    - name: Update Homebrew
+      community.general.homebrew:
+        update_homebrew: true
+      changed_when: false
+
+    - name: Install Homebrew packages
+      community.general.homebrew:
+        name: "{{ homebrew_packages }}"
+        state: present
+
+    - name: Install Homebrew casks
+      community.general.homebrew_cask:
+        name: "{{ homebrew_casks }}"
+        state: present
+
+    # ---------------------------------------------------------------
+    # npm global packages (Claude Code)
+    # ---------------------------------------------------------------
+    - name: Install npm global packages
+      community.general.npm:
+        name: "{{ item }}"
+        global: true
+        state: present
+      loop: "{{ npm_global_packages }}"
+
+    # ---------------------------------------------------------------
+    # Rancher Desktop configuration
+    # ---------------------------------------------------------------
+    - name: Check if Rancher Desktop is running
+      ansible.builtin.command: pgrep -f "Rancher Desktop"
+      register: rancher_running
+      changed_when: false
+      failed_when: false
+
+    - name: Prompt to start Rancher Desktop
+      ansible.builtin.debug:
+        msg: >
+          Rancher Desktop is not running. Start it from Applications,
+          enable Kubernetes, and set the container engine to dockerd (moby).
+          Then re-run this playbook.
+      when: rancher_running.rc != 0
+
+    - name: Wait for kubectl to be available via Rancher Desktop
+      ansible.builtin.command: kubectl cluster-info
+      register: kubectl_check
+      changed_when: false
+      failed_when: false
+      when: rancher_running.rc == 0
+
+    - name: Symlink Rancher docker to PATH
+      ansible.builtin.file:
+        src: "{{ ansible_env.HOME }}/.rd/bin/docker"
+        dest: /usr/local/bin/docker
+        state: link
+      become: true
+      when: rancher_running.rc == 0
+      failed_when: false
+
+    # ---------------------------------------------------------------
+    # Directory structure
+    # ---------------------------------------------------------------
+    - name: Create secrets directory
+      ansible.builtin.file:
+        path: "{{ repo_dir }}/secrets"
+        state: directory
+        mode: "0700"
+
+    - name: Create .claude directory
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.claude"
+        state: directory
+        mode: "0700"
+
+    # ---------------------------------------------------------------
+    # Git configuration
+    # ---------------------------------------------------------------
+    - name: Set git user name
+      community.general.git_config:
+        name: user.name
+        scope: global
+        value: "Kyle Pericak"
+
+    - name: Set git user email
+      community.general.git_config:
+        name: user.email
+        scope: global
+        value: "kyle@pericak.com"
+
+    - name: Set git default branch
+      community.general.git_config:
+        name: init.defaultBranch
+        scope: global
+        value: main
+
+    # ---------------------------------------------------------------
+    # SSH key (for GitHub)
+    # ---------------------------------------------------------------
+    - name: Generate SSH key if missing
+      community.crypto.openssh_keypair:
+        path: "{{ ansible_env.HOME }}/.ssh/id_ed25519"
+        type: ed25519
+        comment: "kyle@pericak.com"
+      register: ssh_key
+
+    - name: Show SSH public key for GitHub
+      ansible.builtin.debug:
+        msg: >
+          Add this SSH key to GitHub (Settings → SSH keys):
+          {{ lookup('file', ansible_env.HOME + '/.ssh/id_ed25519.pub') }}
+      when: ssh_key.changed
+
+    # ---------------------------------------------------------------
+    # Pre-commit hooks
+    # ---------------------------------------------------------------
+    - name: Install pre-commit hooks in repo
+      ansible.builtin.command:
+        cmd: pre-commit install
+        chdir: "{{ repo_dir }}"
+      register: precommit_result
+      changed_when: "'installed' in precommit_result.stdout"
+
+    - name: Install pre-commit push hooks
+      ansible.builtin.command:
+        cmd: pre-commit install --hook-type pre-push
+        chdir: "{{ repo_dir }}"
+      register: precommit_push_result
+      changed_when: "'installed' in precommit_push_result.stdout"
+
+    # ---------------------------------------------------------------
+    # Blog dependencies
+    # ---------------------------------------------------------------
+    - name: Install blog npm dependencies
+      community.general.npm:
+        path: "{{ repo_dir }}/apps/blog/blog"
+        state: present
+
+    # ---------------------------------------------------------------
+    # Shell profile (Homebrew + Rancher Desktop PATH)
+    # ---------------------------------------------------------------
+    - name: Ensure Homebrew in zsh profile
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.zprofile"
+        line: 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+        create: true
+        mode: "0644"
+
+    - name: Ensure Rancher Desktop in PATH
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.zprofile"
+        line: 'export PATH="$HOME/.rd/bin:$PATH"'
+        create: true
+        mode: "0644"
+
+    # ---------------------------------------------------------------
+    # Lima VM workspace (requires Rancher Desktop running)
+    # ---------------------------------------------------------------
+    - name: Create Lima VM agent workspace directories
+      ansible.builtin.command:
+        cmd: rdctl shell -- sudo mkdir -p /tmp/agent-workspace /tmp/agent-workspace/branches
+      when: rancher_running.rc == 0
+      changed_when: false
+      failed_when: false
+
+    - name: Set sticky bit on agent workspace
+      ansible.builtin.command:
+        cmd: rdctl shell -- sudo chmod 1777 /tmp/agent-workspace /tmp/agent-workspace/branches
+      when: rancher_running.rc == 0
+      changed_when: false
+      failed_when: false
+
+    # ---------------------------------------------------------------
+    # Summary
+    # ---------------------------------------------------------------
+    - name: Bootstrap summary
+      ansible.builtin.debug:
+        msg: |
+          Mac setup complete. Installed:
+            - Homebrew packages: {{ homebrew_packages | join(', ') }}
+            - Casks: {{ homebrew_casks | join(', ') }}
+            - npm globals: {{ npm_global_packages | join(', ') }}
+            - Git config, SSH key, pre-commit hooks
+            - Blog npm dependencies
+
+          Next steps:
+            1. Transfer exports.sh from old machine
+            2. source ~/gh/multi/apps/blog/exports.sh
+            3. claude setup-token
+            4. bash ~/gh/multi/infra/ai-agents/bin/bootstrap.sh

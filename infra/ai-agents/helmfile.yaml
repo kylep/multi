@@ -1,0 +1,18 @@
+repositories:
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+
+releases:
+  - name: vault
+    namespace: vault
+    chart: hashicorp/vault
+    version: 0.32.0
+    values:
+      - vault/values.yaml
+    createNamespace: true
+
+  - name: agent-controller
+    namespace: ai-agents
+    chart: ./agent-controller/helm
+    needs:
+      - vault/vault

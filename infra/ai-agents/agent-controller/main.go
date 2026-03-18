@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/kylep/multi/infra/agent-controller/pkg/controller"
-	"github.com/kylep/multi/infra/agent-controller/pkg/crd"
-	"github.com/kylep/multi/infra/agent-controller/pkg/discord"
+	"github.com/kylep/multi/infra/ai-agents/agent-controller/pkg/controller"
+	"github.com/kylep/multi/infra/ai-agents/agent-controller/pkg/crd"
+	"github.com/kylep/multi/infra/ai-agents/agent-controller/pkg/discord"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"

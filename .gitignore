@@ -4,7 +4,7 @@ tmp/
 export.sh
 export-*.sh
 exports/*.sh
-secrets/*.sh
+secrets/
 .DS_Store
 *.swp
 *.pyc

@@ -1,0 +1,30 @@
+# Copy to exports.sh and populate with real values.
+# exports.sh is gitignored; this sample is not.
+#
+# Usage: source apps/blog/exports.sh
+
+# AI model providers
+export OPENAI_API_KEY=""
+export GEMINI_API_KEY=""
+export GOOGLE_API_KEY="$GEMINI_API_KEY"
+export BFL_API_KEY=""
+export OPENCODE_API_KEY=""
+export CLAUDE_CODE_OAUTH_TOKEN=""  # run: claude setup-token
+
+# GitHub App — PericakAI (github.com/settings/apps/pericakai)
+export GITHUB_APP_CLIENT_SECRET=""
+export GITHUB_APP_ID=""
+export GITHUB_INSTALL_ID=""  # from github.com/settings/installations URL — different from APP_ID
+
+# Base64-encoded secret files — single portable backup
+# Generate: base64 < infra/ai-agents/vault/gcp-credentials.json
+export GCP_CREDENTIALS_B64=""
+# Generate: base64 < secrets/pericakai.private-key.pem
+export GITHUB_APP_PRIVATE_KEY_B64=""
+
+# Agent controller secrets (also used by store-secrets.sh)
+export OPENROUTER_API_KEY=""  # openrouter.ai → Account → API Keys
+export DISCORD_BOT_TOKEN=""  # Discord Developer Portal → Bot → Token
+export DISCORD_GUILD_ID=""  # right-click server in Discord (Developer Mode) → Copy ID
+export DISCORD_LOG_CHANNEL_ID=""  # right-click channel → Copy ID
+export AI_WEBHOOK_TOKEN=""  # any strong random string for internal webhook auth

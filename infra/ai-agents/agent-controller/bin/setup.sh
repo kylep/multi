@@ -56,11 +56,11 @@ source "$SECRETS_FILE"
 # --- Optional image builds ---
 if [ "$BUILD_IMAGES" = true ]; then
   echo "==> Building runtime image..."
-  docker build -t kpericak/ai-agent-runtime:0.4 "$REPO_ROOT/infra/ai-agent-runtime"
+  docker build -t kpericak/ai-agent-runtime:0.4 "$REPO_ROOT/infra/ai-agents/ai-agent-runtime"
   docker push kpericak/ai-agent-runtime:0.4
 
   echo "==> Building controller image..."
-  docker build -t kpericak/agent-controller:0.6 "$REPO_ROOT/infra/agent-controller"
+  docker build -t kpericak/agent-controller:0.6 "$REPO_ROOT/infra/ai-agents/agent-controller"
   docker push kpericak/agent-controller:0.6
 fi
 
@@ -71,7 +71,7 @@ kubectl create ns ai-agents --dry-run=client -o yaml | kubectl apply -f -
 # --- Helm install/upgrade ---
 echo "==> Running helm upgrade --install..."
 helm upgrade --install agent-controller \
-  "$REPO_ROOT/infra/agent-controller/helm" \
+  "$REPO_ROOT/infra/ai-agents/agent-controller/helm" \
   -n ai-agents
 
 # --- Patch secrets ---

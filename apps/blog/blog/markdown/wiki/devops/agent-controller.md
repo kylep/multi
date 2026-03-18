@@ -21,12 +21,12 @@ related:
   - wiki/security/claude-code-write-pattern-bug
   - wiki/design-docs/autonomous-publisher/index
 scope: "Covers the agent controller architecture, CRD spec, Helm deployment, runtime image, debugging, and operational procedures. Does not cover agent definitions or blog content pipeline."
-last_verified: 2026-03-17
+last_verified: 2026-03-18
 ---
 
 
 Custom K8s controller that watches `AgentTask` CRDs and creates Jobs
-to run AI agents. Lives in `infra/agent-controller/`.
+to run AI agents. Lives in `infra/ai-agents/agent-controller/`.
 
 Supports two agent types:
 - **journalist** — daily AI news digest (scheduled, OpenRouter auth)
@@ -38,13 +38,18 @@ The system has two images:
 
 | Image | Purpose | Source |
 |-------|---------|--------|
-| `kpericak/ai-agent-runtime:0.4` | Claude Code + Playwright + hooks | `infra/ai-agent-runtime/` |
-| `kpericak/agent-controller:0.6` | Go controller binary | `infra/agent-controller/` |
+| `kpericak/ai-agent-runtime:0.4` | Claude Code + Playwright + hooks | `infra/ai-agents/ai-agent-runtime/` |
+| `kpericak/agent-controller:0.8` | Go controller binary | `infra/ai-agents/agent-controller/` |
 
-The controller runs as a Deployment, watching `AgentTask` resources.
-When a task is due, it creates a Job with:
-1. **Init container** (`alpine/git`) — clones/updates the repo, chowns to UID 1001
-2. **Main container** (`ai-agent-runtime`) — writes MCP config, runs the agent CLI
+The controller runs as a Deployment (2/2 pods — controller + Vault
+sidecar), watching `AgentTask` resources. When a task is due, it
+creates a Job with:
+1. **Vault init container** — injected by Vault Agent Injector, writes secrets to `/vault/secrets/config`
+2. **Init container** (`alpine/git`) — clones/updates the repo, chowns to UID 1001
+3. **Main container** (`ai-agent-runtime`) — sources env vars from `/vault/secrets/config`, runs the agent CLI
+4. **Vault sidecar** — keeps secrets refreshed (auto-injected)
+5. All containers run PSS restricted: `seccompProfile: RuntimeDefault` (pod level),
+   `capabilities.drop: ALL`, `allowPrivilegeEscalation: false`, `runAsNonRoot: true` (UID 1001)
 
 ## Discord #log observability
 
@@ -118,20 +123,22 @@ The controller configures MCP servers per agent type:
 
 Google-news MCP server was removed — agents use WebSearch instead.
 
-## Per-Branch PVCs
+## Workspace Volumes (per agent type)
 
-Write agents (`publisher`, `qa`, `journalist`) get dedicated PV/PVC
-pairs per job run (`agent-ws-<jobName>`) instead of sharing a single
-PVC. This eliminates stale state leakage between runs and enables
-parallel write-agent execution.
+Write agents (`publisher`, `qa`, `journalist`) get a fresh `emptyDir`
+volume per job. Since write agents push all work to GitHub before the pod
+terminates, the ephemeral workspace is safe. This also satisfies PSS
+restricted — `emptyDir` is writable by UID 1001 without any hostPath
+ownership workarounds.
 
-- **PV/PVC name:** `agent-ws-<jobName>` (jobName = `<taskName>-<timestamp>`)
-- **hostPath:** `/tmp/agent-workspace/branches/<jobName>/`
-- **Cleanup:** controller deletes PV+PVC after job completes or fails
-- **Read-only agents** still use the shared `agent-workspace` PVC
+- **Write agents:** `emptyDir` (auto-cleaned when pod terminates)
+- **Read-only agents:** shared `agent-workspace` PVC at `/workspace`
+- **Shared PVC hostPath:** `/tmp/agent-workspace` on Lima VM, must be
+  mode `1777` for UID 1001 write access (set by `rdctl shell -- sudo
+  chmod 1777 /tmp/agent-workspace`)
 
-The previous `canRunWrite()` serialization was removed since
-per-branch PVCs eliminate the need for write serialization.
+The previous per-branch PV/PVC creation pattern was removed in
+controller v0.7 in favour of emptyDir for write agents.
 
 ## GitHub App Auth
 
@@ -157,23 +164,23 @@ clone. `run-publisher.sh` uses the same token for `git push` and
 Use the bootstrap script to deploy from a fresh cluster:
 
 ```bash
-# 1. Copy and populate secrets
-cp secrets/export-agent-controller.sh.SAMPLE secrets/export-agent-controller.sh
-# edit the file, fill in values
-
-# 2. Run setup (optionally build images first)
-infra/agent-controller/bin/setup.sh --build-images
-
-# Or without building images (if they're already pushed):
-infra/agent-controller/bin/setup.sh
+bash infra/ai-agents/bin/bootstrap.sh
 ```
 
-**Prerequisites:** kubectl, helm, docker on PATH; cluster reachable
-via `kubectl cluster-info`.
+This runs `helmfile sync` to install Vault and the agent controller,
+applies CRDs and sample AgentTask manifests, then prints manual Vault
+setup steps if this is a first-time install.
 
-The script handles namespace creation, helm install, and secret
-patching. See `secrets/export-agent-controller.sh.SAMPLE` for the
-full list of required env vars.
+After bootstrap, configure Vault auth and store secrets:
+
+```bash
+bash infra/ai-agents/bin/configure-vault-auth.sh
+bash infra/ai-agents/bin/store-secrets.sh
+```
+
+See the [Bootstrap & Recovery](/wiki/devops/bootstrap.html) guide for
+the full walkthrough including Vault init, secret structure, and
+troubleshooting.
 
 ## Webhook
 
@@ -204,57 +211,46 @@ curl -X POST http://localhost:8080/webhook \
 ## Deployment
 
 ```bash
-helm upgrade agent-controller infra/agent-controller/helm/ \
-  -n ai-agents -f infra/agent-controller/helm/values.yaml
+# Via helmfile (preferred — handles Vault dependency)
+helmfile -f infra/ai-agents/helmfile.yaml apply
+
+# Or direct helm upgrade
+helm upgrade agent-controller infra/ai-agents/agent-controller/helm/ \
+  -n ai-agents -f infra/ai-agents/agent-controller/helm/values.yaml
 ```
 
 Uses a hostPath PV on single-node Rancher Desktop. Not suitable for
 multi-node clusters.
 
-### Secrets
+### Secrets (Vault)
 
-The helm chart's `secret.yaml` uses `lookup` to preserve existing
-secret values on `helm upgrade`.
+All secrets are injected via Vault Agent Injector — there is no K8s
+Secret for agent credentials. The Vault sidecar writes secrets to an
+in-memory tmpfs at `/vault/secrets/config`, which the controller and
+agent Jobs source as environment variables.
 
-**Gotcha:** `helm upgrade` with explicit `-f values.yaml` will reset
-secret values to empty defaults if the secret was previously deleted
-(field manager conflicts). Always restore secrets after a
-delete-and-recreate cycle:
-
-```bash
-# Source the OAuth token
-source apps/blog/exports.sh
-
-# Patch secrets
-kubectl -n ai-agents patch secret agent-secrets --type merge -p "{
-  \"stringData\": {
-    \"CLAUDE_CODE_OAUTH_TOKEN\": \"$CLAUDE_CODE_OAUTH_TOKEN\",
-    \"DISCORD_LOG_CHANNEL_ID\": \"1483433712296398942\",
-    \"REPO_BRANCH\": \"main\"
-  }
-}"
-```
-
-### Field manager conflicts
-
-If `helm upgrade` fails with "conflicts with kubectl-patch", delete
-the secret and re-create via helm, then re-patch values:
+To update secrets in Vault:
 
 ```bash
-kubectl -n ai-agents delete secret agent-secrets
-helm upgrade agent-controller infra/agent-controller/helm/ \
-  -n ai-agents -f infra/agent-controller/helm/values.yaml
-# Then re-patch secrets as above
+bash infra/ai-agents/bin/store-secrets.sh
 ```
+
+Then restart the controller to pick up changes:
+
+```bash
+kubectl rollout restart deploy/agent-controller -n ai-agents
+```
+
+See [Bootstrap & Recovery](/wiki/devops/bootstrap.html) for the full
+secret structure and Vault paths.
 
 ## Workspace Volumes
 
-Write agents get per-branch PVCs (see above). Read-only agents share
-a single `agent-workspace` PVC at `/workspace`.
+See [Per-Agent Workspace Volumes](#workspace-volumes-per-agent-type) above for the full breakdown. Key points:
 
-The init container runs `git clone` (per-branch) or `git fetch` +
-`git reset --hard` (shared) before each run, then
-`chown -R 1001:1001 /workspace/repo`.
+The init container runs `git clone` (write agents, fresh emptyDir) or
+`git fetch` + `git reset --hard` (read-only agents, shared PVC) before
+each run, then `chown -R 1001:1001 /workspace/repo`.
 
 **UID 1001:** The Playwright-based runtime image runs as `pwuser`
 (UID 1001). All agents use this UID regardless of type.
@@ -301,28 +297,43 @@ kubectl -n ai-agents delete agenttask <name1> <name2> ...
 
 ### Debug pod on workspace PVC
 
+The `ai-agents` namespace enforces PSS restricted, so the debug pod must
+include a compliant security context or it will be rejected at admission.
+
 ```bash
 kubectl -n ai-agents run debug --rm -it --restart=Never \
   --image=kpericak/ai-agent-runtime:0.4 \
-  --overrides='{"spec":{"containers":[{
-    "name":"debug",
-    "image":"kpericak/ai-agent-runtime:0.4",
-    "command":["tail","-f","/dev/null"],
-    "workingDir":"/workspace/repo",
-    "volumeMounts":[{"name":"ws","mountPath":"/workspace"}]
-  }],"volumes":[{
-    "name":"ws",
-    "persistentVolumeClaim":{"claimName":"agent-workspace"}
-  }]}}' -- unused
+  --overrides='{
+    "spec": {
+      "securityContext": {
+        "runAsNonRoot": true,
+        "runAsUser": 1001,
+        "fsGroup": 1001,
+        "seccompProfile": {"type": "RuntimeDefault"}
+      },
+      "containers": [{
+        "name": "debug",
+        "image": "kpericak/ai-agent-runtime:0.4",
+        "command": ["tail", "-f", "/dev/null"],
+        "workingDir": "/workspace/repo",
+        "securityContext": {
+          "allowPrivilegeEscalation": false,
+          "capabilities": {"drop": ["ALL"]}
+        },
+        "volumeMounts": [{"name": "ws", "mountPath": "/workspace"}]
+      }],
+      "volumes": [{"name": "ws", "persistentVolumeClaim": {"claimName": "agent-workspace"}}]
+    }
+  }' -- unused
 ```
 
 ## Key Files
 
-- `infra/agent-controller/main.go` — Controller entrypoint + webhook
-- `infra/agent-controller/pkg/controller/controller.go` — Reconcile loop + job creation
-- `infra/agent-controller/pkg/discord/discord.go` — Discord #log notifier
-- `infra/agent-controller/pkg/crd/types.go` — AgentTask Go types
-- `infra/agent-controller/helm/` — Helm chart
+- `infra/ai-agents/agent-controller/main.go` — Controller entrypoint + webhook
+- `infra/ai-agents/agent-controller/pkg/controller/controller.go` — Reconcile loop + job creation
+- `infra/ai-agents/agent-controller/pkg/discord/discord.go` — Discord #log notifier
+- `infra/ai-agents/agent-controller/pkg/crd/types.go` — AgentTask Go types
+- `infra/ai-agents/agent-controller/helm/` — Helm chart
 - `apps/blog/bin/run-publisher.sh` — Publisher entrypoint script
 - `.claude/agents/publisher.md` — Publisher agent definition
 - `.claude/agents/journalist.md` — Journalist agent definition

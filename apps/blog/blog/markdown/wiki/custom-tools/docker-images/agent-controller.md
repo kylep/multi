@@ -14,7 +14,7 @@ last_verified: 2026-03-15
 ---
 
 **Image:** `kpericak/agent-controller:0.5`
-**Source:** `infra/agent-controller/`
+**Source:** `infra/ai-agents/agent-controller/`
 **Base:** Alpine 3.21
 
 Go binary that watches `AgentTask` custom resources and creates
@@ -40,15 +40,35 @@ Runs as non-root `controller` user (UID 1000).
 - Watches `AgentTask` CRDs in the `ai-agents` namespace
 - Creates K8s Jobs on cron schedule or manual trigger
 - Exposes `:8080/webhook` for on-demand runs
-- Serializes write agents to prevent commit conflicts
+- Issues GitHub App installation tokens for write agent git auth
+- Gives write agents (publisher, qa, journalist) dedicated per-branch PVCs
 - Tracks job status back on the AgentTask CR
+
+## Secret delivery
+
+All secrets are injected by the Vault Agent sidecar — no plain-text K8s
+Secrets are used for agent workloads. The controller pod and each Job pod
+both receive `/vault/secrets/config` (a shell-sourceable file) written
+by the vault-agent container at startup. The controller entrypoint
+sources it before the Go binary starts; Job entrypoints source it before
+any git or claude commands run.
+
+Vault paths used:
+
+| Path | Who reads it |
+|------|-------------|
+| `secret/ai-agents/discord` | controller + all jobs |
+| `secret/ai-agents/webhook` | controller |
+| `secret/ai-agents/github` | controller (JWT signing) + jobs (REPO_URL) |
+| `secret/ai-agents/anthropic` | jobs only |
+| `secret/ai-agents/openrouter` | jobs only |
+
+To populate or update secrets: `bash infra/ai-agents/bin/store-secrets.sh`
 
 ## Deployment
 
-Deployed via Helm chart at `infra/agent-controller/helm/`.
+Deployed via Helmfile at `infra/ai-agents/helmfile.yaml`.
 
 ```bash
-helm install agent-controller ./helm \
-  -n ai-agents --create-namespace \
-  -f values-override.yaml
+helmfile -f infra/ai-agents/helmfile.yaml apply
 ```

@@ -1,0 +1,3 @@
+# Environment-specific overrides for the ai-agents stack.
+# StorageClass used by Vault PVC and agent workspace volumes.
+storageClass: local-path

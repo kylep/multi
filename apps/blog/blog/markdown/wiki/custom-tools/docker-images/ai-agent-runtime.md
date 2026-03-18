@@ -19,7 +19,7 @@ last_verified: 2026-03-17
 ---
 
 **Image:** `kpericak/ai-agent-runtime:0.4`
-**Source:** `infra/ai-agent-runtime/`
+**Source:** `infra/ai-agents/ai-agent-runtime/`
 **Base:** `mcr.microsoft.com/playwright:v1.58.2-noble` (Ubuntu, glibc)
 
 Runtime environment for autonomous AI agent pods. Used by the
@@ -127,7 +127,7 @@ container environment and choose the right server.
 
 ## Key files
 
-- `infra/ai-agent-runtime/Dockerfile`
-- `infra/ai-agent-runtime/hooks/discord-log.sh` — PostToolUse hook
-- `infra/ai-agent-runtime/claude-settings.json` — Permissions + hook config
+- `infra/ai-agents/ai-agent-runtime/Dockerfile`
+- `infra/ai-agents/ai-agent-runtime/hooks/discord-log.sh` — PostToolUse hook
+- `infra/ai-agents/ai-agent-runtime/claude-settings.json` — Permissions + hook config
 - `apps/blog/bin/start-static-server.sh` — Container-friendly QA server

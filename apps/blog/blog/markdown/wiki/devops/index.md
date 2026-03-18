@@ -8,7 +8,7 @@ keywords:
   - ruler
 related:
   - wiki/blog-architecture
-scope: "Covers DevOps tooling. Does not cover infrastructure provisioning or cloud services."
+scope: "Covers DevOps tooling and infrastructure provisioning (bootstrap, Vault, Helm). Does not cover cloud services."
 last_verified: 2026-03-15
 ---
 
@@ -21,3 +21,4 @@ configuration management.
 - [Ruler](/wiki/devops/ruler.html) — Cross-tool AI rule inventory
 - [CodeRabbit](/wiki/devops/coderabbit.html) — False positive patterns and path_instructions
 - [Agent Controller](/wiki/devops/agent-controller.html) — K8s controller for autonomous AI agent runs via CRDs
+- [Bootstrap & Recovery](/wiki/devops/bootstrap.html) — Single-command bootstrap, Vault secrets, post-reboot recovery

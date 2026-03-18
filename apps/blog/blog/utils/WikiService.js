@@ -4,6 +4,15 @@ import { MarkdownService } from './MarkdownService.js';
 
 const wikiDirectory = path.join('markdown', 'wiki');
 
+function escapeHtml(str) {
+	return str
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;');
+}
+
 class WikiService {
 	constructor() {
 		if (WikiService.instance) {
@@ -124,7 +133,7 @@ class WikiService {
 		children.forEach((child, i) => {
 			const isLast = i === children.length - 1;
 			const connector = isLast ? '└── ' : '├── ';
-			const link = `<a href="/${child.slug}.html">${child.title}</a>`;
+			const link = `<a href="/${encodeURI(child.slug)}.html">${escapeHtml(child.title)}</a>`;
 			lines.push({ prefix: indent + connector, link });
 			if (child.children.length > 0) {
 				const childIndent = indent + (isLast ? '    ' : '│   ');

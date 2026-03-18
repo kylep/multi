@@ -1,4 +1,4 @@
-module github.com/kylep/multi/infra/agent-controller
+module github.com/kylep/multi/infra/ai-agents/agent-controller
 
 go 1.24
 
