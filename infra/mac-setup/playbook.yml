@@ -26,6 +26,7 @@
       - tmux
       - vim
     homebrew_casks:
+      - iterm2
       - rancher
     npm_global_packages:
       - "@anthropic-ai/claude-code"
