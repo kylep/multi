@@ -103,14 +103,14 @@ Each Job has two containers:
 ## Controller and runtime
 
 The
-[controller](https://github.com/kylep/multi/tree/main/infra/agent-controller/pkg/controller)
+[controller](https://github.com/kylep/multi/tree/main/infra/ai-agents/agent-controller/pkg/controller)
 is a Go reconcile loop that lists all AgentTasks every 30 seconds.
 For scheduled tasks, it compares `lastRunTime` against the cron
 expression and creates a Job when due. For manual and webhook
 tasks, it creates a Job immediately when phase is `Pending`.
 
 The runtime image is an Alpine container with Claude Code and
-OpenCode baked in (`infra/ai-agent-runtime/Dockerfile`). Runs
+OpenCode baked in (`infra/ai-agents/ai-agent-runtime/Dockerfile`). Runs
 as uid 1000.
 
 
@@ -234,7 +234,7 @@ the reconcile loop picks it up.
 ## Helm chart and deployment
 
 The
-[Helm chart](https://github.com/kylep/multi/tree/main/infra/agent-controller/helm)
+[Helm chart](https://github.com/kylep/multi/tree/main/infra/ai-agents/agent-controller/helm)
 packages everything: CRD, controller Deployment, ServiceAccount,
 RBAC, Secrets, and PVC. hostPath volume, single node.
 

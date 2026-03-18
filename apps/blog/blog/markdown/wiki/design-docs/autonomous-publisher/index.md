@@ -94,7 +94,7 @@ graph TD
 **Responsibility:** Provide Claude Code CLI, Playwright, Chromium, and
 all MCP server dependencies in a single image.
 
-**File path:** `infra/ai-agent-runtime/Dockerfile`
+**File path:** `infra/ai-agents/ai-agent-runtime/Dockerfile`
 
 **Key change:** Base image switches from `node:22-alpine` to the
 official Playwright image `mcr.microsoft.com/playwright:v1.58.2-noble`
@@ -136,7 +136,7 @@ controller runs instead of inline Claude Code invocation.
 specific configuration: Playwright MCP server in the MCP config JSON,
 OAuth token injection, and `gh` CLI auth.
 
-**File path:** `infra/agent-controller/pkg/controller/controller.go`
+**File path:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`
 
 **Key changes:**
 - `buildCommand()` detects `agent == "publisher"` and uses the
@@ -159,7 +159,7 @@ OAuth token injection, and `gh` CLI auth.
 **Responsibility:** Store Claude Max OAuth token and GitHub token
 alongside existing secrets.
 
-**File path:** `infra/agent-controller/helm/templates/secret.yaml`
+**File path:** `infra/ai-agents/agent-controller/helm/templates/secret.yaml`
 
 **Key additions:**
 - `CLAUDE_CODE_OAUTH_TOKEN` -- the 1-year token from `claude setup-token`
@@ -175,7 +175,7 @@ The entrypoint script unsets them before invoking Claude Code.
 **Responsibility:** Restrict agent pod network egress to non-RFC1918
 addresses only (following the OpenClaw pattern).
 
-**File path:** `infra/agent-controller/helm/templates/networkpolicy.yaml`
+**File path:** `infra/ai-agents/agent-controller/helm/templates/networkpolicy.yaml`
 
 **Key interfaces:**
 - Deny all ingress
@@ -189,7 +189,7 @@ addresses only (following the OpenClaw pattern).
 **Responsibility:** Declarative task definition for manual publisher
 runs.
 
-**File path:** `infra/agent-controller/config/samples/publisher-manual.yaml`
+**File path:** `infra/ai-agents/agent-controller/config/samples/publisher-manual.yaml`
 
 **Key fields:**
 - `agent: publisher`
@@ -318,13 +318,13 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 
 | Action | File | Rationale |
 |--------|------|-----------|
-| MODIFY | `infra/ai-agent-runtime/Dockerfile` | Switch base to Playwright image, add `@playwright/mcp`, `gh` CLI, bake in `~/.claude.json` onboarding bypass |
+| MODIFY | `infra/ai-agents/ai-agent-runtime/Dockerfile` | Switch base to Playwright image, add `@playwright/mcp`, `gh` CLI, bake in `~/.claude.json` onboarding bypass |
 | CREATE | `apps/blog/bin/run-publisher.sh` | Entrypoint script: branch creation, Claude invocation, git push, PR creation, Discord notification |
-| MODIFY | `infra/agent-controller/pkg/controller/controller.go` | Add publisher-specific command building (entrypoint script invocation), Playwright MCP in config, /dev/shm volume |
-| MODIFY | `infra/agent-controller/helm/templates/secret.yaml` | Add `CLAUDE_CODE_OAUTH_TOKEN` and `GITHUB_TOKEN` fields |
-| MODIFY | `infra/agent-controller/helm/values.yaml` | Add new secret defaults, bump runtime image tag to 0.3 |
-| CREATE | `infra/agent-controller/helm/templates/networkpolicy.yaml` | Non-RFC1918 egress policy for agent pods (OpenClaw pattern) |
-| CREATE | `infra/agent-controller/config/samples/publisher-manual.yaml` | Sample AgentTask for manual publisher runs |
+| MODIFY | `infra/ai-agents/agent-controller/pkg/controller/controller.go` | Add publisher-specific command building (entrypoint script invocation), Playwright MCP in config, /dev/shm volume |
+| MODIFY | `infra/ai-agents/agent-controller/helm/templates/secret.yaml` | Add `CLAUDE_CODE_OAUTH_TOKEN` and `GITHUB_TOKEN` fields |
+| MODIFY | `infra/ai-agents/agent-controller/helm/values.yaml` | Add new secret defaults, bump runtime image tag to 0.3 |
+| CREATE | `infra/ai-agents/agent-controller/helm/templates/networkpolicy.yaml` | Non-RFC1918 egress policy for agent pods (OpenClaw pattern) |
+| CREATE | `infra/ai-agents/agent-controller/config/samples/publisher-manual.yaml` | Sample AgentTask for manual publisher runs |
 | MODIFY | `apps/blog/blog/markdown/wiki/devops/agent-controller.md` | Document publisher task, Max auth, credential rotation |
 | MODIFY | `apps/blog/blog/markdown/wiki/custom-tools/docker-images/ai-agent-runtime.md` | Document new base image, Playwright, version bump |
 
@@ -347,7 +347,7 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 
 - **Requirement:** PRD story "Self-verifying output" -- runtime must
   support Chromium for QA verification
-- **Files:** `infra/ai-agent-runtime/Dockerfile`
+- **Files:** `infra/ai-agents/ai-agent-runtime/Dockerfile`
 - **Dependencies:** TASK-001 (need `~/.claude.json` structure)
 - **Acceptance criteria:**
   - [x] Base image is `mcr.microsoft.com/playwright:v1.58.2-noble` (latest stable at implementation time)
@@ -381,7 +381,7 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 
 - **Requirement:** PRD story "Self-verifying output" -- QA subagent
   needs Playwright MCP tools available
-- **Files:** `infra/agent-controller/pkg/controller/controller.go`
+- **Files:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`
 - **Dependencies:** TASK-002 (Playwright in image)
 - **Completion notes:** [task-004-008-controller-helm.md](task-004-008-controller-helm.md)
 - **Acceptance criteria:**
@@ -395,7 +395,7 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 
 - **Requirement:** PRD story "Self-verifying output" -- Chromium
   requires shared memory and specific pod security settings
-- **Files:** `infra/agent-controller/pkg/controller/controller.go`
+- **Files:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`
 - **Dependencies:** TASK-004
 - **Completion notes:** [task-004-008-controller-helm.md](task-004-008-controller-helm.md)
 - **Acceptance criteria:**
@@ -411,7 +411,7 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 
 - **Requirement:** PRD story "Use Claude Max tokens" -- OAuth token must
   be injected into the pod
-- **Files:** `infra/agent-controller/helm/templates/secret.yaml`, `infra/agent-controller/helm/values.yaml`
+- **Files:** `infra/ai-agents/agent-controller/helm/templates/secret.yaml`, `infra/ai-agents/agent-controller/helm/values.yaml`
 - **Dependencies:** TASK-001 (have the token)
 - **Completion notes:** [task-004-008-controller-helm.md](task-004-008-controller-helm.md)
 - **Acceptance criteria:**
@@ -425,7 +425,7 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 
 - **Requirement:** PRD story "Sandboxed execution" -- restrict network
   egress to non-RFC1918 addresses
-- **Files:** `infra/agent-controller/helm/templates/networkpolicy.yaml`
+- **Files:** `infra/ai-agents/agent-controller/helm/templates/networkpolicy.yaml`
 - **Dependencies:** None
 - **Completion notes:** [task-004-008-controller-helm.md](task-004-008-controller-helm.md)
 - **Acceptance criteria:**
@@ -439,7 +439,7 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 ### TASK-008: Create publisher AgentTask sample ✅
 
 - **Requirement:** PRD story "Trigger an autonomous publisher run"
-- **Files:** `infra/agent-controller/config/samples/publisher-manual.yaml`
+- **Files:** `infra/ai-agents/agent-controller/config/samples/publisher-manual.yaml`
 - **Dependencies:** None
 - **Completion notes:** [task-004-008-controller-helm.md](task-004-008-controller-helm.md)
 - **Acceptance criteria:**
@@ -472,11 +472,11 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 ### TASK-011: Per-branch PVCs for write agents
 
 - **Requirement:** Eliminate stale state leakage and enable parallel runs
-- **Files:** `infra/agent-controller/pkg/controller/controller.go`,
-  `infra/agent-controller/main.go`,
-  `infra/agent-controller/helm/templates/rbac.yaml`,
-  `infra/agent-controller/helm/templates/deployment.yaml`,
-  `infra/agent-controller/helm/values.yaml`
+- **Files:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`,
+  `infra/ai-agents/agent-controller/main.go`,
+  `infra/ai-agents/agent-controller/helm/templates/rbac.yaml`,
+  `infra/ai-agents/agent-controller/helm/templates/deployment.yaml`,
+  `infra/ai-agents/agent-controller/helm/values.yaml`
 - **Dependencies:** TASK-009
 - **Acceptance criteria:**
   - [ ] Write agents get dedicated PV/PVC (`agent-ws-<jobName>`)
@@ -490,11 +490,11 @@ Branch: agent/publisher-1710636000 (preserved for debugging)
 ### TASK-012: GitHub App auth for git push and PR creation
 
 - **Requirement:** Agents push branches and create PRs autonomously
-- **Files:** `infra/agent-controller/pkg/controller/controller.go`,
-  `infra/agent-controller/main.go`,
-  `infra/agent-controller/helm/templates/secret.yaml`,
-  `infra/agent-controller/helm/templates/deployment.yaml`,
-  `infra/agent-controller/helm/values.yaml`,
+- **Files:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`,
+  `infra/ai-agents/agent-controller/main.go`,
+  `infra/ai-agents/agent-controller/helm/templates/secret.yaml`,
+  `infra/ai-agents/agent-controller/helm/templates/deployment.yaml`,
+  `infra/ai-agents/agent-controller/helm/values.yaml`,
   `apps/blog/bin/run-publisher.sh`
 - **Dependencies:** TASK-011, GitHub App setup (manual)
 - **Acceptance criteria:**
@@ -573,7 +573,7 @@ The agent controller now has a reproducible setup path:
 
 - **`secrets/export-agent-controller.sh.SAMPLE`** lists every env var
   the controller needs, with comments on where to get each value.
-- **`infra/agent-controller/bin/setup.sh`** bootstraps from scratch:
+- **`infra/ai-agents/agent-controller/bin/setup.sh`** bootstraps from scratch:
   checks prereqs, sources secrets, runs helm install, patches the K8s
   secret. Optional `--build-images` flag builds and pushes both Docker
   images first.

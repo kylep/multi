@@ -32,3 +32,5 @@ codebase, and produce a design doc from the
 section feeds directly into Claude Code's plan mode for implementation.
 
 ## Design Docs
+
+- [Hardened IaC Bootstrap](hardened-iac-bootstrap.html) — Helmfile-orchestrated bootstrap with Vault secrets, PSS restricted, ResourceQuota (draft, 2026-03-17)

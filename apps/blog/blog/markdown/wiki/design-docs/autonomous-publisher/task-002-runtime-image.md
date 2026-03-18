@@ -12,7 +12,7 @@ date: 2026-03-16
 
 ## What changed
 
-Rewrote `infra/ai-agent-runtime/Dockerfile` from `node:22-alpine` to
+Rewrote `infra/ai-agents/ai-agent-runtime/Dockerfile` from `node:22-alpine` to
 `mcr.microsoft.com/playwright:v1.58.2-noble` (Ubuntu 24.04 LTS). This gives
 the QA subagent access to Chromium for browser-based verification.
 
@@ -42,6 +42,6 @@ the QA subagent access to Chromium for browser-based verification.
 
 ## Follow-up needed
 
-- `infra/agent-controller/main.go:64` still references `ai-agent-runtime:0.1` —
+- `infra/ai-agents/agent-controller/main.go:64` still references `ai-agent-runtime:0.1` —
   update when the new image is pushed to Docker Hub
 - Docker Hub push is Kyle's responsibility (no automated push)

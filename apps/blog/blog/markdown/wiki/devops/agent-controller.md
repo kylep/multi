@@ -21,7 +21,7 @@ related:
   - wiki/security/claude-code-write-pattern-bug
   - wiki/design-docs/autonomous-publisher/index
 scope: "Covers the agent controller architecture, CRD spec, Helm deployment, runtime image, debugging, and operational procedures. Does not cover agent definitions or blog content pipeline."
-last_verified: 2026-03-17
+last_verified: 2026-03-18
 ---
 
 
@@ -39,13 +39,16 @@ The system has two images:
 | Image | Purpose | Source |
 |-------|---------|--------|
 | `kpericak/ai-agent-runtime:0.4` | Claude Code + Playwright + hooks | `infra/ai-agents/ai-agent-runtime/` |
-| `kpericak/agent-controller:0.7` | Go controller binary | `infra/ai-agents/agent-controller/` |
+| `kpericak/agent-controller:0.8` | Go controller binary | `infra/ai-agents/agent-controller/` |
 
-The controller runs as a Deployment, watching `AgentTask` resources.
-When a task is due, it creates a Job with:
-1. **Init container** (`alpine/git`) — clones/updates the repo, chowns to UID 1001
-2. **Main container** (`ai-agent-runtime`) — writes MCP config, runs the agent CLI
-3. Both containers run PSS restricted: `seccompProfile: RuntimeDefault` (pod level),
+The controller runs as a Deployment (2/2 pods — controller + Vault
+sidecar), watching `AgentTask` resources. When a task is due, it
+creates a Job with:
+1. **Vault init container** — injected by Vault Agent Injector, writes secrets to `/vault/secrets/config`
+2. **Init container** (`alpine/git`) — clones/updates the repo, chowns to UID 1001
+3. **Main container** (`ai-agent-runtime`) — sources env vars from `/vault/secrets/config`, runs the agent CLI
+4. **Vault sidecar** — keeps secrets refreshed (auto-injected)
+5. All containers run PSS restricted: `seccompProfile: RuntimeDefault` (pod level),
    `capabilities.drop: ALL`, `allowPrivilegeEscalation: false`, `runAsNonRoot: true` (UID 1001)
 
 ## Discord #log observability
@@ -161,23 +164,23 @@ clone. `run-publisher.sh` uses the same token for `git push` and
 Use the bootstrap script to deploy from a fresh cluster:
 
 ```bash
-# 1. Copy and populate secrets
-cp secrets/export-agent-controller.sh.SAMPLE secrets/export-agent-controller.sh
-# edit the file, fill in values
-
-# 2. Run setup (optionally build images first)
-infra/ai-agents/agent-controller/bin/setup.sh --build-images
-
-# Or without building images (if they're already pushed):
-infra/ai-agents/agent-controller/bin/setup.sh
+bash infra/ai-agents/bin/bootstrap.sh
 ```
 
-**Prerequisites:** kubectl, helm, docker on PATH; cluster reachable
-via `kubectl cluster-info`.
+This runs `helmfile sync` to install Vault and the agent controller,
+applies CRDs and sample AgentTask manifests, then prints manual Vault
+setup steps if this is a first-time install.
 
-The script handles namespace creation, helm install, and secret
-patching. See `secrets/export-agent-controller.sh.SAMPLE` for the
-full list of required env vars.
+After bootstrap, configure Vault auth and store secrets:
+
+```bash
+bash infra/ai-agents/bin/configure-vault-auth.sh
+bash infra/ai-agents/bin/store-secrets.sh
+```
+
+See the [Bootstrap & Recovery](/wiki/devops/bootstrap.html) guide for
+the full walkthrough including Vault init, secret structure, and
+troubleshooting.
 
 ## Webhook
 
@@ -208,6 +211,10 @@ curl -X POST http://localhost:8080/webhook \
 ## Deployment
 
 ```bash
+# Via helmfile (preferred — handles Vault dependency)
+helmfile -f infra/ai-agents/helmfile.yaml apply
+
+# Or direct helm upgrade
 helm upgrade agent-controller infra/ai-agents/agent-controller/helm/ \
   -n ai-agents -f infra/ai-agents/agent-controller/helm/values.yaml
 ```
@@ -215,41 +222,27 @@ helm upgrade agent-controller infra/ai-agents/agent-controller/helm/ \
 Uses a hostPath PV on single-node Rancher Desktop. Not suitable for
 multi-node clusters.
 
-### Secrets
+### Secrets (Vault)
 
-The helm chart's `secret.yaml` uses `lookup` to preserve existing
-secret values on `helm upgrade`.
+All secrets are injected via Vault Agent Injector — there is no K8s
+Secret for agent credentials. The Vault sidecar writes secrets to an
+in-memory tmpfs at `/vault/secrets/config`, which the controller and
+agent Jobs source as environment variables.
 
-**Gotcha:** `helm upgrade` with explicit `-f values.yaml` will reset
-secret values to empty defaults if the secret was previously deleted
-(field manager conflicts). Always restore secrets after a
-delete-and-recreate cycle:
-
-```bash
-# Source the OAuth token
-source apps/blog/exports.sh
-
-# Patch secrets
-kubectl -n ai-agents patch secret agent-secrets --type merge -p "{
-  \"stringData\": {
-    \"CLAUDE_CODE_OAUTH_TOKEN\": \"$CLAUDE_CODE_OAUTH_TOKEN\",
-    \"DISCORD_LOG_CHANNEL_ID\": \"1483433712296398942\",
-    \"REPO_BRANCH\": \"main\"
-  }
-}"
-```
-
-### Field manager conflicts
-
-If `helm upgrade` fails with "conflicts with kubectl-patch", delete
-the secret and re-create via helm, then re-patch values:
+To update secrets in Vault:
 
 ```bash
-kubectl -n ai-agents delete secret agent-secrets
-helm upgrade agent-controller infra/ai-agents/agent-controller/helm/ \
-  -n ai-agents -f infra/ai-agents/agent-controller/helm/values.yaml
-# Then re-patch secrets as above
+bash infra/ai-agents/bin/store-secrets.sh
 ```
+
+Then restart the controller to pick up changes:
+
+```bash
+kubectl rollout restart deploy/agent-controller -n ai-agents
+```
+
+See [Bootstrap & Recovery](/wiki/devops/bootstrap.html) for the full
+secret structure and Vault paths.
 
 ## Workspace Volumes
 

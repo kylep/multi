@@ -1,7 +1,7 @@
 ---
 title: "Autonomous Publisher Pipeline"
 summary: "Run the full publisher pipeline autonomously in K8s using Claude Max tokens, with self-verification and network isolation."
-status: draft
+status: done
 owner: kyle
 date: 2026-03-16
 related:

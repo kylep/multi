@@ -1,6 +1,6 @@
 ---
 title: "Agent Team"
-summary: "AI agent team with 9 roles defined in .claude/agents/."
+summary: "AI agent team with 10 roles defined in .claude/agents/."
 keywords:
   - agent-team
   - ai-agents
@@ -13,13 +13,14 @@ keywords:
   - journalist
   - synthesizer
   - prd-writer
+  - design-doc-writer
 related:
   - wiki/history
 scope: "Source of truth for the agent team: roles, models, tools, coordination, and invocation."
 last_verified: 2026-03-16
 ---
 
-Nine Claude Code agents defined in `.claude/agents/`.
+Ten Claude Code agents defined in `.claude/agents/`.
 
 ## Roles
 
@@ -29,6 +30,7 @@ Nine Claude Code agents defined in `.claude/agents/`.
 | [Analyst](/wiki/agent-team/analyst.html) | Opus | Read, Glob, Grep, WebSearch, WebFetch | Ingest research, validate claims, propose system improvements |
 | [Synthesizer](/wiki/agent-team/synthesizer.html) | Opus | Read, Edit, Glob, Grep, Agent | Compare and contrast Deep Research reports |
 | [PRD Writer](/wiki/agent-team/prd-writer.html) | Opus | Read, Write, Edit, Glob, Grep, WebSearch, WebFetch, Agent | Interview, research, write PRDs |
+| [Design Doc Writer](/wiki/agent-team/design-doc-writer.html) | Opus | Read, Write, Edit, Glob, Grep, WebSearch, WebFetch, Agent | Interview, architect, write design docs from PRDs |
 | [Journalist](/wiki/agent-team/journalist.html) | Haiku | Read, Write, Bash, Glob, Grep, WebFetch, WebSearch | Daily AI news digests to wiki journal |
 | [Researcher](/wiki/agent-team/researcher.html) | Sonnet | Read, Glob, Grep, WebFetch, WebSearch | Gather sourced facts, return research brief |
 | [Reviewer](/wiki/agent-team/reviewer.html) | Opus | Read, Glob, Grep | Check style, substance, frontmatter, sourcing |
@@ -37,9 +39,9 @@ Nine Claude Code agents defined in `.claude/agents/`.
 
 ## Top-level vs subagent
 
-Publisher, Analyst, Synthesizer, Journalist, and PRD Writer are invoked
-directly. Researcher, Reviewer, QA, and Security Auditor are subagents
-called by Publisher during its pipeline.
+Publisher, Analyst, Synthesizer, Journalist, PRD Writer, and Design Doc Writer
+are invoked directly. Researcher, Reviewer, QA, and Security Auditor are
+subagents called by Publisher during its pipeline.
 
 ## Invocation
 
@@ -49,6 +51,7 @@ claude --agent analyst
 claude --agent synthesizer
 claude --agent journalist
 claude --agent prd-writer
+claude --agent design-doc-writer
 ```
 
 ## Coordination
@@ -65,6 +68,21 @@ claude --agent prd-writer
   Haiku for high-frequency low-complexity tasks.
 - **Artifacts not pass-through**: files as intermediate state between
   agents, not large context passed through prompts.
+
+## Adding a new agent
+
+1. Define the agent in `.claude/agents/<name>.md`
+2. Create a wiki page at `wiki/agent-team/<name>.md` (copy `prd-writer.md` as a template)
+3. Add a row to the Roles table above and update the count in the summary
+4. Generate the avatar image:
+   ```bash
+   cd apps/blog/blog
+   OPENAI_API_KEY=<key> node scripts/generate-agent-image.mjs agent-<name>.png "<subject description>"
+   ```
+   The script saves to `public/images/` and matches the existing avatar style
+   (geometric flat design, dark navy background, bold colors).
+5. Reference the image in the wiki page: `![<Name> avatar](/images/agent-<name>.png)`
+6. Add the agent to the invocation block if it's a top-level agent
 
 ## History
 

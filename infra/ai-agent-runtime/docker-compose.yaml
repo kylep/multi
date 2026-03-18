@@ -1,8 +1,0 @@
-services:
-  ai-agent-runtime:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: kpericak/ai-agent-runtime:0.3
-    stdin_open: true
-    tty: true

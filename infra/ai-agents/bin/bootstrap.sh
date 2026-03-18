@@ -11,19 +11,17 @@ for cmd in kubectl helm helmfile docker; do
   command -v "$cmd" >/dev/null || { echo "Error: $cmd not found"; exit 1; }
 done
 
-# 2. Apply CRDs (before helmfile, since controller needs them)
-echo "Applying CRDs..."
-kubectl apply -f "$INFRA_DIR/agent-controller/config/crd/"
-
-# 3. Helmfile sync (creates vault + ai-agents namespaces, deploys charts)
+# 2. Helmfile sync (creates vault + ai-agents namespaces, deploys charts)
+# CRDs are managed by the agent-controller Helm chart — do not kubectl apply
+# them separately (causes field manager conflicts on re-run).
 echo "Running helmfile sync..."
 helmfile -f "$INFRA_DIR/helmfile.yaml" sync
 
-# 4. Wait for Vault pod ready
+# 3. Wait for Vault pod ready
 echo "Waiting for vault-0..."
 kubectl wait --for=condition=Ready pod/vault-0 -n vault --timeout=120s
 
-# 5. If vault not initialized, print manual steps
+# 4. If vault not initialized, print manual steps
 INITIALIZED=$(kubectl exec -n vault vault-0 -- vault status -format=json 2>/dev/null \
   | jq -r '.initialized' 2>/dev/null || echo "false")
 if [ "$INITIALIZED" = "false" ]; then
@@ -41,11 +39,11 @@ else
   bash "$SCRIPT_DIR/configure-vault-auth.sh"
 fi
 
-# 6. Apply sample AgentTask manifests
+# 5. Apply sample AgentTask manifests
 echo "Applying sample AgentTasks..."
 kubectl apply -f "$INFRA_DIR/agent-controller/config/samples/"
 
-# 7. Report status
+# 6. Report status
 echo ""
 echo "=== Status ==="
 kubectl get pods -n vault

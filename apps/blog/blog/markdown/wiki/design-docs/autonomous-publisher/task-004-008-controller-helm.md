@@ -17,7 +17,7 @@ isolation, and new secrets.
 
 ## TASK-004: Publisher routing in `buildCommand()`
 
-**File:** `infra/agent-controller/pkg/controller/controller.go`
+**File:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`
 
 `buildCommand()` now branches on `task.Spec.Agent == "publisher"`:
 
@@ -39,7 +39,7 @@ Publisher MCP config adds:
 
 ## TASK-005: Pod spec for Chromium
 
-**File:** `infra/agent-controller/pkg/controller/controller.go`
+**File:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`
 
 Publisher-specific pod changes:
 

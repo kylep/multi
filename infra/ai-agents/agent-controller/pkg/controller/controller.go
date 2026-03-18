@@ -543,6 +543,7 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						"vault.hashicorp.com/agent-inject":                 "true",
+						"vault.hashicorp.com/agent-pre-populate-only":      "true",
 						"vault.hashicorp.com/role":                         "ai-agents",
 						"vault.hashicorp.com/agent-inject-secret-config":   "secret/ai-agents/anthropic",
 						"vault.hashicorp.com/agent-inject-template-config": vaultTemplate,

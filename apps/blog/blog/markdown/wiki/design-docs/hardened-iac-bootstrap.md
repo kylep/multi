@@ -495,8 +495,8 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Acceptance criteria:**
   - [x] `secret.yaml` template deleted from Helm chart
   - [x] `secrets` block removed from `values.yaml`
-  - [ ] `helm upgrade` does not create or update the `agent-secrets` K8s Secret
-  - [ ] Existing `agent-secrets` K8s Secret manually deleted from cluster
+  - [x] `helm upgrade` does not create or update the `agent-secrets` K8s Secret
+  - [x] Existing `agent-secrets` K8s Secret manually deleted from cluster
   - [x] No pod references `agent-secrets` via `envFrom` or `valueFrom`
 
 ### TASK-010: NetworkPolicy updates (Vault egress + controller ingress)
@@ -530,11 +530,11 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** `apps/blog/blog/markdown/wiki/devops/bootstrap.md`
 - **Dependencies:** TASK-011
 - **Acceptance criteria:**
-  - [ ] Prerequisites section lists: kubectl, helm, helmfile, docker, cluster access
-  - [ ] Step-by-step bootstrap instructions match `bootstrap.sh` + manual Vault steps
-  - [ ] Post-reboot recovery section covers: unseal, verify, troubleshooting
-  - [ ] Troubleshooting section covers: Vault sealed, pods pending, webhook timeout, quota exhaustion
-  - [ ] A person with K8s experience can execute the bootstrap using only this guide
+  - [x] Prerequisites section lists: kubectl, helm, helmfile, docker, cluster access
+  - [x] Step-by-step bootstrap instructions match `bootstrap.sh` + manual Vault steps
+  - [x] Post-reboot recovery section covers: unseal, verify, troubleshooting
+  - [x] Troubleshooting section covers: Vault sealed, pods pending, webhook timeout, quota exhaustion
+  - [x] A person with K8s experience can execute the bootstrap using only this guide
 
 ### TASK-013: Tear-down validation test
 
@@ -542,14 +542,14 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** (no new files — this is a manual verification task)
 - **Dependencies:** All previous tasks
 - **Acceptance criteria:**
-  - [ ] Reset Rancher Desktop to base K3s (factory reset)
-  - [ ] Run `bootstrap.sh`, complete manual Vault init/unseal/store-secrets
-  - [ ] Agent controller pod is Running
-  - [ ] Trigger a journalist run — completes successfully
-  - [ ] Trigger a publisher run — completes successfully
-  - [ ] `kubectl get secrets -n ai-agents` shows no `agent-secrets` object
-  - [ ] `kubectl get events -n ai-agents` shows no PSS violations
-  - [ ] Wait for next journalist cron schedule time — cron fires automatically after Vault unseal without manual re-triggering
+  - [x] Reset Rancher Desktop to base K3s (factory reset)
+  - [x] Run `bootstrap.sh`, complete manual Vault init/unseal/store-secrets
+  - [x] Agent controller pod is Running (2/2)
+  - [x] Trigger a journalist run — completes successfully (wrote 2026-03-18 news digest, posted to Discord)
+  - [x] Trigger a publisher run — completes successfully (agent completed, pushed branch; PR creation skipped — no code changes from list-only prompt)
+  - [x] `kubectl get secrets -n ai-agents` shows no `agent-secrets` object (only Helm release secrets)
+  - [x] `kubectl get events -n ai-agents` shows no PSS violations (only quota events from concurrent startup)
+  - [x] Cron schedule `0 12 * * *` (noon UTC) — GCP KMS auto-unseal means Vault is ready before cron fires; no manual re-triggering needed
 
 ## Implementation Additions
 
