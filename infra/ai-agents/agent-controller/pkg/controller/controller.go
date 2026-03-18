@@ -392,20 +392,17 @@ func base64URLEncode(data []byte) string {
 	return base64.RawURLEncoding.EncodeToString(data)
 }
 
-const vaultTemplate = `{{- with secret "secret/ai-agents/anthropic" -}}
+const vaultTemplate = `{{- with secret "secret/ai-agents/anthropic" }}
 export CLAUDE_CODE_OAUTH_TOKEN="{{ .Data.data.claude_oauth_token }}"
-{{- end }}
-{{- with secret "secret/ai-agents/discord" -}}
+{{ end -}}
+{{- with secret "secret/ai-agents/discord" }}
 export DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
 export DISCORD_GUILD_ID="{{ .Data.data.discord_guild_id }}"
 export DISCORD_LOG_CHANNEL_ID="{{ .Data.data.discord_log_channel_id }}"
-{{- end }}
-{{- with secret "secret/ai-agents/webhook" -}}
+{{ end -}}
+{{- with secret "secret/ai-agents/webhook" }}
 export AI_WEBHOOK_TOKEN="{{ .Data.data.webhook_token }}"
-{{- end }}
-{{- with secret "secret/ai-agents/github" -}}
-export REPO_URL="{{ .Data.data.repo_url }}"
-{{- end }}`
+{{ end -}}`
 
 func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	jobName := fmt.Sprintf("%s-%d", task.Name, time.Now().Unix())
@@ -462,21 +459,24 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 
 	// Build git-sync args: write agents clone fresh into emptyDir workspace;
 	// read-only agents fetch/reset on the shared PVC.
+	// Note: git-sync runs as an init container BEFORE vault-agent-init,
+	// so it cannot source /vault/secrets/config. Use hardcoded public URL
+	// for read-only agents; write agents get a GitHub App token URL.
 	var gitSyncArgs string
-	cloneURL := "$REPO_URL"
+	cloneURL := "https://github.com/kylep/multi.git"
 	if githubToken != "" {
 		cloneURL = fmt.Sprintf("https://x-access-token:%s@github.com/kylep/multi.git", githubToken)
 	}
 	if isWriteAgent {
 		// Fresh clone into writable emptyDir workspace
 		gitSyncArgs = fmt.Sprintf(
-			". /vault/secrets/config && git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
+			"git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
 			cloneURL, chownUID, chownUID,
 		)
 	} else {
 		// Shared PVC: fetch and reset (owned by UID 1001, no safe.directory needed)
 		gitSyncArgs = fmt.Sprintf(
-			". /vault/secrets/config && { cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; }; chown -R %s:%s /workspace/repo",
+			"{ cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; }; chown -R %s:%s /workspace/repo",
 			cloneURL, chownUID, chownUID,
 		)
 	}
@@ -550,6 +550,7 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 				},
 				Spec: corev1.PodSpec{
 					RestartPolicy:         corev1.RestartPolicyNever,
+					ServiceAccountName:    "agent-controller",
 					ShareProcessNamespace: boolPtr(isPublisher),
 					SecurityContext: &corev1.PodSecurityContext{
 						RunAsNonRoot: boolPtr(true),

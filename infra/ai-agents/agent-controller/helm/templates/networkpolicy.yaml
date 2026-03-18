@@ -78,13 +78,15 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # K8s API server (cluster IP, for Job/CRD/PVC management)
+    # K8s API server — use node IP + real port because CNI applies
+    # NetworkPolicy after DNAT (service IP 10.43.0.1:443 is rewritten
+    # to node endpoint before policy evaluation)
     - to:
         - ipBlock:
-            cidr: {{ .Values.kubeApiServerCIDR | default "10.43.0.1/32" }}
+            cidr: {{ .Values.kubeApiServerCIDR | default "192.168.64.2/32" }}
       ports:
         - protocol: TCP
-          port: 443
+          port: {{ .Values.kubeApiServerPort | default 6443 }}
     # Vault for secret injection
     - to:
         - namespaceSelector:

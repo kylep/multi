@@ -18,18 +18,18 @@ spec:
         vault.hashicorp.com/role: "ai-agents"
         vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/discord"
         vault.hashicorp.com/agent-inject-template-config: |
-          {{`{{- with secret "secret/ai-agents/discord" -}}
+          {{`{{- with secret "secret/ai-agents/discord" }}
           export DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
           export DISCORD_LOG_CHANNEL_ID="{{ .Data.data.discord_log_channel_id }}"
-          {{- end }}
-          {{- with secret "secret/ai-agents/webhook" -}}
+          {{ end -}}
+          {{- with secret "secret/ai-agents/webhook" }}
           export AI_WEBHOOK_TOKEN="{{ .Data.data.webhook_token }}"
-          {{- end }}
-          {{- with secret "secret/ai-agents/github" -}}
+          {{ end -}}
+          {{- with secret "secret/ai-agents/github" }}
           export GITHUB_APP_ID="{{ .Data.data.github_app_id }}"
           export GITHUB_APP_PRIVATE_KEY="{{ .Data.data.github_app_private_key }}"
           export GITHUB_INSTALL_ID="{{ .Data.data.github_install_id }}"
-          {{- end }}`}}
+          {{ end -}}`}}
     spec:
       serviceAccountName: {{ include "agent-controller.fullname" . }}
       securityContext:
