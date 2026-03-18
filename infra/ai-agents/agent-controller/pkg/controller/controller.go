@@ -395,9 +395,6 @@ func base64URLEncode(data []byte) string {
 const vaultTemplate = `{{- with secret "secret/ai-agents/anthropic" -}}
 export CLAUDE_CODE_OAUTH_TOKEN="{{ .Data.data.claude_oauth_token }}"
 {{- end }}
-{{- with secret "secret/ai-agents/openrouter" -}}
-export OPENROUTER_API_KEY="{{ .Data.data.openrouter_api_key }}"
-{{- end }}
 {{- with secret "secret/ai-agents/discord" -}}
 export DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
 export DISCORD_GUILD_ID="{{ .Data.data.discord_guild_id }}"
