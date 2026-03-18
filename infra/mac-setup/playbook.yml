@@ -91,6 +91,14 @@
       failed_when: false
 
     # ---------------------------------------------------------------
+    # Power management — prevent sleep (this is an AI workstation)
+    # ---------------------------------------------------------------
+    - name: Disable system sleep
+      ansible.builtin.command: pmset -a sleep 0 disksleep 0 displaysleep 0 standby 0 hibernatemode 0 powernap 0
+      become: true
+      changed_when: false
+
+    # ---------------------------------------------------------------
     # Directory structure
     # ---------------------------------------------------------------
     - name: Create secrets directory

@@ -5,11 +5,11 @@ set -euo pipefail
 #
 # Usage (factory reset):
 #   source exports.sh   # must be available — contains GitHub App credentials
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/kylep/multi/main/infra/mac-setup/bootstrap.sh)"
+#   sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/kylep/multi/main/infra/mac-setup/bootstrap.sh)"
 #
 # Usage (repo already cloned):
 #   source ~/gh/multi/apps/blog/exports.sh
-#   bash ~/gh/multi/infra/mac-setup/bootstrap.sh
+#   sudo bash ~/gh/multi/infra/mac-setup/bootstrap.sh
 #
 # What this does:
 #   1. Installs Xcode CLI tools (if missing)
