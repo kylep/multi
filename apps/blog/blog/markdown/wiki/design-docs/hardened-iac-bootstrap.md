@@ -457,11 +457,11 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** `infra/ai-agents/vault/values.yaml`, `infra/ai-agents/vault/policy.hcl`, `infra/ai-agents/vault/network-policy.yaml`
 - **Dependencies:** TASK-001
 - **Acceptance criteria:**
-  - [ ] Vault values file configures standalone mode, file storage on PVC with configurable StorageClass (from environment values), no TLS (internal only), no UI
-  - [ ] Vault policy `ai-agents-read` grants read on `secret/data/ai-agents/*` and `secret/metadata/ai-agents/*`
-  - [ ] Vault NetworkPolicy allows ingress from `ai-agents` namespace on TCP 8200
-  - [ ] Vault namespace has PSS `baseline` enforce + `restricted` warn labels
-  - [ ] Vault audit logging enabled (stdout)
+  - [x] Vault values file configures standalone mode, file storage on PVC with configurable StorageClass (from environment values), no TLS (internal only), no UI; GCP KMS auto-unseal configured (seal type `gcpckms`)
+  - [x] Vault policy `ai-agents-read` grants read on `secret/data/ai-agents/*` and `secret/metadata/ai-agents/*`
+  - [x] Vault NetworkPolicy allows ingress from `ai-agents` namespace on TCP 8200
+  - [x] Vault namespace has PSS `baseline` enforce + `restricted` warn labels
+  - [x] Vault audit logging enabled (stdout)
 
 ### TASK-007: Vault K8s auth and secret storage scripts
 
@@ -469,11 +469,11 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** `infra/ai-agents/bin/store-secrets.sh`, helmfile postsync hook script
 - **Dependencies:** TASK-006
 - **Acceptance criteria:**
-  - [ ] K8s auth method configured: role `ai-agents` bound to `agent-controller` ServiceAccount in `ai-agents` namespace
-  - [ ] `store-secrets.sh` interactively prompts for secrets split by concern (anthropic, github, discord, webhook, openrouter)
-  - [ ] `store-secrets.sh` uses `vault kv patch` (merge) with `put` fallback
-  - [ ] Secrets stored at correct paths: `secret/ai-agents/anthropic`, `secret/ai-agents/github`, etc.
-  - [ ] Agent pod can authenticate to Vault and read secrets (verified with test pod)
+  - [x] K8s auth method configured: role `ai-agents` bound to `agent-controller` ServiceAccount in `ai-agents` namespace
+  - [x] `store-secrets.sh` interactively prompts for secrets split by concern (anthropic, github, discord, webhook, openrouter)
+  - [x] `store-secrets.sh` uses `vault kv patch` (merge) with `put` fallback
+  - [x] Secrets stored at correct paths: `secret/ai-agents/anthropic`, `secret/ai-agents/github`, etc.
+  - [x] Agent pod can authenticate to Vault and read secrets (verified with test pod)
 
 ### TASK-008: Controller Vault integration (replace K8s Secrets)
 
@@ -481,11 +481,11 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** `infra/ai-agents/agent-controller/pkg/controller/controller.go`, `infra/ai-agents/agent-controller/helm/templates/deployment.yaml`
 - **Dependencies:** TASK-002 (spike), TASK-005, TASK-007
 - **Acceptance criteria:**
-  - [ ] Controller Deployment has Vault Agent Injector annotations for its own secrets
-  - [ ] Controller Go code adds Vault annotations to generated Job pod specs
-  - [ ] Job entrypoint sources env vars from `/vault/secrets/config` instead of K8s Secret `envFrom`
-  - [ ] Vault injection template renders all required env vars (anthropic, github, discord, webhook, openrouter)
-  - [ ] Agent Job completes successfully with secrets sourced from Vault
+  - [x] Controller Deployment has Vault Agent Injector annotations for its own secrets
+  - [x] Controller Go code adds Vault annotations to generated Job pod specs
+  - [x] Job entrypoint sources env vars from `/vault/secrets/config` instead of K8s Secret `envFrom`
+  - [x] Vault injection template renders all required env vars (anthropic, github, discord, webhook, openrouter)
+  - [x] Agent Job completes successfully with secrets sourced from Vault
 
 ### TASK-009: Delete K8s Secret template and clean up Helm values `[P]`
 
@@ -493,11 +493,11 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** `infra/ai-agents/agent-controller/helm/templates/secret.yaml`, `infra/ai-agents/agent-controller/helm/values.yaml`
 - **Dependencies:** TASK-008
 - **Acceptance criteria:**
-  - [ ] `secret.yaml` template deleted from Helm chart
-  - [ ] `secrets` block removed from `values.yaml`
+  - [x] `secret.yaml` template deleted from Helm chart
+  - [x] `secrets` block removed from `values.yaml`
   - [ ] `helm upgrade` does not create or update the `agent-secrets` K8s Secret
   - [ ] Existing `agent-secrets` K8s Secret manually deleted from cluster
-  - [ ] No pod references `agent-secrets` via `envFrom` or `valueFrom`
+  - [x] No pod references `agent-secrets` via `envFrom` or `valueFrom`
 
 ### TASK-010: NetworkPolicy updates (Vault egress + controller ingress)
 
@@ -505,10 +505,10 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** `infra/ai-agents/agent-controller/helm/templates/networkpolicy.yaml`
 - **Dependencies:** TASK-006
 - **Acceptance criteria:**
-  - [ ] Agent pods can reach Vault on TCP 8200 (egress rule to vault namespace)
-  - [ ] Controller ingress allows from `kube-system` on port 8080
-  - [ ] Existing egress rules (DNS to kube-system, HTTP/HTTPS to public IPs) preserved
-  - [ ] Agent pods cannot reach other RFC1918 addresses (existing exclusion maintained)
+  - [x] Agent pods can reach Vault on TCP 8200 (egress rule to vault namespace)
+  - [x] Controller ingress allows from `kube-system` on port 8080
+  - [x] Existing egress rules (DNS to kube-system, HTTP/HTTPS to public IPs) preserved
+  - [x] Agent pods cannot reach other RFC1918 addresses (existing exclusion maintained)
 
 ### TASK-011: Bootstrap script and post-reboot unseal script
 
@@ -516,13 +516,13 @@ is chosen. Fallback to Vault Secrets Operator is not needed.
 - **Files:** `infra/ai-agents/bin/bootstrap.sh`, `infra/ai-agents/bin/unseal.sh`
 - **Dependencies:** TASK-001, TASK-006, TASK-007
 - **Acceptance criteria:**
-  - [ ] `bootstrap.sh` checks prerequisites (kubectl, helm, helmfile, docker)
-  - [ ] `bootstrap.sh` runs `helmfile sync` and prints manual post-install steps (vault init, unseal, store-secrets)
-  - [ ] `bootstrap.sh` applies CRDs and sample AgentTask manifests (journalist cron, publisher manual)
-  - [ ] `bootstrap.sh` is idempotent (running twice produces no errors)
-  - [ ] `unseal.sh` reads `~/.vault-init`, unseals Vault, verifies pod health
-  - [ ] `unseal.sh` reports controller pod status
-  - [ ] Old `infra/ai-agents/agent-controller/bin/setup.sh` deleted
+  - [x] `bootstrap.sh` checks prerequisites (kubectl, helm, helmfile, docker)
+  - [x] `bootstrap.sh` runs `helmfile sync` and prints manual post-install steps (vault init, unseal, store-secrets)
+  - [x] `bootstrap.sh` applies CRDs and sample AgentTask manifests (journalist cron, publisher manual)
+  - [x] `bootstrap.sh` is idempotent (running twice produces no errors)
+  - [x] `unseal.sh` N/A — GCP KMS auto-unseal replaces manual unseal
+  - [x] `unseal.sh` N/A — GCP KMS auto-unseal replaces manual unseal
+  - [x] Old `infra/ai-agents/agent-controller/bin/setup.sh` deleted
 
 ### TASK-012: Wiki guide
 
@@ -601,6 +601,42 @@ are unnecessary for Vault chart v0.29.1 — remove them from TASK-008 implementa
 
 **Spike also confirmed:** Zero PSS events (no warnings), secret injection
 working (`/vault/secrets/config` readable by application container).
+
+### GCP KMS Auto-Unseal (2026-03-17)
+
+Vault is configured to auto-unseal via GCP Cloud KMS instead of Shamir keys.
+On restart, Vault calls GCP KMS to decrypt its master key — no manual unseal step required.
+
+**Resources created:**
+- KMS keyring: `vault-unseal` (region `us-east1`, project `kylepericak`)
+- KMS key: `ai-agents` (symmetric, software protection)
+- Service account: `vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com`
+- Custom IAM role: `projects/kylepericak/roles/vaultUnsealKMS`
+  — permissions: `cloudkms.cryptoKeys.get`, `cloudkms.cryptoKeyVersions.useToEncrypt`,
+    `cloudkms.cryptoKeyVersions.useToDecrypt` (bound to the specific key only)
+
+**Credentials file:** `infra/ai-agents/vault/gcp-credentials.json` (gitignored).
+Loaded into a K8s Secret `gcp-credentials` in the `vault` namespace.
+Vault mounts it at `/vault/userconfig/gcp-credentials/gcp-credentials.json`
+via `GOOGLE_APPLICATION_CREDENTIALS`.
+
+**To regenerate `gcp-credentials.json` on a new machine:**
+```bash
+gcloud iam service-accounts keys create \
+  infra/ai-agents/vault/gcp-credentials.json \
+  --iam-account=vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com \
+  --project=kylepericak
+kubectl create secret generic gcp-credentials \
+  --from-file=gcp-credentials.json=infra/ai-agents/vault/gcp-credentials.json \
+  --namespace=vault --dry-run=client -o yaml | kubectl apply -f -
+```
+
+**`~/.vault-init` format changed:** No longer stores an unseal key.
+Only stores `VAULT_ROOT_TOKEN` and 5 `VAULT_RECOVERY_KEY_*` entries
+(recovery keys protect against KMS key loss — need 3-of-5 to regenerate root token).
+
+**Cost:** ~$0.06/month for the KMS key. First 20K operations/month free;
+auto-unseal on restart uses ≪1K operations/month.
 
 ### TASK-005 Implementation: emptyDir for write agents (2026-03-17)
 

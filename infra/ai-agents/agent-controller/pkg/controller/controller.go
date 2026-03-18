@@ -392,6 +392,24 @@ func base64URLEncode(data []byte) string {
 	return base64.RawURLEncoding.EncodeToString(data)
 }
 
+const vaultTemplate = `{{- with secret "secret/ai-agents/anthropic" -}}
+export CLAUDE_CODE_OAUTH_TOKEN="{{ .Data.data.claude_oauth_token }}"
+{{- end }}
+{{- with secret "secret/ai-agents/openrouter" -}}
+export OPENROUTER_API_KEY="{{ .Data.data.openrouter_api_key }}"
+{{- end }}
+{{- with secret "secret/ai-agents/discord" -}}
+export DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
+export DISCORD_GUILD_ID="{{ .Data.data.discord_guild_id }}"
+export DISCORD_LOG_CHANNEL_ID="{{ .Data.data.discord_log_channel_id }}"
+{{- end }}
+{{- with secret "secret/ai-agents/webhook" -}}
+export AI_WEBHOOK_TOKEN="{{ .Data.data.webhook_token }}"
+{{- end }}
+{{- with secret "secret/ai-agents/github" -}}
+export REPO_URL="{{ .Data.data.repo_url }}"
+{{- end }}`
+
 func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	jobName := fmt.Sprintf("%s-%d", task.Name, time.Now().Unix())
 	runID := uuid.New().String()[:8]
@@ -455,13 +473,13 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	if isWriteAgent {
 		// Fresh clone into writable emptyDir workspace
 		gitSyncArgs = fmt.Sprintf(
-			"git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
+			". /vault/secrets/config && git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
 			cloneURL, chownUID, chownUID,
 		)
 	} else {
 		// Shared PVC: fetch and reset (owned by UID 1001, no safe.directory needed)
 		gitSyncArgs = fmt.Sprintf(
-			"cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
+			". /vault/secrets/config && { cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; }; chown -R %s:%s /workspace/repo",
 			cloneURL, chownUID, chownUID,
 		)
 	}
@@ -525,6 +543,14 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 			TTLSecondsAfterFinished: &ttl,
 			ActiveDeadlineSeconds:   &activeDeadline,
 			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{
+						"vault.hashicorp.com/agent-inject":                 "true",
+						"vault.hashicorp.com/role":                         "ai-agents",
+						"vault.hashicorp.com/agent-inject-secret-config":   "secret/ai-agents/anthropic",
+						"vault.hashicorp.com/agent-inject-template-config": vaultTemplate,
+					},
+				},
 				Spec: corev1.PodSpec{
 					RestartPolicy:         corev1.RestartPolicyNever,
 					ShareProcessNamespace: boolPtr(isPublisher),
@@ -542,15 +568,6 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 							Image:   "alpine/git:v2.52.0",
 							Command: []string{"sh", "-c"},
 							Args:    []string{gitSyncArgs},
-							EnvFrom: []corev1.EnvFromSource{
-								{
-									SecretRef: &corev1.SecretEnvSource{
-										LocalObjectReference: corev1.LocalObjectReference{
-											Name: "agent-secrets",
-										},
-									},
-								},
-							},
 							VolumeMounts: []corev1.VolumeMount{
 								{Name: "workspace", MountPath: "/workspace"},
 							},
@@ -580,15 +597,6 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 							Command:         []string{"sh", "-c"},
 							Args:            []string{cmd},
 							Env:             envVars,
-							EnvFrom: []corev1.EnvFromSource{
-								{
-									SecretRef: &corev1.SecretEnvSource{
-										LocalObjectReference: corev1.LocalObjectReference{
-											Name: "agent-secrets",
-										},
-									},
-								},
-							},
 							VolumeMounts: volumeMounts,
 							WorkingDir:   "/workspace/repo",
 							SecurityContext: &corev1.SecurityContext{
@@ -644,23 +652,23 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 	switch runtime {
 	case "opencode":
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
-		return fmt.Sprintf(`opencode -a '%s' -p '%s'`, escapedAgent, escapedPrompt)
+		return fmt.Sprintf(`. /vault/secrets/config && opencode -a '%s' -p '%s'`, escapedAgent, escapedPrompt)
 	default:
 		// Write MCP config and run Claude Code.
-		// Env vars (DISCORD_BOT_TOKEN etc.) are injected by the Secret.
+		// Env vars (DISCORD_BOT_TOKEN etc.) are sourced from /vault/secrets/config.
 		escapedPrompt := escapeShellArg(task.Spec.Prompt)
 
 		if task.Spec.Agent == "publisher" {
 			// Publisher uses entrypoint script for branch lifecycle, git push, PR, Discord.
 			// MCP config includes Playwright for QA subagent browser verification.
 			mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"playwright":{"type":"stdio","command":"npx","args":["-y","@playwright/mcp@latest","--headless"]}}}' > /tmp/mcp.json`
-			return fmt.Sprintf(`%s && apps/blog/bin/run-publisher.sh '%s'`, mcpConfig, escapedPrompt)
+			return fmt.Sprintf(`. /vault/secrets/config && %s && apps/blog/bin/run-publisher.sh '%s'`, mcpConfig, escapedPrompt)
 		}
 
 		// Default: journalist and other agents
 		// Discord MCP for posting notifications; agents use WebSearch for news lookup.
 		mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
-		cmd := fmt.Sprintf(`%s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json --verbose --include-partial-messages`, mcpConfig, escapedAgent, escapedPrompt)
+		cmd := fmt.Sprintf(`. /vault/secrets/config && %s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json --verbose --include-partial-messages`, mcpConfig, escapedAgent, escapedPrompt)
 		if task.Spec.AllowedTools != "" {
 			tools := strings.Split(task.Spec.AllowedTools, ",")
 			for _, tool := range tools {
