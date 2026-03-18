@@ -1,8 +1,8 @@
 ---
 # Ansible playbook: factory-reset Mac → ready for K8s + Claude Code
-# Usage: ansible-playbook infra/mac-setup/playbook.yml --ask-become-pass
+# Usage: ansible-playbook infra/mac-setup/playbook.yml
 #
-# Idempotent — safe to re-run.
+# Idempotent — safe to re-run. Re-runs skip already-installed packages.
 
 - name: Configure macOS development workstation
   hosts: localhost

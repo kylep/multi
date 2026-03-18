@@ -100,12 +100,26 @@ Clean run confirming deprecation fix. Zero failures, zero warnings (aside from t
 
 1. **`infra/mac-setup/playbook.yml`** — Added `Create .ssh directory` task before SSH key generation
 2. **`infra/mac-setup/playbook.yml`** — Replaced all `ansible_env.HOME` with `ansible_facts['env']['HOME']` to fix Ansible 13.x deprecation warnings
+3. **`infra/mac-setup/bootstrap.sh`** — Replaced interactive `gh auth login` with GitHub App installation token flow using `GH_TOKEN` env var (JWT signed with App PEM from `exports.sh`)
+4. **`infra/mac-setup/bootstrap.sh`** — Removed `--ask-become-pass` from ansible-playbook invocation (only `become` task is docker symlink with `failed_when: false`)
+5. **`infra/mac-setup/bootstrap.sh`** — Added timestamped progress output via `_step()` helper
+6. **`infra/mac-setup/playbook.yml`** — Updated usage comment to remove `--ask-become-pass`
+7. **`.pre-commit-config.yaml`** — Scoped ruff hook to `types: [python]` and biome hook to `types_or: [javascript, ts, jsx, tsx]` so they don't fire on markdown/yaml/shell files
+8. **`CLAUDE.md`** — Added guidance to poll background tasks every 15 seconds
+
+## Bugs found and fixed
+
+| Bug | Root cause | Fix |
+|-----|-----------|-----|
+| Playbook fails on SSH key generation | `~/.ssh` directory didn't exist, `openssh_keypair` doesn't create parent dirs | Added `Create .ssh directory` task |
+| Token extraction returns empty | GitHub API returns pretty-printed JSON (multi-line), `sed` only matched single lines | Added `tr -d '\n '` to collapse JSON before extraction |
+| `gh auth login --with-token` hangs | Piped stdin ignored, falls through to interactive device flow | Switched to `GH_TOKEN` env var approach instead |
+| `--ask-become-pass` hangs in automation | Prompts for sudo password interactively | Removed — the only `become` task has `failed_when: false` |
+| Pre-commit hooks fail on markdown commits | ruff/biome hooks had no `types` filter, ran on all files, required Docker | Added `types` filters to scope to Python/JS only |
 
 ## Remaining manual steps
 
-1. **`gh auth login`** — GitHub CLI needs interactive browser authentication
-2. **Add SSH public key to GitHub** — Settings → SSH keys
-3. **Start Rancher Desktop** — Then re-run playbook for K8s-dependent tasks (docker symlink, Lima workspace)
-4. **Transfer `exports.sh`** from old machine and source it
-5. **`claude setup-token`** — Authenticate Claude Code
-6. **`bash ~/gh/multi/infra/ai-agents/bin/bootstrap.sh`** — Deploy K8s stack
+1. **Add SSH public key to GitHub** — Settings → SSH keys
+2. **Start Rancher Desktop** — Then re-run playbook for K8s-dependent tasks (docker symlink, Lima workspace)
+3. **`claude setup-token`** — Authenticate Claude Code
+4. **`bash ~/gh/multi/infra/ai-agents/bin/bootstrap.sh`** — Deploy K8s stack

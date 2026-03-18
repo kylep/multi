@@ -23,62 +23,64 @@ REPO_URL="https://github.com/kpericak/multi.git"
 REPO_DIR="$HOME/gh/multi"
 PLAYBOOK="infra/mac-setup/playbook.yml"
 
-echo "=== Mac Bootstrap ==="
-echo ""
+_step() { printf "[%s] %s\n" "$(date +%H:%M:%S)" "$1"; }
+
+_step "=== Mac Bootstrap ==="
 
 # --- 1. Xcode Command Line Tools ---
 if ! xcode-select -p &>/dev/null; then
-  echo "Installing Xcode Command Line Tools..."
+  _step "Installing Xcode Command Line Tools..."
   xcode-select --install
-  echo ""
-  echo "Xcode CLI tools installer launched."
+  _step "Xcode CLI tools installer launched."
   echo "Complete the installation dialog, then re-run this script."
   exit 0
 else
-  echo "[ok] Xcode CLI tools"
+  _step "[ok] Xcode CLI tools"
 fi
 
 # --- 2. Homebrew ---
 if ! command -v brew &>/dev/null; then
-  echo "Installing Homebrew..."
+  _step "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   # Add to path for the rest of this script (Apple Silicon)
   if [ -f /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
 else
-  echo "[ok] Homebrew"
+  _step "[ok] Homebrew"
 fi
 
 # --- 3. Ansible + Git ---
 if ! command -v ansible-playbook &>/dev/null; then
-  echo "Installing Ansible..."
+  _step "Installing Ansible..."
   brew install ansible
 else
-  echo "[ok] Ansible"
+  _step "[ok] Ansible"
 fi
 
 if ! command -v git &>/dev/null; then
-  echo "Installing Git..."
+  _step "Installing Git..."
   brew install git
 else
-  echo "[ok] Git"
+  _step "[ok] Git"
 fi
 
 # --- 4. GitHub auth + clone ---
 if ! command -v gh &>/dev/null; then
-  echo "Installing GitHub CLI..."
+  _step "Installing GitHub CLI..."
   brew install gh
 else
-  echo "[ok] GitHub CLI"
+  _step "[ok] GitHub CLI"
 fi
 
 # Authenticate gh using GitHub App installation token (from exports.sh).
 # Generates a short-lived token and sets GH_TOKEN for the rest of the script.
 # Falls back to interactive login if App credentials aren't available.
-if ! gh auth status &>/dev/null 2>&1; then
+if [ -n "${GH_TOKEN:-}" ]; then
+  _step "[ok] GitHub auth (GH_TOKEN already set)"
+elif ! gh auth status &>/dev/null 2>&1; then
   if [ -n "${GITHUB_APP_ID:-}" ] && [ -n "${GITHUB_INSTALL_ID:-}" ] && [ -n "${GITHUB_APP_PRIVATE_KEY_B64:-}" ]; then
-    echo "Generating GitHub App installation token..."
+    _step "Generating GitHub App installation token..."
     _pem_file=$(mktemp)
     echo "$GITHUB_APP_PRIVATE_KEY_B64" | base64 -d > "$_pem_file"
 
@@ -104,34 +106,33 @@ if ! gh auth status &>/dev/null 2>&1; then
 
     if [ -n "$_token" ]; then
       export GH_TOKEN="$_token"
-      echo "[ok] GitHub CLI authenticated as App (via GH_TOKEN)"
+      _step "[ok] GitHub CLI authenticated as App (via GH_TOKEN)"
     else
-      echo "WARNING: Failed to get installation token."
+      _step "WARNING: Failed to get installation token."
       echo "Falling back to interactive login..."
       gh auth login
     fi
   else
-    echo ""
-    echo "No GitHub App credentials found. Running interactive gh auth login..."
+    _step "No GitHub App credentials found. Running interactive gh auth login..."
     gh auth login
   fi
+else
+  _step "[ok] GitHub auth (gh already authenticated)"
 fi
 
 if [ ! -d "$REPO_DIR" ]; then
-  echo "Cloning repo to $REPO_DIR..."
+  _step "Cloning repo to $REPO_DIR..."
   mkdir -p "$(dirname "$REPO_DIR")"
   gh repo clone kpericak/multi "$REPO_DIR"
 else
-  echo "[ok] Repo exists at $REPO_DIR"
+  _step "[ok] Repo exists at $REPO_DIR"
 fi
 
 # --- 5. Run Ansible ---
-echo ""
-echo "Running Ansible playbook..."
+_step "Running Ansible playbook..."
 ansible-playbook "$REPO_DIR/$PLAYBOOK"
 
-echo ""
-echo "=== Bootstrap complete ==="
+_step "=== Bootstrap complete ==="
 echo ""
 echo "Next steps:"
 echo "  1. Transfer exports.sh from your old machine"
