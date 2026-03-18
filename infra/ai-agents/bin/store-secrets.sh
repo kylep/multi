@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # Supported env vars (set any subset, unset vars prompt interactively):
 #   CLAUDE_TOKEN, OPENROUTER_KEY,
-#   GITHUB_TOKEN, GITHUB_APP_ID, GITHUB_APP_KEY_FILE, GITHUB_INSTALL_ID, REPO_URL,
+#   GITHUB_TOKEN, GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY_B64 or GITHUB_APP_KEY_FILE, GITHUB_INSTALL_ID, REPO_URL,
 #   DISCORD_TOKEN, DISCORD_GUILD, DISCORD_LOG_CH,
 #   WEBHOOK_TOKEN
 #
@@ -93,10 +93,24 @@ echo "=== GitHub ==="
 EXISTING_GITHUB=$(get_existing github)
 prompt_or_env GITHUB_TOKEN "GitHub PAT$(already_set "$EXISTING_GITHUB" github_token)" secret
 prompt_or_env GITHUB_APP_ID "GitHub App ID$(already_set "$EXISTING_GITHUB" github_app_id)"
-prompt_or_env GITHUB_APP_KEY_FILE "GitHub App private key file path$(already_set "$EXISTING_GITHUB" github_app_private_key)"
+# Resolve PEM: prefer base64 env var, fall back to file path
 GITHUB_APP_KEY=""
-if [ -n "${GITHUB_APP_KEY_FILE:-}" ]; then
-  GITHUB_APP_KEY=$(cat "$GITHUB_APP_KEY_FILE")
+GITHUB_APP_KEY_TMPFILE=""
+if [ -n "${GITHUB_APP_PRIVATE_KEY_B64:-}" ]; then
+  echo "GitHub App private key (from base64 env)"
+  GITHUB_APP_KEY_TMPFILE=$(mktemp)
+  echo "$GITHUB_APP_PRIVATE_KEY_B64" | base64 -d > "$GITHUB_APP_KEY_TMPFILE"
+  GITHUB_APP_KEY="set"
+elif [ -n "${GITHUB_APP_KEY_FILE:-}" ]; then
+  echo "GitHub App private key (from file path env)"
+  GITHUB_APP_KEY_TMPFILE="$GITHUB_APP_KEY_FILE"
+  GITHUB_APP_KEY="set"
+else
+  prompt_or_env GITHUB_APP_KEY_FILE "GitHub App private key file path$(already_set "$EXISTING_GITHUB" github_app_private_key)"
+  if [ -n "${GITHUB_APP_KEY_FILE:-}" ]; then
+    GITHUB_APP_KEY_TMPFILE="$GITHUB_APP_KEY_FILE"
+    GITHUB_APP_KEY="set"
+  fi
 fi
 prompt_or_env GITHUB_INSTALL_ID "GitHub App install ID$(already_set "$EXISTING_GITHUB" github_install_id)"
 prompt_or_env REPO_URL "Repo URL$(already_set "$EXISTING_GITHUB" repo_url)"
@@ -110,12 +124,16 @@ GITHUB_ARGS=""
 # Store private key separately (multiline PEM can't be passed inline)
 # Copy PEM into the pod as a temp file, then use @/path for Vault
 if [ -n "$GITHUB_APP_KEY" ]; then
-  kubectl cp "$GITHUB_APP_KEY_FILE" vault/vault-0:/tmp/github-app-key.pem
+  kubectl cp "$GITHUB_APP_KEY_TMPFILE" vault/vault-0:/tmp/github-app-key.pem
   kubectl exec -n vault vault-0 -- sh -c \
     "VAULT_TOKEN=$ROOT_TOKEN vault kv patch secret/ai-agents/github github_app_private_key=@/tmp/github-app-key.pem" 2>/dev/null \
   || kubectl exec -n vault vault-0 -- sh -c \
     "VAULT_TOKEN=$ROOT_TOKEN vault kv put secret/ai-agents/github github_app_private_key=@/tmp/github-app-key.pem"
   kubectl exec -n vault vault-0 -- rm -f /tmp/github-app-key.pem
+  # Clean up temp file if we created one from base64
+  if [ -n "${GITHUB_APP_PRIVATE_KEY_B64:-}" ] && [ -n "$GITHUB_APP_KEY_TMPFILE" ]; then
+    rm -f "$GITHUB_APP_KEY_TMPFILE"
+  fi
 fi
 
 echo ""

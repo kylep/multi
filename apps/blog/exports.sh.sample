@@ -15,7 +15,12 @@ export CLAUDE_CODE_OAUTH_TOKEN=""  # run: claude setup-token
 export GITHUB_APP_CLIENT_SECRET=""
 export GITHUB_APP_ID=""  # e.g. 3100834
 export GITHUB_INSTALL_ID=""  # from github.com/settings/installations URL — different from APP_ID
-export GITHUB_APP_KEY_FILE=""  # absolute path to pericakai.private-key.pem
+
+# Base64-encoded secret files — single portable backup
+# Generate: base64 < infra/ai-agents/vault/gcp-credentials.json
+export GCP_CREDENTIALS_B64=""
+# Generate: base64 < secrets/pericakai.private-key.pem
+export GITHUB_APP_PRIVATE_KEY_B64=""
 
 # Agent controller secrets (also used by store-secrets.sh)
 export OPENROUTER_API_KEY=""  # openrouter.ai → Account → API Keys

@@ -1,6 +1,6 @@
 ---
 title: "Bootstrap & Recovery"
-summary: "Single-command bootstrap for the AI agent K8s stack, Vault secret management, and post-reboot recovery."
+summary: "From factory-reset Mac to running AI agent K8s stack — single-command bootstrap, Vault secret management, and post-reboot recovery."
 keywords:
   - bootstrap
   - vault
@@ -8,13 +8,68 @@ keywords:
   - helm
   - helmfile
   - recovery
+  - ansible
+  - mac-setup
 related:
   - wiki/devops/agent-controller
   - wiki/design-docs/hardened-iac-bootstrap
-scope: "Covers bootstrapping from bare K3s, Vault init/auth/secrets, post-reboot recovery, and troubleshooting. Does not cover agent definitions or blog pipeline."
+scope: "Covers full Mac setup from factory reset, K8s stack bootstrapping, Vault init/auth/secrets, post-reboot recovery, and troubleshooting."
 last_verified: 2026-03-18
 ---
 
+
+## From factory reset to running stack
+
+On a factory-reset Mac, two things are needed: this bootstrap script
+and `exports.sh` from the old machine (USB drive, AirDrop, etc.).
+
+### 1. Run the Mac bootstrap
+
+```bash
+bash -c "$(curl -fsSL https://kyle.pericak.com/mac-bootstrap.sh)"
+```
+
+Or if the repo is already cloned:
+
+```bash
+bash ~/gh/multi/infra/mac-setup/bootstrap.sh
+```
+
+This installs (idempotent — safe to re-run):
+- Xcode CLI tools, Homebrew
+- Git, GitHub CLI, Node.js, Python, jq, helm, helmfile, pre-commit
+- Rancher Desktop (K3s + Docker)
+- Claude Code (`@anthropic-ai/claude-code`)
+- SSH key, git config, pre-commit hooks, blog npm deps
+- Lima VM workspace directories for agent pods
+
+Uses Ansible under the hood (`infra/mac-setup/playbook.yml`) so
+state is tracked and runs are idempotent.
+
+### 2. Transfer secrets and authenticate
+
+```bash
+# Copy exports.sh from old machine, then:
+source ~/gh/multi/apps/blog/exports.sh
+claude setup-token
+```
+
+`exports.sh` is the single portable secret file — it contains all
+API keys plus base64-encoded GCP credentials and GitHub App PEM.
+
+### 3. Bootstrap the K8s stack
+
+```bash
+bash ~/gh/multi/infra/ai-agents/bin/bootstrap.sh
+```
+
+This decodes secrets from env vars, deploys Vault + agent-controller
+via helmfile, and configures Vault auth. See the detailed walkthrough
+below for first-time Vault initialization.
+
+---
+
+## K8s stack details
 
 ## Prerequisites
 
@@ -35,15 +90,32 @@ sync completes. On an existing cluster it's idempotent — safe to re-run.
 
 ## Fresh install walkthrough
 
-### 0. Create GCP credentials K8s Secret
+### 0. Prepare secrets
 
-The Vault pod requires GCP KMS credentials for auto-unseal. The Helm
-chart mounts a K8s Secret `gcp-credentials` in the `vault` namespace —
-without it, the `vault-0` pod will be stuck in `CreateContainerConfigError`.
+**If you have `exports.sh` from a prior machine**, `source` it and skip to
+step 1 — `bootstrap.sh` detects the base64 env vars (`GCP_CREDENTIALS_B64`,
+`GITHUB_APP_PRIVATE_KEY_B64`), decodes the files, and creates the GCP
+credentials K8s Secret automatically.
 
-The credentials file (`infra/ai-agents/vault/gcp-credentials.json`) is
-gitignored but persists on the macOS filesystem across K3s resets. Create
-the namespace and secret before running bootstrap.sh:
+```bash
+source apps/blog/exports.sh
+```
+
+`exports.sh` is the single file to back up and transfer between machines.
+The only machine-specific secret is the Claude Code OAuth token — run
+`claude setup-token` on the new machine.
+
+**If starting from scratch** (no `exports.sh`), generate the GCP
+credentials manually:
+
+```bash
+gcloud iam service-accounts keys create \
+  infra/ai-agents/vault/gcp-credentials.json \
+  --iam-account=vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com \
+  --project=kylepericak
+```
+
+Then create the namespace and K8s Secret:
 
 ```bash
 kubectl create namespace vault
@@ -52,13 +124,11 @@ kubectl create secret generic gcp-credentials \
   --namespace=vault
 ```
 
-If the credentials file doesn't exist (new machine), regenerate it first:
+You can also run `restore-secrets.sh` standalone after populating
+the env vars:
 
 ```bash
-gcloud iam service-accounts keys create \
-  infra/ai-agents/vault/gcp-credentials.json \
-  --iam-account=vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com \
-  --project=kylepericak
+bash infra/ai-agents/bin/restore-secrets.sh
 ```
 
 ### 1. Run bootstrap.sh
@@ -130,7 +200,7 @@ stored via stdin to preserve newlines.
 | Claude OAuth token | Run `claude setup-token` on a machine where Claude Code is authenticated |
 | OpenRouter API key | [openrouter.ai](https://openrouter.ai) → Account → API Keys |
 | GitHub App ID | GitHub → Settings → Developer settings → GitHub Apps → PericakAI |
-| GitHub App private key | Same page → Private keys → Generate (one-time download, save the `.pem` file) |
+| GitHub App private key | Same page → Private keys → Generate (one-time download, save the `.pem` file). Stored in `exports.sh` as `GITHUB_APP_PRIVATE_KEY_B64` |
 | GitHub Install ID | GitHub → Settings → Applications → Installed GitHub Apps → PericakAI (the URL contains the installation ID) |
 | Discord bot token | Discord Developer Portal → Application → Bot → Token (reset if lost) |
 | Discord guild/channel IDs | Right-click server or channel in Discord with Developer Mode enabled → Copy ID |
@@ -291,8 +361,11 @@ kubectl delete jobs --field-selector=status.successful=1 -n ai-agents
 
 | File | Purpose |
 |------|---------|
-| `infra/ai-agents/bin/bootstrap.sh` | Main bootstrap script |
+| `infra/mac-setup/bootstrap.sh` | Factory-reset Mac → ready for K8s (curl \| bash entry point) |
+| `infra/mac-setup/playbook.yml` | Ansible playbook for Mac system configuration |
+| `infra/ai-agents/bin/bootstrap.sh` | K8s stack bootstrap (Vault + agent-controller) |
 | `infra/ai-agents/bin/configure-vault-auth.sh` | Vault K8s auth + policy setup |
+| `infra/ai-agents/bin/restore-secrets.sh` | Decode base64 env vars to files + create K8s Secret |
 | `infra/ai-agents/bin/store-secrets.sh` | Interactive secret storage |
 | `infra/ai-agents/bin/vault-cmd.sh` | Vault command helper |
 | `infra/ai-agents/helmfile.yaml` | Helmfile with Vault + controller releases |

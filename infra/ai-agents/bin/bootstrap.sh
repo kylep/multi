@@ -6,6 +6,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INFRA_DIR="$SCRIPT_DIR/.."
 
+# 0. Restore secret files from env vars if available
+if [ -n "${GCP_CREDENTIALS_B64:-}" ] || [ -n "${GITHUB_APP_PRIVATE_KEY_B64:-}" ]; then
+  echo "Restoring secrets from base64 env vars..."
+  bash "$SCRIPT_DIR/restore-secrets.sh"
+fi
+
 # 1. Check prerequisites
 for cmd in kubectl helm helmfile docker; do
   command -v "$cmd" >/dev/null || { echo "Error: $cmd not found"; exit 1; }
