@@ -10,7 +10,7 @@
   gather_facts: true
 
   vars:
-    repo_dir: "{{ ansible_env.HOME }}/gh/multi"
+    repo_dir: "{{ ansible_facts['env']['HOME'] }}/gh/multi"
     homebrew_taps:
       - homebrew/cask
     homebrew_packages:
@@ -83,7 +83,7 @@
 
     - name: Symlink Rancher docker to PATH
       ansible.builtin.file:
-        src: "{{ ansible_env.HOME }}/.rd/bin/docker"
+        src: "{{ ansible_facts['env']['HOME'] }}/.rd/bin/docker"
         dest: /usr/local/bin/docker
         state: link
       become: true
@@ -101,7 +101,7 @@
 
     - name: Create .claude directory
       ansible.builtin.file:
-        path: "{{ ansible_env.HOME }}/.claude"
+        path: "{{ ansible_facts['env']['HOME'] }}/.claude"
         state: directory
         mode: "0700"
 
@@ -129,9 +129,15 @@
     # ---------------------------------------------------------------
     # SSH key (for GitHub)
     # ---------------------------------------------------------------
+    - name: Create .ssh directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
+        state: directory
+        mode: "0700"
+
     - name: Generate SSH key if missing
       community.crypto.openssh_keypair:
-        path: "{{ ansible_env.HOME }}/.ssh/id_ed25519"
+        path: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_ed25519"
         type: ed25519
         comment: "kyle@pericak.com"
       register: ssh_key
@@ -140,7 +146,7 @@
       ansible.builtin.debug:
         msg: >
           Add this SSH key to GitHub (Settings → SSH keys):
-          {{ lookup('file', ansible_env.HOME + '/.ssh/id_ed25519.pub') }}
+          {{ lookup('file', ansible_facts['env']['HOME'] + '/.ssh/id_ed25519.pub') }}
       when: ssh_key.changed
 
     # ---------------------------------------------------------------
@@ -173,14 +179,14 @@
     # ---------------------------------------------------------------
     - name: Ensure Homebrew in zsh profile
       ansible.builtin.lineinfile:
-        path: "{{ ansible_env.HOME }}/.zprofile"
+        path: "{{ ansible_facts['env']['HOME'] }}/.zprofile"
         line: 'eval "$(/opt/homebrew/bin/brew shellenv)"'
         create: true
         mode: "0644"
 
     - name: Ensure Rancher Desktop in PATH
       ansible.builtin.lineinfile:
-        path: "{{ ansible_env.HOME }}/.zprofile"
+        path: "{{ ansible_facts['env']['HOME'] }}/.zprofile"
         line: 'export PATH="$HOME/.rd/bin:$PATH"'
         create: true
         mode: "0644"

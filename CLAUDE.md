@@ -8,6 +8,14 @@ Never use `sleep` commands longer than 30 seconds. If you need to wait
 for something, use `run_in_background` and check later, or poll with
 short intervals. Long sleeps block the conversation and waste time.
 
+When running background tasks (`run_in_background`), **poll task output
+every 15 seconds** using `TaskOutput` with `block: false` and
+`timeout: 15000`. Never block indefinitely on a background task — if
+it hasn't produced output after 15–30 seconds, check status and report
+progress to the user. Tasks that require interactive input (like
+`gh auth login`) will hang forever; detect this early by polling and
+kill the process if stuck.
+
 # Agent Team
 
 This repo has 10 Claude Code agents defined in `.claude/agents/`.
