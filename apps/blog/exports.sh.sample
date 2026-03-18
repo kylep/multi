@@ -13,7 +13,7 @@ export CLAUDE_CODE_OAUTH_TOKEN=""  # run: claude setup-token
 
 # GitHub App — PericakAI (github.com/settings/apps/pericakai)
 export GITHUB_APP_CLIENT_SECRET=""
-export GITHUB_APP_ID=""  # e.g. 3100834
+export GITHUB_APP_ID=""
 export GITHUB_INSTALL_ID=""  # from github.com/settings/installations URL — different from APP_ID
 
 # Base64-encoded secret files — single portable backup
