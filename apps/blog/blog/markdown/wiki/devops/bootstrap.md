@@ -152,6 +152,7 @@ manual steps:
 
 ```bash
 kubectl exec -n vault vault-0 -- vault operator init -format=json > ~/.vault-init
+chmod 600 ~/.vault-init
 ```
 
 Save `~/.vault-init` securely — it contains the root token and recovery
@@ -190,8 +191,8 @@ Interactive prompts for each secret group. Press Enter to skip a field
 | Discord | `discord_bot_token`, `discord_guild_id`, `discord_log_channel_id` |
 | Webhook | `webhook_token` |
 
-The GitHub App private key is read from a file (multiline PEM) and
-stored via stdin to preserve newlines.
+The GitHub App private key is copied into the Vault pod as a temp file
+and stored via `@/path` syntax to preserve newlines.
 
 #### Where to find each secret
 

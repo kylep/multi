@@ -10,7 +10,7 @@ set -euo pipefail
 #   DISCORD_TOKEN, DISCORD_GUILD, DISCORD_LOG_CH,
 #   WEBHOOK_TOKEN
 #
-# Note: secrets passed via sh -c args, visible in process listings.
+# Note: secrets passed as env/args to kubectl exec, visible in process listings.
 # Acceptable for single-node dev. See configure-vault-auth.sh header.
 
 VAULT_CREDS="$HOME/.vault-init"
@@ -35,8 +35,8 @@ if [ "$SEALED" = "true" ]; then
 fi
 
 get_existing() {
-  kubectl exec -n vault vault-0 -- sh -c \
-    "VAULT_TOKEN=$ROOT_TOKEN vault kv get -format=json secret/ai-agents/$1" 2>/dev/null \
+  kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+    vault kv get -format=json "secret/ai-agents/$1" 2>/dev/null \
     | jq -r '.data.data // {} | keys[]' 2>/dev/null || true
 }
 
@@ -47,10 +47,11 @@ already_set() {
 
 kv_store() {
   local subpath=$1; shift
-  local cmd="VAULT_TOKEN=$ROOT_TOKEN vault kv patch secret/ai-agents/$subpath $*"
-  local fallback="VAULT_TOKEN=$ROOT_TOKEN vault kv put secret/ai-agents/$subpath $*"
-  kubectl exec -n vault vault-0 -- sh -c "$cmd" 2>/dev/null \
-    || kubectl exec -n vault vault-0 -- sh -c "$fallback"
+  # shellcheck disable=SC2068
+  kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+    vault kv patch "secret/ai-agents/$subpath" $@ 2>/dev/null \
+    || kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+      vault kv put "secret/ai-agents/$subpath" $@
 }
 
 # prompt_or_env VAR_NAME PROMPT_TEXT [secret]
@@ -124,16 +125,21 @@ GITHUB_ARGS=""
 # Store private key separately (multiline PEM can't be passed inline)
 # Copy PEM into the pod as a temp file, then use @/path for Vault
 if [ -n "$GITHUB_APP_KEY" ]; then
+  # Ensure cleanup of PEM material on all exit paths
+  cleanup_pem() {
+    kubectl exec -n vault vault-0 -- rm -f /tmp/github-app-key.pem 2>/dev/null || true
+    if [ -n "${GITHUB_APP_PRIVATE_KEY_B64:-}" ] && [ -n "$GITHUB_APP_KEY_TMPFILE" ]; then
+      rm -f "$GITHUB_APP_KEY_TMPFILE"
+    fi
+  }
+  trap cleanup_pem EXIT
   kubectl cp "$GITHUB_APP_KEY_TMPFILE" vault/vault-0:/tmp/github-app-key.pem
-  kubectl exec -n vault vault-0 -- sh -c \
-    "VAULT_TOKEN=$ROOT_TOKEN vault kv patch secret/ai-agents/github github_app_private_key=@/tmp/github-app-key.pem" 2>/dev/null \
-  || kubectl exec -n vault vault-0 -- sh -c \
-    "VAULT_TOKEN=$ROOT_TOKEN vault kv put secret/ai-agents/github github_app_private_key=@/tmp/github-app-key.pem"
-  kubectl exec -n vault vault-0 -- rm -f /tmp/github-app-key.pem
-  # Clean up temp file if we created one from base64
-  if [ -n "${GITHUB_APP_PRIVATE_KEY_B64:-}" ] && [ -n "$GITHUB_APP_KEY_TMPFILE" ]; then
-    rm -f "$GITHUB_APP_KEY_TMPFILE"
-  fi
+  kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+    vault kv patch secret/ai-agents/github github_app_private_key=@/tmp/github-app-key.pem 2>/dev/null \
+  || kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+    vault kv put secret/ai-agents/github github_app_private_key=@/tmp/github-app-key.pem
+  cleanup_pem
+  trap - EXIT
 fi
 
 echo ""

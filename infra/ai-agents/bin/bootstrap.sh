@@ -33,7 +33,7 @@ INITIALIZED=$(kubectl exec -n vault vault-0 -- vault status -format=json 2>/dev/
 if [ "$INITIALIZED" = "false" ]; then
   echo ""
   echo "=== Manual Vault setup required ==="
-  echo "1. kubectl exec -n vault vault-0 -- vault operator init -format=json > ~/.vault-init"
+  echo "1. kubectl exec -n vault vault-0 -- vault operator init -format=json > ~/.vault-init && chmod 600 ~/.vault-init"
   echo "2. bash $SCRIPT_DIR/configure-vault-auth.sh"
   echo "3. bash $SCRIPT_DIR/store-secrets.sh"
   echo ""
