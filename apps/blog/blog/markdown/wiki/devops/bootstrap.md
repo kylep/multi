@@ -26,7 +26,7 @@ and `exports.sh` from the old machine (USB drive, AirDrop, etc.).
 ### 1. Run the Mac bootstrap
 
 ```bash
-bash -c "$(curl -fsSL https://kyle.pericak.com/mac-bootstrap.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/kylep/multi/main/infra/mac-setup/bootstrap.sh)"
 ```
 
 Or if the repo is already cloned:
