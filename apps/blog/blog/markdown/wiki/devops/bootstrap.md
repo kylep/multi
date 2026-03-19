@@ -113,8 +113,8 @@ credentials manually:
 ```bash
 gcloud iam service-accounts keys create \
   infra/ai-agents/vault/gcp-credentials.json \
-  --iam-account=vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com \
-  --project=kylepericak
+  --iam-account=vault-unseal-<PROJECT_ID>@<PROJECT_ID>.iam.gserviceaccount.com \
+  --project=<PROJECT_ID>
 ```
 
 Then create the namespace and K8s Secret:
@@ -288,8 +288,8 @@ To regenerate on a new machine:
 ```bash
 gcloud iam service-accounts keys create \
   infra/ai-agents/vault/gcp-credentials.json \
-  --iam-account=vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com \
-  --project=kylepericak
+  --iam-account=vault-unseal-<PROJECT_ID>@<PROJECT_ID>.iam.gserviceaccount.com \
+  --project=<PROJECT_ID>
 kubectl create secret generic gcp-credentials \
   --from-file=gcp-credentials.json=infra/ai-agents/vault/gcp-credentials.json \
   --namespace=vault --dry-run=client -o yaml | kubectl apply -f -

@@ -72,7 +72,7 @@ After adding the `.ssh` directory task, full playbook passed (0 failures).
 | Task | Result |
 |------|--------|
 | Create ~/.ssh (mode 0700) | Created |
-| Generate ed25519 SSH key | Created — `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILLgFXkaTVXKCoRCn/uJ2Ccgu9HUn2+9C6U6gFwB6Lnc kyle@pericak.com` |
+| Generate ed25519 SSH key | Created — key generated (add to GitHub manually) |
 | Pre-commit hooks | Installed (commit + pre-push) |
 | Blog npm deps | Installed |
 | ~/.zprofile | Added Homebrew shellenv + Rancher PATH lines |
