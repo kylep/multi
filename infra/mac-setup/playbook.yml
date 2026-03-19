@@ -437,7 +437,7 @@
                   }]
                 },
                 {
-                  "matcher": "Read|Edit|Write|Bash",
+                  "matcher": "Read|Edit|Write|Bash|Grep|Glob",
                   "hooks": [{
                     "type": "command",
                     "command": "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh"
