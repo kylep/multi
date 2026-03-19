@@ -242,6 +242,29 @@
       changed_when: false
 
     # ---------------------------------------------------------------
+    # macOS software update settings
+    # ---------------------------------------------------------------
+    - name: Enable automatic update check
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+      become: true
+      changed_when: false
+
+    - name: Enable automatic update download
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+      become: true
+      changed_when: false
+
+    - name: Enable automatic critical security update install
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+      become: true
+      changed_when: false
+
+    - name: Enable automatic XProtect and config data install
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+      become: true
+      changed_when: false
+
+    # ---------------------------------------------------------------
     # Computer name
     # ---------------------------------------------------------------
     - name: Set ComputerName
@@ -342,6 +365,10 @@
           Git commits use the identity "PericakAI (Pai)" <pericakai@gmail.com>.
           Do not use the kylep/ GitHub account or Kyle Pericak identity on
           this machine.
+
+          ## Pull requests
+
+          When creating pull requests, always assign them to `kylep`.
 
           ## Git push authentication
 
