@@ -136,6 +136,35 @@ PREFIX="Security >"
 discord_status() { _discord_send "${DISCORD_STATUS_CHANNEL_ID:-}" "${PREFIX} $1"; }
 discord_log()    { _discord_send "${DISCORD_LOG_CHANNEL_ID:-}" "${PREFIX} $1"; }
 
+# --- Git push via GitHub App token ---
+git_push() {
+  local _pem_file _header _now _iat _exp _payload _sig _jwt _token
+  _pem_file=$(mktemp)
+  echo "$GITHUB_APP_PRIVATE_KEY_B64" | base64 -d > "$_pem_file"
+
+  _header=$(printf '{"alg":"RS256","typ":"JWT"}' | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+  _now=$(date +%s)
+  _iat=$((_now - 60))
+  _exp=$((_now + 300))
+  _payload=$(printf '{"iss":"%s","iat":%d,"exp":%d}' "$GITHUB_APP_ID" "$_iat" "$_exp" \
+    | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+  _sig=$(printf '%s.%s' "$_header" "$_payload" \
+    | openssl dgst -sha256 -sign "$_pem_file" -binary \
+    | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+  _jwt="${_header}.${_payload}.${_sig}"
+  rm -f "$_pem_file"
+
+  _token=$(curl -sf -X POST \
+    -H "Authorization: Bearer ${_jwt}" \
+    -H "Accept: application/vnd.github+json" \
+    "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
+    | jq -r '.token')
+
+  git remote set-url origin "https://x-access-token:${_token}@github.com/kylep/multi.git"
+  git push -u origin HEAD
+  git remote set-url origin https://github.com/kylep/multi.git
+}
+
 # --- Argument parsing ---
 parse_args() {
   while [ $# -gt 0 ]; do
@@ -324,6 +353,7 @@ Automated by: apps/agent-loops/macbook-security-loop/loop.sh
 Co-Authored-By: Claude Sonnet <noreply@anthropic.com>
 EOF
 )"
+        git_push
         local branch
         branch=$(git rev-parse --abbrev-ref HEAD)
         discord_status "Done, pushed to ${branch} — ${finding}"
