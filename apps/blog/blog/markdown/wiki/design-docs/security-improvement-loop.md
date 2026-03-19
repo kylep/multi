@@ -200,9 +200,13 @@ reverted.
   state
 - **File path:** `/tmp/sec-loop.lock`
 - **Key interfaces:**
-  - Contains PID of the running wrapper
-  - `trap` on EXIT/INT/TERM removes the lock file
+  - Contains PID and start timestamp of the running wrapper
+  - Created atomically via `noclobber` shell option
+    (`(set -o noclobber; echo "$$:$(date +%s)" > "$lockfile")`)
+  - `trap` on EXIT/INT/TERM/HUP removes the lock file
   - New invocations check if PID is alive via `kill -0`
+  - PID reuse mitigation: lock file stores `PID:START_TIME`;
+    validator compares stored start time against `ps -p $PID -o lstart=`
 
 Stale lock detection: if the PID in the lock file is not running
 (`kill -0 $PID` fails), the lock is stale. Clean it up and proceed.
@@ -326,6 +330,8 @@ claude -p "$(cat prompt.md)" \
   --model sonnet \
   --output-format json \
   --max-turns 30 \
+  --max-budget-usd 5.00 \
+  --no-session-persistence \
   2>&1 | tee "/tmp/sec-loop-iter-${ITERATION}.log"
 
 # Adversarial verification
@@ -333,8 +339,23 @@ claude -p "$(cat verify-prompt.md)" \
   --model sonnet \
   --output-format json \
   --max-turns 15 \
+  --max-budget-usd 2.00 \
+  --no-session-persistence \
   2>&1 | tee "/tmp/sec-loop-verify-${ITERATION}.log"
 ```
+
+Key CLI flags:
+- `--max-budget-usd` — per-invocation hard cap (defense-in-depth with
+  the daily cost gate; prevents a single runaway iteration)
+- `--no-session-persistence` — ephemeral invocations that don't
+  accumulate session state on disk
+- `--output-format json` — the `ResultMessage` includes
+  `total_cost_usd` which the wrapper can accumulate for more accurate
+  daily cost tracking than JSONL parsing alone
+
+Note: piping stdin > ~7k characters to `claude -p` produces empty
+output (known bug). The prompt files must stay under this limit, or
+the wrapper should pass a file path in a short prompt instead.
 
 ## Alternatives Considered
 
