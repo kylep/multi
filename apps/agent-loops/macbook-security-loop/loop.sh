@@ -180,7 +180,7 @@ main() {
       break
     fi
 
-    discord_status "${LOG_PREFIX} Starting iteration ${iteration} — scanning hooks for the next highest-impact security gap, then adversarially verifying the fix"
+    discord_status "${LOG_PREFIX} Starting iteration ${iteration} — assessing Mac workstation security posture, then adversarially verifying any fix"
 
     export SEC_LOOP_ITERATION="$iteration"
 

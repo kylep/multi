@@ -5,9 +5,23 @@ Your job is to find and fix one security gap per iteration.
 
 ## Context
 
-This machine runs Claude Code in bypass-permissions mode. Three safety hooks
-protect against destructive commands, sensitive file access, and provide audit
-logging. The hooks are defined as standalone scripts managed by Ansible.
+This machine runs Claude Code in bypass-permissions mode as an always-on AI
+workstation. The entire machine configuration is managed by an Ansible playbook
+(`infra/mac-setup/playbook.yml`), which covers:
+
+- **Safety hooks** — Claude Code PreToolUse/PostToolUse hooks that block
+  destructive commands, protect sensitive files, and provide audit logging
+- **SSH** — key generation, SSH server for Blink/iPhone access over Tailscale
+- **Tailscale** — VPN daemon with Tailscale SSH enabled
+- **Power management** — sleep disabled (always-on workstation)
+- **Git config** — identity, credential helper disabled
+- **Homebrew packages** — dev tools, security tools, runtime dependencies
+- **MCP servers** — Playwright, analytics, screenshot, Discord, OpenRouter, cc-usage
+- **Shell profile** — PATH configuration for Homebrew and Rancher Desktop
+- **Rancher Desktop** — Docker and Kubernetes via Lima VM
+- **Pre-commit hooks** — semgrep, gitleaks, secret detection
+
+The playbook is the source of truth. All changes must go through it.
 
 ## Your task
 
@@ -18,20 +32,31 @@ logging. The hooks are defined as standalone scripts managed by Ansible.
    for observations, strategy notes, and known limitations from previous iterations.
 
 3. **Assess current security posture** by reading:
-   - `infra/mac-setup/playbook.yml` (Ansible playbook)
+   - `infra/mac-setup/playbook.yml` (full Ansible playbook — read the whole thing)
    - `infra/mac-setup/hooks/block-destructive.sh`
    - `infra/mac-setup/hooks/protect-sensitive.sh`
    - `infra/mac-setup/hooks/audit-log.sh`
+   - Any other files referenced by the playbook that are relevant to your finding
 
 4. **Identify the single highest-impact security gap** that is not yet addressed.
-   Consider: detection gaps in hook patterns, missing command patterns, file access
-   bypasses, log tampering, exfiltration vectors, etc.
+   Consider the full workstation attack surface:
+   - Hook detection gaps (missing patterns, bypass techniques, log tampering)
+   - SSH hardening (config, key permissions, authorized_keys management)
+   - Network exposure (Tailscale ACLs, listening services, firewall)
+   - File permissions (secrets, credentials, sensitive config files)
+   - Credential hygiene (token storage, env var exposure, key rotation)
+   - macOS system settings (Gatekeeper, SIP, FileVault, auto-updates)
+   - Homebrew supply chain (package auditing, cask verification)
+   - MCP server security (env var handling, input validation)
+   - Container security (Docker socket access, Lima VM isolation)
+   - Ansible playbook hardening (idempotency, error handling, least privilege)
 
-5. **Implement the fix** by editing the appropriate file(s). You may ONLY edit:
+5. **Implement the fix** by editing the appropriate file(s). You may edit:
    - `infra/mac-setup/hooks/block-destructive.sh`
    - `infra/mac-setup/hooks/protect-sensitive.sh`
    - `infra/mac-setup/hooks/audit-log.sh`
-   - `infra/mac-setup/playbook.yml` (only the settings.json content block or hook-related tasks)
+   - `infra/mac-setup/playbook.yml` (any section — add new tasks if needed)
+   - New files under `infra/mac-setup/` if the playbook needs to deploy them
    - `apps/agent-loops/macbook-security-loop/run-notes.md` (run notes only)
 
 6. **Validate syntax** by running:
@@ -85,5 +110,5 @@ logging. The hooks are defined as standalone scripts managed by Ansible.
   source files in this repo. The playbook deploys them.
 - **Write the status file atomically:** write to `/tmp/sec-loop-status.json.tmp`
   first, then `mv` it to `/tmp/sec-loop-status.json`.
-- **Stay focused.** Do not create new files, install tools, or modify anything
-  outside the allowed file set.
+- **Stay focused.** Do not install new tools or modify anything outside
+  `infra/mac-setup/` and the run notes/improvement log.
