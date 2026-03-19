@@ -7,12 +7,14 @@ repos:
       entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-lint-toolkit:0.1 -c "ruff check /workspace --no-cache"'
       language: system
       stages: ["pre-commit"]
+      types: [python]
     - id: biome
       name: Biome
       description: JS/TS linter using the lint toolkit image.
       entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-lint-toolkit:0.1 -c "biome lint /workspace/apps/blog/blog/pages /workspace/apps/blog/blog/components /workspace/apps/blog/blog/utils"'
       language: system
       stages: ["pre-commit"]
+      types_or: [javascript, ts, jsx, tsx]
     - id: semgrep
       name: Semgrep
       description: Static analysis on changed files (1 min timeout).

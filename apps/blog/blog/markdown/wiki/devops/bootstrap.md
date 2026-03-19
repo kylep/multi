@@ -26,13 +26,15 @@ and `exports.sh` from the old machine (USB drive, AirDrop, etc.).
 ### 1. Run the Mac bootstrap
 
 ```bash
-bash -c "$(curl -fsSL https://kyle.pericak.com/mac-bootstrap.sh)"
+source exports.sh
+sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/kylep/multi/main/infra/mac-setup/bootstrap.sh)"
 ```
 
 Or if the repo is already cloned:
 
 ```bash
-bash ~/gh/multi/infra/mac-setup/bootstrap.sh
+source ~/gh/multi/apps/blog/exports.sh
+sudo bash ~/gh/multi/infra/mac-setup/bootstrap.sh
 ```
 
 This installs (idempotent — safe to re-run):
@@ -111,8 +113,8 @@ credentials manually:
 ```bash
 gcloud iam service-accounts keys create \
   infra/ai-agents/vault/gcp-credentials.json \
-  --iam-account=vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com \
-  --project=kylepericak
+  --iam-account=vault-unseal-<PROJECT_ID>@<PROJECT_ID>.iam.gserviceaccount.com \
+  --project=<PROJECT_ID>
 ```
 
 Then create the namespace and K8s Secret:
@@ -286,8 +288,8 @@ To regenerate on a new machine:
 ```bash
 gcloud iam service-accounts keys create \
   infra/ai-agents/vault/gcp-credentials.json \
-  --iam-account=vault-unseal-ai-agents@kylepericak.iam.gserviceaccount.com \
-  --project=kylepericak
+  --iam-account=vault-unseal-<PROJECT_ID>@<PROJECT_ID>.iam.gserviceaccount.com \
+  --project=<PROJECT_ID>
 kubectl create secret generic gcp-credentials \
   --from-file=gcp-credentials.json=infra/ai-agents/vault/gcp-credentials.json \
   --namespace=vault --dry-run=client -o yaml | kubectl apply -f -

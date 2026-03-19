@@ -27,5 +27,4 @@ spec:
     Bash(git add apps/blog/blog/markdown/wiki/journal/*),
     Bash(git config user.name *),Bash(git config user.email *),
     Bash(git commit --no-verify *),Bash(date *),
-    mcp__discord__send_message,mcp__discord__list_channels,
-    mcp__google-news__search_news,mcp__google-news__top_headlines
+    mcp__discord__send_message,mcp__discord__list_channels
