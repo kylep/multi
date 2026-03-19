@@ -10,6 +10,7 @@ LOCKFILE="/tmp/sec-loop.lock"
 STATUS_FILE="/tmp/sec-loop-status.json"
 VERIFY_FILE="/tmp/sec-loop-verify.json"
 SLEEP_INTERVAL=1800
+MAX_VERIFY_RETRIES=3
 DAILY_BUDGET=150
 WORST_CASE_RATE_PER_MTOK=75
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -176,87 +177,117 @@ main() {
 
     export SEC_LOOP_ITERATION="$iteration"
 
-    # Clean status files from previous iteration
-    rm -f "$STATUS_FILE" "$VERIFY_FILE"
+    local attempt=0
+    local verified=false
+    local finding=""
+    local prior_failure=""
 
-    # --- Improvement phase ---
-    echo "Running improvement agent..."
-    claude -p "$(cat "$SCRIPT_DIR/prompt.md")" \
-      --model sonnet --output-format json \
-      --max-turns 30 --max-budget-usd 5.00 \
-      --no-session-persistence --dangerously-skip-permissions \
-      || true
+    while [ "$attempt" -lt "$MAX_VERIFY_RETRIES" ]; do
+      attempt=$(( attempt + 1 ))
+      echo "--- Attempt $attempt/$MAX_VERIFY_RETRIES ---"
 
-    # Read status file
-    if [ ! -f "$STATUS_FILE" ]; then
-      echo "WARN: Status file missing after iteration $iteration (agent may have hit budget)"
-      discord_log "Iteration $iteration: status file missing (agent may have hit budget cap), restoring and continuing"
+      # Clean status files
+      rm -f "$STATUS_FILE" "$VERIFY_FILE"
+
+      # --- Improvement phase ---
+      local improvement_prompt
+      improvement_prompt=$(cat "$SCRIPT_DIR/prompt.md")
+      if [ -n "$prior_failure" ]; then
+        improvement_prompt="${improvement_prompt}
+
+## Previous attempt failed verification
+
+The adversarial verifier found a bypass. Fix the underlying weakness before trying a new approach.
+
+**Bypass that succeeded:** ${prior_failure}
+
+Do NOT just add more entries to a blocklist — the verifier will find another gap. Consider a fundamentally stronger approach."
+      fi
+
+      echo "Running improvement agent..."
+      claude -p "$improvement_prompt" \
+        --model sonnet --output-format json \
+        --max-turns 30 --max-budget-usd 5.00 \
+        --no-session-persistence --dangerously-skip-permissions \
+        || true
+
+      # Read status file
+      if [ ! -f "$STATUS_FILE" ]; then
+        echo "WARN: Status file missing (agent may have hit budget)"
+        discord_log "Iteration $iteration attempt $attempt: status file missing, restoring"
+        git restore . 2>/dev/null || true
+        break
+      fi
+
+      local action
+      action=$(jq -r '.action // "unknown"' "$STATUS_FILE" 2>/dev/null || echo "unknown")
+
+      if [ "$action" = "done" ]; then
+        local reason
+        reason=$(jq -r '.reason // "no reason given"' "$STATUS_FILE" 2>/dev/null)
+        echo "Agent reports no more improvements: $reason"
+        discord_status "Security loop terminated: $reason"
+        # Signal outer loop to exit
+        verified="done"
+        break
+      elif [ "$action" != "improved" ]; then
+        echo "WARN: Unexpected action '$action' in status file"
+        discord_log "Iteration $iteration attempt $attempt: unexpected action '$action', restoring"
+        git restore . 2>/dev/null || true
+        break
+      fi
+
+      finding=$(jq -r '.finding // "unknown"' "$STATUS_FILE" 2>/dev/null)
+      echo "Finding: $finding"
+
+      # --- Verification phase ---
+      echo "Running verification agent..."
+      claude -p "$(cat "$SCRIPT_DIR/verify-prompt.md")" \
+        --model sonnet --output-format json \
+        --max-turns 15 --max-budget-usd 2.00 \
+        --no-session-persistence --dangerously-skip-permissions \
+        || true
+
+      local verify_result="unknown"
+      if [ -f "$VERIFY_FILE" ]; then
+        verify_result=$(jq -r '.result // "unknown"' "$VERIFY_FILE" 2>/dev/null || echo "unknown")
+      fi
+
+      if [ "$verify_result" = "pass" ]; then
+        echo "Verification passed (attempt $attempt)"
+        verified=true
+        break
+      fi
+
+      # Verification failed — capture reason and retry
+      prior_failure=$(jq -r '.failure_reason // "unknown"' "$VERIFY_FILE" 2>/dev/null || echo "unknown")
+      echo "Verification FAILED (attempt $attempt/$MAX_VERIFY_RETRIES): $prior_failure"
       git restore . 2>/dev/null || true
-      sleep "$SLEEP_INTERVAL"
-      continue
-    fi
+    done
 
-    local action
-    action=$(jq -r '.action // "unknown"' "$STATUS_FILE" 2>/dev/null || echo "unknown")
-
-    if [ "$action" = "done" ]; then
-      local reason
-      reason=$(jq -r '.reason // "no reason given"' "$STATUS_FILE" 2>/dev/null)
-      echo "Agent reports no more improvements: $reason"
-      discord_status "Security loop terminated: $reason"
+    # Act on the outcome
+    if [ "$verified" = "done" ]; then
       break
-    elif [ "$action" != "improved" ]; then
-      echo "WARN: Unexpected action '$action' in status file"
-      discord_log "Iteration $iteration: unexpected status action '$action', restoring and continuing"
-      git restore . 2>/dev/null || true
-      sleep "$SLEEP_INTERVAL"
-      continue
-    fi
-
-    local finding
-    finding=$(jq -r '.finding // "unknown"' "$STATUS_FILE" 2>/dev/null)
-    echo "Finding: $finding"
-
-    # --- Verification phase ---
-    echo "Running verification agent..."
-    claude -p "$(cat "$SCRIPT_DIR/verify-prompt.md")" \
-      --model sonnet --output-format json \
-      --max-turns 15 --max-budget-usd 2.00 \
-      --no-session-persistence --dangerously-skip-permissions \
-      || true
-
-    # Read verification result
-    local verify_result="unknown"
-    if [ -f "$VERIFY_FILE" ]; then
-      verify_result=$(jq -r '.result // "unknown"' "$VERIFY_FILE" 2>/dev/null || echo "unknown")
-    fi
-
-    if [ "$verify_result" = "pass" ]; then
-      echo "Verification passed"
+    elif [ "$verified" = true ]; then
       if [ "$DRY_RUN" = false ]; then
         git add -A
         git commit -m "$(cat <<EOF
 sec-loop: fix — $finding
 
-Iteration: $iteration
+Iteration: $iteration (verified on attempt $attempt)
 Automated by: apps/agent-loops/macbook-security-loop/loop.sh
 
 Co-Authored-By: Claude Sonnet <noreply@anthropic.com>
 EOF
 )"
-        discord_status "Security loop iteration ${iteration} complete: ${finding}"
+        discord_status "Security loop iteration ${iteration} complete (attempt $attempt): ${finding}"
       else
         echo "DRY-RUN: Skipping git commit and discord notification"
       fi
     else
-      local failure_reason
-      failure_reason=$(jq -r '.failure_reason // "unknown"' "$VERIFY_FILE" 2>/dev/null || echo "unknown")
-      echo "Verification FAILED: $failure_reason"
+      echo "All $MAX_VERIFY_RETRIES attempts failed for iteration $iteration"
       if [ "$DRY_RUN" = false ]; then
-        git restore .
-        discord_log "Iteration $iteration verification failed: $failure_reason"
-      else
-        echo "DRY-RUN: Skipping git restore and discord notification"
+        discord_log "Iteration $iteration: all $MAX_VERIFY_RETRIES verification attempts failed, moving on"
       fi
     fi
 
