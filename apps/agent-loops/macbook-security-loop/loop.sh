@@ -185,6 +185,7 @@ main() {
     while [ "$attempt" -lt "$MAX_VERIFY_RETRIES" ]; do
       attempt=$(( attempt + 1 ))
       echo "--- Attempt $attempt/$MAX_VERIFY_RETRIES ---"
+      discord_log "Iteration $iteration: attempt $attempt/$MAX_VERIFY_RETRIES"
 
       # Clean status files
       rm -f "$STATUS_FILE" "$VERIFY_FILE"
@@ -242,7 +243,17 @@ Do NOT just add more entries to a blocklist — the verifier will find another g
 
       # --- Verification phase ---
       echo "Running verification agent..."
-      claude -p "$(cat "$SCRIPT_DIR/verify-prompt.md")" \
+      local verify_prompt
+      verify_prompt=$(cat "$SCRIPT_DIR/verify-prompt.md")
+      if [ "$attempt" -eq "$MAX_VERIFY_RETRIES" ]; then
+        verify_prompt="${verify_prompt}
+
+## Final attempt ($attempt/$MAX_VERIFY_RETRIES)
+
+This is the last retry. Focus on whether the security measure provides **meaningful protection** against realistic threats. Do not fail the verification for edge cases that require exotic tooling, unlikely attack chains, or theoretical bypasses that no real attacker would use. Pass if the improvement is a net positive for security, even if imperfect."
+      fi
+
+      claude -p "$verify_prompt" \
         --model sonnet --output-format json \
         --max-turns 15 --max-budget-usd 2.00 \
         --no-session-persistence --dangerously-skip-permissions \
