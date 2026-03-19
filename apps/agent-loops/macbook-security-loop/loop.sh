@@ -17,6 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 LOGFILE="/tmp/sec-loop.log"
 DRY_RUN=false
+ONE_SHOT=false
 
 # Source Discord credentials and other env vars
 # shellcheck source=../../blog/exports.sh
@@ -143,8 +144,12 @@ parse_args() {
         DRY_RUN=true
         shift
         ;;
+      --one-shot)
+        ONE_SHOT=true
+        shift
+        ;;
       *)
-        echo "Usage: $0 [--dry-run]"
+        echo "Usage: $0 [--dry-run] [--one-shot]"
         exit 1
         ;;
     esac
@@ -309,9 +314,13 @@ EOF
       fi
     fi
 
-    # Dry-run: single iteration only
+    # Single-iteration modes
     if [ "$DRY_RUN" = true ]; then
       echo "DRY-RUN: Exiting after one iteration"
+      break
+    fi
+    if [ "$ONE_SHOT" = true ]; then
+      echo "ONE-SHOT: Exiting after one iteration"
       break
     fi
 
