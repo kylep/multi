@@ -168,6 +168,20 @@ main() {
 
   acquire_lock || exit 1
 
+  # Generate minimal MCP config (Discord only) — no secrets in the file,
+  # the server inherits DISCORD_BOT_TOKEN and DISCORD_GUILD_ID from env
+  MCP_CONFIG="/tmp/sec-loop-mcp.json"
+  cat > "$MCP_CONFIG" <<MCPEOF
+{
+  "mcpServers": {
+    "discord": {
+      "command": "${REPO_DIR}/apps/mcp-servers/discord/.venv/bin/python",
+      "args": ["${REPO_DIR}/apps/mcp-servers/discord/server.py"]
+    }
+  }
+}
+MCPEOF
+
   cd "$REPO_DIR"
   local iteration=0
 
@@ -221,6 +235,7 @@ Do NOT just add more entries to a blocklist — the verifier will find another g
       claude -p "$improvement_prompt" \
         --model sonnet --output-format json \
         --max-turns 30 --max-budget-usd 5.00 \
+        --mcp-config "$MCP_CONFIG" \
         --no-session-persistence --dangerously-skip-permissions \
         || true
 
@@ -267,6 +282,7 @@ This is the last retry. Focus on whether the security measure provides **meaning
 
       claude -p "$verify_prompt" \
         --model sonnet --output-format json \
+        --mcp-config "$MCP_CONFIG" \
         --max-turns 15 --max-budget-usd 2.00 \
         --no-session-persistence --dangerously-skip-permissions \
         || true
@@ -329,7 +345,7 @@ EOF
   done
 
   # Cleanup
-  rm -f "$STATUS_FILE" "$VERIFY_FILE" /tmp/sec-loop-cost-anchor
+  rm -f "$STATUS_FILE" "$VERIFY_FILE" /tmp/sec-loop-cost-anchor "$MCP_CONFIG"
   echo "=== Security Improvement Loop finished ==="
 }
 
