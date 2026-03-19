@@ -253,15 +253,22 @@ MCPEOF
       local improvement_prompt
       improvement_prompt=$(cat "$SCRIPT_DIR/prompt.md")
       if [ -n "$prior_failure" ]; then
+        local escalation=""
+        if [ "$attempt" -eq 2 ]; then
+          escalation="Try a fundamentally different implementation approach to the same finding. Do NOT just patch the previous attempt — rethink the mechanism."
+        elif [ "$attempt" -eq 3 ]; then
+          escalation="Two attempts at this finding have failed. Consider whether this finding is even fixable with the tools available. If you can make it work with a completely different mechanism, do so. Otherwise, ABANDON this finding and pick a different security gap entirely — there are many other areas to improve."
+        elif [ "$attempt" -ge 4 ]; then
+          escalation="STRONGLY RECOMMENDED: Abandon this finding. Pick a completely different security improvement in a different area (SSH, firewall, macOS settings, file permissions, etc.). The verifier has beaten ${attempt} approaches to this problem — continuing to iterate on the same finding is wasting budget. Move on to something the verifier can't easily bypass."
+        fi
+
         improvement_prompt="${improvement_prompt}
 
-## Previous attempt failed verification
-
-The adversarial verifier found a bypass. Fix the underlying weakness before trying a new approach.
+## Previous attempt failed verification (attempt $((attempt - 1))/$MAX_VERIFY_RETRIES)
 
 **Bypass that succeeded:** ${prior_failure}
 
-Do NOT just add more entries to a blocklist — the verifier will find another gap. Consider a fundamentally stronger approach."
+${escalation}"
       fi
 
       echo "Running improvement agent..."
