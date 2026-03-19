@@ -28,6 +28,7 @@ Source: `apps/mcp-servers/`
 | [Discord](/wiki/custom-tools/discord-mcp.html) | Python | 13 | Read/write Discord messages, threads, reactions |
 | [OpenRouter](/wiki/custom-tools/openrouter-mcp.html) | TypeScript | 2 | Check API usage and model pricing |
 | [Google News](/wiki/custom-tools/google-news-mcp.html) | TypeScript | 2 | Search news via GNews API (journalist agent) |
+| [CC Usage](/wiki/custom-tools/cc-usage-mcp.html) | TypeScript | 2 | Track Claude Code token usage and estimated costs |
 
 ## Skills
 
