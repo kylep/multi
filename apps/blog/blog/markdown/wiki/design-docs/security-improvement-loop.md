@@ -599,7 +599,29 @@ with other `[P]` tasks at the same dependency level).
 
 ## Implementation Additions
 
-_Scope drifts during implementation. Document divergences here._
+- **Cost gate simplified.** Instead of fetching LiteLLM pricing JSON,
+  the cost gate uses a hardcoded worst-case rate ($75/MTok — Opus
+  output pricing) applied to all output tokens. This always
+  overestimates, which is the safe direction for a budget gate. The
+  `--max-budget-usd` per-invocation flag provides the precise
+  per-call cap.
+
+- **Discord split into two channels.** Milestones (iteration complete,
+  self-termination, budget exceeded) go to `#status-updates` via
+  `DISCORD_STATUS_CHANNEL_ID`. Operational noise (missing status file,
+  verification failures, unexpected actions) goes to `#log` via
+  `DISCORD_LOG_CHANNEL_ID`. Added `DISCORD_LOG_CHANNEL_ID` to
+  `exports.sh.sample`.
+
+- **Restore-and-continue on agent failure.** If the improvement agent
+  doesn't write a status file (e.g., hit budget cap mid-run) or writes
+  an unexpected action, the wrapper runs `git restore .`, sleeps 30
+  minutes, and continues to the next iteration instead of halting the
+  loop. Relies on the 30-minute timer for retry.
+
+- **shellcheck added to Ansible.** Added `shellcheck` to
+  `homebrew_packages` in the playbook so it's available on the
+  workstation for future hook script linting.
 
 ## Open Questions
 
