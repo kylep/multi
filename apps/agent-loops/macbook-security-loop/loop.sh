@@ -9,7 +9,7 @@ set -euo pipefail
 LOCKFILE="/tmp/sec-loop.lock"
 STATUS_FILE="/tmp/sec-loop-status.json"
 VERIFY_FILE="/tmp/sec-loop-verify.json"
-SLEEP_INTERVAL=1800
+SLEEP_INTERVAL=1200
 MAX_VERIFY_RETRIES=5
 DAILY_BUDGET=200
 WORST_CASE_RATE_PER_MTOK=75
