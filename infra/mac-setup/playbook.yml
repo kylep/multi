@@ -687,6 +687,7 @@
       loop:
         - screenshot
         - openrouter
+        - cc-usage
 
     - name: Build MCP server TypeScript
       ansible.builtin.command:
@@ -697,6 +698,7 @@
       loop:
         - screenshot
         - openrouter
+        - cc-usage
 
     # Python-based server: discord (uses uv for venv)
     - name: Create Discord MCP venv
@@ -749,6 +751,10 @@
                   "DISCORD_BOT_TOKEN": "{{ lookup('env', 'DISCORD_BOT_TOKEN') }}",
                   "DISCORD_GUILD_ID": "{{ lookup('env', 'DISCORD_GUILD_ID') }}"
                 }
+              },
+              "cc-usage": {
+                "command": "node",
+                "args": ["{{ mcp_dir }}/cc-usage/build/index.js"]
               }
             }
           }
