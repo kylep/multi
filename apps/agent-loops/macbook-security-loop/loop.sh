@@ -127,8 +127,9 @@ _discord_send() {
 }
 
 # Milestones → #status-updates, operational noise → #log
+LOG_PREFIX="sec-loop:"
 discord_status() { _discord_send "${DISCORD_STATUS_CHANNEL_ID:-}" "$1"; }
-discord_log()    { _discord_send "${DISCORD_LOG_CHANNEL_ID:-}" "$1"; }
+discord_log()    { _discord_send "${DISCORD_LOG_CHANNEL_ID:-}" "${LOG_PREFIX} $1"; }
 
 # --- Argument parsing ---
 parse_args() {
@@ -170,10 +171,12 @@ main() {
 
     # Cost gate
     if ! cost_gate; then
-      discord_status "Security loop stopped: daily budget of \$${DAILY_BUDGET} exceeded"
+      discord_status "${LOG_PREFIX} Stopping — daily budget of \$${DAILY_BUDGET} exceeded"
       echo "Exiting: budget exceeded"
       break
     fi
+
+    discord_status "${LOG_PREFIX} Starting iteration ${iteration} — scanning hooks for the next highest-impact security gap, then adversarially verifying the fix"
 
     export SEC_LOOP_ITERATION="$iteration"
 
@@ -227,7 +230,7 @@ Do NOT just add more entries to a blocklist — the verifier will find another g
         local reason
         reason=$(jq -r '.reason // "no reason given"' "$STATUS_FILE" 2>/dev/null)
         echo "Agent reports no more improvements: $reason"
-        discord_status "Security loop terminated: $reason"
+        discord_status "${LOG_PREFIX} Done — $reason"
         # Signal outer loop to exit
         verified="done"
         break
@@ -291,7 +294,7 @@ Automated by: apps/agent-loops/macbook-security-loop/loop.sh
 Co-Authored-By: Claude Sonnet <noreply@anthropic.com>
 EOF
 )"
-        discord_status "Security loop iteration ${iteration} complete (attempt $attempt): ${finding}"
+        discord_status "${LOG_PREFIX} Iteration ${iteration} complete (attempt $attempt) — ${finding}"
       else
         echo "DRY-RUN: Skipping git commit and discord notification"
       fi
