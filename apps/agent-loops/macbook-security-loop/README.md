@@ -20,6 +20,12 @@ source apps/blog/exports.sh
 apps/agent-loops/macbook-security-loop/loop.sh --dry-run
 ```
 
+Follow the log:
+
+```bash
+tail -f /tmp/sec-loop.log
+```
+
 ### Long-running (tmux)
 
 ```bash

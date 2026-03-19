@@ -14,6 +14,7 @@ DAILY_BUDGET=150
 WORST_CASE_RATE_PER_MTOK=75
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+LOGFILE="/tmp/sec-loop.log"
 DRY_RUN=false
 
 # --- Lock file ---
@@ -151,6 +152,9 @@ main() {
   # Create cost anchor file for find -newer (today start)
   touch -t "$(date -u +%Y%m%d)0000" /tmp/sec-loop-cost-anchor 2>/dev/null || touch /tmp/sec-loop-cost-anchor
 
+  # Send all output to the log file and stdout
+  exec > >(tee -a "$LOGFILE") 2>&1
+
   acquire_lock || exit 1
 
   cd "$REPO_DIR"
@@ -181,7 +185,7 @@ main() {
       --model sonnet --output-format json \
       --max-turns 30 --max-budget-usd 5.00 \
       --no-session-persistence --dangerously-skip-permissions \
-      2>&1 | tee "/tmp/sec-loop-iter-${iteration}.log" || true
+      || true
 
     # Read status file
     if [ ! -f "$STATUS_FILE" ]; then
@@ -219,7 +223,7 @@ main() {
       --model sonnet --output-format json \
       --max-turns 15 --max-budget-usd 2.00 \
       --no-session-persistence --dangerously-skip-permissions \
-      2>&1 | tee "/tmp/sec-loop-verify-${iteration}.log" || true
+      || true
 
     # Read verification result
     local verify_result="unknown"
@@ -255,9 +259,6 @@ EOF
         echo "DRY-RUN: Skipping git restore and discord notification"
       fi
     fi
-
-    # Clean up iteration logs
-    rm -f "/tmp/sec-loop-iter-${iteration}.log" "/tmp/sec-loop-verify-${iteration}.log"
 
     # Dry-run: single iteration only
     if [ "$DRY_RUN" = true ]; then
