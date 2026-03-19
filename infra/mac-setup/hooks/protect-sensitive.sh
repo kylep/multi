@@ -19,6 +19,12 @@ check_path() {
     */.kube/config*)
       echo "BLOCKED by protect-sensitive hook: kubeconfig" >&2
       exit 2 ;;
+    */exports.sh)
+      echo "BLOCKED by protect-sensitive hook: exports.sh credential file" >&2
+      exit 2 ;;
+    */secrets/*)
+      echo "BLOCKED by protect-sensitive hook: secrets directory" >&2
+      exit 2 ;;
   esac
 }
 
@@ -32,6 +38,16 @@ if [[ "$TOOL" == "Bash" ]]; then
   if echo "$COMMAND" | \
      grep -qE '(cat|less|head|tail)\s+.*(\.ssh/id_|\.aws/credentials|\.kube/config)'; then
     echo "BLOCKED by protect-sensitive hook: sensitive file access via bash" >&2
+    exit 2
+  fi
+  if echo "$COMMAND" | \
+     grep -qE '(cat|less|head|tail|base64|strings|xxd|grep)\s+.*exports\.sh'; then
+    echo "BLOCKED by protect-sensitive hook: exports.sh access via bash" >&2
+    exit 2
+  fi
+  if echo "$COMMAND" | \
+     grep -qE '(cat|less|head|tail|base64|strings|xxd|grep)\s+.*/secrets/'; then
+    echo "BLOCKED by protect-sensitive hook: secrets directory access via bash" >&2
     exit 2
   fi
 else
