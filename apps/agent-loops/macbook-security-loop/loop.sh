@@ -132,9 +132,9 @@ _discord_send() {
 }
 
 # Milestones → #status-updates, operational noise → #log
-LOG_PREFIX="sec-loop:"
-discord_status() { _discord_send "${DISCORD_STATUS_CHANNEL_ID:-}" "$1"; }
-discord_log()    { _discord_send "${DISCORD_LOG_CHANNEL_ID:-}" "${LOG_PREFIX} $1"; }
+PREFIX="Security >"
+discord_status() { _discord_send "${DISCORD_STATUS_CHANNEL_ID:-}" "${PREFIX} $1"; }
+discord_log()    { _discord_send "${DISCORD_LOG_CHANNEL_ID:-}" "${PREFIX} $1"; }
 
 # --- Argument parsing ---
 parse_args() {
@@ -194,14 +194,16 @@ MCPEOF
 
     # Cost gate
     if ! cost_gate; then
-      discord_status "${LOG_PREFIX} Stopping — daily budget of \$${DAILY_BUDGET} exceeded"
+      discord_status "Stopping — daily budget of \$${DAILY_BUDGET} exceeded"
       echo "Exiting: budget exceeded"
       break
     fi
 
-    discord_status "${LOG_PREFIX} Starting iteration ${iteration} — assessing Mac workstation security posture, then adversarially verifying any fix"
+    discord_log "Starting iteration ${iteration}"
 
     export SEC_LOOP_ITERATION="$iteration"
+    export SEC_LOOP_STATUS_CHANNEL="${DISCORD_STATUS_CHANNEL_ID:-}"
+    export SEC_LOOP_LOG_CHANNEL="${DISCORD_LOG_CHANNEL_ID:-}"
 
     local attempt=0
     local verified=false
@@ -211,7 +213,9 @@ MCPEOF
     while [ "$attempt" -lt "$MAX_VERIFY_RETRIES" ]; do
       attempt=$(( attempt + 1 ))
       echo "--- Attempt $attempt/$MAX_VERIFY_RETRIES ---"
-      discord_log "Iteration $iteration: attempt $attempt/$MAX_VERIFY_RETRIES"
+      if [ "$attempt" -gt 1 ]; then
+        discord_log "${finding:-unknown}: attempt $attempt"
+      fi
 
       # Clean status files
       rm -f "$STATUS_FILE" "$VERIFY_FILE"
@@ -242,7 +246,7 @@ Do NOT just add more entries to a blocklist — the verifier will find another g
       # Read status file
       if [ ! -f "$STATUS_FILE" ]; then
         echo "WARN: Status file missing (agent may have hit budget)"
-        discord_log "Iteration $iteration attempt $attempt: status file missing, restoring"
+        discord_log "${finding:-iteration $iteration}: status file missing, restoring"
         git diff --name-only | grep -v 'run-notes.md' | xargs -r git restore 2>/dev/null || true
         break
       fi
@@ -254,13 +258,13 @@ Do NOT just add more entries to a blocklist — the verifier will find another g
         local reason
         reason=$(jq -r '.reason // "no reason given"' "$STATUS_FILE" 2>/dev/null)
         echo "Agent reports no more improvements: $reason"
-        discord_status "${LOG_PREFIX} Done — $reason"
+        discord_status "Nothing left to improve — $reason"
         # Signal outer loop to exit
         verified="done"
         break
       elif [ "$action" != "improved" ]; then
         echo "WARN: Unexpected action '$action' in status file"
-        discord_log "Iteration $iteration attempt $attempt: unexpected action '$action', restoring"
+        discord_log "${finding:-iteration $iteration}: unexpected status '$action', restoring"
         git diff --name-only | grep -v 'run-notes.md' | xargs -r git restore 2>/dev/null || true
         break
       fi
@@ -301,6 +305,7 @@ This is the last retry. Focus on whether the security measure provides **meaning
       # Verification failed — capture reason and retry
       prior_failure=$(jq -r '.failure_reason // "unknown"' "$VERIFY_FILE" 2>/dev/null || echo "unknown")
       echo "Verification FAILED (attempt $attempt/$MAX_VERIFY_RETRIES): $prior_failure"
+      discord_log "${finding}: $prior_failure"
       git diff --name-only | grep -v 'run-notes.md' | xargs -r git restore 2>/dev/null || true
     done
 
@@ -319,14 +324,18 @@ Automated by: apps/agent-loops/macbook-security-loop/loop.sh
 Co-Authored-By: Claude Sonnet <noreply@anthropic.com>
 EOF
 )"
-        discord_status "${LOG_PREFIX} Iteration ${iteration} complete (attempt $attempt) — ${finding}"
+        local branch
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        discord_status "Done, pushed to ${branch} — ${finding}"
+        discord_log "${finding}: verified, committed and pushed"
       else
         echo "DRY-RUN: Skipping git commit and discord notification"
       fi
     else
       echo "All $MAX_VERIFY_RETRIES attempts failed for iteration $iteration"
       if [ "$DRY_RUN" = false ]; then
-        discord_log "Iteration $iteration: all $MAX_VERIFY_RETRIES verification attempts failed, moving on"
+        discord_status "Couldn't make that work after $MAX_VERIFY_RETRIES attempts, moving on"
+        discord_log "${finding}: failed all $MAX_VERIFY_RETRIES attempts, rolling back and moving on"
       fi
     fi
 

@@ -101,6 +101,20 @@ The playbook is the source of truth. All changes must go through it.
    }
    ```
 
+## Discord updates
+
+You have access to the Discord MCP server. Post a short message to
+**#status-updates** (channel ID in env var `SEC_LOOP_STATUS_CHANNEL`)
+when you identify your finding and plan. Use the `mcp__discord__send_message`
+tool. Format: describe what you found and what you plan to do, as if
+narrating your work to a human observer. Keep it to 1-2 sentences.
+
+Example: `"I think we should harden the SSH config through Ansible — currently accepting password auth and all ciphers"`
+
+Do NOT post to #status-updates about operational details, attempts, or
+errors — that goes to #logs. Do NOT post when you're done — the wrapper
+script handles outcome messages.
+
 ## Rules
 
 - **One improvement per iteration.** Do not batch multiple changes.
