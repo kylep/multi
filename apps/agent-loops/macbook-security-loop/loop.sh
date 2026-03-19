@@ -216,7 +216,7 @@ Do NOT just add more entries to a blocklist — the verifier will find another g
       if [ ! -f "$STATUS_FILE" ]; then
         echo "WARN: Status file missing (agent may have hit budget)"
         discord_log "Iteration $iteration attempt $attempt: status file missing, restoring"
-        git restore . 2>/dev/null || true
+        git diff --name-only | grep -v 'run-notes.md' | xargs -r git restore 2>/dev/null || true
         break
       fi
 
@@ -234,7 +234,7 @@ Do NOT just add more entries to a blocklist — the verifier will find another g
       elif [ "$action" != "improved" ]; then
         echo "WARN: Unexpected action '$action' in status file"
         discord_log "Iteration $iteration attempt $attempt: unexpected action '$action', restoring"
-        git restore . 2>/dev/null || true
+        git diff --name-only | grep -v 'run-notes.md' | xargs -r git restore 2>/dev/null || true
         break
       fi
 
@@ -273,7 +273,7 @@ This is the last retry. Focus on whether the security measure provides **meaning
       # Verification failed — capture reason and retry
       prior_failure=$(jq -r '.failure_reason // "unknown"' "$VERIFY_FILE" 2>/dev/null || echo "unknown")
       echo "Verification FAILED (attempt $attempt/$MAX_VERIFY_RETRIES): $prior_failure"
-      git restore . 2>/dev/null || true
+      git diff --name-only | grep -v 'run-notes.md' | xargs -r git restore 2>/dev/null || true
     done
 
     # Act on the outcome

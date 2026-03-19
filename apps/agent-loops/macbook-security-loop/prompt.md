@@ -14,23 +14,27 @@ logging. The hooks are defined as standalone scripts managed by Ansible.
 1. **Read the improvement log** at `apps/blog/blog/markdown/wiki/design-docs/security-improvement-log.md`
    to understand what has already been done. Do not repeat past work.
 
-2. **Assess current security posture** by reading:
+2. **Read the run notes** at `apps/agent-loops/macbook-security-loop/run-notes.md`
+   for observations, strategy notes, and known limitations from previous iterations.
+
+3. **Assess current security posture** by reading:
    - `infra/mac-setup/playbook.yml` (Ansible playbook)
    - `infra/mac-setup/hooks/block-destructive.sh`
    - `infra/mac-setup/hooks/protect-sensitive.sh`
    - `infra/mac-setup/hooks/audit-log.sh`
 
-3. **Identify the single highest-impact security gap** that is not yet addressed.
+4. **Identify the single highest-impact security gap** that is not yet addressed.
    Consider: detection gaps in hook patterns, missing command patterns, file access
    bypasses, log tampering, exfiltration vectors, etc.
 
-4. **Implement the fix** by editing the appropriate file(s). You may ONLY edit:
+5. **Implement the fix** by editing the appropriate file(s). You may ONLY edit:
    - `infra/mac-setup/hooks/block-destructive.sh`
    - `infra/mac-setup/hooks/protect-sensitive.sh`
    - `infra/mac-setup/hooks/audit-log.sh`
    - `infra/mac-setup/playbook.yml` (only the settings.json content block or hook-related tasks)
+   - `apps/agent-loops/macbook-security-loop/run-notes.md` (run notes only)
 
-5. **Validate syntax** by running:
+6. **Validate syntax** by running:
    ```bash
    bash -n infra/mac-setup/hooks/block-destructive.sh
    bash -n infra/mac-setup/hooks/protect-sensitive.sh
@@ -38,7 +42,7 @@ logging. The hooks are defined as standalone scripts managed by Ansible.
    ansible-playbook --check infra/mac-setup/playbook.yml 2>&1 | head -20
    ```
 
-6. **Append an entry** to the improvement log table with:
+7. **Append an entry** to the improvement log table with:
    - Timestamp (UTC ISO 8601)
    - Finding (what gap you identified)
    - Change (what you modified)
@@ -46,7 +50,12 @@ logging. The hooks are defined as standalone scripts managed by Ansible.
    - Result: `pending` (the verifier will update this)
    - Commit: `pending`
 
-7. **Write the status file** to `/tmp/sec-loop-status.json`:
+8. **Update the run notes** at `apps/agent-loops/macbook-security-loop/run-notes.md`
+   with any observations, strategy decisions, or known limitations discovered
+   during this iteration. This file persists across runs and helps future
+   iterations build on your experience.
+
+9. **Write the status file** to `/tmp/sec-loop-status.json`:
    ```json
    {
      "action": "improved",
