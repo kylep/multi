@@ -329,6 +329,55 @@
           Do not use the kylep/ GitHub account or Kyle Pericak identity on
           this machine.
 
+          ## Git push authentication
+
+          This machine uses a GitHub App for git push. There is no persistent
+          SSH key on GitHub and no stored credential helper. To push, generate
+          a short-lived installation token from the App credentials in
+          `exports.sh` and use it as an HTTPS token.
+
+          Steps (run in a single Bash call to keep the token in scope):
+
+          ```bash
+          source ~/gh/multi/apps/blog/exports.sh
+
+          _pem_file=$(mktemp)
+          echo "$GITHUB_APP_PRIVATE_KEY_B64" | base64 -d > "$_pem_file"
+
+          _header=$(printf '{"alg":"RS256","typ":"JWT"}' | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          _now=$(date +%s)
+          _iat=$((_now - 60))
+          _exp=$((_now + 300))
+          _payload=$(printf '{"iss":"%s","iat":%d,"exp":%d}' "$GITHUB_APP_ID" "$_iat" "$_exp" \
+            | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          _sig=$(printf '%s.%s' "$_header" "$_payload" \
+            | openssl dgst -sha256 -sign "$_pem_file" -binary \
+            | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          _jwt="${_header}.${_payload}.${_sig}"
+          rm -f "$_pem_file"
+
+          curl -sf -X POST \
+            -H "Authorization: Bearer ${_jwt}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
+            -o /tmp/gh-token-response.json
+
+          _token=$(jq -r '.token' /tmp/gh-token-response.json)
+          rm -f /tmp/gh-token-response.json
+
+          git remote set-url origin "https://x-access-token:${_token}@github.com/kylep/multi.git"
+          git push -u origin HEAD
+          git remote set-url origin https://github.com/kylep/multi.git
+          ```
+
+          Required env vars (all in `exports.sh`):
+          - `GITHUB_APP_ID` — the GitHub App's numeric ID
+          - `GITHUB_APP_PRIVATE_KEY_B64` — base64-encoded PEM private key
+          - `GITHUB_INSTALL_ID` — the App's installation ID
+
+          The token is valid for 1 hour. Always reset the remote URL after
+          pushing so the token isn't persisted in git config.
+
     # ---------------------------------------------------------------
     # Claude Code safety hooks
     # ---------------------------------------------------------------
