@@ -132,6 +132,7 @@ when you're done — the wrapper script handles outcome messages.
 - **DO NOT touch SSH config, sshd_config, or Tailscale SSH settings.** The owner
   accesses this machine remotely via SSH over Tailscale. Any change to SSH or
   Tailscale SSH configuration risks locking him out. This is completely off-limits.
+- **DO NOT modify audit-log.sh.** The audit log hook is done. Move on to other areas.
 - **Never edit deployed files directly.** All changes go through Ansible-managed
   source files in this repo. The playbook deploys them.
 - **Write the status file atomically:** write to `/tmp/sec-loop-status.json.tmp`
