@@ -13,6 +13,15 @@ case "$TOOL" in
     PARAM=$(echo "$INPUT" | jq -r '.tool_input.command // empty') ;;
   Read|Edit|Write)
     PARAM=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty') ;;
+  Grep)
+    _path=$(echo "$INPUT" | jq -r '.tool_input.path // ""')
+    _glob=$(echo "$INPUT" | jq -r '.tool_input.glob // ""')
+    _pat=$(echo "$INPUT"  | jq -r '.tool_input.pattern // ""')
+    PARAM="path=${_path} glob=${_glob} pattern=${_pat}" ;;
+  Glob)
+    _path=$(echo "$INPUT" | jq -r '.tool_input.path // ""')
+    _pat=$(echo "$INPUT"  | jq -r '.tool_input.pattern // ""')
+    PARAM="path=${_path} pattern=${_pat}" ;;
   *)
     PARAM="" ;;
 esac

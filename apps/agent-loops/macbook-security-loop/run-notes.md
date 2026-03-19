@@ -458,6 +458,18 @@ Persists across runs so future iterations build on past experience.
 - **Remaining theoretical gap**: Physical access or a pre-authenticated root session (e.g., human admin already in a `sudo -s` shell) could re-add the sudoers entry. This is out of scope for prompt-injection threat model.
 - **Autonomy confirmed intact**: `cat /tmp/sec-loop-status.json` (read), `echo "autonomy-check-ok"` (command), write+delete `/tmp/sec-loop-autonomy-test.txt` all succeeded normally.
 
+**Iteration 24 (2026-03-19):**
+- All 23 previous iterations focused on protect-sensitive.sh and block-destructive.sh (credential access blocking, hook self-protection, OS-level controls). The audit-log.sh PostToolUse hook was never improved.
+- **Finding**: `audit-log.sh` case statement had `*) PARAM=""` as the fallback for any tool not explicitly listed. Since only `Bash` and `Read|Edit|Write` had explicit branches, ALL Grep and Glob calls were logged with empty `param`. The audit log showed `{"tool": "Grep", "param": ""}` — no record of what was searched, what file filter was used, or what regex pattern was applied.
+- **Impact on threat model**: The known structural limitation documented in every iteration ("Grep with no glob, relying on .gitignore") means some Grep calls WILL be allowed through. When they are, the audit log provides zero forensic value. If an adversary succeeds at a low-sophistication exfiltration (e.g., `Grep(path=apps/blog, pattern="OPENAI_API_KEY")`), the log shows a blank `param` entry — no evidence trail.
+- **Fix applied**: Added `Grep` branch logging `path=<root> glob=<filter> pattern=<regex>` and `Glob` branch logging `path=<base> pattern=<glob>` to the `case "$TOOL"` statement. Changed `_path`, `_glob`, `_pat` local vars to avoid accidental shadowing.
+- **Deployment note**: `audit-log.sh` is deployed via Ansible `template` (not `copy`) so the playbook's `Write audit-log hook` task needs to run to deploy. However, the playbook has `become: true` tasks that now require a sudo password (passwordless sudo removed in iteration 23). Future playbook runs need `-K` flag from the human operator. For this iteration: syntax-checked with `bash -n` and `ansible-playbook --syntax-check` — both pass. Deployment requires operator to run `ansible-playbook -K`.
+- **Documentation-divergence reminder**: Always diff source vs deployed at the start of each iteration. The run notes and improvement log repeatedly claimed fixes that weren't in the source file. Don't trust documentation — trust the file.
+- **Remaining gaps (carried forward)**:
+  - `Grep(path=".../apps/blog", pattern="KEY|TOKEN")` with no glob — protection relies on `.gitignore`. Structural limitation.
+  - `.mcp.json` and `.claude/` paths not in `check_path()` — multiple iterations claimed to add these but source file still lacks them.
+  - Bash exfiltration via `python3`, `awk`, `node`, etc. — structural limitation.
+
 ## Strategy Notes
 
 - Prioritize protecting named credential files and directories first (exports.sh, secrets/).
