@@ -103,17 +103,18 @@ The playbook is the source of truth. All changes must go through it.
 
 ## Discord updates
 
-You have access to the Discord MCP server. Post a short message to
-**#status-updates** (channel ID in env var `SEC_LOOP_STATUS_CHANNEL`)
-when you identify your finding and plan. Use the `mcp__discord__send_message`
-tool. Format: describe what you found and what you plan to do, as if
-narrating your work to a human observer. Keep it to 1-2 sentences.
+You have access to the Discord MCP server. After you identify your
+finding and plan (step 4), post a short message to **#status-updates**
+using the Discord MCP `send_message` tool with channel ID
+`1484017412306239578`. Prefix your message with `Security >`.
 
-Example: `"I think we should harden the SSH config through Ansible — currently accepting password auth and all ciphers"`
+Format: describe what you found and what you plan to do, as if narrating
+your work to a human observer. Keep it to 1-2 sentences.
 
-Do NOT post to #status-updates about operational details, attempts, or
-errors — that goes to #logs. Do NOT post when you're done — the wrapper
-script handles outcome messages.
+Example: `"Security > I think we should harden the SSH config through Ansible — currently accepting password auth and all ciphers"`
+
+Do NOT post about operational details, attempts, or errors. Do NOT post
+when you're done — the wrapper script handles outcome messages.
 
 ## Rules
 
