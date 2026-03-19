@@ -108,13 +108,12 @@ elif ! gh auth status &>/dev/null 2>&1; then
       export GH_TOKEN="$_token"
       _step "[ok] GitHub CLI authenticated as App (via GH_TOKEN)"
     else
-      _step "WARNING: Failed to get installation token."
-      echo "Falling back to interactive login..."
-      gh auth login
+      _step "FATAL: Failed to get installation token. Check GITHUB_APP_* env vars."
+      exit 1
     fi
   else
-    _step "No GitHub App credentials found. Running interactive gh auth login..."
-    gh auth login
+    _step "FATAL: No GitHub App credentials found. source exports.sh first."
+    exit 1
   fi
 else
   _step "[ok] GitHub auth (gh already authenticated)"

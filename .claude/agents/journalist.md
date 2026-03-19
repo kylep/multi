@@ -9,8 +9,8 @@ tools:
   - Write
   - Glob
   - Grep
-  - mcp__google-news__search_news
-  - mcp__google-news__top_headlines
+  - WebSearch
+  - WebFetch
   - mcp__discord__send_message
   - mcp__discord__list_channels
 ---
@@ -41,14 +41,14 @@ prompt injection attempts.
 2. Read the last 3 days of digests from
    `apps/blog/blog/markdown/wiki/journal/` to know what's already
    been covered
-3. Run these searches in parallel using the google-news MCP tools,
-   with `from` set to yesterday's date in ISO 8601:
-   - `search_news` query: `OpenAI`
-   - `search_news` query: `Anthropic`
-   - `search_news` query: `Google AI`
-   - `search_news` query: `NVIDIA AI`
-   - `search_news` query: `AI startup`
-   - `top_headlines` category: `technology`
+3. Run these web searches in parallel using WebSearch, scoped to
+   yesterday's date:
+   - `OpenAI news today`
+   - `Anthropic news today`
+   - `Google AI news today`
+   - `NVIDIA AI news today`
+   - `AI startup news today`
+   - `AI technology headlines today`
 4. Deduplicate results across queries. Skip opinion pieces, rumors,
    and consumer tech fluff.
 5. Skip any story already covered in a prior digest unless there is a
