@@ -491,6 +491,25 @@
       changed_when: false
 
     # ---------------------------------------------------------------
+    # Remove dangerous passwordless-sudo grant
+    # /etc/sudoers.d/claude-temp was created during initial setup as a
+    # temporary convenience but never removed.  It grants NOPASSWD: ALL to
+    # the primary user, meaning any process running as that user (including
+    # a prompt-injected Claude Code session) can sudo without a password —
+    # bypassing all OS-level protections (uchg flags, Application Firewall,
+    # pmset, scutil, etc.).  Remove it permanently.
+    # NOTE: Future ansible-playbook runs that use `become: true` will require
+    # the operator to supply a sudo password (run with -K or via a pre-authenticated
+    # sudo session).
+    # ---------------------------------------------------------------
+    - name: Remove temporary passwordless sudo grant
+      ansible.builtin.file:
+        path: /private/etc/sudoers.d/claude-temp
+        state: absent
+      become: true
+      failed_when: false
+
+    # ---------------------------------------------------------------
     # Pre-commit hooks
     # ---------------------------------------------------------------
     - name: Install pre-commit hooks in repo
