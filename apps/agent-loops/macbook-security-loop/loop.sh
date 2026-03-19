@@ -105,43 +105,28 @@ cost_gate() {
 }
 
 # --- Discord notifications ---
-discord_post() {
-  local msg_type="$1"
-  shift
+# Posts to a specific channel. No-op if credentials missing or dry-run.
+_discord_send() {
+  local channel_id="$1" content="$2"
 
-  # No-op if credentials missing or dry-run
-  if [ -z "${DISCORD_STATUS_CHANNEL_ID:-}" ] || [ -z "${DISCORD_BOT_TOKEN:-}" ]; then
+  if [ -z "${DISCORD_BOT_TOKEN:-}" ] || [ -z "$channel_id" ]; then
     return 0
   fi
   if [ "$DRY_RUN" = true ]; then
     return 0
   fi
 
-  local content=""
-  case "$msg_type" in
-    iteration_complete)
-      local iteration="$1" finding="$2"
-      content="Security loop iteration ${iteration} complete: ${finding}"
-      ;;
-    self_termination)
-      local reason="$1"
-      content="Security loop terminated: ${reason}"
-      ;;
-    cost_limit)
-      content="Security loop stopped: daily budget of \$${DAILY_BUDGET} exceeded"
-      ;;
-    warning)
-      content="Security loop warning: $1"
-      ;;
-  esac
-
   curl -sf -X POST \
-    "https://discord.com/api/v10/channels/${DISCORD_STATUS_CHANNEL_ID}/messages" \
+    "https://discord.com/api/v10/channels/${channel_id}/messages" \
     -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
     -H "Content-Type: application/json" \
     -d "{\"content\": \"${content}\"}" \
     > /dev/null 2>&1 || true
 }
+
+# Milestones → #status-updates, operational noise → #log
+discord_status() { _discord_send "${DISCORD_STATUS_CHANNEL_ID:-}" "$1"; }
+discord_log()    { _discord_send "${DISCORD_LOG_CHANNEL_ID:-}" "$1"; }
 
 # --- Argument parsing ---
 parse_args() {
@@ -180,7 +165,7 @@ main() {
 
     # Cost gate
     if ! cost_gate; then
-      discord_post cost_limit
+      discord_status "Security loop stopped: daily budget of \$${DAILY_BUDGET} exceeded"
       echo "Exiting: budget exceeded"
       break
     fi
@@ -199,9 +184,11 @@ main() {
 
     # Read status file
     if [ ! -f "$STATUS_FILE" ]; then
-      echo "WARN: Status file missing after iteration $iteration"
-      discord_post warning "Status file missing after iteration $iteration"
-      break
+      echo "WARN: Status file missing after iteration $iteration (agent may have hit budget)"
+      discord_log "Iteration $iteration: status file missing (agent may have hit budget cap), restoring and continuing"
+      git restore . 2>/dev/null || true
+      sleep "$SLEEP_INTERVAL"
+      continue
     fi
 
     local action
@@ -211,12 +198,14 @@ main() {
       local reason
       reason=$(jq -r '.reason // "no reason given"' "$STATUS_FILE" 2>/dev/null)
       echo "Agent reports no more improvements: $reason"
-      discord_post self_termination "$reason"
+      discord_status "Security loop terminated: $reason"
       break
     elif [ "$action" != "improved" ]; then
       echo "WARN: Unexpected action '$action' in status file"
-      discord_post warning "Unexpected status action: $action"
-      break
+      discord_log "Iteration $iteration: unexpected status action '$action', restoring and continuing"
+      git restore . 2>/dev/null || true
+      sleep "$SLEEP_INTERVAL"
+      continue
     fi
 
     local finding
@@ -249,7 +238,7 @@ Automated by: apps/agent-loops/macbook-security-loop/loop.sh
 Co-Authored-By: Claude Sonnet <noreply@anthropic.com>
 EOF
 )"
-        discord_post iteration_complete "$iteration" "$finding"
+        discord_status "Security loop iteration ${iteration} complete: ${finding}"
       else
         echo "DRY-RUN: Skipping git commit and discord notification"
       fi
@@ -259,7 +248,7 @@ EOF
       echo "Verification FAILED: $failure_reason"
       if [ "$DRY_RUN" = false ]; then
         git restore .
-        discord_post warning "Iteration $iteration verification failed: $failure_reason"
+        discord_log "Iteration $iteration verification failed: $failure_reason"
       else
         echo "DRY-RUN: Skipping git restore and discord notification"
       fi
