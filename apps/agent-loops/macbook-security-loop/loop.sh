@@ -18,6 +18,10 @@ REPO_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 LOGFILE="/tmp/sec-loop.log"
 DRY_RUN=false
 
+# Source Discord credentials and other env vars
+# shellcheck source=../../blog/exports.sh
+source "$REPO_DIR/apps/blog/exports.sh"
+
 # --- Lock file ---
 acquire_lock() {
   if [ -f "$LOCKFILE" ]; then
