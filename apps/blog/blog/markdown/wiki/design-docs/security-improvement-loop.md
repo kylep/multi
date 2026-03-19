@@ -1,7 +1,7 @@
 ---
 title: "Autonomous Security Improvement Loop — Design Doc"
 summary: "A bash wrapper that invokes Claude Code every 30 minutes to iteratively harden the Mac workstation, with adversarial verification, cost gating, and structured logging."
-status: draft
+status: approved
 owner: kyle
 date: 2026-03-18
 prd: wiki/prds/security-improvement-loop
