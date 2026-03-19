@@ -33,6 +33,14 @@ check_path() {
       echo "BLOCKED by protect-sensitive hook: exports.sh credential file" >&2; exit 2 ;;
     */secrets/*)
       echo "BLOCKED by protect-sensitive hook: secrets directory" >&2; exit 2 ;;
+    */.mcp.json)
+      echo "BLOCKED by protect-sensitive hook: .mcp.json credential file" >&2; exit 2 ;;
+    */.claude/settings.json)
+      echo "BLOCKED by protect-sensitive hook: Claude Code settings.json" >&2; exit 2 ;;
+    */.claude/hooks/*)
+      echo "BLOCKED by protect-sensitive hook: Claude Code hook file" >&2; exit 2 ;;
+    */.config/gcloud/application_default_credentials.json)
+      echo "BLOCKED by protect-sensitive hook: gcloud application default credentials" >&2; exit 2 ;;
   esac
 }
 
@@ -56,6 +64,9 @@ import sys, os, re, fnmatch
 SENSITIVE = [
     "exports.sh", ".env", "credentials",
     "id_ed25519", "id_rsa", "id_ecdsa", "id_dsa",
+    ".mcp.json", "settings.json",
+    "block-destructive.sh", "protect-sensitive.sh", "audit-log.sh",
+    "application_default_credentials.json",
 ]
 
 def expand_braces(s):
@@ -125,23 +136,48 @@ for p in expand_braces(sys.argv[1]):
 
 if [[ "$TOOL" == "Bash" ]]; then
   COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-  if echo "$COMMAND" | grep -qE '(cat|less|head|tail|curl -d @|base64|scp)\s+\.env'; then
+  # Strip shell quoting metacharacters before all substring checks.
+  # Shell quoting can fragment a filename across quotes — e.g., set'tings.json'
+  # or hoo"ks"/ — while bash evaluates them back to the real path at runtime.
+  # Removing all quoting characters reassembles the effective filename so that
+  # grep-based checks cannot be bypassed by inserting empty-string quotes.
+  # tr -d never fails and handles all POSIX quoting metacharacters.
+  # Note: variable substitution ($VAR) is NOT expanded by tr — that remains a
+  # known limitation documented in run notes.
+  COMMAND_NORM=$(printf '%s' "$COMMAND" | tr -d "'\"\`\\")
+  if printf '%s' "$COMMAND_NORM" | grep -qE '(cat|less|head|tail|curl -d @|base64|scp)\s+\.env'; then
     echo "BLOCKED by protect-sensitive hook: .env access via bash" >&2; exit 2
   fi
-  if echo "$COMMAND" | grep -qE '(cat|less|head|tail)\s+.*(\.ssh/id_|\.aws/credentials|\.kube/config)'; then
+  if printf '%s' "$COMMAND_NORM" | grep -qE '(cat|less|head|tail)\s+.*(\.ssh/id_|\.aws/credentials|\.kube/config)'; then
     echo "BLOCKED by protect-sensitive hook: sensitive file access via bash" >&2; exit 2
   fi
-  if echo "$COMMAND" | grep -qE '(cat|less|head|tail|base64|strings|xxd|grep)\s+.*exports\.sh'; then
+  if printf '%s' "$COMMAND_NORM" | grep -qE '(cat|less|head|tail|base64|strings|xxd|grep)\s+.*exports\.sh'; then
     echo "BLOCKED by protect-sensitive hook: exports.sh access via bash" >&2; exit 2
   fi
-  if echo "$COMMAND" | grep -qE '(cat|less|head|tail|base64|strings|xxd|grep)\s+.*/secrets/'; then
+  if printf '%s' "$COMMAND_NORM" | grep -qE '(cat|less|head|tail|base64|strings|xxd|grep)\s+.*/secrets/'; then
     echo "BLOCKED by protect-sensitive hook: secrets directory access via bash" >&2; exit 2
   fi
-  if echo "$COMMAND" | grep -qE '(source|\. ).*exports\.sh'; then
+  if printf '%s' "$COMMAND_NORM" | grep -qE '(source|\. ).*exports\.sh'; then
     echo "BLOCKED by protect-sensitive hook: source exports.sh" >&2; exit 2
   fi
-  if echo "$COMMAND" | grep -qE '(source|\. ).*\.env'; then
+  if printf '%s' "$COMMAND_NORM" | grep -qE '(source|\. ).*\.env'; then
     echo "BLOCKED by protect-sensitive hook: source .env" >&2; exit 2
+  fi
+  # Filename-centric blocks: block any Bash command containing the sensitive
+  # filename as a substring, regardless of what program reads the file.
+  # All checks run against COMMAND_NORM (quote-stripped) to defeat quoting-
+  # fragmentation attacks like cat ~/.claude/set'tings.json'.
+  if printf '%s' "$COMMAND_NORM" | grep -q '\.mcp\.json'; then
+    echo "BLOCKED by protect-sensitive hook: .mcp.json access via bash" >&2; exit 2
+  fi
+  if printf '%s' "$COMMAND_NORM" | grep -q '\.claude/settings\.json'; then
+    echo "BLOCKED by protect-sensitive hook: Claude Code settings.json access via bash" >&2; exit 2
+  fi
+  if printf '%s' "$COMMAND_NORM" | grep -q '\.claude/hooks/'; then
+    echo "BLOCKED by protect-sensitive hook: Claude Code hook file access via bash" >&2; exit 2
+  fi
+  if printf '%s' "$COMMAND_NORM" | grep -q 'application_default_credentials'; then
+    echo "BLOCKED by protect-sensitive hook: gcloud application_default_credentials access via bash" >&2; exit 2
   fi
 else
   # Extract fields for different tool types:
