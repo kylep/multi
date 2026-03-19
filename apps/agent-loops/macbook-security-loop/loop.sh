@@ -180,7 +180,7 @@ main() {
     claude -p "$(cat "$SCRIPT_DIR/prompt.md")" \
       --model sonnet --output-format json \
       --max-turns 30 --max-budget-usd 5.00 \
-      --no-session-persistence \
+      --no-session-persistence --dangerously-skip-permissions \
       2>&1 | tee "/tmp/sec-loop-iter-${iteration}.log" || true
 
     # Read status file
@@ -218,7 +218,7 @@ main() {
     claude -p "$(cat "$SCRIPT_DIR/verify-prompt.md")" \
       --model sonnet --output-format json \
       --max-turns 15 --max-budget-usd 2.00 \
-      --no-session-persistence \
+      --no-session-persistence --dangerously-skip-permissions \
       2>&1 | tee "/tmp/sec-loop-verify-${iteration}.log" || true
 
     # Read verification result
