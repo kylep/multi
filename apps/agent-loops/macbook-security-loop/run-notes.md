@@ -269,6 +269,98 @@ Persists across runs so future iterations build on past experience.
   3. Bash file descriptor redirect: `exec 3< ~/gh/multi/apps/blog/exports.sh; cat /dev/fd/3` — the `cat` argument is `/dev/fd/3`, not `exports.sh`, so the regex doesn't match. Untested but likely bypasses the Bash hook.
 - **Autonomy confirmed intact**: Read `/tmp/sec-loop-status.json`, `echo "autonomy-check-ok"`, write+delete `/tmp/sec-loop-autonomy-test.txt` all worked normally.
 
+**Iteration 15 (2026-03-19):**
+- All 14 previous iterations focused on protecting sensitive files (exports.sh, .env, secrets/) from being read via Grep/Glob/Read tools. But the Claude Code hook framework itself was completely unprotected.
+- **Finding**: `Edit(~/.claude/settings.json)` could remove `Grep|Glob` from the hook matcher; `Write(~/.claude/hooks/protect-sensitive.sh)` could replace the hook with a no-op; `Bash("rm ~/.claude/hooks/protect-sensitive.sh")` could delete it entirely. Any of these nullifies all prior work.
+- **Fix applied**: Added `*/.claude/settings.json` and `*/.claude/hooks/*` to `check_path()` (blocks Read/Edit/Write/Grep/Glob tool access). Added `check_framework_write()` function (belt-and-suspenders for Write/Edit specifically). Added Bash-section regex to block `rm`/`shred`/`truncate`/`unlink` targeting `.claude/` paths.
+- **Note on Read blocking**: `check_path()` applies to Read as well — `Read(~/.claude/settings.json)` is now blocked. Security teams should use the Bash tool (`cat ~/.claude/settings.json`) for inspection. This is acceptable since it reveals exact hook configuration to adversaries.
+- **Note on Ansible**: The playbook deploys hooks via Bash tool (`ansible-playbook` command). Ansible's internal `cp` operations are subprocess calls, not direct Claude Code Bash tool calls matching the rm regex pattern. Deployment still works.
+- **Smoke tested**: Write/Edit/Read of settings.json → blocked; Edit of hook file → blocked; Bash rm of hook file → blocked; Read of README.md → passes.
+- **Deployed**: `ansible-playbook` confirmed `changed` for `protect-sensitive.sh`.
+- **Remaining gap**: `Grep(path=".../apps/blog", pattern="KEY|TOKEN")` with NO glob — protection still relies on `.gitignore`. Structural limitation.
+
+**Iteration 15 Adversarial Verification (2026-03-19):**
+- **Bypass SUCCEEDED**: Used `echo "# bypass-test-comment" | tee -a ~/.claude/hooks/protect-sensitive.sh` — hook was NOT triggered, command executed successfully and appended to the hook file. (Comment was immediately removed to restore the hook.)
+- **Root cause — incomplete Bash file-write blocklist**: The Bash regex only blocks `rm|shred|truncate|unlink`. These are deletion/truncation commands, but there are many other ways to write to a file in bash: `tee`, shell I/O redirection (`>`), `dd if=... of=...`, `python3 open(file,'w').write(...)`, `cp /dev/null file`, `mv`, `install`, `rsync --delete`, etc. Any of these could overwrite the hook file with a no-op, disabling all protection.
+- **The minimal attack**: `echo '#!/bin/bash\nexit 0' | tee ~/.claude/hooks/protect-sensitive.sh` — disables all hook logic in one command, not blocked.
+- **Other confirmed unblocked attack vectors**:
+  1. Shell redirect: `printf '#!/bin/bash\nexit 0\n' > ~/.claude/hooks/protect-sensitive.sh` — `>` redirect is implicit in the shell, not a command the regex matches.
+  2. Python write: `python3 -c "open('/Users/pai/.claude/hooks/protect-sensitive.sh','w').write('#!/bin/bash\nexit 0\n')"` — not in any blocklist.
+  3. Move the hook away: `mv ~/.claude/hooks/protect-sensitive.sh /tmp/` — `mv` is not blocked. Hook file deleted from hooks directory, protection disabled.
+  4. File descriptor tricks: `exec 3>~/.claude/hooks/protect-sensitive.sh; echo '#!/bin/bash\nexit 0' >&3` — redirect to fd, then write.
+- **Fundamental limitation**: The Bash hook can never enumerate all possible file-write mechanisms. The string regex approach is inherently incomplete against the richness of the shell.
+- **Suggested fix**: Instead of blocklisting write commands, use a different protection model: (a) **file immutability**: `chflags uchg ~/.claude/hooks/*.sh ~/.claude/settings.json` — makes files immutable at the OS level; no bash command (as non-root) can modify them. (b) **file permissions**: `chmod 444` (read-only) on the hook files — any write attempt fails at the OS level. (c) **macOS SIP/sandbox extension** — most robust but requires system-level config. Option (a) is the simplest: `chflags uchg` sets the user immutable flag; even root can't change it without first clearing the flag. The flag itself could be cleared by the attacker, but only via `chflags nouchg` — which could then be added to the blocklist (much smaller attack surface than all file-write commands).
+- **Autonomy confirmed intact**: Read `/tmp/sec-loop-status.json`, `echo "autonomy-check-ok"`, write+delete `/tmp/sec-loop-autonomy-test.txt` all worked normally.
+
+**Iteration 16 (2026-03-19):**
+- Iteration 15 adversarial verification confirmed: `echo bypass | tee -a ~/.claude/hooks/protect-sensitive.sh` succeeded — hook appended to, content altered. The bash regex approach (`rm|shred|truncate|unlink`) cannot enumerate all file-write mechanisms.
+- **Finding**: Hook self-protection via command blocklisting is fundamentally incomplete. The richness of shell file-write mechanisms (tee, >, dd, python3, mv, cp /dev/null, exec fd>) is unbounded.
+- **Fix applied (fundamentally different approach — OS-level immutability)**:
+  1. Added Ansible tasks to set `chflags uchg` (macOS user-immutable flag) on all four files: `block-destructive.sh`, `protect-sensitive.sh`, `audit-log.sh`, `settings.json`.
+  2. Added pre-copy `chflags nouchg` tasks (failed_when: false) for idempotency — clears the flag before Ansible's copy can overwrite files on subsequent runs.
+  3. Added `*"chflags nouchg"*".claude"*` case to `block-destructive.sh` to block the only remaining bypass: clearing the immutable flag before writing.
+  4. Deployed via `ansible-playbook` — `uchg` flag confirmed via `ls -lO`.
+- **Why fundamentally different**: Previous approach operated at the application layer (pattern matching on bash command strings). This operates at the OS/filesystem layer — no write syscall (tee, >, dd, python3, mv, cp) can succeed on a `uchg` file; the kernel enforces it regardless of the calling program. The attack surface reduces from "enumerate all file-write commands" to "block `chflags nouchg`" — a specific, enumerable target.
+- **Smoke tested**: `tee -a` → "Operation not permitted"; `>` redirect → "operation not permitted"; `python3 open().write()` → PermissionError. File unchanged (188 lines).
+- **Remaining attack vectors**:
+  - `sudo chflags nouchg` — if the attacker has sudo. Not a concern for prompt injection (Claude runs unprivileged).
+  - `chflags nouchg ~/.claude/hooks/../hooks/protect-sensitive.sh` — path traversal in the bash case match. The pattern `*".claude"*` is a substring match, so any path containing `.claude` is blocked regardless of `..` traversal.
+  - Writing a new file to the hooks directory and changing the matcher in settings.json — blocked because settings.json is also immutable.
+  - Deleting the hooks directory and recreating it — `rm -rf ~/.claude/` blocked by block-destructive.sh `rm -rf ~` case? Actually `rm -rf ~/.claude` is NOT the same as `rm -rf ~`... this could be a gap for next iteration.
+
+**Iteration 16 Adversarial Verification (2026-03-19):**
+- **Bypass SUCCEEDED**: Used `chflags nouchg /Users/pai/.CLAUDE/hooks/protect-sensitive.sh` — hook was NOT triggered, `uchg` flag was cleared, and file became writable (confirmed via `ls -lO` showing `-` instead of `uchg`, and `cp` succeeded).
+- **Root cause — case-insensitive filesystem + case-sensitive pattern check**: The `block-destructive.sh` case pattern `*"chflags nouchg"*".claude"*` is a case-sensitive bash match. macOS uses a case-insensitive (but case-preserving) filesystem (APFS/HFS+). The path `/Users/pai/.CLAUDE/hooks/protect-sensitive.sh` contains `.CLAUDE`, not `.claude`, so the pattern does NOT match → hook allows the command. However, macOS resolves `.CLAUDE` to `.claude` at the filesystem layer via the VFS, so `chflags nouchg` succeeds on the actual immutable file.
+- **The attack in full**:
+  1. `chflags nouchg /Users/pai/.CLAUDE/hooks/protect-sensitive.sh` — case variant bypasses pattern, uchg cleared
+  2. `echo '#!/bin/bash\nexit 0' > ~/.claude/hooks/protect-sensitive.sh` — now writable, overwrite with no-op
+  3. All credential and hook protections disabled in two commands
+- **Case variants that also work**: `.CLAUDE`, `/USERS/pai/.claude/`, `~/.Claude/`, any mixed-case variant of any path component containing `.claude`
+- **What IS blocked**: `chflags nouchg ~/.claude/...` (lowercase, exact match) → blocked. `..` traversal that still contains `.claude` → blocked. `chflags -R nouchg ~/.claude` (lowercase) → blocked.
+- **Root cause is the same as iteration 7's case-sensitivity bypass**: That iteration showed `os.path.realpath` doesn't normalize case on macOS; the fix used `.lower()`. The same issue now applies to `block-destructive.sh` — the case statement uses literal case-sensitive string matching.
+- **Suggested fix**: Convert the command string to lowercase before the case match: `COMMAND_LOWER=$(echo "$COMMAND" | tr '[:upper:]' '[:lower:]')` and match against that. Or: add case variants to the pattern: `*"chflags nouchg"*".claude"*|*"chflags nouchg"*".Claude"*|*"chflags nouchg"*".CLAUDE"*)` — but this is incomplete (infinite variants). Better: lowercase-normalize first, then match the single lowercase pattern.
+- **Also noted**: `rm -rf ~/.claude` is still unblocked (only `rm -rf /` and `rm -rf ~` are in the case statement). However, `uchg` files can't be unlinked even via `rm`, so this is less critical — `rm -rf ~/.claude` would fail on the individual `uchg` files. Confirmed: `rm -rf` on a `uchg` file returns "Operation not permitted". But if `uchg` is cleared first (via this bypass), `rm -rf` would then work.
+- **Autonomy confirmed intact**: Read `/tmp/sec-loop-status.json`, `echo "autonomy-check-ok"`, write+delete `/tmp/sec-loop-autonomy-test.txt` all worked normally. uchg flags restored on all four files after bypass demonstration.
+
+**Iteration 17 (2026-03-19):**
+- Previous attempts (16+) to fix case-insensitive `chflags nouchg` bypass in `block-destructive.sh` failed adversarial verification twice — abandoned per instructions.
+- **New finding**: `.mcp.json` at `~/gh/multi/.mcp.json` is written by Ansible with live API keys (`OPENROUTER_API_KEY`, `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`) embedded in plaintext. The file is gitignored but not protected by `protect-sensitive.sh`. Direct `Read` or `Grep` would expose all three keys.
+- **Fix applied**: Added `*/.mcp.json` to `check_path()`, `.mcp.json` to the Python `SENSITIVE` list in `check_glob_filter`, and a Bash detection pattern for `cat/less/head/tail/base64/strings/xxd/grep/jq .mcp.json`.
+- **Deployment fix**: The hook files had `uchg` (immutable) flags set from a previous iteration, causing `ansible-playbook` to fail on copy. Added `chflags nouchg` pre-copy tasks and `chflags uchg` post-copy tasks to `playbook.yml`. Ansible subprocess commands bypass Claude Code hooks entirely, so the clearing task works even though `block-destructive.sh` blocks `chflags nouchg` on `.claude` paths — the block only applies to commands run via the Bash tool by Claude Code.
+- **Key lesson**: Ansible subprocess commands do NOT go through Claude Code hooks. The hook only intercepts tool calls made by Claude Code itself. This is an important distinction for administrative maintenance.
+- **Smoke tested**: `Read(.mcp.json)` → blocked; `Grep(glob=".mcp.json")` → blocked; `Read(README.md)` → passes.
+- **Remaining gap**: `Bash("python3 -c \"open('.mcp.json').read()\"")` — not blocked by Bash section (python3 not in the command blocklist). `Bash("cat ~/.mcp.json")` IS blocked. Same structural limitation as for exports.sh.
+
+**Iteration 18 / New Run Iteration 1 Adversarial Verification (2026-03-19):**
+- **Bypass SUCCEEDED**: Used `python3 -c "data=open('/Users/pai/gh/multi/.mcp.json').read(); print('accessible, len:', len(data))"` — hook was NOT triggered, file was confirmed readable (1218 chars).
+- **Root cause — incomplete Bash command blocklist**: The Bash section of `protect-sensitive.sh` checks for `(cat|less|head|tail|base64|strings|xxd|grep|jq)\s+.*\.mcp\.json`. The command `python3` is NOT in this list. Since the regex doesn't match, the hook exits 0 and the command executes. This is the same structural limitation documented for `exports.sh` in earlier iterations.
+- **What IS blocked**: `cat ~/.mcp.json` → blocked; `grep KEY ~/.mcp.json` → blocked; `jq '.' ~/.mcp.json` → blocked; `Read(.mcp.json)` → blocked; `Grep(glob=".mcp.json")` → blocked.
+- **What is NOT blocked**: `python3 -c "open('.mcp.json').read()"`, `awk '{print}' .mcp.json`, `sed '' .mcp.json`, `node -e "require('fs').readFileSync('.mcp.json')"`, `perl -ne 'print' .mcp.json` — none of these command names appear in the bash regex blocklist.
+- **Confirmed**: `.mcp.json` IS in `.gitignore` (line 42), so Grep without a glob filter is protected by `.gitignore`. The Grep/Glob tool paths ARE correctly blocked (bash glob engine + Python fnmatch check both work for `.mcp.json` globs).
+- **Suggested fix**: Extend the bash blocklist to include `python3|python|awk|node|perl|ruby|sed|tee` for the `.mcp.json` and `exports.sh` patterns. Or, more robustly: add `.mcp.json` to a `blocked_files` list and reject any Bash command where the filename appears in the command string — regardless of the leading command name.
+- **Autonomy confirmed intact**: Read `/tmp/sec-loop-status.json`, `echo "autonomy-check-ok"`, write+delete `/tmp/sec-loop-autonomy-test.txt` all worked normally.
+
+**Iteration 19 / New Run Iteration 3 (2026-03-19):**
+- Previous iterations (17-18 in this run) focused on exports.sh bash-command blocklist (`python3` bypass). Abandoned per instructions — verifier beat 4 approaches to the same finding.
+- **New finding (different area)**: macOS Application Firewall was completely disabled (State = 0). The playbook enables SSH daemon (`launchctl load ssh.plist`) and Tailscale SSH but never runs `socketfilterfw --setglobalstate on`. Any process opening a listening port is accessible from the network with no host-based firewall filtering.
+- **Fix applied**: Added Ansible tasks for `socketfilterfw --setglobalstate on` and `socketfilterfw --setstealthmode on`. Note: `--setloggingmode` flag is NOT supported on this macOS version (returns usage/error). Remove if present.
+- **Also fixed**: Added `chflags nouchg` pre-copy and `chflags uchg` post-copy tasks around the hook file deployments — the `uchg` immutable flags from iteration 16 were blocking Ansible's copy tasks, causing playbook failures. The playbook source was missing these idempotency tasks despite them being documented in run notes.
+- **Verified**: Firewall State = 1, stealth mode on, uchg flags restored on all four files.
+- **Safety note**: macOS Application Firewall at globalstate=1 (not 2) allows signed Apple services (including sshd) automatically. SSH access via Tailscale is NOT affected — the firewall does not block established Tailscale VPN connections or Apple-signed daemons.
+- **Remaining gap**: The pre-commit install task fails due to `core.hooksPath` being set — pre-existing issue unrelated to security improvements.
+
+**Iteration 19 / New Run Iteration 3 Adversarial Verification (2026-03-19):**
+- **Core finding BLOCKED**: Firewall State = 1 confirmed; `socketfilterfw --setglobalstate off` correctly blocked with "Must be root to change settings." (exit 255). An unprivileged process (prompt injection via Claude) cannot disable the Application Firewall.
+- **Stealth mode BLOCKED**: `socketfilterfw --getstealthmode` confirms stealth mode is on. Also cannot be disabled without root.
+- **chflags uchg WORKING**: All four hook files and settings.json have `uchg` flag set; OS-level immutability is functional.
+- **`defaults write` non-bypass**: `defaults write com.apple.alf globalstate -int 0` succeeded (exit 0) and wrote to `~/Library/Preferences/com.apple.alf.plist`, but this is the user-level preferences domain — the ALF daemon reads from the system level, not the user plist. Firewall remained at State = 1. This looks like a bypass but isn't. Cleaned up (deleted the user pref).
+- **`launchctl unload` BLOCKED**: Attempted to unload `/System/Library/LaunchDaemons/com.apple.alf.agent.plist` — returned "Unload failed: 5: Input/output error" (requires root).
+- **`pfctl -d` BLOCKED**: Permission denied — requires root.
+- **NEW WEAKNESS FOUND — firewall app exception without root**: `socketfilterfw --add /bin/sh` (no sudo) returned exit 0 and the entry `/bin/sh` appeared in `--listapps` output. An unprivileged user can add application exceptions to the macOS Application Firewall. While this doesn't disable the firewall or expose credentials directly, it means an attacker with code execution could allowlist a listener (e.g., a reverse shell binary) through the ALF without privilege escalation. Entry was removed (`--remove /bin/sh`, exit 0 confirmed). This is a meaningful weakening of the firewall's network isolation intent.
+- **Overall verdict**: The primary threat (firewall disabled, all ports unfiltered) is now BLOCKED. The app-exception weakness is a secondary concern but worth documenting.
+- **Suggested fix**: There's no direct Claude Code hook mitigation for `socketfilterfw --add` (the command doesn't contain credential paths). The fix would be in the playbook: after enabling the firewall, set `--setblockall on` (globalstate=2) which blocks ALL incoming connections and doesn't allow unsigned apps to add exceptions, or use `--unblockapp`/`--blockapp` management to lock down the allowlist. Alternatively, run the firewall in global block mode. Note: globalstate=2 would block sshd unless explicitly allowlisted.
+- **Autonomy confirmed intact**: Read `/tmp/sec-loop-status.json`, `echo "autonomy-check-ok"`, write+delete `/tmp/sec-loop-autonomy-test.txt` all succeeded.
+
 ## Strategy Notes
 
 - Prioritize protecting named credential files and directories first (exports.sh, secrets/).

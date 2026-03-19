@@ -229,6 +229,19 @@
       failed_when: false
 
     # ---------------------------------------------------------------
+    # macOS Application Firewall
+    # ---------------------------------------------------------------
+    - name: Enable macOS Application Firewall
+      ansible.builtin.command: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+      become: true
+      changed_when: false
+
+    - name: Enable Application Firewall stealth mode
+      ansible.builtin.command: /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+      become: true
+      changed_when: false
+
+    # ---------------------------------------------------------------
     # Computer name
     # ---------------------------------------------------------------
     - name: Set ComputerName
@@ -394,6 +407,17 @@
         state: directory
         mode: "0755"
 
+    - name: Clear uchg flag on hook files before copy (idempotency)
+      ansible.builtin.command: >
+        chflags nouchg
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/audit-log.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/settings.json
+      become: true
+      failed_when: false
+      changed_when: false
+
     - name: Write block-destructive hook
       ansible.builtin.copy:
         src: hooks/block-destructive.sh
@@ -455,6 +479,16 @@
               ]
             }
           }
+
+    - name: Set uchg flag on hook files to prevent tampering
+      ansible.builtin.command: >
+        chflags uchg
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/audit-log.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/settings.json
+      become: true
+      changed_when: false
 
     # ---------------------------------------------------------------
     # Pre-commit hooks
