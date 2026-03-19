@@ -119,6 +119,14 @@ when you're done — the wrapper script handles outcome messages.
 ## Rules
 
 - **One improvement per iteration.** Do not batch multiple changes.
+- **Maximize diversity across iterations.** Read the run notes and improvement
+  log carefully. If a previous iteration already attempted something in the same
+  area (e.g., protect-sensitive.sh glob handling, hook pattern matching), move on
+  to a completely different area — even if the previous attempt failed. There are
+  many categories on this workstation to harden: file permissions, macOS system
+  settings, firewall rules, credential hygiene, container security, playbook
+  hardening, etc. Spending multiple iterations on the same narrow problem is
+  wasting budget. Pick something fresh every time.
 - **Never reduce Claude Code's autonomy.** Do not block commands that Claude Code
   needs for normal operation (read, write, edit, git, npm, docker, ansible, etc.).
 - **DO NOT touch SSH config, sshd_config, or Tailscale SSH settings.** The owner
