@@ -400,10 +400,12 @@ def escalation_message(attempt: int) -> str:
 
 
 CLAUDE_TIMEOUT = 600  # 10 minutes max per claude invocation
+IMPROVE_LOG = Path("/tmp/sec-loop-improve.log")
+VERIFY_LOG = Path("/tmp/sec-loop-verify.log")
 
 
-def run_claude(prompt: str, *, max_turns: int, max_budget: float):
-    """Run claude -p with the given prompt. Returns the exit code."""
+def run_claude(prompt: str, *, max_turns: int, max_budget: float, output_log: Path):
+    """Run claude -p with the given prompt. Streams output to a log file."""
     cmd = [
         "claude", "-p", prompt,
         "--model", "sonnet",
@@ -421,7 +423,11 @@ def run_claude(prompt: str, *, max_turns: int, max_budget: float):
         "SEC_LOOP_LOG_CHANNEL": os.environ.get("DISCORD_LOG_CHANNEL_ID", ""),
     }
     try:
-        result = subprocess.run(cmd, cwd=REPO_DIR, env=env, check=False, timeout=CLAUDE_TIMEOUT)
+        with open(output_log, "w") as logf:
+            result = subprocess.run(
+                cmd, cwd=REPO_DIR, env=env, check=False,
+                timeout=CLAUDE_TIMEOUT, stdout=logf, stderr=subprocess.STDOUT,
+            )
         return result.returncode
     except subprocess.TimeoutExpired:
         log.warning("Claude process timed out after %ds", CLAUDE_TIMEOUT)
@@ -429,7 +435,7 @@ def run_claude(prompt: str, *, max_turns: int, max_budget: float):
 
 
 def cleanup():
-    for f in [STATUS_FILE, VERIFY_FILE, COST_ANCHOR, MCP_CONFIG]:
+    for f in [STATUS_FILE, VERIFY_FILE, COST_ANCHOR, MCP_CONFIG, IMPROVE_LOG, VERIFY_LOG]:
         f.unlink(missing_ok=True)
     # Don't delete DIRECTIVES_FILE — it persists across runs
 
@@ -461,7 +467,7 @@ def run_iteration(iteration: int, *, dry_run: bool) -> str:
 
         log.info("Running improvement agent...")
         discord_log(f"Iteration {iteration}: running improvement agent (attempt {attempt})", dry_run=dry_run)
-        run_claude(prompt, max_turns=30, max_budget=5.00)
+        run_claude(prompt, max_turns=30, max_budget=5.00, output_log=IMPROVE_LOG)
 
         # Read status
         if not STATUS_FILE.exists():
@@ -502,7 +508,7 @@ def run_iteration(iteration: int, *, dry_run: bool) -> str:
                 "for security, even if imperfect."
             )
 
-        run_claude(verify_prompt, max_turns=12, max_budget=3.00)
+        run_claude(verify_prompt, max_turns=12, max_budget=3.00, output_log=VERIFY_LOG)
 
         verify = read_json(VERIFY_FILE)
         verify_result = verify.get("result", "unknown")

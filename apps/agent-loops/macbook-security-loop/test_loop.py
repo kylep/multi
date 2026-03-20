@@ -326,7 +326,7 @@ class TestRunIteration:
 
         call_count = [0]
 
-        def fake_claude(prompt, *, max_turns, max_budget):
+        def fake_claude(prompt, *, max_turns, max_budget, output_log=None):
             call_count[0] += 1
             if call_count[0] == 1:  # improvement
                 loop.STATUS_FILE.write_text(json.dumps({
@@ -347,7 +347,7 @@ class TestRunIteration:
     def test_done_signal(self, mock_claude, tmp_path):
         (tmp_path / "script" / "prompt.md").write_text("improve")
 
-        def fake_claude(prompt, *, max_turns, max_budget):
+        def fake_claude(prompt, *, max_turns, max_budget, output_log=None):
             loop.STATUS_FILE.write_text(json.dumps({
                 "action": "done",
                 "reason": "all gaps addressed",
@@ -368,7 +368,7 @@ class TestRunIteration:
 
         call_count = [0]
 
-        def fake_claude(prompt, *, max_turns, max_budget):
+        def fake_claude(prompt, *, max_turns, max_budget, output_log=None):
             call_count[0] += 1
             if call_count[0] % 2 == 1:  # improvement
                 loop.STATUS_FILE.write_text(json.dumps({
