@@ -31,6 +31,12 @@ The playbook is the source of truth. All changes must go through it.
 - chmod / file permission fixes
 - protect-sensitive.sh glob/pattern matching (13+ iterations spent here already)
 
+## Operator directives
+
+If the file `apps/agent-loops/macbook-security-loop/operator-directives.md`
+exists, read it FIRST. It contains instructions from the human operator
+posted via Discord. These take priority over everything else in this prompt.
+
 ## Your task
 
 1. **Read the improvement log** at `apps/blog/blog/markdown/wiki/design-docs/security-improvement-log.md`

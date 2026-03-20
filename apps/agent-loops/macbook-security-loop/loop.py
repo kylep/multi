@@ -39,8 +39,11 @@ WORST_CASE_RATE_PER_MTOK = 75
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_DIR = SCRIPT_DIR.parent.parent.parent
+DIRECTIVES_FILE = SCRIPT_DIR / "operator-directives.md"
 
 PREFIX = "Security >"
+# Bot's application ID — messages from this author are from the bot, not the operator
+BOT_APP_ID = "1482826496588956034"
 
 log = logging.getLogger("sec-loop")
 
@@ -214,6 +217,71 @@ def discord_log(msg: str, *, dry_run: bool = False):
     discord_send(channel, f"{PREFIX} {msg}", dry_run=dry_run)
 
 
+# --- Operator directives from Discord ---
+
+def poll_operator_directives():
+    """Read recent #status-updates messages and save any human (non-bot) messages as directives."""
+    token = os.environ.get("DISCORD_BOT_TOKEN", "")
+    channel = os.environ.get("DISCORD_STATUS_CHANNEL_ID", "")
+    if not token or not channel:
+        return
+
+    url = f"https://discord.com/api/v10/channels/{channel}/messages?limit=10"
+    req = Request(url, headers={
+        "Authorization": f"Bot {token}",
+    })
+    try:
+        messages = json.loads(urlopen(req).read())  # nosemgrep: dynamic-urllib-use-detected
+    except Exception:
+        log.warning("Failed to read Discord messages for operator directives")
+        return
+
+    # Filter to human messages (not from the bot)
+    human_msgs = []
+    for msg in messages:
+        author = msg.get("author", {})
+        if author.get("id") == BOT_APP_ID or author.get("bot", False):
+            continue
+        human_msgs.append({
+            "id": msg["id"],
+            "author": author.get("username", "unknown"),
+            "content": msg.get("content", ""),
+            "timestamp": msg.get("timestamp", ""),
+        })
+
+    if not human_msgs:
+        return
+
+    # Read existing directives to avoid duplicates
+    existing_ids: set[str] = set()
+    if DIRECTIVES_FILE.exists():
+        for line in DIRECTIVES_FILE.read_text().splitlines():
+            # Lines look like: "- [1234567890] message content"
+            if line.startswith("- ["):
+                msg_id = line.split("]")[0].removeprefix("- [")
+                existing_ids.add(msg_id)
+
+    new_msgs = [m for m in human_msgs if m["id"] not in existing_ids]
+    if not new_msgs:
+        return
+
+    # Append new directives
+    with open(DIRECTIVES_FILE, "a") as f:
+        if not DIRECTIVES_FILE.exists() or DIRECTIVES_FILE.stat().st_size == 0:
+            f.write("# Operator Directives\n\n")
+            f.write("Messages from the operator in #status-updates.\n")
+            f.write("These are instructions — follow them.\n\n")
+        for msg in reversed(new_msgs):  # oldest first
+            f.write(f"- [{msg['id']}] ({msg['timestamp']}) {msg['author']}: {msg['content']}\n")
+
+    log.info("Added %d new operator directive(s) from Discord", len(new_msgs))
+
+    # Ack in Discord with a summary of what we picked up
+    summaries = [m["content"][:80] for m in new_msgs]
+    ack = f"Picked up {len(new_msgs)} directive(s): " + "; ".join(summaries)
+    discord_status(ack)
+
+
 # --- Git push ---
 
 def git_push():
@@ -354,6 +422,7 @@ def run_claude(prompt: str, *, max_turns: int, max_budget: float):
 def cleanup():
     for f in [STATUS_FILE, VERIFY_FILE, COST_ANCHOR, MCP_CONFIG]:
         f.unlink(missing_ok=True)
+    # Don't delete DIRECTIVES_FILE — it persists across runs
 
 
 # --- Main loop ---
@@ -507,6 +576,11 @@ def main():
                 break
 
             discord_log(f"Starting iteration {iteration}", dry_run=args.dry_run)
+
+            # Check for operator messages in #status-updates
+            if not args.dry_run:
+                poll_operator_directives()
+
             os.environ["SEC_LOOP_ITERATION"] = str(iteration)
 
             result = run_iteration(iteration, dry_run=args.dry_run)

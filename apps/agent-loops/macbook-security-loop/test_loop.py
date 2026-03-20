@@ -206,6 +206,65 @@ class TestEscalation:
         assert "5" in msg
 
 
+# --- poll_operator_directives ---
+
+class TestPollOperatorDirectives:
+    @mock.patch("loop.urlopen")
+    def test_saves_human_messages(self, mock_urlopen, monkeypatch, tmp_path):
+        monkeypatch.setenv("DISCORD_BOT_TOKEN", "fake")
+        monkeypatch.setenv("DISCORD_STATUS_CHANNEL_ID", "12345")
+        monkeypatch.setattr("loop.DIRECTIVES_FILE", tmp_path / "directives.md")
+
+        mock_urlopen.return_value.__enter__ = lambda s: s
+        mock_urlopen.return_value.__exit__ = mock.Mock(return_value=False)
+        mock_urlopen.return_value.read.return_value = json.dumps([
+            {"id": "111", "author": {"id": "human123", "username": "kyle", "bot": False},
+             "content": "focus on firewall rules", "timestamp": "2026-03-20T10:00:00Z"},
+            {"id": "222", "author": {"id": loop.BOT_APP_ID, "username": "Journalist", "bot": True},
+             "content": "Security > doing stuff", "timestamp": "2026-03-20T10:01:00Z"},
+        ]).encode()
+
+        loop.poll_operator_directives()
+
+        directives = (tmp_path / "directives.md").read_text()
+        assert "focus on firewall rules" in directives
+        assert "doing stuff" not in directives
+
+    @mock.patch("loop.urlopen")
+    def test_deduplicates(self, mock_urlopen, monkeypatch, tmp_path):
+        monkeypatch.setenv("DISCORD_BOT_TOKEN", "fake")
+        monkeypatch.setenv("DISCORD_STATUS_CHANNEL_ID", "12345")
+        directives_path = tmp_path / "directives.md"
+        monkeypatch.setattr("loop.DIRECTIVES_FILE", directives_path)
+
+        directives_path.write_text("- [111] (2026-03-20T10:00:00Z) kyle: focus on firewall rules\n")
+
+        mock_urlopen.return_value.__enter__ = lambda s: s
+        mock_urlopen.return_value.__exit__ = mock.Mock(return_value=False)
+        mock_urlopen.return_value.read.return_value = json.dumps([
+            {"id": "111", "author": {"id": "human123", "username": "kyle", "bot": False},
+             "content": "focus on firewall rules", "timestamp": "2026-03-20T10:00:00Z"},
+        ]).encode()
+
+        loop.poll_operator_directives()
+
+        # Should not duplicate
+        content = directives_path.read_text()
+        assert content.count("111") == 1
+
+    def test_noop_without_token(self, monkeypatch):
+        monkeypatch.delenv("DISCORD_BOT_TOKEN", raising=False)
+        # Should not raise
+        loop.poll_operator_directives()
+
+    @mock.patch("loop.urlopen", side_effect=Exception("network error"))
+    def test_swallows_errors(self, mock_urlopen, monkeypatch):
+        monkeypatch.setenv("DISCORD_BOT_TOKEN", "fake")
+        monkeypatch.setenv("DISCORD_STATUS_CHANNEL_ID", "12345")
+        # Should not raise
+        loop.poll_operator_directives()
+
+
 # --- read_json ---
 
 class TestReadJson:
