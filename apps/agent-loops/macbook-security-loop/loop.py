@@ -98,7 +98,14 @@ def acquire_lock() -> bool:
 
 
 def release_lock():
-    LOCKFILE.unlink(missing_ok=True)
+    """Only delete lock if we own it (PID matches)."""
+    try:
+        content = LOCKFILE.read_text().strip()
+        pid_str = content.split(":")[0]
+        if int(pid_str) == os.getpid():
+            LOCKFILE.unlink(missing_ok=True)
+    except (FileNotFoundError, ValueError):
+        pass
 
 
 def _check_existing_lock() -> bool:
