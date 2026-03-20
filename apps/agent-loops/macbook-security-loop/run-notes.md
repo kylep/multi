@@ -1076,8 +1076,14 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - **core.protectHFS/NTFS**: Pure security, no performance cost, no false positives. These protect against path traversal attacks where a repo contains filenames that exploit OS-specific Unicode normalization (HFS+) or special stream names (NTFS) to write outside the working tree.
 - **Remaining gaps (carried forward)**:
   - `block-destructive.sh` launchctl/LaunchAgents ordering bypass — abandoned after 3 failed attempts.
-  - `logs/` directory `0755` in playbook source will regress on next `ansible-playbook -K` (live is `0700`).
   - `audit-log.sh` forensic completeness (logs entire tool_input JSON now — this gap may be resolved).
+
+**Iteration 1 (2026-03-20) — Audit log directory permissions regression:**
+- **Finding**: `Create logs directory` task in `playbook.yml` had `mode: "0755"`. Live directory was already `0700` from a prior manual fix, but the source never matched — next full Ansible deployment would have silently widened permissions on the forensic audit trail.
+- **Fix**: Changed `mode: "0755"` → `mode: "0700"` in `playbook.yml`. Deployed; `logs/` confirmed `drwx------`.
+- **Why this matters**: `logs/claude-audit.jsonl` records every tool call with full parameters (file paths, bash commands, grep patterns). World-readable logs would give any co-resident process insight into AI activity patterns and sensitive file paths.
+- **Lesson**: Playbook source and live state can silently diverge. Each area needs a round-trip check (source → playbook → live), not just checking the live state.
+- **Remaining gap**: `logs/` directory item removed from carried-forward list.
 
 ## Known Limitations
 

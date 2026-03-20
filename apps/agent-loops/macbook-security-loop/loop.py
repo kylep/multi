@@ -399,6 +399,9 @@ def escalation_message(attempt: int) -> str:
     return ""
 
 
+CLAUDE_TIMEOUT = 600  # 10 minutes max per claude invocation
+
+
 def run_claude(prompt: str, *, max_turns: int, max_budget: float):
     """Run claude -p with the given prompt. Returns the exit code."""
     cmd = [
@@ -417,8 +420,12 @@ def run_claude(prompt: str, *, max_turns: int, max_budget: float):
         "SEC_LOOP_STATUS_CHANNEL": os.environ.get("DISCORD_STATUS_CHANNEL_ID", ""),
         "SEC_LOOP_LOG_CHANNEL": os.environ.get("DISCORD_LOG_CHANNEL_ID", ""),
     }
-    result = subprocess.run(cmd, cwd=REPO_DIR, env=env, check=False)
-    return result.returncode
+    try:
+        result = subprocess.run(cmd, cwd=REPO_DIR, env=env, check=False, timeout=CLAUDE_TIMEOUT)
+        return result.returncode
+    except subprocess.TimeoutExpired:
+        log.warning("Claude process timed out after %ds", CLAUDE_TIMEOUT)
+        return 1
 
 
 def cleanup():

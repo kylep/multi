@@ -432,7 +432,7 @@
       ansible.builtin.file:
         path: "{{ repo_dir }}/logs"
         state: directory
-        mode: "0755"
+        mode: "0700"
 
     - name: Clear uchg flag on hook files before copy (idempotency)
       ansible.builtin.command: >
