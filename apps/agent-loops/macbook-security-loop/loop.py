@@ -200,6 +200,7 @@ def discord_send(channel_id: str, content: str, *, dry_run: bool = False):
     req = Request(url, data=data, method="POST", headers={
         "Authorization": f"Bot {token}",
         "Content-Type": "application/json",
+        "User-Agent": "sec-loop/1.0",
     })
     try:
         urlopen(req)  # nosemgrep: dynamic-urllib-use-detected  # hardcoded Discord API URL
@@ -229,6 +230,7 @@ def poll_operator_directives():
     url = f"https://discord.com/api/v10/channels/{channel}/messages?limit=10"
     req = Request(url, headers={
         "Authorization": f"Bot {token}",
+        "User-Agent": "sec-loop/1.0",
     })
     try:
         messages = json.loads(urlopen(req).read())  # nosemgrep: dynamic-urllib-use-detected
