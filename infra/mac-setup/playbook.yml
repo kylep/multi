@@ -147,6 +147,29 @@
           {% endfor %}
       when: human_actions | length > 0
 
+    # ---------------------------------------------------------------
+    # FileVault (full-disk encryption) — hard gate
+    # Uses diskutil apfs list: always exits 0, no sudo required.
+    # Fails the playbook if FileVault is off so the operator cannot
+    # proceed without disk encryption in place.
+    # ---------------------------------------------------------------
+    - name: Check FileVault status via diskutil
+      ansible.builtin.shell: |
+        diskutil apfs list 2>/dev/null | grep -c "FileVault:.*Yes"
+      register: filevault_check
+      changed_when: false
+      failed_when: false
+
+    - name: Enforce FileVault is enabled
+      ansible.builtin.fail:
+        msg: >
+          SECURITY: FileVault is OFF. The disk is unencrypted — physical access
+          (Recovery Mode, Target Disk Mode, external boot) bypasses all in-session
+          credential and hook protections. Enable FileVault before continuing:
+          System Settings → Privacy & Security → FileVault → Turn On FileVault.
+          Re-run this playbook after FileVault is fully enabled.
+      when: (filevault_check.stdout | trim | int) == 0
+
     # =================================================================
     # PHASE 2: Automated — everything below is hands-off
     # =================================================================

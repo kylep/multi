@@ -1109,3 +1109,10 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 **Result**: PASS — no active bypass found.
 
 **Fragility noted**: Domain split is architecturally fragile. If hardware UUID changes (logic board replacement), ByHost `idleTime` is silently lost; auto-lock stops working while `askForPassword` persists in global. Also: settings are not MDM-enforced and remain user-writable.
+
+**Iteration 3 (2026-03-20) — FileVault disabled:**
+- **Finding**: `fdesetup status` returned `"FileVault is Off."` — full-disk encryption not enabled. All hook-based credential protection only defends against in-session access; physical-access disk reads (Recovery Mode, external drive) bypass everything.
+- **Fix (attempt 1 — failed verification)**: Added `Check FileVault status` pre-flight task using `fdesetup status` with `failed_when: false` + `ansible.builtin.debug`. Bypassed: (1) `failed_when: false` silences fdesetup errors (empty stdout → condition never true); (2) `debug` is non-enforcing.
+- **Fix (attempt 2 — current)**: Replaced with `diskutil apfs list | grep -c "FileVault:.*Yes"` (always exits 0, stdout is count) + `ansible.builtin.fail` (hard enforcement, exits 1). Deployed: playbook confirmed exits 1 with SECURITY message when FileVault is off.
+- **Why not automated**: `fdesetup enable` requires interactive UI authentication. Playbook enforces the gate; operator must enable FileVault manually.
+- **Lesson**: Hard enforcement requires both (a) a check command that can't silently return empty output and (b) `ansible.builtin.fail` not `ansible.builtin.debug`. Count-based checks (grep -c) are more robust than string-match checks for this reason.
