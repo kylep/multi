@@ -291,6 +291,23 @@
       changed_when: false
 
     # ---------------------------------------------------------------
+    # Screen lock — require password after idle (physical access protection)
+    # Note: displaysleep is disabled (always-on), but screensaver idle timer
+    # is independent. Screen lock does not affect SSH/Tailscale access.
+    # ---------------------------------------------------------------
+    - name: Set screensaver idle time to 10 minutes
+      ansible.builtin.command: defaults -currentHost write com.apple.screensaver idleTime -int 600
+      changed_when: false
+
+    - name: Require password on screensaver/lock
+      ansible.builtin.command: defaults write com.apple.screensaver askForPassword -int 1
+      changed_when: false
+
+    - name: Require password immediately (no grace period)
+      ansible.builtin.command: defaults write com.apple.screensaver askForPasswordDelay -int 0
+      changed_when: false
+
+    # ---------------------------------------------------------------
     # Directory structure
     # ---------------------------------------------------------------
     - name: Create secrets directory

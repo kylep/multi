@@ -1078,6 +1078,12 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
   - `block-destructive.sh` launchctl/LaunchAgents ordering bypass — abandoned after 3 failed attempts.
   - `audit-log.sh` forensic completeness (logs entire tool_input JSON now — this gap may be resolved).
 
+**Iteration 2 (2026-03-20) — Screen lock not configured:**
+- **Finding**: `defaults -currentHost read com.apple.screensaver idleTime` returned NOT SET (0 = never activates). `askForPassword` also NOT SET. With `displaysleep 0` from pmset, there was no automatic screen protection at all — physical access = full access.
+- **Fix**: Added three `defaults` tasks to `playbook.yml`: screensaver idle 600s, askForPassword=1, askForPasswordDelay=0. Deployed directly (tasks sit below the sudo barrier, no sudo needed).
+- **Why these are user-level**: Screen saver settings live in the user domain (`-currentHost` for idleTime, user domain for askForPassword) — no root required.
+- **Lesson**: The pmset `displaysleep 0` setting (for always-on AI workstation) was masking the screen lock gap. Display sleep and screensaver are independent — the screensaver idle timer still fires even with display sleep disabled.
+
 **Iteration 1 (2026-03-20) — Audit log directory permissions regression:**
 - **Finding**: `Create logs directory` task in `playbook.yml` had `mode: "0755"`. Live directory was already `0700` from a prior manual fix, but the source never matched — next full Ansible deployment would have silently widened permissions on the forensic audit trail.
 - **Fix**: Changed `mode: "0755"` → `mode: "0700"` in `playbook.yml`. Deployed; `logs/` confirmed `drwx------`.
@@ -1090,3 +1096,16 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - Bash exfiltration via `python3 -c "open('exports.sh').read()"`, `node -e`, `vim`/`nano`, `awk`, `sed` etc. — these are not blocked. The bash regex only catches the most common shell read commands.
 - `protect-sensitive.sh` bash detection uses substring grep rather than path-anchored matching, so it could have false positives (e.g., a file named `not-exports.sh`). Acceptable trade-off for now.
 - The audit log hook uses Ansible `template` (not `copy`) so the `REPO_DIR` variable is templated in at deploy time — if the repo moves, the log path breaks silently.
+
+## Iteration 2 — Verifier (Screen Lock)
+
+**Change**: Added screensaver idleTime=600 (-currentHost), askForPassword=1, askForPasswordDelay=0 (global domain) to playbook.yml and deployed.
+
+**Bypasses attempted**:
+1. `-currentHost` domain shadow: `idleTime` stored in ByHost plist, `askForPassword` in global plist — tested if split would prevent password enforcement. macOS merges domains correctly; no bypass.
+2. `loginwindow DisableScreenLock` override: not set; no bypass.
+3. `pmset PreventUserIdleDisplaySleep` assertion: assertion is 0 (display idle NOT prevented); screensaver will trigger.
+
+**Result**: PASS — no active bypass found.
+
+**Fragility noted**: Domain split is architecturally fragile. If hardware UUID changes (logic board replacement), ByHost `idleTime` is silently lost; auto-lock stops working while `askForPassword` persists in global. Also: settings are not MDM-enforced and remain user-writable.
