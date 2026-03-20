@@ -422,7 +422,7 @@ def run_iteration(iteration: int, *, dry_run: bool) -> str:
                 "for security, even if imperfect."
             )
 
-        run_claude(verify_prompt, max_turns=20, max_budget=3.00)
+        run_claude(verify_prompt, max_turns=12, max_budget=3.00)
 
         verify = read_json(VERIFY_FILE)
         verify_result = verify.get("result", "unknown")

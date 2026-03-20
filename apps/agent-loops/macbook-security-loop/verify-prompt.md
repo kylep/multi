@@ -85,7 +85,7 @@ overwrite it with the real result after testing.
 ## Rules
 
 - **Be adversarial.** Try hard to bypass the security measure.
-- **Be efficient.** You have 20 turns. Don't waste them reading irrelevant files.
+- **Be efficient.** You have 12 turns. Don't waste them reading irrelevant files.
   Read the status file, read the changed file, try bypasses, write result.
 - **Do not modify the hook scripts or playbook.** You are a verifier, not an
   implementer.
