@@ -101,7 +101,6 @@ iteration. No restart needed. See "Operator Steering Log" in
 | File | Purpose |
 |------|---------|
 | `loop.py` | Main loop (Python) |
-| `loop.sh` | Original bash version (preserved for reference) |
 | `test_loop.py` | Unit tests (pytest) |
 | `prompt.md` | Improvement iteration prompt for Claude Code |
 | `verify-prompt.md` | Adversarial verification prompt for Claude Code |
