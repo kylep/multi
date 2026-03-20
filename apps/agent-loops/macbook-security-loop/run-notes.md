@@ -1097,6 +1097,11 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - `protect-sensitive.sh` bash detection uses substring grep rather than path-anchored matching, so it could have false positives (e.g., a file named `not-exports.sh`). Acceptable trade-off for now.
 - The audit log hook uses Ansible `template` (not `copy`) so the `REPO_DIR` variable is templated in at deploy time — if the repo moves, the log path breaks silently.
 
+**Iteration 3 (2026-03-20) — Git security settings missing from playbook:**
+- **Finding**: `core.protectHFS`, `core.protectNTFS`, `fetch.fsckObjects`, `transfer.fsckObjects` were applied live (iteration 51) via `git config --global` but never added to `playbook.yml`. Machine rebuild would lose all four settings.
+- **Fix**: Added four `community.general.git_config` tasks to `playbook.yml` after the credential.helper task. No deployment needed — live state already matches from prior iteration. Playbook now encodes the settings so they survive reprovisioning.
+- **Lesson**: "Applied directly" fixes (outside Ansible) must always be followed by a playbook task. The live state and the playbook are both sources of truth and can silently diverge.
+
 ## Iteration 2 — Verifier (Screen Lock)
 
 **Change**: Added screensaver idleTime=600 (-currentHost), askForPassword=1, askForPasswordDelay=0 (global domain) to playbook.yml and deployed.
@@ -1116,3 +1121,41 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - **Fix (attempt 2 — current)**: Replaced with `diskutil apfs list | grep -c "FileVault:.*Yes"` (always exits 0, stdout is count) + `ansible.builtin.fail` (hard enforcement, exits 1). Deployed: playbook confirmed exits 1 with SECURITY message when FileVault is off.
 - **Why not automated**: `fdesetup enable` requires interactive UI authentication. Playbook enforces the gate; operator must enable FileVault manually.
 - **Lesson**: Hard enforcement requires both (a) a check command that can't silently return empty output and (b) `ansible.builtin.fail` not `ansible.builtin.debug`. Count-based checks (grep -c) are more robust than string-match checks for this reason.
+
+**Iteration 5 (2026-03-20) — Firewall allowlist contained world-writable path and interpreter binaries:**
+- **Finding**: `socketfilterfw --listapps` showed 11 entries; three were dangerous: `/tmp/bypass-test-binary` (leftover adversarial test artifact — world-writable `/tmp/` means any process can write a binary there and inherit the inbound-connection allowance), `/usr/bin/python3` (all Python scripts can accept inbound connections), `/usr/bin/ruby` (same for Ruby). Any Python/Ruby script — including a prompt-injected MCP server or malicious package — could open a listening socket without the firewall blocking it.
+- **Fix**: Removed all three via `socketfilterfw --remove` directly on the live system. Added three Ansible tasks to the firewall section of `playbook.yml` (`changed_when: false` for idempotency, no `become: true` needed) to keep them removed on every deployment.
+- **Why no become**: `socketfilterfw --remove` succeeded without sudo (user-level operation for non-system entries).
+- **Lesson**: The firewall allowlist accumulates entries over time from macOS prompts and testing. It needs periodic audits — entries in `/tmp/` or for language interpreters are almost always wrong.
+
+**Iteration 4 (2026-03-20) — Terminal Secure Keyboard Entry disabled:**
+- **Finding**: `defaults read com.apple.Terminal SecureKeyboardEntry` returned `0`. macOS Secure Keyboard Entry, when disabled, allows any process with Accessibility API access or `CGEventTapCreate` privileges to read keystrokes from the active Terminal window. On an AI workstation that sources `exports.sh` with API keys and runs sensitive operations, this is a concrete credential-theft vector for any malicious process co-resident on the machine.
+- **Fix**: Added `Enable Terminal secure keyboard entry` task to `playbook.yml` in the Screen lock section: `defaults write com.apple.Terminal SecureKeyboardEntry -bool true`. Applied directly via `defaults write`; live state confirmed `1`.
+- **Why no sudo**: This is a user-domain Terminal preference — no root required. The `defaults write com.apple.Terminal` domain is the user's own app preferences.
+- **Playbook deploy note**: Playbook stops at FileVault enforcement before reaching this task on the current machine. Applied directly to live system for immediate effect; playbook source updated for future deployments.
+- **Lesson**: macOS app-specific security settings (per-app defaults) are easy to overlook because they live in app preference domains rather than system settings. Worth checking default-disabled security features in each app used for sensitive work.
+
+**Iteration 5 (2026-03-20) — git security settings missing from playbook + transfer.fsckObjects:**
+- **Finding**: Iteration 51 applied `core.protectHFS=true`, `core.protectNTFS=true`, `fetch.fsckObjects=true` directly to `~/.gitconfig` but never added them to `playbook.yml`. They would be lost on machine rebuild. Additionally `transfer.fsckObjects` was not set — this supersedes `fetch.fsckObjects` and also validates objects received via `git am` (email-format patches).
+- **Fix**: Added four `community.general.git_config` tasks to playbook.yml git section (all four settings). Applied `transfer.fsckObjects=true` directly via `git config --global`; the other three were already live.
+- **Lesson**: Run-notes claiming "added to playbook.yml" are unreliable. Always grep the actual file to confirm. The three iteration-51 settings were live but not in the source-of-truth.
+
+**Current Run Iteration (2026-03-20) — Homebrew attestation verification:**
+- **Finding**: `HOMEBREW_VERIFY_ATTESTATIONS` was not set. Homebrew 5.1.0 + `gh` CLI 2.88.1 are both installed (prerequisites). Without this, Homebrew downloads bottles without cryptographic attestation verification — a supply-chain gap where a compromised CDN or MITM could serve a tampered bottle.
+- **Fix**: Added `export HOMEBREW_VERIFY_ATTESTATIONS=1` directly to `~/.zprofile` (live deployment without Ansible since the FileVault enforcement gate blocks playbook execution before the shell profile tasks). Added corresponding `lineinfile` task to `playbook.yml` for future deployments.
+- **Verification**: `zsh -c 'source ~/.zprofile; echo $HOMEBREW_VERIFY_ATTESTATIONS'` → `1`. New shell sessions will have attestation checking enabled.
+- **Lesson**: When the playbook has an early enforcement gate (FileVault), tasks after the gate can't be deployed via Ansible. For user-space changes (no sudo needed), direct deployment via shell is the correct fallback — update both the live file AND the playbook source.
+
+**Current Run Iteration (2026-03-20) — Login keychain no-timeout:**
+- **Finding**: `security show-keychain-info ~/Library/Keychains/login.keychain-db` returned `no-timeout`. The login keychain unlocks at login and stays unlocked indefinitely. Any user-land process (prompt-injected Claude session, malicious npm postinstall, rogue MCP server) can call `security find-generic-password` to silently drain all stored credentials without a password prompt.
+- **Fix**: Added `Set login keychain lock timeout to match screen lock (10 minutes)` task to the Screen lock section of `playbook.yml`: `security set-keychain-settings -l -t 600 <keychain>`. `-l` = also lock on sleep; `-t 600` = 600s inactivity timeout matching the screensaver idle. Applied directly to the live system. Confirmed: `lock-on-sleep timeout=600s`.
+- **Why no Ansible deploy**: The FileVault enforcement gate halts the playbook before Phase 2 tasks. Applied directly via the `security` command (no sudo needed for user's own keychain).
+- **Impact**: Forces an attacker who has user-land code execution to get a credential prompt before accessing the keychain, rather than reading it silently.
+
+**Verifier Iteration 3 (2026-03-20) — Git hardening settings in playbook:**
+- **Change verified**: Added core.protectHFS, core.protectNTFS, fetch.fsckObjects, transfer.fsckObjects to playbook.yml (scope: global).
+- **Live state confirmed**: All four settings verified true via `git config --global --get`.
+- **Bypass attempt 1**: Checked receive.fsckObjects — not explicitly set, but transfer.fsckObjects=true serves as fallback per git docs. Not a gap.
+- **Bypass attempt 2**: Local .git/config CAN override global fetch.fsckObjects (confirmed: `git config --local fetch.fsckObjects false` takes precedence). Pre-existing git architecture limitation; cannot be fixed via global config alone.
+- **Bypass attempt 3**: Playbook uses scope:global (correct for user settings; system scope would need sudo and is unnecessary here).
+- **Result**: PASS. Implementation correct. Pre-existing local-override caveat noted but not addressable at this layer.

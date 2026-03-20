@@ -370,6 +370,30 @@
       ansible.builtin.command: git config --global credential.helper ''
       changed_when: false
 
+    - name: Protect against HFS+ Unicode normalization path traversal attacks
+      community.general.git_config:
+        name: core.protectHFS
+        scope: global
+        value: "true"
+
+    - name: Protect against NTFS special-filename path traversal attacks
+      community.general.git_config:
+        name: core.protectNTFS
+        scope: global
+        value: "true"
+
+    - name: Verify object integrity on fetch (fsck all received objects)
+      community.general.git_config:
+        name: fetch.fsckObjects
+        scope: global
+        value: "true"
+
+    - name: Verify object integrity on all transfers (master switch)
+      community.general.git_config:
+        name: transfer.fsckObjects
+        scope: global
+        value: "true"
+
     # ---------------------------------------------------------------
     # System-level CLAUDE.md (applies to all projects on this machine)
     # ---------------------------------------------------------------
