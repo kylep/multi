@@ -453,6 +453,7 @@ def run_iteration(iteration: int, *, dry_run: bool) -> str:
             )
 
         log.info("Running improvement agent...")
+        discord_log(f"Iteration {iteration}: running improvement agent (attempt {attempt})", dry_run=dry_run)
         run_claude(prompt, max_turns=30, max_budget=5.00)
 
         # Read status
@@ -481,6 +482,7 @@ def run_iteration(iteration: int, *, dry_run: bool) -> str:
 
         # --- Verification phase ---
         log.info("Running verification agent...")
+        discord_log(f"{finding}: running verifier", dry_run=dry_run)
         verify_prompt = (SCRIPT_DIR / "verify-prompt.md").read_text()
         if attempt == MAX_VERIFY_RETRIES:
             verify_prompt += (
@@ -598,6 +600,7 @@ def main():
                 break
 
             log.info("Sleeping %ds before next iteration...", SLEEP_INTERVAL)
+            discord_log(f"Sleeping {SLEEP_INTERVAL // 60}min before next iteration", dry_run=args.dry_run)
             time.sleep(SLEEP_INTERVAL)
     finally:
         cleanup()
