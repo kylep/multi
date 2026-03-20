@@ -96,6 +96,9 @@ cost_gate() {
         | (.message.usage.output_tokens // 0) + (.message.usage.cache_creation_input_tokens // 0)
       ' 2>/dev/null \
     | awk '{s+=$1} END {print s+0}' || echo "0")
+  # Sanitize: ensure it's a single integer (newlines or empty → 0)
+  total_tokens="${total_tokens%%[^0-9]*}"
+  total_tokens="${total_tokens:-0}"
 
   # Cost in dollars: tokens * (rate_per_MTok / 1_000_000)
   # Use integer arithmetic in cents to avoid bc dependency
