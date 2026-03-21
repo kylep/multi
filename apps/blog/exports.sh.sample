@@ -27,4 +27,5 @@ export OPENROUTER_API_KEY=""  # openrouter.ai → Account → API Keys
 export DISCORD_BOT_TOKEN=""  # Discord Developer Portal → Bot → Token
 export DISCORD_GUILD_ID=""  # right-click server in Discord (Developer Mode) → Copy ID
 export DISCORD_LOG_CHANNEL_ID=""  # right-click channel → Copy ID
+export DISCORD_STATUS_CHANNEL_ID=""  # #status-updates channel → Copy ID
 export AI_WEBHOOK_TOKEN=""  # any strong random string for internal webhook auth
