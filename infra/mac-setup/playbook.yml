@@ -338,6 +338,13 @@
       ansible.builtin.command: defaults write com.apple.screensaver askForPasswordDelay -int 0
       changed_when: false
 
+    # AirDrop — disable to eliminate Bluetooth/WiFi file-push attack surface.
+    # This is an always-on headless AI workstation; AirDrop is never needed.
+    # AirDrop has had CVEs allowing nearby-device file delivery without consent.
+    - name: Disable AirDrop
+      ansible.builtin.command: defaults write com.apple.NetworkBrowser DisableAirDrop -bool YES
+      changed_when: false
+
     # ---------------------------------------------------------------
     # Directory structure
     # ---------------------------------------------------------------

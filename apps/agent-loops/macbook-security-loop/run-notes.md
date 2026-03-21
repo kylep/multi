@@ -1173,3 +1173,8 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - **Bypass attempt 2**: Local .git/config CAN override global fetch.fsckObjects (confirmed: `git config --local fetch.fsckObjects false` takes precedence). Pre-existing git architecture limitation; cannot be fixed via global config alone.
 - **Bypass attempt 3**: Playbook uses scope:global (correct for user settings; system scope would need sudo and is unnecessary here).
 - **Result**: PASS. Implementation correct. Pre-existing local-override caveat noted but not addressable at this layer.
+
+**Iteration 4 (2026-03-20) — AirDrop enabled:**
+- **Finding**: `defaults read com.apple.NetworkBrowser DisableAirDrop` returned NOT SET. AirDrop uses Bluetooth + WiFi for proximity-based file transfers; no authentication required from sender. An attacker within Bluetooth range could push a malicious file to the workstation's Downloads folder.
+- **Fix**: Added `Disable AirDrop` task to `playbook.yml` (after screensaver tasks, before Directory structure section): `defaults write com.apple.NetworkBrowser DisableAirDrop -bool YES`. Applied directly via `defaults` command (FileVault gate blocks Ansible from reaching this task on current machine). Verified live: returns `1`.
+- **Lesson**: User-level preferences not covered by the playbook accumulate silently. Systematic review of sharing/networking preferences (AirDrop, Bluetooth, Bonjour) is worth doing category by category.
