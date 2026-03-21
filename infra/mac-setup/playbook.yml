@@ -295,6 +295,11 @@
       become: true
       changed_when: false
 
+    - name: Enable automatic macOS version updates
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+      become: true
+      changed_when: false
+
     # ---------------------------------------------------------------
     # Computer name
     # ---------------------------------------------------------------
