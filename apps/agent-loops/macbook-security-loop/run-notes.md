@@ -1184,3 +1184,17 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - **Fix**: Added `Enable automatic macOS version updates` task to the software update section of `playbook.yml`: `defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true` with `become: true`. No direct deployment needed — live state already correct.
 - **Why no deployment**: Task requires `become: true` (writes to `/Library/Preferences`), which is behind the FileVault enforcement gate on this machine. Live value already `1`; playbook source updated for rebuild correctness.
 - **Lesson**: Rebuild-correctness gaps can accumulate when settings are set manually and not captured in the playbook. The four existing software update settings created a false sense of completeness; `AutomaticallyInstallMacOSUpdates` is the most impactful missing one (covers full OS version upgrades, not just patches).
+
+---
+## Iteration 2 — AutomaticallyInstallMacOSUpdates verification
+
+**Change verified:** playbook.yml now sets `AutomaticallyInstallMacOSUpdates -bool true` in `/Library/Preferences/com.apple.SoftwareUpdate`
+
+**Live value confirmed:** `defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates` → `1` ✓
+
+**Bypass attempts:**
+1. User-level override: `defaults write com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool false` succeeds and creates a user-level plist (reads 0 via unqualified `defaults read`), but `softwareupdated` daemon reads `/Library/Preferences/` directly — system value `1` is authoritative. Cleaned up.
+2. `com.apple.commerce AutoUpdate` domain: already `1`, no gap.
+3. System-level plist: readable without root, but write-protected — modification requires `become: true` (root), consistent with playbook.
+
+**Result:** PASS — control is effective; user-level defaults domain is not authoritative for the update daemon.
