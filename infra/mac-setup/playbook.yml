@@ -252,6 +252,14 @@
       failed_when: false
 
     # ---------------------------------------------------------------
+    # Gatekeeper — enforce code-signing and notarization checks
+    # ---------------------------------------------------------------
+    - name: Enable Gatekeeper (enforce code signing)
+      ansible.builtin.command: spctl --master-enable
+      become: true
+      changed_when: false
+
+    # ---------------------------------------------------------------
     # macOS Application Firewall
     # ---------------------------------------------------------------
     - name: Enable macOS Application Firewall
