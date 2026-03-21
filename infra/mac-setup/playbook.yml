@@ -662,6 +662,18 @@
         create: true
         mode: "0644"
 
+    # Enable Homebrew cryptographic attestation verification.
+    # Homebrew 5.1.0+ with gh CLI installed supports attestation
+    # checks on bottles via GitHub's artifact attestation API.
+    # Without this, a compromised CDN or MITM could serve tampered
+    # bottles and Homebrew would install them silently.
+    - name: Enable Homebrew bottle attestation verification
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['env']['HOME'] }}/.zprofile"
+        line: 'export HOMEBREW_VERIFY_ATTESTATIONS=1'
+        create: true
+        mode: "0644"
+
     # ---------------------------------------------------------------
     # tmux + vim configs (from kylep gists)
     # ---------------------------------------------------------------
