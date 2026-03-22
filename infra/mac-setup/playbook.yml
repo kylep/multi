@@ -929,7 +929,7 @@
       ansible.builtin.file:
         path: /var/log/security-scans
         state: directory
-        mode: "0750"
+        mode: "0755"
         owner: root
         group: wheel
       become: true
