@@ -64,6 +64,14 @@
       ansible.builtin.debug:
         msg: "{{ launchd_status.stdout_lines[:5] }}"
 
+    - name: Fix Lynis file ownership for root execution (Lynis requires own files owned by root)
+      ansible.builtin.file:
+        path: /opt/homebrew/Cellar/lynis
+        state: directory
+        owner: root
+        group: wheel
+        recurse: true
+
     - name: Run scan now
       ansible.builtin.command: /usr/local/bin/security-daily-scan.sh
       timeout: 1200
