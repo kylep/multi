@@ -12,9 +12,8 @@
   gather_facts: true
   become: true
 
-  vars:
-    user_home: "{{ ansible_facts['env']['SUDO_USER'] | default(ansible_facts['env']['HOME']) }}"
-    brew_user: "{{ ansible_facts['env']['SUDO_USER'] | default('pai') }}"
+  vars_files:
+    - vars/machine.yml
 
   tasks:
 
@@ -64,6 +63,10 @@
     - name: Show LaunchDaemon status
       ansible.builtin.debug:
         msg: "{{ launchd_status.stdout_lines[:5] }}"
+
+    - name: Refresh rkhunter property database after SSH config changes
+      ansible.builtin.command: /opt/homebrew/bin/rkhunter --propupd --nocolors
+      changed_when: false
 
     - name: Run scan now
       ansible.builtin.command: /usr/local/bin/security-daily-scan.sh

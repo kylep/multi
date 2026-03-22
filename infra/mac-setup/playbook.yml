@@ -11,6 +11,9 @@
   connection: local
   gather_facts: true
 
+  vars_files:
+    - vars/machine.yml
+
   vars:
     repo_dir: "{{ ansible_facts['env']['HOME'] }}/gh/multi"
     homebrew_taps:
@@ -969,6 +972,36 @@
           ALLOWPROMISCIF=en2
           ALLOWPROMISCIF=vmenet0
 
+    - name: Configure rkhunter — point to macOS SSH config directory
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?SSH_CONFIG_DIR='
+        line: 'SSH_CONFIG_DIR=/etc/ssh'
+
+    - name: Configure rkhunter — disable tests that produce macOS false positives
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^DISABLE_TESTS='
+        line: 'DISABLE_TESTS=suspscan hidden_ports hidden_procs deleted_files packet_cap_apps apps promisc startup_files'
+
+    - name: Configure rkhunter — set macOS-appropriate startup paths
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?STARTUP_PATHS='
+        line: 'STARTUP_PATHS=/Library/LaunchDaemons /Library/LaunchAgents'
+
+    - name: Configure rkhunter — whitelist macOS hidden system file
+      ansible.builtin.blockinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        marker: "# {mark} ANSIBLE MANAGED — macOS hidden file whitelists"
+        insertafter: '^#ALLOWHIDDENFILE=/usr/share/man/man1/..1.gz'
+        block: |
+          ALLOWHIDDENFILE=/usr/share/man/man5/.rhosts.5
+
+    - name: Configure rkhunter — initialize property database (rkhunter.dat)
+      ansible.builtin.command: /opt/homebrew/bin/rkhunter --propupd --nocolors
+      changed_when: false
+
     # ---------------------------------------------------------------
     # Daily security scan — LaunchDaemon runs at 06:00 as root
     # Logs to /var/log/security-scans/
@@ -990,9 +1023,6 @@
         mode: "0750"
         owner: root
         group: wheel
-      vars:
-        user_home: "{{ ansible_facts['env']['HOME'] }}"
-        brew_user: "{{ ansible_facts['env']['USER'] }}"
       become: true
       ignore_errors: true
 
