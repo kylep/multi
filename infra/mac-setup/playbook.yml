@@ -922,6 +922,54 @@
       failed_when: false
 
     # ---------------------------------------------------------------
+    # rkhunter configuration — macOS-specific whitelists
+    # Owned by pai, no sudo needed
+    # ---------------------------------------------------------------
+    - name: Configure rkhunter — log to scan directory (world-readable after chmod)
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^LOGFILE='
+        line: 'LOGFILE=/var/log/security-scans/rkhunter-verbose.log'
+
+    - name: Configure rkhunter — disable Linux package manager checks (macOS)
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?PKGMGR='
+        line: 'PKGMGR=NONE'
+
+    - name: Configure rkhunter — SSH root login should not be allowed
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?ALLOW_SSH_ROOT_USER='
+        line: 'ALLOW_SSH_ROOT_USER=no'
+
+    - name: Configure rkhunter — SSH protocol v1 should not be allowed
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?ALLOW_SSH_PROT_V1='
+        line: 'ALLOW_SSH_PROT_V1=0'
+
+    - name: Configure rkhunter — whitelist macOS script hash mismatches (false positives)
+      ansible.builtin.blockinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        marker: "# {mark} ANSIBLE MANAGED — macOS script whitelists"
+        insertafter: '^#SCRIPTWHITELIST=/usr/bin/groups'
+        block: |
+          SCRIPTWHITELIST=/usr/bin/fuser
+          SCRIPTWHITELIST=/usr/bin/whatis
+          SCRIPTWHITELIST=/usr/bin/shasum
+
+    - name: Configure rkhunter — whitelist macOS promiscuous interfaces (Thunderbolt/virtualization)
+      ansible.builtin.blockinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        marker: "# {mark} ANSIBLE MANAGED — promiscuous interface whitelists"
+        insertafter: '^#ALLOWPROMISCIF=eth0'
+        block: |
+          ALLOWPROMISCIF=en1
+          ALLOWPROMISCIF=en2
+          ALLOWPROMISCIF=vmenet0
+
+    # ---------------------------------------------------------------
     # Daily security scan — LaunchDaemon runs at 06:00 as root
     # Logs to /var/log/security-scans/
     # ---------------------------------------------------------------

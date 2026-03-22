@@ -78,3 +78,15 @@
       ansible.builtin.file:
         path: /var/spool/uucp
         mode: "0750"
+
+    - name: Harden SSH — disable root login (rkhunter SSH-7412)
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin no'
+
+    - name: Harden SSH — enforce protocol v2 only (rkhunter SSH-7408)
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Protocol '
+        line: 'Protocol 2'

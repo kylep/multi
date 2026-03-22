@@ -1,8 +1,9 @@
 #!/bin/zsh
 # Daily security scan — deployed by Ansible, run by LaunchDaemon at 06:00
 # Logs to /var/log/security-scans/YYYY-MM-DD-<tool>.log
+# scan.log = human-readable summary; verbose logs per tool for deep inspection
 
-set -euo pipefail
+set -uo pipefail
 
 DATE=$(date +%Y-%m-%d)
 LOG_DIR=/var/log/security-scans
@@ -11,31 +12,52 @@ mkdir -p "$LOG_DIR"
 # Rotate logs older than 30 days
 find "$LOG_DIR" -name "*.log" -mtime +30 -delete 2>/dev/null || true
 
-echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Starting daily security scan" >> "$LOG_DIR/scan.log"
+log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*" >> "$LOG_DIR/scan.log"; }
+
+log "=== Starting daily security scan ==="
 
 # --- Lynis ---
-echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Running Lynis..." >> "$LOG_DIR/scan.log"
+log "Running Lynis..."
+_start=$SECONDS
 /opt/homebrew/bin/lynis audit system --no-colors --quiet \
-  > "$LOG_DIR/${DATE}-lynis.log" 2>&1 && \
-  grep "Hardening index" "$LOG_DIR/${DATE}-lynis.log" >> "$LOG_DIR/scan.log" || true
+  > "$LOG_DIR/${DATE}-lynis.log" 2>&1
+_rc=$?
+_elapsed=$(( SECONDS - _start ))
+log "Lynis complete (exit=${_rc}, ${_elapsed}s)"
+grep -E "Hardening index" "$LOG_DIR/${DATE}-lynis.log" >> "$LOG_DIR/scan.log" 2>/dev/null || true
+_sug=$(grep -c "Suggestion" "$LOG_DIR/${DATE}-lynis.log" 2>/dev/null || echo 0)
+_warn=$(grep -c "Warning" "$LOG_DIR/${DATE}-lynis.log" 2>/dev/null || echo 0)
+log "Lynis: ${_warn} warnings, ${_sug} suggestions — see ${DATE}-lynis.log"
 
 # --- rkhunter ---
-echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Running rkhunter..." >> "$LOG_DIR/scan.log"
+log "Running rkhunter..."
+_start=$SECONDS
 /opt/homebrew/bin/rkhunter --update --nocolors --sk > /dev/null 2>&1 || true
 /opt/homebrew/bin/rkhunter --check --skip-keypress --nocolors \
   > "$LOG_DIR/${DATE}-rkhunter.log" 2>&1
-grep -E "Warning|Infected|rootkit" "$LOG_DIR/${DATE}-rkhunter.log" \
-  >> "$LOG_DIR/scan.log" 2>/dev/null || \
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] rkhunter: no warnings" >> "$LOG_DIR/scan.log"
+_rc=$?
+_elapsed=$(( SECONDS - _start ))
+# Make verbose log (LOGFILE in rkhunter.conf) world-readable for debugging
+chmod 644 "$LOG_DIR/rkhunter-verbose.log" 2>/dev/null || true
+log "rkhunter complete (exit=${_rc}, ${_elapsed}s)"
+_warn=$(grep -c "Warning" "$LOG_DIR/${DATE}-rkhunter.log" 2>/dev/null || echo 0)
+log "rkhunter: ${_warn} warnings — see ${DATE}-rkhunter.log and rkhunter-verbose.log"
+grep "Warning" "$LOG_DIR/${DATE}-rkhunter.log" >> "$LOG_DIR/scan.log" 2>/dev/null || true
 
 # --- mSCP CIS Level 1 ---
 MSCP_SCRIPT="{{ user_home }}/tools/macos_security/build/cis_lvl1/cis_lvl1_compliance.sh"
 if [[ -x "$MSCP_SCRIPT" ]]; then
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Running mSCP CIS Level 1..." >> "$LOG_DIR/scan.log"
+  log "Running mSCP CIS Level 1..."
+  _start=$SECONDS
   "$MSCP_SCRIPT" > "$LOG_DIR/${DATE}-mscp.log" 2>&1
-  grep -E "pass|fail|PASS|FAIL" "$LOG_DIR/${DATE}-mscp.log" | tail -5 >> "$LOG_DIR/scan.log" || true
+  _rc=$?
+  _elapsed=$(( SECONDS - _start ))
+  log "mSCP complete (exit=${_rc}, ${_elapsed}s)"
+  _pass=$(grep -ciE "^pass" "$LOG_DIR/${DATE}-mscp.log" 2>/dev/null || echo 0)
+  _fail=$(grep -ciE "^fail" "$LOG_DIR/${DATE}-mscp.log" 2>/dev/null || echo 0)
+  log "mSCP CIS L1: ${_pass} pass, ${_fail} fail — see ${DATE}-mscp.log"
 else
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] mSCP script not found, skipping" >> "$LOG_DIR/scan.log"
+  log "mSCP script not found at ${MSCP_SCRIPT} — skipping (run security-scan-setup.yml)"
 fi
 
-echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Daily security scan complete" >> "$LOG_DIR/scan.log"
+log "=== Daily security scan complete ==="
