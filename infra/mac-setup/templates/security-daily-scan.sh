@@ -17,9 +17,12 @@ log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*" >> "$LOG_DIR/scan.log"; }
 log "=== Starting daily security scan ==="
 
 # --- Lynis ---
+# Run as the brew-owning user to avoid Lynis's ownership check (it refuses
+# to run as root if its own files aren't owned by root — Homebrew owns them).
 log "Running Lynis..."
 _start=$SECONDS
-/opt/homebrew/bin/lynis audit system --no-colors --quiet \
+su -l {{ brew_user }} -c \
+  "/opt/homebrew/bin/lynis audit system --no-colors --quiet" \
   > "$LOG_DIR/${DATE}-lynis.log" 2>&1
 _rc=$?
 _elapsed=$(( SECONDS - _start ))

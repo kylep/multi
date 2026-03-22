@@ -992,6 +992,7 @@
         group: wheel
       vars:
         user_home: "{{ ansible_facts['env']['HOME'] }}"
+        brew_user: "{{ ansible_facts['env']['USER'] }}"
       become: true
       ignore_errors: true
 
