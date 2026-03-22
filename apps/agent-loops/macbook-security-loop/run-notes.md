@@ -1224,6 +1224,13 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - **Side observation**: Run-notes iteration 11 claimed to add firewall removal tasks (python3/ruby/cupsd) to `playbook.yml` but `grep` confirms they are NOT present. Classic documentation-divergence — `grep` is the only reliable truth.
 - **Lesson**: Cross-check every "applied directly + added to playbook" claim with grep before moving on. This iteration caught the HOMEBREW_VERIFY gap; firewall removal tasks remain uncaptured in playbook (candidate for next iteration).
 
+**Manual removal (2026-03-22) — protect-sensitive.sh hook deleted and removed from playbook:**
+- **What it was**: A PreToolUse hook that blocked Claude from reading/sourcing sensitive files (exports.sh, .env, .ssh keys, secrets/) to prevent credential exfiltration via prompt injection.
+- **What it broke**: `exports.sh` exists specifically so Claude can generate GitHub App tokens for git push. The hook blocked `source exports.sh` entirely, which meant Claude could never push to GitHub autonomously. This defeats the entire point of running an AI agent on this machine.
+- **Root cause**: The hook treated all access to exports.sh as exfiltration, with no way to distinguish legitimate operational use (Claude sourcing its own credentials) from a prompt injection attack. A hook that can't distinguish friend from foe will always break the thing it's protecting.
+- **Do not re-add in this form**: Any future credential-protection hook must either (a) allow sourcing exports.sh explicitly while blocking print/read of its values, or (b) use a different mechanism (e.g., a dedicated credentials helper that returns tokens without exposing raw keys). The current hook pattern is fundamentally incompatible with an AI agent that needs credentials to operate.
+- **What remains**: `block-destructive.sh` (blocks rm -rf, git reset --hard, etc.) and `audit-log.sh` (logs all tool calls) are still active and unaffected.
+
 **Manual revert (2026-03-22) — protectHFS, protectNTFS, fetch.fsckObjects, transfer.fsckObjects removed:**
 - **Reason**: These four git settings were added in iteration 7 but provide no meaningful protection on this machine. `protectHFS`/`protectNTFS` guard against path-traversal attacks on filesystems this machine doesn't use (APFS is neither HFS+ nor NTFS). `fetch.fsckObjects`/`transfer.fsckObjects` guard against a malicious git server sending corrupted objects — not a credible threat when the only remote is GitHub, which validates objects server-side.
 - **Practical harm**: `fetch.fsckObjects` caused macOS to prompt for the login keychain password via the `security` binary during git operations, breaking agent autonomy and surfacing as a suspicious UI prompt with no security benefit.

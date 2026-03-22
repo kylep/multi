@@ -499,7 +499,6 @@
       ansible.builtin.command: >
         chflags nouchg
         {{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh
-        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh
         {{ ansible_facts['env']['HOME'] }}/.claude/hooks/audit-log.sh
         {{ ansible_facts['env']['HOME'] }}/.claude/settings.json
       become: true
@@ -510,12 +509,6 @@
       ansible.builtin.copy:
         src: hooks/block-destructive.sh
         dest: "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh"
-        mode: "0755"
-
-    - name: Write protect-sensitive hook
-      ansible.builtin.copy:
-        src: hooks/protect-sensitive.sh
-        dest: "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh"
         mode: "0755"
 
     - name: Write audit-log hook
@@ -548,13 +541,6 @@
                     "command": "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh"
                   }]
                 },
-                {
-                  "matcher": "Read|Edit|Write|Bash|Grep|Glob",
-                  "hooks": [{
-                    "type": "command",
-                    "command": "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh"
-                  }]
-                }
               ],
               "PostToolUse": [
                 {
@@ -572,7 +558,6 @@
       ansible.builtin.command: >
         chflags uchg
         {{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh
-        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh
         {{ ansible_facts['env']['HOME'] }}/.claude/hooks/audit-log.sh
         {{ ansible_facts['env']['HOME'] }}/.claude/settings.json
       become: true
