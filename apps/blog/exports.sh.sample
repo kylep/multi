@@ -10,6 +10,7 @@ export GOOGLE_API_KEY="$GEMINI_API_KEY"
 export BFL_API_KEY=""
 export OPENCODE_API_KEY=""
 export CLAUDE_CODE_OAUTH_TOKEN=""  # run: claude setup-token
+export CURSOR_API_KEY=""  # cursor.com/dashboard/cloud-agents → User API Keys
 
 # GitHub App — PericakAI (github.com/settings/apps/pericakai)
 export GITHUB_APP_CLIENT_SECRET=""
