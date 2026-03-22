@@ -17,4 +17,4 @@ or produces output below the quality bar, we write it up here.
 
 | Date | Incident | Status |
 |------|----------|--------|
-| _No entries yet_ | — | — |
+| 2026-03-22 | [Security loop: lower impact than expected](security-loop-low-impact.html) | closed |
