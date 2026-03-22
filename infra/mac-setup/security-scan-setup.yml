@@ -64,11 +64,10 @@
       ansible.builtin.debug:
         msg: "{{ launchd_status.stdout_lines[:5] }}"
 
-    - name: Run scan immediately on first deploy
+    - name: Run scan now
       ansible.builtin.command: /usr/local/bin/security-daily-scan.sh
-      when: scan_plist is changed
-      async: 300
-      poll: 0
+      timeout: 300
+      changed_when: false
 
     - name: Fix sshd_config permissions (Lynis FILE-7524)
       ansible.builtin.file:
