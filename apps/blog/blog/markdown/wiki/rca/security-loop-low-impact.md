@@ -118,11 +118,27 @@ more stable initial implementation would have recovered this time for actual fin
 
 ## Action Items
 
-| # | Action | Why |
-|---|--------|-----|
-| 1 | **Lead with a scanner.** Run Lynis or equivalent before any LLM-driven iteration. Loop works the scored finding list top-down. | Replaces intuition-based discovery with ground truth |
-| 2 | **Add deployment verification gate.** After each fix: `ansible-playbook --check`. Finding not closed until playbook enforces it with zero drift. | Breaks the re-finding loop caused by ad-hoc deployments |
-| 3 | **Separate playbook-drift pass.** Tag and defer "live but not in playbook" findings. Run them as a batched cleanup, not interleaved with live-gap work. | Eliminates low-urgency noise from the core loop |
-| 4 | **Tier findings before acting.** P0 = live exploitable now, P1 = exploitable on rebuild, P2 = defense-in-depth. Address in order. | Prevents low-impact work crowding out high-impact work |
-| 5 | **Architecture review in iteration 1.** If a proposed control requires the agent to bypass itself to deploy, reject it before iterating. | Avoids the protect-sensitive.sh sunk cost |
-| 6 | **Cap meta-work.** Loop mechanics improvements are scheduled, not reactive. One meta-commit per 10 finding commits maximum. | Protects finding time from loop self-improvement |
+| # | Action | Status | Why |
+|---|--------|--------|-----|
+| 1 | **Lead with a scanner.** Run Lynis or equivalent before any LLM-driven iteration. Loop works the scored finding list top-down. | **done** — Lynis installed, scored 68/100, findings actioned below | Replaces intuition-based discovery with ground truth |
+| 2 | **Add deployment verification gate.** After each fix: `ansible-playbook --check`. Finding not closed until playbook enforces it with zero drift. | open | Breaks the re-finding loop caused by ad-hoc deployments |
+| 3 | **Separate playbook-drift pass.** Tag and defer "live but not in playbook" findings. Run them as a batched cleanup, not interleaved with live-gap work. | open | Eliminates low-urgency noise from the core loop |
+| 4 | **Tier findings before acting.** P0 = live exploitable now, P1 = exploitable on rebuild, P2 = defense-in-depth. Address in order. | open | Prevents low-impact work crowding out high-impact work |
+| 5 | **Architecture review in iteration 1.** If a proposed control requires the agent to bypass itself to deploy, reject it before iterating. | open | Avoids the protect-sensitive.sh sunk cost |
+| 6 | **Cap meta-work.** Loop mechanics improvements are scheduled, not reactive. One meta-commit per 10 finding commits maximum. | open | Protects finding time from loop self-improvement |
+
+## Lynis Scan Results (2026-03-22)
+
+Hardening index: **68/100**. Run non-privileged (6 tests skipped). No warnings, 14 suggestions.
+
+| Finding | Lynis ID | Severity | Action taken |
+|---------|----------|----------|--------------|
+| `/etc/ssh/sshd_config` is mode 644, should be 600 | FILE-7524 | P1 | Added playbook task — applies on next `-K` run |
+| `/var/spool/uucp` is mode 755, should be 750 | HOME-9304 | P2 | Added playbook task — applies on next `-K` run |
+| No malware/rootkit scanner installed | HRDN-7230 | P1 | `rkhunter` installed and added to playbook |
+| Compilers world-executable | HRDN-7222 | N/A | Not actionable — `/usr/bin/clang` etc. are SIP-protected |
+| PAM password strength not configured | AUTH-9262 | N/A | Not applicable — macOS uses its own auth stack, not PAM |
+| Symlinked mount points | FILE-6310 | N/A | Expected macOS behavior (`/home`, `/tmp`, `/var` are symlinks) |
+| Apache mod_evasive/modsecurity missing | HTTP-6640/6643 | N/A | Apache not running as a production server |
+| DNS domain name not configured | NAME-4028/4404 | N/A | Not relevant for this workstation |
+| No package audit tool | PKGS-7398 | N/A | Trivy already covers this |

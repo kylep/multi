@@ -34,6 +34,8 @@
       - tailscale  # CLI/daemon version — supports Tailscale SSH (not the sandboxed App Store cask)
       - tmux
       - vim
+      - lynis     # security auditor — run periodically to get hardening score
+      - rkhunter  # rootkit scanner — satisfies HRDN-7230, run with: rkhunter --check
     homebrew_casks:
       - google-chrome
       - iterm2
@@ -248,6 +250,20 @@
       ansible.builtin.command: launchctl load -w /System/Library/LaunchDaemons/ssh.plist
       become: true
       changed_when: false
+      ignore_errors: true
+
+    - name: Restrict sshd_config permissions to 600 (Lynis FILE-7524)
+      ansible.builtin.file:
+        path: /etc/ssh/sshd_config
+        mode: "0600"
+      become: true
+      ignore_errors: true
+
+    - name: Restrict /var/spool/uucp permissions to 750 (Lynis HOME-9304)
+      ansible.builtin.file:
+        path: /var/spool/uucp
+        mode: "0750"
+      become: true
       ignore_errors: true
 
     # ---------------------------------------------------------------
