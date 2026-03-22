@@ -922,6 +922,51 @@
       failed_when: false
 
     # ---------------------------------------------------------------
+    # Daily security scan — LaunchDaemon runs at 06:00 as root
+    # Logs to /var/log/security-scans/
+    # ---------------------------------------------------------------
+    - name: Create security scan log directory
+      ansible.builtin.file:
+        path: /var/log/security-scans
+        state: directory
+        mode: "0750"
+        owner: root
+        group: wheel
+      become: true
+      ignore_errors: true
+
+    - name: Deploy daily security scan script
+      ansible.builtin.template:
+        src: templates/security-daily-scan.sh
+        dest: /usr/local/bin/security-daily-scan.sh
+        mode: "0750"
+        owner: root
+        group: wheel
+      vars:
+        user_home: "{{ ansible_facts['env']['HOME'] }}"
+      become: true
+      ignore_errors: true
+
+    - name: Deploy security scan LaunchDaemon plist
+      ansible.builtin.copy:
+        src: templates/com.pericakai.security-scan.plist
+        dest: /Library/LaunchDaemons/com.pericakai.security-scan.plist
+        mode: "0644"
+        owner: root
+        group: wheel
+      become: true
+      ignore_errors: true
+      register: scan_plist
+
+    - name: Load security scan LaunchDaemon
+      ansible.builtin.command: >
+        launchctl bootstrap system
+        /Library/LaunchDaemons/com.pericakai.security-scan.plist
+      become: true
+      when: scan_plist is changed
+      ignore_errors: true
+
+    # ---------------------------------------------------------------
     # Summary
     # ---------------------------------------------------------------
     - name: Bootstrap summary

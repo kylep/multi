@@ -1,0 +1,75 @@
+# security-scan-setup.yml
+# Sets up the daily security scan LaunchDaemon (runs as root at 06:00).
+# Run separately from the main playbook because it needs sudo throughout:
+#
+#   ansible-playbook infra/mac-setup/security-scan-setup.yml -K
+#
+# This is idempotent — safe to re-run.
+
+- name: Configure daily security scans
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+
+  vars:
+    user_home: "{{ ansible_facts['env']['SUDO_USER'] | default(ansible_facts['env']['HOME']) }}"
+
+  tasks:
+
+    - name: Create security scan log directory
+      ansible.builtin.file:
+        path: /var/log/security-scans
+        state: directory
+        mode: "0750"
+        owner: root
+        group: wheel
+
+    - name: Deploy daily security scan script
+      ansible.builtin.template:
+        src: templates/security-daily-scan.sh
+        dest: /usr/local/bin/security-daily-scan.sh
+        mode: "0750"
+        owner: root
+        group: wheel
+
+    - name: Deploy security scan LaunchDaemon plist
+      ansible.builtin.copy:
+        src: templates/com.pericakai.security-scan.plist
+        dest: /Library/LaunchDaemons/com.pericakai.security-scan.plist
+        mode: "0644"
+        owner: root
+        group: wheel
+      register: scan_plist
+
+    - name: Unload existing LaunchDaemon if present (for re-deploy)
+      ansible.builtin.command: >
+        launchctl bootout system
+        /Library/LaunchDaemons/com.pericakai.security-scan.plist
+      when: scan_plist is changed
+      failed_when: false
+
+    - name: Load security scan LaunchDaemon
+      ansible.builtin.command: >
+        launchctl bootstrap system
+        /Library/LaunchDaemons/com.pericakai.security-scan.plist
+      when: scan_plist is changed
+
+    - name: Verify LaunchDaemon is registered
+      ansible.builtin.command: launchctl print system/com.pericakai.security-scan
+      changed_when: false
+      register: launchd_status
+
+    - name: Show LaunchDaemon status
+      ansible.builtin.debug:
+        msg: "{{ launchd_status.stdout_lines[:5] }}"
+
+    - name: Fix sshd_config permissions (Lynis FILE-7524)
+      ansible.builtin.file:
+        path: /etc/ssh/sshd_config
+        mode: "0600"
+
+    - name: Fix /var/spool/uucp permissions (Lynis HOME-9304)
+      ansible.builtin.file:
+        path: /var/spool/uucp
+        mode: "0750"
