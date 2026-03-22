@@ -1224,6 +1224,12 @@ mechanism for human-in-the-loop oversight of an autonomous agent.
 - **Side observation**: Run-notes iteration 11 claimed to add firewall removal tasks (python3/ruby/cupsd) to `playbook.yml` but `grep` confirms they are NOT present. Classic documentation-divergence — `grep` is the only reliable truth.
 - **Lesson**: Cross-check every "applied directly + added to playbook" claim with grep before moving on. This iteration caught the HOMEBREW_VERIFY gap; firewall removal tasks remain uncaptured in playbook (candidate for next iteration).
 
+**Manual revert (2026-03-22) — protectHFS, protectNTFS, fetch.fsckObjects, transfer.fsckObjects removed:**
+- **Reason**: These four git settings were added in iteration 7 but provide no meaningful protection on this machine. `protectHFS`/`protectNTFS` guard against path-traversal attacks on filesystems this machine doesn't use (APFS is neither HFS+ nor NTFS). `fetch.fsckObjects`/`transfer.fsckObjects` guard against a malicious git server sending corrupted objects — not a credible threat when the only remote is GitHub, which validates objects server-side.
+- **Practical harm**: `fetch.fsckObjects` caused macOS to prompt for the login keychain password via the `security` binary during git operations, breaking agent autonomy and surfacing as a suspicious UI prompt with no security benefit.
+- **Fix**: Removed all four tasks from `playbook.yml` and unset them live with `git config --global --unset`.
+- **Lesson**: Security controls must be proportionate to the actual threat model. Controls that break operational workflows without reducing real risk are net negatives — they erode trust in the security posture and create friction without payoff.
+
 ## Iteration 13 — Verifier
 
 - **Control**: `HOMEBREW_VERIFY_ATTESTATIONS=1` in `~/.zprofile` via `lineinfile` playbook task.
