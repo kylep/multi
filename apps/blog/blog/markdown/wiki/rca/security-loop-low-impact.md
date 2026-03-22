@@ -120,12 +120,25 @@ more stable initial implementation would have recovered this time for actual fin
 
 | # | Action | Status | Why |
 |---|--------|--------|-----|
-| 1 | **Lead with a scanner.** Run Lynis or equivalent before any LLM-driven iteration. Loop works the scored finding list top-down. | **done** — Lynis installed, scored 68/100, findings actioned below | Replaces intuition-based discovery with ground truth |
+| 1 | **Lead with a scanner.** Run Lynis or equivalent before any LLM-driven iteration. Loop works the scored finding list top-down. | **done** — Lynis installed (68/100, findings actioned below); NIST mSCP installed for macOS-native CIS Level 1 auditing | Replaces intuition-based discovery with ground truth |
 | 2 | **Add deployment verification gate.** After each fix: `ansible-playbook --check`. Finding not closed until playbook enforces it with zero drift. | open | Breaks the re-finding loop caused by ad-hoc deployments |
 | 3 | **Separate playbook-drift pass.** Tag and defer "live but not in playbook" findings. Run them as a batched cleanup, not interleaved with live-gap work. | open | Eliminates low-urgency noise from the core loop |
 | 4 | **Tier findings before acting.** P0 = live exploitable now, P1 = exploitable on rebuild, P2 = defense-in-depth. Address in order. | open | Prevents low-impact work crowding out high-impact work |
 | 5 | **Architecture review in iteration 1.** If a proposed control requires the agent to bypass itself to deploy, reject it before iterating. | open | Avoids the protect-sensitive.sh sunk cost |
 | 6 | **Cap meta-work.** Loop mechanics improvements are scheduled, not reactive. One meta-commit per 10 finding commits maximum. | open | Protects finding time from loop self-improvement |
+
+## Scanners Installed
+
+| Tool | Source | Scope | Run with |
+|------|--------|-------|----------|
+| **Lynis** | `brew install lynis` | Linux-first, non-privileged checks | `lynis audit system` |
+| **rkhunter** | `brew install rkhunter` | Rootkit detection | `rkhunter --check` |
+| **NIST mSCP** | Cloned to `~/tools/macos_security` (tahoe branch) | macOS CIS Level 1, macOS-native checks | `sudo ~/tools/macos_security/build/cis_lvl1/cis_lvl1_compliance.sh` |
+
+mSCP requires root and generates a compliance script from the CIS Level 1 baseline. Re-generate after OS upgrades:
+```
+cd ~/tools/macos_security && .venv/bin/python3 scripts/generate_guidance.py baselines/cis_lvl1.yaml -s
+```
 
 ## Lynis Scan Results (2026-03-22)
 

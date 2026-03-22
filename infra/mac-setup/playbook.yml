@@ -888,6 +888,40 @@
       when: dock_removed is changed
 
     # ---------------------------------------------------------------
+    # macOS Security Compliance Project (mSCP) — NIST-backed macOS auditor
+    # https://github.com/usnistgov/macos_security
+    # Usage: cd ~/tools/macos_security && python3 scripts/generate_guidance.py baselines/cis_lvl1.yaml -s
+    #        Then run the generated script in build/
+    # ---------------------------------------------------------------
+    - name: Clone / update macos_security (NIST mSCP)
+      ansible.builtin.git:
+        repo: https://github.com/usnistgov/macos_security.git
+        dest: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security"
+        version: tahoe
+        update: true
+        depth: 1
+
+    - name: Create mSCP Python venv
+      ansible.builtin.command:
+        cmd: python3 -m venv .venv
+        chdir: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security"
+        creates: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security/.venv"
+
+    - name: Install mSCP Python requirements into venv
+      ansible.builtin.pip:
+        requirements: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security/requirements.txt"
+        virtualenv: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security/.venv"
+        state: present
+
+    - name: Pre-generate CIS Level 1 audit script
+      ansible.builtin.command:
+        cmd: >
+          .venv/bin/python3 scripts/generate_guidance.py baselines/cis_lvl1.yaml -s
+        chdir: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security"
+      changed_when: false
+      failed_when: false
+
+    # ---------------------------------------------------------------
     # Summary
     # ---------------------------------------------------------------
     - name: Bootstrap summary
