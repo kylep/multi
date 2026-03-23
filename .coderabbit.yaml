@@ -4,6 +4,7 @@ reviews:
   high_level_summary: true
   auto_review:
     enabled: true
+    ignore_bots: false
     base_branches:
       - main
 

@@ -1,0 +1,5 @@
+# Machine-specific variables shared across all mac-setup playbooks.
+# Edit this file when the primary user or home directory changes.
+
+brew_user: "pai"
+user_home: "/Users/pai"

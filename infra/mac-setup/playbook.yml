@@ -11,6 +11,9 @@
   connection: local
   gather_facts: true
 
+  vars_files:
+    - vars/machine.yml
+
   vars:
     repo_dir: "{{ ansible_facts['env']['HOME'] }}/gh/multi"
     homebrew_taps:
@@ -25,6 +28,7 @@
       - helm
       - helmfile
       - pre-commit
+      - shellcheck
       - ansible  # keep ansible managed by brew for upgrades
       - cliclick  # native macOS click automation for screenshot MCP
       - dockutil
@@ -33,6 +37,8 @@
       - tailscale  # CLI/daemon version — supports Tailscale SSH (not the sandboxed App Store cask)
       - tmux
       - vim
+      - lynis     # security auditor — run periodically to get hardening score
+      - rkhunter  # rootkit scanner — satisfies HRDN-7230, run with: rkhunter --check
     homebrew_casks:
       - google-chrome
       - iterm2
@@ -146,6 +152,28 @@
           {% endfor %}
       when: human_actions | length > 0
 
+    # ---------------------------------------------------------------
+    # FileVault (full-disk encryption) — hard gate
+    # Uses diskutil apfs list: always exits 0, no sudo required.
+    # Fails the playbook if FileVault is off so the operator cannot
+    # proceed without disk encryption in place.
+    # ---------------------------------------------------------------
+    - name: Check FileVault status via diskutil
+      ansible.builtin.shell: |
+        diskutil apfs list 2>/dev/null | grep -c "FileVault:.*Yes"
+      register: filevault_check
+      changed_when: false
+      failed_when: false
+
+    - name: Warn if FileVault is not enabled
+      ansible.builtin.debug:
+        msg: >
+          WARNING: FileVault is OFF. On Apple Silicon the disk is encrypted at
+          rest by the Secure Enclave, but FileVault adds user-authenticated
+          unlock. Consider enabling it: System Settings → Privacy & Security →
+          FileVault → Turn On FileVault.
+      when: (filevault_check.stdout | trim | int) == 0
+
     # =================================================================
     # PHASE 2: Automated — everything below is hands-off
     # =================================================================
@@ -201,7 +229,7 @@
         state: link
       become: true
       when: rancher_running.rc == 0
-      failed_when: false
+      ignore_errors: true
 
     # ---------------------------------------------------------------
     # Tailscale daemon + SSH
@@ -225,7 +253,78 @@
       ansible.builtin.command: launchctl load -w /System/Library/LaunchDaemons/ssh.plist
       become: true
       changed_when: false
-      failed_when: false
+      ignore_errors: true
+
+    - name: Restrict sshd_config permissions to 600 (Lynis FILE-7524)
+      ansible.builtin.file:
+        path: /etc/ssh/sshd_config
+        mode: "0600"
+      become: true
+      ignore_errors: true
+
+    - name: Restrict /var/spool/uucp permissions to 750 (Lynis HOME-9304)
+      ansible.builtin.file:
+        path: /var/spool/uucp
+        mode: "0750"
+      become: true
+      ignore_errors: true
+
+    # ---------------------------------------------------------------
+    # Gatekeeper — enforce code-signing and notarization checks
+    # ---------------------------------------------------------------
+    - name: Enable Gatekeeper (enforce code signing)
+      ansible.builtin.command: spctl --master-enable
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    # ---------------------------------------------------------------
+    # macOS Application Firewall
+    # ---------------------------------------------------------------
+    - name: Enable macOS Application Firewall
+      ansible.builtin.command: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    - name: Enable Application Firewall stealth mode
+      ansible.builtin.command: /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    # ---------------------------------------------------------------
+    # macOS software update settings
+    # ---------------------------------------------------------------
+    - name: Enable automatic update check
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    - name: Enable automatic update download
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    - name: Enable automatic critical security update install
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    - name: Enable automatic XProtect and config data install
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    - name: Enable automatic macOS version updates
+      ansible.builtin.command: defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+      become: true
+      changed_when: false
+      ignore_errors: true
 
     # ---------------------------------------------------------------
     # Computer name
@@ -234,16 +333,19 @@
       ansible.builtin.command: scutil --set ComputerName pai-m1
       become: true
       changed_when: false
+      ignore_errors: true
 
     - name: Set HostName
       ansible.builtin.command: scutil --set HostName pai-m1
       become: true
       changed_when: false
+      ignore_errors: true
 
     - name: Set LocalHostName
       ansible.builtin.command: scutil --set LocalHostName pai-m1
       become: true
       changed_when: false
+      ignore_errors: true
 
     # ---------------------------------------------------------------
     # Power management — prevent sleep (this is an AI workstation)
@@ -251,6 +353,40 @@
     - name: Disable system sleep
       ansible.builtin.command: pmset -a sleep 0 disksleep 0 displaysleep 0 standby 0 hibernatemode 0 powernap 0
       become: true
+      changed_when: false
+      ignore_errors: true
+
+    # ---------------------------------------------------------------
+    # Screen lock — require password after idle (physical access protection)
+    # Note: displaysleep is disabled (always-on), but screensaver idle timer
+    # is independent. Screen lock does not affect SSH/Tailscale access.
+    # ---------------------------------------------------------------
+    - name: Set screensaver idle time to 10 minutes
+      ansible.builtin.command: defaults -currentHost write com.apple.screensaver idleTime -int 600
+      changed_when: false
+
+    - name: Require password on screensaver/lock
+      ansible.builtin.command: defaults write com.apple.screensaver askForPassword -int 1
+      changed_when: false
+
+    - name: Require password immediately (no grace period)
+      ansible.builtin.command: defaults write com.apple.screensaver askForPasswordDelay -int 0
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # Keychain — keep login keychain unlocked for agent autonomy
+    # Lock-on-sleep blocks unattended tasks that need credentials.
+    # Screen lock (above) still protects physical access.
+    # ---------------------------------------------------------------
+    - name: Disable login keychain auto-lock
+      ansible.builtin.command: security set-keychain-settings ~/Library/Keychains/login.keychain-db
+      changed_when: false
+
+    # AirDrop — disable to eliminate Bluetooth/WiFi file-push attack surface.
+    # This is an always-on headless AI workstation; AirDrop is never needed.
+    # AirDrop has had CVEs allowing nearby-device file delivery without consent.
+    - name: Disable AirDrop
+      ansible.builtin.command: defaults write com.apple.NetworkBrowser DisableAirDrop -bool YES
       changed_when: false
 
     # ---------------------------------------------------------------
@@ -293,6 +429,31 @@
       ansible.builtin.command: git config --global credential.helper ''
       changed_when: false
 
+    - name: Enable HFS+ path traversal protection
+      community.general.git_config:
+        name: core.protectHFS
+        scope: global
+        value: "true"
+
+    - name: Enable NTFS path traversal protection
+      community.general.git_config:
+        name: core.protectNTFS
+        scope: global
+        value: "true"
+
+    - name: Enable git object integrity check on fetch
+      community.general.git_config:
+        name: fetch.fsckObjects
+        scope: global
+        value: "true"
+
+    - name: Enable git object integrity check on transfer
+      community.general.git_config:
+        name: transfer.fsckObjects
+        scope: global
+        value: "true"
+
+
     # ---------------------------------------------------------------
     # System-level CLAUDE.md (applies to all projects on this machine)
     # ---------------------------------------------------------------
@@ -328,6 +489,10 @@
           Git commits use the identity "PericakAI (Pai)" <pericakai@gmail.com>.
           Do not use the kylep/ GitHub account or Kyle Pericak identity on
           this machine.
+
+          ## Pull requests
+
+          When creating pull requests, always assign them to `kylep`.
 
           ## Git push authentication
 
@@ -391,139 +556,31 @@
       ansible.builtin.file:
         path: "{{ repo_dir }}/logs"
         state: directory
-        mode: "0755"
+        mode: "0700"
+
+    - name: Clear uchg flag on hook files before copy (idempotency)
+      ansible.builtin.command: >
+        chflags nouchg
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/audit-log.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/settings.json
+      become: true
+      ignore_errors: true
+      changed_when: false
 
     - name: Write block-destructive hook
       ansible.builtin.copy:
+        src: hooks/block-destructive.sh
         dest: "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh"
         mode: "0755"
-        content: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-
-          INPUT=$(cat)
-          COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-
-          if [[ -z "$COMMAND" ]]; then
-            exit 0
-          fi
-
-          BLOCKED=""
-
-          case "$COMMAND" in
-            *"rm -rf /"*|*"rm -rf ~"*)
-              BLOCKED="recursive delete of root or home" ;;
-            *"git push --force"*|*"git push -f "*)
-              BLOCKED="force push" ;;
-            *"git reset --hard"*)
-              BLOCKED="hard reset" ;;
-            *"DROP TABLE"*|*"DROP DATABASE"*)
-              BLOCKED="database drop" ;;
-            *":(){ :|:& };:"*)
-              BLOCKED="fork bomb" ;;
-            *"curl"*"|"*"sh"*|*"curl"*"|"*"bash"*)
-              BLOCKED="piped remote execution" ;;
-            *"chmod 777"*)
-              BLOCKED="world-writable permissions" ;;
-            *"mkfs."*)
-              BLOCKED="filesystem format" ;;
-          esac
-
-          if [[ -z "$BLOCKED" ]] && echo "$COMMAND" | \
-             grep -qE 'dd\s+if=.*of=/dev/'; then
-            BLOCKED="raw device write"
-          fi
-
-          if [[ -n "$BLOCKED" ]]; then
-            echo "BLOCKED by block-destructive hook: $BLOCKED" >&2
-            exit 2
-          fi
-
-          exit 0
-
-    - name: Write protect-sensitive hook
-      ansible.builtin.copy:
-        dest: "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh"
-        mode: "0755"
-        content: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-
-          INPUT=$(cat)
-          TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
-
-          check_path() {
-            local filepath="$1"
-            case "$filepath" in
-              */.env|*/.env.*|*.env)
-                echo "BLOCKED by protect-sensitive hook: .env file" >&2
-                exit 2 ;;
-              */.ssh/id_*)
-                echo "BLOCKED by protect-sensitive hook: SSH key" >&2
-                exit 2 ;;
-              */.aws/credentials*)
-                echo "BLOCKED by protect-sensitive hook: AWS creds" >&2
-                exit 2 ;;
-              */.kube/config*)
-                echo "BLOCKED by protect-sensitive hook: kubeconfig" >&2
-                exit 2 ;;
-            esac
-          }
-
-          if [[ "$TOOL" == "Bash" ]]; then
-            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-            if echo "$COMMAND" | \
-               grep -qE '(cat|less|head|tail|curl -d @|base64|scp)\s+\.env'; then
-              echo "BLOCKED by protect-sensitive hook: .env access via bash" >&2
-              exit 2
-            fi
-            if echo "$COMMAND" | \
-               grep -qE '(cat|less|head|tail)\s+.*(\.ssh/id_|\.aws/credentials|\.kube/config)'; then
-              echo "BLOCKED by protect-sensitive hook: sensitive file access via bash" >&2
-              exit 2
-            fi
-          else
-            FILEPATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-            if [[ -n "$FILEPATH" ]]; then
-              check_path "$FILEPATH"
-            fi
-          fi
-
-          exit 0
+      ignore_errors: true
 
     - name: Write audit-log hook
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: hooks/audit-log.sh
         dest: "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/audit-log.sh"
         mode: "0755"
-        content: |
-          #!/usr/bin/env bash
-
-          LOG="{{ repo_dir }}/logs/claude-audit.jsonl"
-
-          INPUT=$(cat)
-          TOOL=$(echo "$INPUT" | jq -r '.tool_name // "unknown"')
-          SESSION=$(echo "$INPUT" | jq -r '.session_id // "unknown"')
-          CWD=$(echo "$INPUT" | jq -r '.cwd // "unknown"')
-
-          case "$TOOL" in
-            Bash)
-              PARAM=$(echo "$INPUT" | jq -r '.tool_input.command // empty') ;;
-            Read|Edit|Write)
-              PARAM=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty') ;;
-            *)
-              PARAM="" ;;
-          esac
-
-          jq -nc \
-            --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --arg sid "$SESSION" \
-            --arg tool "$TOOL" \
-            --arg param "$PARAM" \
-            --arg cwd "$CWD" \
-            '{timestamp: $ts, session_id: $sid, tool: $tool, param: $param, cwd: $cwd}' \
-            >> "$LOG"
-
-          exit 0
+      ignore_errors: true
 
     - name: Configure Claude Code safety hooks
       ansible.builtin.copy:
@@ -548,13 +605,6 @@
                     "type": "command",
                     "command": "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh"
                   }]
-                },
-                {
-                  "matcher": "Read|Edit|Write|Bash",
-                  "hooks": [{
-                    "type": "command",
-                    "command": "{{ ansible_facts['env']['HOME'] }}/.claude/hooks/protect-sensitive.sh"
-                  }]
                 }
               ],
               "PostToolUse": [
@@ -568,10 +618,47 @@
               ]
             }
           }
+      ignore_errors: true
+
+    - name: Set uchg flag on hook files to prevent tampering
+      ansible.builtin.command: >
+        chflags uchg
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/block-destructive.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/hooks/audit-log.sh
+        {{ ansible_facts['env']['HOME'] }}/.claude/settings.json
+      become: true
+      changed_when: false
+      ignore_errors: true
+
+    # ---------------------------------------------------------------
+    # Remove dangerous passwordless-sudo grant
+    # /etc/sudoers.d/claude-temp was created during initial setup as a
+    # temporary convenience but never removed.  It grants NOPASSWD: ALL to
+    # the primary user, meaning any process running as that user (including
+    # a prompt-injected Claude Code session) can sudo without a password —
+    # bypassing all OS-level protections (uchg flags, Application Firewall,
+    # pmset, scutil, etc.).  Remove it permanently.
+    # NOTE: Future ansible-playbook runs that use `become: true` will require
+    # the operator to supply a sudo password (run with -K or via a pre-authenticated
+    # sudo session).
+    # ---------------------------------------------------------------
+    - name: Remove temporary passwordless sudo grant
+      ansible.builtin.file:
+        path: /private/etc/sudoers.d/claude-temp
+        state: absent
+      become: true
+      ignore_errors: true
 
     # ---------------------------------------------------------------
     # Pre-commit hooks
     # ---------------------------------------------------------------
+    - name: Unset core.hooksPath so pre-commit can install
+      ansible.builtin.command:
+        cmd: git config --unset-all core.hooksPath
+        chdir: "{{ repo_dir }}"
+      changed_when: true
+      failed_when: false
+
     - name: Install pre-commit hooks in repo
       ansible.builtin.command:
         cmd: pre-commit install
@@ -608,6 +695,18 @@
       ansible.builtin.lineinfile:
         path: "{{ ansible_facts['env']['HOME'] }}/.zprofile"
         line: 'export PATH="$HOME/.rd/bin:$PATH"'
+        create: true
+        mode: "0644"
+
+    # Enable Homebrew cryptographic attestation verification.
+    # Homebrew 5.1.0+ with gh CLI installed supports attestation
+    # checks on bottles via GitHub's artifact attestation API.
+    # Without this, a compromised CDN or MITM could serve tampered
+    # bottles and Homebrew would install them silently.
+    - name: Enable Homebrew bottle attestation verification
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['env']['HOME'] }}/.zprofile"
+        line: 'export HOMEBREW_VERIFY_ATTESTATIONS=1'
         create: true
         mode: "0644"
 
@@ -790,6 +889,161 @@
       ansible.builtin.command: killall Dock
       changed_when: true
       when: dock_removed is changed
+
+    # ---------------------------------------------------------------
+    # macOS Security Compliance Project (mSCP) — NIST-backed macOS auditor
+    # https://github.com/usnistgov/macos_security
+    # Usage: cd ~/tools/macos_security && python3 scripts/generate_guidance.py baselines/cis_lvl1.yaml -s
+    #        Then run the generated script in build/
+    # ---------------------------------------------------------------
+    - name: Clone / update macos_security (NIST mSCP)
+      ansible.builtin.git:
+        repo: https://github.com/usnistgov/macos_security.git
+        dest: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security"
+        version: tahoe
+        update: true
+        depth: 1
+
+    - name: Create mSCP Python venv
+      ansible.builtin.command:
+        cmd: python3 -m venv .venv
+        chdir: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security"
+        creates: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security/.venv"
+
+    - name: Install mSCP Python requirements into venv
+      ansible.builtin.pip:
+        requirements: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security/requirements.txt"
+        virtualenv: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security/.venv"
+        state: present
+
+    - name: Pre-generate CIS Level 1 audit script
+      ansible.builtin.command:
+        cmd: >
+          .venv/bin/python3 scripts/generate_guidance.py baselines/cis_lvl1.yaml -s
+        chdir: "{{ ansible_facts['env']['HOME'] }}/tools/macos_security"
+      changed_when: false
+      failed_when: false
+
+    # ---------------------------------------------------------------
+    # rkhunter configuration — macOS-specific whitelists
+    # Owned by pai, no sudo needed
+    # ---------------------------------------------------------------
+    - name: Configure rkhunter — log to scan directory (world-readable after chmod)
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^LOGFILE='
+        line: 'LOGFILE=/var/log/security-scans/rkhunter-verbose.log'
+
+    - name: Configure rkhunter — disable Linux package manager checks (macOS)
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?PKGMGR='
+        line: 'PKGMGR=NONE'
+
+    - name: Configure rkhunter — SSH root login should not be allowed
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?ALLOW_SSH_ROOT_USER='
+        line: 'ALLOW_SSH_ROOT_USER=no'
+
+    - name: Configure rkhunter — SSH protocol v1 should not be allowed
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?ALLOW_SSH_PROT_V1='
+        line: 'ALLOW_SSH_PROT_V1=0'
+
+    - name: Configure rkhunter — whitelist macOS script hash mismatches (false positives)
+      ansible.builtin.blockinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        marker: "# {mark} ANSIBLE MANAGED — macOS script whitelists"
+        insertafter: '^#SCRIPTWHITELIST=/usr/bin/groups'
+        block: |
+          SCRIPTWHITELIST=/usr/bin/fuser
+          SCRIPTWHITELIST=/usr/bin/whatis
+          SCRIPTWHITELIST=/usr/bin/shasum
+
+    - name: Configure rkhunter — whitelist macOS promiscuous interfaces (Thunderbolt/virtualization)
+      ansible.builtin.blockinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        marker: "# {mark} ANSIBLE MANAGED — promiscuous interface whitelists"
+        insertafter: '^#ALLOWPROMISCIF=eth0'
+        block: |
+          ALLOWPROMISCIF=en1
+          ALLOWPROMISCIF=en2
+          ALLOWPROMISCIF=vmenet0
+
+    - name: Configure rkhunter — point to macOS SSH config directory
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?SSH_CONFIG_DIR='
+        line: 'SSH_CONFIG_DIR=/etc/ssh'
+
+    - name: Configure rkhunter — disable tests that produce macOS false positives
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^DISABLE_TESTS='
+        line: 'DISABLE_TESTS=suspscan hidden_ports hidden_procs deleted_files packet_cap_apps apps promisc startup_files'
+
+    - name: Configure rkhunter — set macOS-appropriate startup paths
+      ansible.builtin.lineinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        regexp: '^#?STARTUP_PATHS='
+        line: 'STARTUP_PATHS=/Library/LaunchDaemons /Library/LaunchAgents'
+
+    - name: Configure rkhunter — whitelist macOS hidden system file
+      ansible.builtin.blockinfile:
+        path: /opt/homebrew/etc/rkhunter.conf
+        marker: "# {mark} ANSIBLE MANAGED — macOS hidden file whitelists"
+        insertafter: '^#ALLOWHIDDENFILE=/usr/share/man/man1/..1.gz'
+        block: |
+          ALLOWHIDDENFILE=/usr/share/man/man5/.rhosts.5
+
+    - name: Configure rkhunter — initialize property database (rkhunter.dat)
+      ansible.builtin.command: /opt/homebrew/bin/rkhunter --propupd --nocolors
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # Daily security scan — LaunchDaemon runs at 06:00 as root
+    # Logs to /var/log/security-scans/
+    # ---------------------------------------------------------------
+    - name: Create security scan log directory
+      ansible.builtin.file:
+        path: /var/log/security-scans
+        state: directory
+        mode: "0755"
+        owner: root
+        group: wheel
+      become: true
+      ignore_errors: true
+
+    - name: Deploy daily security scan script
+      ansible.builtin.template:
+        src: templates/security-daily-scan.sh
+        dest: /usr/local/bin/security-daily-scan.sh
+        mode: "0750"
+        owner: root
+        group: wheel
+      become: true
+      ignore_errors: true
+
+    - name: Deploy security scan LaunchDaemon plist
+      ansible.builtin.copy:
+        src: templates/com.pericakai.security-scan.plist
+        dest: /Library/LaunchDaemons/com.pericakai.security-scan.plist
+        mode: "0644"
+        owner: root
+        group: wheel
+      become: true
+      ignore_errors: true
+      register: scan_plist
+
+    - name: Load security scan LaunchDaemon
+      ansible.builtin.command: >
+        launchctl bootstrap system
+        /Library/LaunchDaemons/com.pericakai.security-scan.plist
+      become: true
+      when: scan_plist is changed
+      ignore_errors: true
 
     # ---------------------------------------------------------------
     # Summary

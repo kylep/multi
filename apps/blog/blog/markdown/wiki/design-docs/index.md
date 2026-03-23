@@ -34,3 +34,5 @@ section feeds directly into Claude Code's plan mode for implementation.
 ## Design Docs
 
 - [Hardened IaC Bootstrap](hardened-iac-bootstrap.html) — Helmfile-orchestrated bootstrap with Vault secrets, PSS restricted, ResourceQuota (draft, 2026-03-17)
+- [Autonomous Security Improvement Loop](security-improvement-loop.html) — Bash wrapper invoking Claude Code for iterative Mac workstation hardening with adversarial verification (draft, 2026-03-18)
+- [Security Improvement Log](security-improvement-log.html) — Structured log of autonomous security improvements
