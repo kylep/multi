@@ -25,6 +25,7 @@ Use them instead of doing everything yourself.
 
 | Agent | When to use | Invocation |
 |-------|------------|------------|
+| Pai | Discord communication, wiki coordination, delegating to agents | `claude --agent pai` |
 | Publisher | Writing or editing blog posts (full pipeline) | `claude --agent publisher` |
 | Analyst | Ingesting external research, proposing system improvements | `claude --agent analyst` |
 | Synthesizer | Comparing/contrasting multiple Deep Research reports | `claude --agent synthesizer` |
@@ -42,8 +43,8 @@ field with trigger phrases that tell you when to invoke it. When a task
 matches an agent's description, delegate to it as a subagent rather than
 doing the work yourself.
 
-Publisher, Analyst, Synthesizer, PRD Writer, and Design Doc Writer are top-level agents (run
-via `claude --agent <name>`). Researcher, Reviewer, QA, and Security Auditor
+Pai, Publisher, Analyst, Synthesizer, PRD Writer, and Design Doc Writer are top-level agents
+(run via `claude --agent <name>`). Researcher, Reviewer, QA, and Security Auditor
 are subagents that Publisher calls during its pipeline.
 
 
