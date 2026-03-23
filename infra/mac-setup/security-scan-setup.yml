@@ -144,10 +144,10 @@
         SHOWFULLNAME -bool true
       changed_when: false
 
-    - name: CIS — Set login window banner text
+    - name: CIS — Set login window banner text (CIS required string)
       ansible.builtin.command: >
         defaults write /Library/Preferences/com.apple.loginwindow
-        LoginwindowText -string "Authorized use only."
+        LoginwindowText -string "Center for Internet Security Test Message"
       changed_when: false
 
     - name: CIS — Disable password hints
@@ -166,10 +166,16 @@
     # CIS Level 1 — MCX managed settings (mSCP: com.apple.MCX)
     # Written to /Library/Preferences/com.apple.MCX.plist (already exists).
     # ---------------------------------------------------------------
-    - name: CIS — Disable guest account via MCX pref
+    - name: CIS — Disable guest account via MCX pref (DisableGuestAccount)
       ansible.builtin.command: >
         defaults write /Library/Preferences/com.apple.MCX
         DisableGuestAccount -bool true
+      changed_when: false
+
+    - name: CIS — Disable guest account via MCX pref (EnableGuestAccount)
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.MCX
+        EnableGuestAccount -bool false
       changed_when: false
 
     - name: CIS — Force internet sharing off via MCX pref
@@ -210,8 +216,11 @@
 
     # ---------------------------------------------------------------
     # CIS Level 1 — Diagnostics (mSCP: com.apple.SubmitDiagInfo)
+    # system_settings_diagnostics_reports_disable needs BOTH:
+    #   com.apple.SubmitDiagInfo.AutoSubmit=false
+    #   com.apple.applicationaccess.allowDiagnosticSubmission=false
     # ---------------------------------------------------------------
-    - name: CIS — Disable diagnostic submission
+    - name: CIS — Disable diagnostic submission (SubmitDiagInfo)
       ansible.builtin.command: >
         defaults write /Library/Preferences/com.apple.SubmitDiagInfo
         AutoSubmit -bool false
@@ -228,152 +237,149 @@
 
     # ---------------------------------------------------------------
     # CIS Level 1 — Screensaver (mSCP: com.apple.screensaver)
-    # mSCP runs as root; write to /Library/Preferences so root finds it.
+    # mSCP runs as root via LaunchDaemon; NSUserDefaults for root reads
+    # /var/root/Library/Preferences/ (not /Library/Preferences/).
+    # askForPassword must be <true/> bool for .js == "true" check.
+    # Use copy module — defaults write with full paths is unreliable as root.
     # ---------------------------------------------------------------
-    - name: CIS — Set screensaver idle timeout (max 1200s)
-      ansible.builtin.command: >
-        defaults write /Library/Preferences/com.apple.screensaver
-        idleTime -int 600
-      changed_when: false
-
-    - name: CIS — Require password on screensaver
-      ansible.builtin.command: >
-        defaults write /Library/Preferences/com.apple.screensaver
-        askForPassword -int 1
-      changed_when: false
-
-    - name: CIS — Require password immediately (no delay)
-      ansible.builtin.command: >
-        defaults write /Library/Preferences/com.apple.screensaver
-        askForPasswordDelay -int 0
-      changed_when: false
-
-    # ---------------------------------------------------------------
-    # CIS Level 1 — applicationaccess managed prefs
-    # mSCP reads these from NSUserDefaults suite com.apple.applicationaccess
-    # which checks /Library/Managed Preferences/ first (MDM-style).
-    # Writing there directly simulates MDM enforcement on a non-MDM machine.
-    # ---------------------------------------------------------------
-    - name: CIS — Create /Library/Managed Preferences directory
+    - name: CIS — Ensure /var/root/Library/Preferences exists
       ansible.builtin.file:
-        path: /Library/Managed\ Preferences
+        path: /var/root/Library/Preferences
         state: directory
-        mode: "0755"
+        mode: "0700"
         owner: root
         group: wheel
 
-    - name: CIS — Disable AirDrop (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowAirDrop -bool false
-      changed_when: false
-
-    - name: CIS — Disable AirPlay receiver (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowAirPlayIncomingRequests -bool false
-      changed_when: false
-
-    - name: CIS — Disable Siri (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowAssistant -bool false
-      changed_when: false
-
-    - name: CIS — Disable external intelligence integrations (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowExternalIntelligenceIntegrations -bool false
-      changed_when: false
-
-    - name: CIS — Disable external intelligence sign-in (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowExternalIntelligenceIntegrationsSignIn -bool false
-      changed_when: false
-
-    - name: CIS — Disable Mail summaries (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowMailSummary -bool false
-      changed_when: false
-
-    - name: CIS — Disable Notes transcription (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowNotesTranscription -bool false
-      changed_when: false
-
-    - name: CIS — Disable Notes transcription summary (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowNotesTranscriptionSummary -bool false
-      changed_when: false
-
-    - name: CIS — Disable personalized advertising (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowApplePersonalizedAdvertising -bool false
-      changed_when: false
-
-    - name: CIS — Disable writing tools (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        allowWritingTools -bool false
-      changed_when: false
-
-    - name: CIS — Enforce on-device dictation (managed pref)
-      ansible.builtin.command: >
-        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
-        forceOnDeviceOnlyDictation -bool true
-      changed_when: false
+    - name: CIS — Write screensaver plist to root prefs
+      ansible.builtin.copy:
+        dest: /var/root/Library/Preferences/com.apple.screensaver.plist
+        owner: root
+        group: wheel
+        mode: "0600"
+        content: |
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>idleTime</key><integer>600</integer>
+            <key>askForPassword</key><true/>
+            <key>askForPasswordDelay</key><integer>0</integer>
+          </dict>
+          </plist>
 
     # ---------------------------------------------------------------
-    # CIS Level 1 — User-level prefs (run as brew_user)
-    # mSCP checks these in the current user context; setting system-level
-    # versions ensures they're found when running as root.
+    # CIS Level 1 — applicationaccess prefs
+    # mSCP reads via NSUserDefaults initWithSuiteName('com.apple.applicationaccess').
+    # /Library/Managed Preferences/ is MDM-protected: macOS silently deletes
+    # any plist written there without a real MDM enrollment.
+    # Write to /var/root/Library/Preferences/ instead — root's user pref dir,
+    # which NSUserDefaults finds when running as root (e.g. via LaunchDaemon).
     # ---------------------------------------------------------------
-    - name: CIS — Disable Siri data sharing (user pref)
+    - name: CIS — Write applicationaccess plist to root prefs
+      ansible.builtin.copy:
+        dest: /var/root/Library/Preferences/com.apple.applicationaccess.plist
+        owner: root
+        group: wheel
+        mode: "0600"
+        content: |
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>allowAirDrop</key><false/>
+            <key>allowAirPlayIncomingRequests</key><false/>
+            <key>allowAssistant</key><false/>
+            <key>allowDiagnosticSubmission</key><false/>
+            <key>allowExternalIntelligenceIntegrations</key><false/>
+            <key>allowExternalIntelligenceIntegrationsSignIn</key><false/>
+            <key>allowMailSummary</key><false/>
+            <key>allowNotesTranscription</key><false/>
+            <key>allowNotesTranscriptionSummary</key><false/>
+            <key>allowApplePersonalizedAdvertising</key><false/>
+            <key>allowWritingTools</key><false/>
+            <key>forceOnDeviceOnlyDictation</key><true/>
+          </dict>
+          </plist>
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — User-level prefs
+    # Write to both:
+    #   - brew_user's prefs (for when user runs mSCP interactively)
+    #   - /var/root/Library/Preferences/ (for LaunchDaemon root context)
+    # ---------------------------------------------------------------
+    - name: CIS — Disable Siri data sharing (brew_user pref)
       ansible.builtin.command: >
         su -l {{ brew_user }} -c
         "defaults write com.apple.assistant.support 'Siri Data Sharing Opt-In Status' -int 2"
       changed_when: false
       failed_when: false
 
-    - name: CIS — Disable search query data sharing (user pref)
+    - name: CIS — Disable search query data sharing (brew_user pref)
       ansible.builtin.command: >
         su -l {{ brew_user }} -c
         "defaults write com.apple.assistant.support 'Search Queries Data Sharing Status' -int 2"
       changed_when: false
       failed_when: false
 
-    - name: CIS — Disable assistive voice data donation (user pref)
+    - name: CIS — Disable assistive voice data donation (brew_user pref)
       ansible.builtin.command: >
         su -l {{ brew_user }} -c
         "defaults write com.apple.Accessibility AXSAudioDonationSiriImprovementEnabled -bool false"
       changed_when: false
       failed_when: false
 
-    - name: CIS — Enable Terminal secure keyboard entry (user pref)
+    - name: CIS — Enable Terminal secure keyboard entry (brew_user pref)
       ansible.builtin.command: >
         su -l {{ brew_user }} -c
         "defaults write com.apple.Terminal SecureKeyboardEntry -bool true"
       changed_when: false
       failed_when: false
 
-    - name: CIS — Also write Siri assistant support to system-level for mSCP check
-      ansible.builtin.command: >
-        defaults write /Library/Preferences/com.apple.assistant.support
-        "Siri Data Sharing Opt-In Status" -int 2
-      changed_when: false
-      failed_when: false
+    - name: CIS — Write assistant.support plist to root prefs (mSCP LaunchDaemon context)
+      ansible.builtin.copy:
+        dest: /var/root/Library/Preferences/com.apple.assistant.support.plist
+        owner: root
+        group: wheel
+        mode: "0600"
+        content: |
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>Siri Data Sharing Opt-In Status</key><integer>2</integer>
+            <key>Search Queries Data Sharing Status</key><integer>2</integer>
+          </dict>
+          </plist>
 
-    - name: CIS — Write search queries disable to system-level for mSCP check
-      ansible.builtin.command: >
-        defaults write /Library/Preferences/com.apple.assistant.support
-        "Search Queries Data Sharing Status" -int 2
-      changed_when: false
-      failed_when: false
+    - name: CIS — Write Accessibility plist to root prefs (mSCP LaunchDaemon context)
+      ansible.builtin.copy:
+        dest: /var/root/Library/Preferences/com.apple.Accessibility.plist
+        owner: root
+        group: wheel
+        mode: "0600"
+        content: |
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>AXSAudioDonationSiriImprovementEnabled</key><false/>
+          </dict>
+          </plist>
+
+    - name: CIS — Write Terminal plist to root prefs (mSCP LaunchDaemon context)
+      ansible.builtin.copy:
+        dest: /var/root/Library/Preferences/com.apple.Terminal.plist
+        owner: root
+        group: wheel
+        mode: "0600"
+        content: |
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>SecureKeyboardEntry</key><true/>
+          </dict>
+          </plist>
 
     # ---------------------------------------------------------------
     # CIS Level 1 — Run scan to verify
