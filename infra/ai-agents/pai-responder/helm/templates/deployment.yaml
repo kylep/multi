@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pai-responder.fullname" . }}
+  labels:
+    {{- include "pai-responder.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "pai-responder.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pai-responder.selectorLabels" . | nindent 8 }}
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: {{ .Values.vault.role | quote }}
+        vault.hashicorp.com/agent-inject-secret-config: {{ .Values.vault.secretPath | quote }}
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{`{{- with secret `}}"{{ .Values.vault.secretPath }}"{{` -}}`}}
+          export CLAUDE_CODE_OAUTH_TOKEN="{{`{{ .Data.data.claude_oauth_token }}`}}"
+          export PAI_DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
+          export LINEAR_API_KEY="{{`{{ .Data.data.linear_api_key }}`}}"
+          {{`{{- end }}`}}
+    spec:
+      serviceAccountName: agent-controller
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: pai-responder
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              . /vault/secrets/config
+              exec python3 /opt/pai/poll-loop.py
+          env:
+            - name: DISCORD_GUILD_ID
+              value: {{ .Values.discord.guildId | quote }}
+            - name: POLL_INTERVAL
+              value: {{ .Values.polling.interval | quote }}
+            - name: REVIEW_INTERVAL
+              value: {{ .Values.polling.reviewInterval | quote }}
+            - name: STATE_PATH
+              value: /data/state.json
+          volumeMounts:
+            - name: pai-state
+              mountPath: /data
+            - name: pai-script
+              mountPath: /opt/pai/poll-loop.py
+              subPath: poll-loop.py
+            - name: pai-script
+              mountPath: /opt/discord-mcp/server.py
+              subPath: discord-mcp-server.py
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: pai-state
+          persistentVolumeClaim:
+            claimName: {{ include "pai-responder.fullname" . }}-state
+        - name: pai-script
+          configMap:
+            name: {{ include "pai-responder.fullname" . }}-script

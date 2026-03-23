@@ -61,6 +61,7 @@ accent colors. The animals are chosen to reflect each agent's role.
 | Reviewer | Hawk | Piercing eye, catches what others miss |
 | QA | Beaver | Meticulous builder, structural integrity |
 | Security Auditor | Pangolin | Natural armor, defensive posture |
+| Pai | Octopus | Multi-armed coordinator, curious, adaptive |
 
 ### Style spec
 
