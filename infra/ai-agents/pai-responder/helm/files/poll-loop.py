@@ -51,7 +51,7 @@ def save_state(state):
 
 
 def write_mcp_config():
-    """Write MCP config so claude --agent pai can use pai-discord tools."""
+    """Write MCP config so claude --agent pai can use pai-discord and linear tools."""
     config = {
         "mcpServers": {
             "pai-discord": {
@@ -62,7 +62,15 @@ def write_mcp_config():
                     "DISCORD_BOT_TOKEN": BOT_TOKEN,
                     "DISCORD_GUILD_ID": GUILD_ID,
                 },
-            }
+            },
+            "linear-server": {
+                "type": "stdio",
+                "command": "npx",
+                "args": ["-y", "@hatcloud/linear-mcp"],
+                "env": {
+                    "LINEAR_API_KEY": os.environ.get("LINEAR_API_KEY", ""),
+                },
+            },
         }
     }
     MCP_CONFIG_PATH.write_text(json.dumps(config))
@@ -124,6 +132,7 @@ def invoke_claude(prompt):
         "--agent", "pai",
         "-p", prompt,
         "--allowedTools", "mcp__pai-discord__*",
+        "--allowedTools", "mcp__linear-server__*",
         "--mcp-config", str(MCP_CONFIG_PATH),
         "--output-format", "text",
     ]

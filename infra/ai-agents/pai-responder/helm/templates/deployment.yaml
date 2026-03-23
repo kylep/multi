@@ -23,6 +23,7 @@ spec:
           {{`{{- with secret `}}"{{ .Values.vault.secretPath }}"{{` -}}`}}
           export CLAUDE_CODE_OAUTH_TOKEN="{{`{{ .Data.data.claude_oauth_token }}`}}"
           export PAI_DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
+          export LINEAR_API_KEY="{{`{{ .Data.data.linear_api_key }}`}}"
           {{`{{- end }}`}}
     spec:
       serviceAccountName: agent-controller

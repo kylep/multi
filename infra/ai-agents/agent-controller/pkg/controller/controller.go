@@ -402,6 +402,7 @@ export DISCORD_LOG_CHANNEL_ID="{{ .Data.data.discord_log_channel_id }}"
 {{ end -}}
 {{- with secret "secret/ai-agents/pai" }}
 export PAI_DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
+export LINEAR_API_KEY="{{ .Data.data.linear_api_key }}"
 {{ end -}}
 {{- with secret "secret/ai-agents/webhook" }}
 export AI_WEBHOOK_TOKEN="{{ .Data.data.webhook_token }}"
@@ -671,7 +672,9 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 			// Pai uses its own Discord bot identity (pai-discord MCP server).
 			// Override DISCORD_BOT_TOKEN with PAI_DISCORD_BOT_TOKEN so the
 			// MCP subprocess uses Pai's token instead of Journalist's.
-			mcpConfig := `export DISCORD_BOT_TOKEN="$PAI_DISCORD_BOT_TOKEN" && printf '{"mcpServers":{"pai-discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
+			mcpConfig := `export DISCORD_BOT_TOKEN="$PAI_DISCORD_BOT_TOKEN" && cat > /tmp/mcp.json <<MCPEOF
+{"mcpServers":{"pai-discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"linear-server":{"type":"stdio","command":"npx","args":["-y","@hatcloud/linear-mcp"],"env":{"LINEAR_API_KEY":"$LINEAR_API_KEY"}}}}
+MCPEOF`
 			cmd := fmt.Sprintf(`. /vault/secrets/config && %s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json --verbose --include-partial-messages`, mcpConfig, escapedAgent, escapedPrompt)
 			if task.Spec.AllowedTools != "" {
 				tools := strings.Split(task.Spec.AllowedTools, ",")

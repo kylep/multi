@@ -12,6 +12,8 @@ export OPENCODE_API_KEY=""
 export CLAUDE_CODE_OAUTH_TOKEN=""  # run: claude setup-token
 export CURSOR_API_KEY=""  # cursor.com/dashboard/cloud-agents → User API Keys
 
+export LINEAR_API_KEY=""  # linear.app/pericak/settings/account/security → API keys
+
 # GitHub App — PericakAI (github.com/settings/apps/pericakai)
 export GITHUB_APP_CLIENT_SECRET=""
 export GITHUB_APP_ID=""
