@@ -156,10 +156,25 @@ DISCORD_ARGS=""
 [ -n "$DISCORD_ARGS" ]        && kv_store discord $DISCORD_ARGS
 
 echo ""
+echo "=== Pai ==="
+EXISTING_PAI=$(get_existing pai)
+prompt_or_env PAI_DISCORD_TOKEN "Pai Discord bot token$(already_set "$EXISTING_PAI" discord_bot_token)" secret
+prompt_or_env PAI_CLAUDE_TOKEN "Pai Claude OAuth token (leave blank to reuse anthropic secret)$(already_set "$EXISTING_PAI" claude_oauth_token)" secret
+# Fall back to the shared Claude token if not set separately
+if [ -z "${PAI_CLAUDE_TOKEN:-}" ] && [ -n "${CLAUDE_TOKEN:-}" ]; then
+  PAI_CLAUDE_TOKEN="$CLAUDE_TOKEN"
+fi
+PAI_ARGS=""
+[ -n "${PAI_DISCORD_TOKEN:-}" ] && PAI_ARGS="$PAI_ARGS discord_bot_token=$PAI_DISCORD_TOKEN"
+[ -n "${PAI_CLAUDE_TOKEN:-}" ]  && PAI_ARGS="$PAI_ARGS claude_oauth_token=$PAI_CLAUDE_TOKEN"
+# shellcheck disable=SC2086
+[ -n "$PAI_ARGS" ]              && kv_store pai $PAI_ARGS
+
+echo ""
 echo "=== Webhook ==="
 EXISTING_WEBHOOK=$(get_existing webhook)
 prompt_or_env WEBHOOK_TOKEN "Webhook bearer token$(already_set "$EXISTING_WEBHOOK" webhook_token)" secret
 [ -n "${WEBHOOK_TOKEN:-}" ] && kv_store webhook "webhook_token=$WEBHOOK_TOKEN"
 
 echo ""
-echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,webhook}"
+echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook}"
