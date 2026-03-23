@@ -10,6 +10,9 @@ export GOOGLE_API_KEY="$GEMINI_API_KEY"
 export BFL_API_KEY=""
 export OPENCODE_API_KEY=""
 export CLAUDE_CODE_OAUTH_TOKEN=""  # run: claude setup-token
+export CURSOR_API_KEY=""  # cursor.com/dashboard/cloud-agents → User API Keys
+
+export LINEAR_API_KEY=""  # linear.app/pericak/settings/account/security → API keys
 
 # GitHub App — PericakAI (github.com/settings/apps/pericakai)
 export GITHUB_APP_CLIENT_SECRET=""
@@ -29,3 +32,7 @@ export DISCORD_GUILD_ID=""  # right-click server in Discord (Developer Mode) →
 export DISCORD_LOG_CHANNEL_ID=""  # right-click channel → Copy ID
 export DISCORD_STATUS_CHANNEL_ID=""  # #status-updates channel → Copy ID
 export AI_WEBHOOK_TOKEN=""  # any strong random string for internal webhook auth
+
+# Pai Discord bot (discord.com/developers/applications/1485425671554596995)
+export PAI_DISCORD_BOT_TOKEN=""  # Discord Developer Portal → Pai app → Bot → Token
+export PAI_DISCORD_APP_ID="1485425671554596995"

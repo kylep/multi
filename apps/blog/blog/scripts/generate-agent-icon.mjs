@@ -53,6 +53,7 @@ const AGENT_SUBJECTS = {
   qa:               'a beaver with square teeth, building with tiny blocks',
   'security-auditor': 'a pangolin curled into a defensive ball, with a small shield emblem',
   'prd-writer':       'a bowerbird arranging colorful geometric objects into a precise pattern',
+  pai:                'a cheerful octopus with a small headset, juggling a chat bubble, a calendar, and a clipboard',
 };
 
 function buildPrompt(agentName) {

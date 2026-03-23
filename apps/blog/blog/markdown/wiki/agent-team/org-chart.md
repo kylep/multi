@@ -17,6 +17,7 @@ last_verified: 2026-03-13
 ```mermaid
 graph TD
     Kyle["Kyle"]
+    Pai["Pai — Executive Assistant (Haiku)"]
     Publisher["Publisher — Content Pipeline (Opus)"]
     Analyst["Analyst — Research Ingestion + System Improvement (Opus)"]
     Researcher["Researcher — Sourced Facts (Sonnet)"]
@@ -25,9 +26,13 @@ graph TD
     Security["Security Auditor — OWASP + Privacy (Opus)"]
     Synthesizer["Synthesizer — Cross-Source Synthesis (Opus)"]
 
+    Kyle --> Pai
     Kyle --> Publisher
     Kyle --> Analyst
     Kyle --> Synthesizer
+    Pai -.-> Publisher
+    Pai -.-> Analyst
+    Pai -.-> Synthesizer
     Publisher --> Researcher
     Publisher --> Reviewer
     Publisher --> QA
@@ -41,6 +46,13 @@ invocation commands or which agent owns a domain.
 
 ```yaml
 agents:
+  - name: pai
+    model: haiku
+    invoke: claude --agent pai
+    reports_to: kyle
+    domain: Executive assistant, Discord communication, agent coordination
+    tools: [Read, Write, Bash, Glob, Grep, pai-discord MCP]
+
   - name: publisher
     model: opus
     invoke: claude --agent publisher
