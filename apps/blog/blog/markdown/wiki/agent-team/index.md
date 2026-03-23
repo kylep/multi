@@ -1,9 +1,10 @@
 ---
 title: "Agent Team"
-summary: "AI agent team with 10 roles defined in .claude/agents/."
+summary: "AI agent team with 11 roles defined in .claude/agents/."
 keywords:
   - agent-team
   - ai-agents
+  - pai
   - publisher
   - researcher
   - reviewer
@@ -20,12 +21,13 @@ scope: "Source of truth for the agent team: roles, models, tools, coordination, 
 last_verified: 2026-03-16
 ---
 
-Ten Claude Code agents defined in `.claude/agents/`.
+Eleven Claude Code agents defined in `.claude/agents/`.
 
 ## Roles
 
 | Role | Model | Tools | Purpose |
 |------|-------|-------|---------|
+| [Pai](/wiki/agent-team/pai.html) | Haiku | Read, Write, Bash, Glob, Grep, pai-discord MCP | Executive assistant, Discord comms, agent coordination |
 | [Publisher](/wiki/agent-team/publisher.html) | Opus | Read, Write, Edit, Bash, Glob, Grep, Agent | Orchestrate content pipeline, write blog posts |
 | [Analyst](/wiki/agent-team/analyst.html) | Opus | Read, Glob, Grep, WebSearch, WebFetch | Ingest research, validate claims, propose system improvements |
 | [Synthesizer](/wiki/agent-team/synthesizer.html) | Opus | Read, Edit, Glob, Grep, Agent | Compare and contrast Deep Research reports |
@@ -39,13 +41,14 @@ Ten Claude Code agents defined in `.claude/agents/`.
 
 ## Top-level vs subagent
 
-Publisher, Analyst, Synthesizer, Journalist, PRD Writer, and Design Doc Writer
+Pai, Publisher, Analyst, Synthesizer, Journalist, PRD Writer, and Design Doc Writer
 are invoked directly. Researcher, Reviewer, QA, and Security Auditor are
 subagents called by Publisher during its pipeline.
 
 ## Invocation
 
 ```bash
+claude --agent pai
 claude --agent publisher
 claude --agent analyst
 claude --agent synthesizer

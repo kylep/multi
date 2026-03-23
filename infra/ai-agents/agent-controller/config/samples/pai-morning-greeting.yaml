@@ -1,0 +1,23 @@
+apiVersion: agents.kyle.pericak.com/v1alpha1
+kind: AgentTask
+metadata:
+  name: pai-morning-greeting
+  namespace: ai-agents
+spec:
+  agent: pai
+  runtime: claude
+  prompt: >-
+    Send a creative, fun morning greeting to #general.
+    @mention <@293425741406928906> (penegy) in the message.
+    Be creative and non-repetitive. Some ideas for inspiration
+    (pick one, or do something entirely different):
+    a short joke or pun, something about today's date (holidays,
+    historical events, fun facts, pop culture references like
+    May 4th = Star Wars day), a tiny poem or haiku, a playful
+    motivational one-liner. Keep it to 1-3 sentences.
+    Cute, warm, fun. No emojis.
+  schedule: "0 12 * * *"
+  trigger: scheduled
+  readOnly: false
+  allowedTools: >-
+    mcp__pai-discord__send_message,mcp__pai-discord__list_channels

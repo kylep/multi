@@ -400,6 +400,9 @@ export DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
 export DISCORD_GUILD_ID="{{ .Data.data.discord_guild_id }}"
 export DISCORD_LOG_CHANNEL_ID="{{ .Data.data.discord_log_channel_id }}"
 {{ end -}}
+{{- with secret "secret/ai-agents/pai" }}
+export PAI_DISCORD_BOT_TOKEN="{{ .Data.data.discord_bot_token }}"
+{{ end -}}
 {{- with secret "secret/ai-agents/webhook" }}
 export AI_WEBHOOK_TOKEN="{{ .Data.data.webhook_token }}"
 {{ end -}}`
@@ -662,6 +665,21 @@ func (c *Controller) buildCommand(task *crd.AgentTask) string {
 			// MCP config includes Playwright for QA subagent browser verification.
 			mcpConfig := `printf '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]},"playwright":{"type":"stdio","command":"npx","args":["-y","@playwright/mcp@latest","--headless"]}}}' > /tmp/mcp.json`
 			return fmt.Sprintf(`. /vault/secrets/config && %s && apps/blog/bin/run-publisher.sh '%s'`, mcpConfig, escapedPrompt)
+		}
+
+		if task.Spec.Agent == "pai" {
+			// Pai uses its own Discord bot identity (pai-discord MCP server).
+			// Override DISCORD_BOT_TOKEN with PAI_DISCORD_BOT_TOKEN so the
+			// MCP subprocess uses Pai's token instead of Journalist's.
+			mcpConfig := `export DISCORD_BOT_TOKEN="$PAI_DISCORD_BOT_TOKEN" && printf '{"mcpServers":{"pai-discord":{"type":"stdio","command":"python3","args":["apps/mcp-servers/discord/server.py"]}}}' > /tmp/mcp.json`
+			cmd := fmt.Sprintf(`. /vault/secrets/config && %s && claude --mcp-config /tmp/mcp.json --agent '%s' -p '%s' --output-format stream-json --verbose --include-partial-messages`, mcpConfig, escapedAgent, escapedPrompt)
+			if task.Spec.AllowedTools != "" {
+				tools := strings.Split(task.Spec.AllowedTools, ",")
+				for _, tool := range tools {
+					cmd += fmt.Sprintf(` --allowedTools '%s'`, escapeShellArg(strings.TrimSpace(tool)))
+				}
+			}
+			return cmd
 		}
 
 		// Default: journalist and other agents
