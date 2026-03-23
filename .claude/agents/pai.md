@@ -11,6 +11,8 @@ tools:
   - Glob
   - Grep
   - Bash
+  - WebSearch
+  - WebFetch
   - mcp__pai-discord__send_message
   - mcp__pai-discord__read_messages
   - mcp__pai-discord__list_channels
