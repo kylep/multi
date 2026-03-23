@@ -190,24 +190,28 @@ last_verified: YYYY-MM-DD
 ```
 
 After frontmatter, organize by section using `##` headers. Each item
-is a linked title with a one-sentence factual summary:
+leads with the source name as a link, then 1-2 plain sentences about
+what actually matters from the article:
 
 ```markdown
 ## AI Industry
 
-- [Anthropic launches Claude 5 with 2M context window](https://anthropic.com/blog/...) — Doubles context ceiling and adds native tool use for enterprise. [(Anthropic Blog)](https://...)
+- [Anthropic Blog](https://anthropic.com/blog/...) Claude 5 doubles context to 2M tokens and adds native tool use for enterprise customers.
+
+- [TechCrunch](https://techcrunch.com/...) OpenAI acquiring Astral, the team behind uv and Ruff. Tools stay open source.
 
 ## Open Source
 
-- [OpenClaw v0.3 adds Linear integration](https://github.com/openclaw/...) — The Claude Code skill framework now syncs tasks with Linear. [(GitHub)](https://...)
+- [GitHub](https://github.com/openclaw/...) OpenClaw v0.3 ships Linear integration — tasks sync bidirectionally.
 
 ## Weather
 
 - Whitby: 8C high, 2C low, overcast with 40% chance of afternoon rain. No alerts.
 ```
 
-Each item: linked title, em-dash, one-sentence summary, source link
-in parentheses. No analysis, no "why it matters," no adjectives like
+Each item: `[Source Name](url)` then 1-2 sentences of what matters.
+Not the article headline — your own plain-language summary of the
+key facts. No analysis, no "why it matters," no adjectives like
 "groundbreaking."
 
 ## Discord Output Format
@@ -217,38 +221,36 @@ in parentheses. No analysis, no "why it matters," no adjectives like
 <one witty/casual sentence summarizing the day — no emojis>
 
 **AI Industry**
-- [Anthropic launches Claude 5 with 2M context](<https://anthropic.com/blog/...>)
-  Doubles context ceiling, adds native tool use for enterprise.
+- [Yahoo](<https://yahoo.com/news/...>) Anthropic CFO: hundreds of millions to billions in revenue at risk in Pentagon case. Financial testimony filed ahead of March 24 hearing.
+- [TechCrunch](<https://techcrunch.com/...>) OpenAI acquiring Astral, the team behind uv and Ruff. Tools stay open source, team joins Codex.
 
 **AI Tooling**
-- [Cursor ships multi-file editing in v0.45](<https://cursor.com/changelog>)
-  Applies diffs across entire project from a single prompt.
+- [Cursor Blog](<https://cursor.com/changelog>) Multi-file editing lands in v0.45 — applies diffs across an entire project from one prompt.
 
 **Open Source**
-- [OpenClaw v0.3 adds Linear integration](<https://github.com/openclaw/...>)
+- [GitHub](<https://github.com/openclaw/...>) OpenClaw v0.3 ships Linear integration, tasks sync bidirectionally.
 
 **Security**
-- [Critical RCE in popular npm package affects 1.2M projects](<https://nvd.nist.gov/...>)
+- [NVD](<https://nvd.nist.gov/...>) Critical RCE in lodash-extended affects 1.2M npm projects. Patch available.
 
 **Geopolitics**
-- [EU passes Digital Services Act enforcement framework](<https://ec.europa.eu/...>)
+- [Reuters](<https://reuters.com/...>) EU passes Digital Services Act enforcement framework.
 
 **Local**
-- [Whitby council approves GO station expansion](<https://durhamregion.com/...>)
+- [Durham Region](<https://durhamregion.com/...>) Whitby council approves GO station expansion, construction starts fall 2026.
 
 **Weather**
 Whitby: 8C high, 2C low, overcast, 40% chance afternoon rain. No alerts.
 
 **Just for You**
-- [Playwright MCP gets Firefox support](<https://github.com/anthropics/...>)
-  Browser automation MCP server now supports Firefox alongside Chromium.
+- [Anthropic Blog](<https://docs.anthropic.com/...>) Playwright MCP server adds Firefox support alongside Chromium.
 ```
 
 Format rules:
-- Titles are markdown links: `[Title](<url>)` — angle brackets
-  suppress Discord link previews
-- Optional one-sentence summary below the link (indented with two
-  spaces). Omit for self-explanatory items.
+- Each bullet starts with the source name as a link: `[Source](<url>)`
+  — angle brackets suppress Discord link previews
+- After the link, 1-2 plain sentences about what actually matters.
+  Not the article headline — your own summary of the key facts.
 - Omit empty sections entirely
 - Use bullets, not numbers
 - Use em dash (—) in the header, not a hyphen
