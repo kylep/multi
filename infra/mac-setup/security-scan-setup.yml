@@ -382,6 +382,41 @@
           </plist>
 
     # ---------------------------------------------------------------
+    # CIS Level 1 — mSCP exemptions for checks that cannot pass without MDM
+    # Writes exempt=1 into /Library/Preferences/org.cis_lvl1.audit.plist
+    # so mSCP logs "Exemption Allowed" instead of bare "failed".
+    # The scan script then reports these separately from real failures.
+    # ---------------------------------------------------------------
+    - name: CIS — Set mSCP exemptions for MDM-only and intentional exceptions
+      ansible.builtin.shell: |
+        PLB=/usr/libexec/PlistBuddy
+        PLIST=/Library/Preferences/org.cis_lvl1.audit.plist
+
+        set_exempt() {
+          local check="$1" reason="$2"
+          $PLB -c "Add :${check} dict" "$PLIST" 2>/dev/null || true
+          $PLB -c "Add :${check}:exempt integer 1" "$PLIST" 2>/dev/null || \
+            $PLB -c "Set :${check}:exempt 1" "$PLIST"
+          $PLB -c "Add :${check}:exempt_reason string ${reason}" "$PLIST" 2>/dev/null || \
+            $PLB -c "Set :${check}:exempt_reason ${reason}" "$PLIST"
+        }
+
+        set_exempt os_safari_advertising_privacy_protection_enable "Requires MDM config profile"
+        set_exempt os_safari_open_safe_downloads_disable "Requires MDM config profile"
+        set_exempt "os_safari_prevent_cross-site_tracking_enable" "Requires MDM config profile"
+        set_exempt os_safari_show_full_website_address_enable "Requires MDM config profile"
+        set_exempt os_safari_show_status_bar_enabled "Requires MDM config profile"
+        set_exempt os_safari_warn_fraudulent_website_enable "Requires MDM config profile"
+        set_exempt pwpolicy_account_lockout_enforce "Requires MDM or domain enrollment"
+        set_exempt pwpolicy_account_lockout_timeout_enforce "Requires MDM or domain enrollment"
+        set_exempt pwpolicy_history_enforce "Requires MDM or domain enrollment"
+        set_exempt pwpolicy_max_lifetime_enforce "Requires MDM or domain enrollment"
+        set_exempt pwpolicy_minimum_length_enforce "Requires MDM or domain enrollment"
+        set_exempt system_settings_filevault_enforce "Apple Silicon encrypts via Secure Enclave"
+        set_exempt system_settings_ssh_disable "SSH intentionally enabled for Tailscale and agent access"
+      changed_when: false
+
+    # ---------------------------------------------------------------
     # CIS Level 1 — Run scan to verify
     # ---------------------------------------------------------------
     - name: Run scan now

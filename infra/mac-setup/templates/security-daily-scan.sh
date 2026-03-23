@@ -57,8 +57,9 @@ if [[ -x "$MSCP_SCRIPT" ]]; then
   _elapsed=$(( SECONDS - _start ))
   log "mSCP complete (exit=${_rc}, ${_elapsed}s)"
   _pass=$(grep -c " passed " "$LOG_DIR/${DATE}-mscp.log" 2>/dev/null) || _pass=0
-  _fail=$(grep -c " failed " "$LOG_DIR/${DATE}-mscp.log" 2>/dev/null) || _fail=0
-  log "mSCP CIS L1: ${_pass} pass, ${_fail} fail — see ${DATE}-mscp.log"
+  _fail=$(grep " failed " "$LOG_DIR/${DATE}-mscp.log" 2>/dev/null | grep -cv "Exemption Allowed") || _fail=0
+  _exempt=$(grep -c "Exemption Allowed" "$LOG_DIR/${DATE}-mscp.log" 2>/dev/null) || _exempt=0
+  log "mSCP CIS L1: ${_pass} pass, ${_fail} fail, ${_exempt} exempt — see ${DATE}-mscp.log"
 else
   log "mSCP script not found at ${MSCP_SCRIPT} — skipping (run security-scan-setup.yml)"
 fi
