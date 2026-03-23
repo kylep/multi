@@ -21,6 +21,7 @@ metadata:
   labels:
     {{- include "pai-responder.labels" . | nindent 4 }}
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:

@@ -25,7 +25,7 @@ spec:
           export PAI_DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
           {{`{{- end }}`}}
     spec:
-      serviceAccountName: ai-agents
+      serviceAccountName: agent-controller
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
