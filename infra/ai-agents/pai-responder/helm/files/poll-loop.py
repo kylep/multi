@@ -117,16 +117,12 @@ def is_mention(msg, bot_user_id):
     # Check content for raw mention
     if f"<@{bot_user_id}>" in (msg.get("content") or ""):
         return True
-    # Check for name mention (case-insensitive)
-    content_lower = (msg.get("content") or "").lower()
-    if "pai" in content_lower.split():
-        return True
     return False
 
 
-def invoke_claude(prompt):
+def invoke_claude(prompt, trigger_type="mention"):
     """Invoke claude --agent pai with the given prompt."""
-    log.info("Invoking Claude: %.100s...", prompt)
+    log.info("Invoking Claude (trigger=%s, prompt_len=%d)", trigger_type, len(prompt))
     cmd = [
         "claude",
         "--agent", "pai",
@@ -144,9 +140,9 @@ def invoke_claude(prompt):
             timeout=CLAUDE_TIMEOUT,
         )
         if result.returncode != 0:
-            log.error("Claude failed (rc=%d): %s", result.returncode, result.stderr[:500])
+            log.error("Claude failed (rc=%d, trigger=%s)", result.returncode, trigger_type)
         else:
-            log.info("Claude completed: %.200s", result.stdout[:200])
+            log.info("Claude completed (trigger=%s)", trigger_type)
     except subprocess.TimeoutExpired:
         log.error("Claude timed out after %ds", CLAUDE_TIMEOUT)
 
@@ -235,7 +231,7 @@ def main():
                             # Immediate response to @mention
                             context = get_new_messages(client, ch_id)
                             context.reverse()
-                            invoke_claude(build_mention_prompt(msg, context[-10:], ch_name))
+                            invoke_claude(build_mention_prompt(msg, context[-10:], ch_name), "mention")
                             # Track thread if this is a thread
                             if channel.get("type") == 11:  # thread
                                 if ch_id not in state["pai_threads"]:
@@ -245,7 +241,7 @@ def main():
                             # Reply in a thread Pai is in
                             context = get_new_messages(client, ch_id)
                             context.reverse()
-                            invoke_claude(build_mention_prompt(msg, context[-10:], ch_name))
+                            invoke_claude(build_mention_prompt(msg, context[-10:], ch_name), "thread")
 
                         else:
                             # Buffer for periodic review
@@ -280,7 +276,7 @@ def main():
                                 continue
                             context = get_new_messages(client, t_id)
                             context.reverse()
-                            invoke_claude(build_mention_prompt(msg, context[-10:], t_name))
+                            invoke_claude(build_mention_prompt(msg, context[-10:], t_name), "thread")
                 except Exception:
                     log.warning("Failed to check threads", exc_info=True)
 
@@ -292,7 +288,7 @@ def main():
                             "Periodic review: %d unreviewed messages",
                             len(state["unreviewed_messages"]),
                         )
-                        invoke_claude(build_review_prompt(state["unreviewed_messages"]))
+                        invoke_claude(build_review_prompt(state["unreviewed_messages"]), "review")
                     state["unreviewed_messages"] = []
                     state["last_review_time"] = now.isoformat()
 
