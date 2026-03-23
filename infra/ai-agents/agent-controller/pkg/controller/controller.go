@@ -416,12 +416,24 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 
 	cmd := c.buildCommand(task)
 
+	// Resolve git branch: task spec overrides, default to "main".
+	branch := task.Spec.Branch
+	if branch == "" {
+		branch = "main"
+	}
+
 	// Log to Discord #log
 	promptPreview := task.Spec.Prompt
 	if len(promptPreview) > 100 {
 		promptPreview = promptPreview[:100] + "..."
 	}
-	if err := c.discord.Send(fmt.Sprintf("▶ `%s` | agent=**%s** | job=`%s`\n> %s", runID, task.Spec.Agent, jobName, promptPreview)); err != nil {
+	branchLabel := branch
+	if branchLabel == "main" {
+		branchLabel = ""
+	} else {
+		branchLabel = fmt.Sprintf(" | branch=`%s`", branchLabel)
+	}
+	if err := c.discord.Send(fmt.Sprintf("▶ `%s` | agent=**%s**%s | job=`%s`\n> %s", runID, task.Spec.Agent, branchLabel, jobName, promptPreview)); err != nil {
 		log.Printf("Discord log failed: %v", err)
 	}
 
@@ -466,6 +478,8 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	// Note: git-sync runs as an init container BEFORE vault-agent-init,
 	// so it cannot source /vault/secrets/config. Use hardcoded public URL
 	// for read-only agents; write agents get a GitHub App token URL.
+	// If the requested branch does not exist, git clone fails and the
+	// init container exits non-zero with a clear error message.
 	var gitSyncArgs string
 	cloneURL := "https://github.com/kylep/multi.git"
 	if githubToken != "" {
@@ -474,14 +488,14 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	if isWriteAgent {
 		// Fresh clone into writable emptyDir workspace
 		gitSyncArgs = fmt.Sprintf(
-			"git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; chown -R %s:%s /workspace/repo",
-			cloneURL, chownUID, chownUID,
+			"git clone -b '%s' %s /workspace/repo || { echo 'FATAL: branch \"%s\" does not exist in remote'; exit 1; }; chown -R %s:%s /workspace/repo",
+			branch, cloneURL, branch, chownUID, chownUID,
 		)
 	} else {
 		// Shared PVC: fetch and reset (owned by UID 1001, no safe.directory needed)
 		gitSyncArgs = fmt.Sprintf(
-			"{ cd /workspace/repo && git fetch origin && git checkout ${REPO_BRANCH:-main} && git reset --hard origin/${REPO_BRANCH:-main} || git clone -b ${REPO_BRANCH:-main} %s /workspace/repo; }; chown -R %s:%s /workspace/repo",
-			cloneURL, chownUID, chownUID,
+			"{ cd /workspace/repo && git fetch origin && git checkout '%s' && git reset --hard origin/'%s' || git clone -b '%s' %s /workspace/repo || { echo 'FATAL: branch \"%s\" does not exist in remote'; exit 1; }; }; chown -R %s:%s /workspace/repo",
+			branch, branch, branch, cloneURL, branch, chownUID, chownUID,
 		)
 	}
 
@@ -635,8 +649,8 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	if !isWriteAgent {
 		workspace = "pvc:" + pvcName
 	}
-	log.Printf("Created job %s for task %s (agent=%s, runtime=%s, workspace=%s)",
-		jobName, task.Name, task.Spec.Agent, task.Spec.Runtime, workspace)
+	log.Printf("Created job %s for task %s (agent=%s, runtime=%s, branch=%s, workspace=%s)",
+		jobName, task.Name, task.Spec.Agent, task.Spec.Runtime, branch, workspace)
 	c.updateStatus(ctx, task, "Running", jobName)
 	return nil
 }

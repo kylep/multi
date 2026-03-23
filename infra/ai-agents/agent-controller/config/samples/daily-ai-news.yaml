@@ -16,7 +16,8 @@ spec:
     using the format defined in your agent instructions. Apply the
     significance rubric strictly — if fewer than 2 stories qualify,
     write a one-line wiki entry and skip Discord.
-  schedule: "52 22 * * *"
+  branch: "kyle/journalist-v2"
+  schedule: "0 12 * * *"
   trigger: scheduled
   readOnly: false
   allowedTools: >-
