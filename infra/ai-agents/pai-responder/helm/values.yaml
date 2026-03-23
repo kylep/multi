@@ -1,3 +1,6 @@
+# Set to false to skip deploying all resources (e.g. on M2 to avoid duplicate Discord listeners)
+enabled: true
+
 image:
   repository: kpericak/ai-agent-runtime
   tag: "0.4"

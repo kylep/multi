@@ -1,0 +1,6 @@
+apiVersion: v2
+name: agent-tasks
+description: AgentTask CRs deployed per cluster via helmfile environment values flags
+type: application
+version: 0.1.0
+appVersion: "0.1"

@@ -1,0 +1,10 @@
+# All tasks disabled by default. Enable per cluster via environments/m1.yaml or m2.yaml.
+tasks:
+  journalist:
+    enabled: false
+  paiMorning:
+    enabled: false
+  publisher:
+    enabled: false
+  analyst:
+    enabled: false

@@ -1,0 +1,30 @@
+# Deploys the agent-controller to every cluster labeled cluster-role=ai-agents.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: agent-controller
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cluster-role: ai-agents
+  template:
+    metadata:
+      name: "agent-controller-{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kylep/multi
+        targetRevision: main
+        path: infra/ai-agents/agent-controller/helm
+      destination:
+        server: "{{server}}"
+        namespace: ai-agents
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

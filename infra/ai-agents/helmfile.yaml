@@ -2,6 +2,19 @@ repositories:
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
 
+# Environments map to per-cluster values files. Use: helmfile -e m1 apply
+# ArgoCD uses these same files for ongoing GitOps sync (see argocd/).
+environments:
+  default:
+    values:
+      - environments/default.yaml
+  m1:
+    values:
+      - environments/m1.yaml
+  m2:
+    values:
+      - environments/m2.yaml
+
 releases:
   - name: vault
     namespace: vault
@@ -20,5 +33,12 @@ releases:
   - name: pai-responder
     namespace: ai-agents
     chart: ./pai-responder/helm
+    condition: enabled
     needs:
       - vault/vault
+
+  - name: agent-tasks
+    namespace: ai-agents
+    chart: ./agent-tasks/helm
+    needs:
+      - ai-agents/agent-controller
