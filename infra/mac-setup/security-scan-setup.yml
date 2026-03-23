@@ -1,12 +1,13 @@
 # security-scan-setup.yml
-# Sets up the daily security scan LaunchDaemon (runs as root at 06:00).
+# Sets up the daily security scan LaunchDaemon (runs as root at 06:00)
+# and applies CIS Level 1 hardening settings.
 # Run separately from the main playbook because it needs sudo throughout:
 #
-#   ansible-playbook infra/mac-setup/security-scan-setup.yml -K
+#   sudo ansible-playbook infra/mac-setup/security-scan-setup.yml
 #
 # This is idempotent — safe to re-run.
 
-- name: Configure daily security scans
+- name: Configure daily security scans and CIS Level 1 hardening
   hosts: localhost
   connection: local
   gather_facts: true
@@ -64,15 +65,13 @@
       ansible.builtin.debug:
         msg: "{{ launchd_status.stdout_lines[:5] }}"
 
-    - name: Refresh rkhunter property database after SSH config changes
+    - name: Refresh rkhunter property database
       ansible.builtin.command: /opt/homebrew/bin/rkhunter --propupd --nocolors
       changed_when: false
 
-    - name: Run scan now
-      ansible.builtin.command: /usr/local/bin/security-daily-scan.sh
-      timeout: 1200
-      changed_when: false
-
+    # ---------------------------------------------------------------
+    # SSH hardening (Lynis + rkhunter findings)
+    # ---------------------------------------------------------------
     - name: Fix sshd_config permissions (Lynis FILE-7524)
       ansible.builtin.file:
         path: /etc/ssh/sshd_config
@@ -94,3 +93,292 @@
         path: /etc/ssh/sshd_config
         regexp: '^#?Protocol '
         line: 'Protocol 2'
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Firewall (mSCP: com.apple.security.firewall)
+    # mSCP reads from NSUserDefaults suite, not socketfilterfw state.
+    # Both must be set: actual firewall on + pref domain for mSCP check.
+    # ---------------------------------------------------------------
+    - name: CIS — Enable macOS firewall (socketfilterfw)
+      ansible.builtin.command: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Enable firewall stealth mode (socketfilterfw)
+      ansible.builtin.command: /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Write firewall enable to mSCP-checked pref domain
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.security.firewall
+        EnableFirewall -bool true
+      changed_when: false
+
+    - name: CIS — Write firewall stealth mode to mSCP-checked pref domain
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.security.firewall
+        EnableStealthMode -bool true
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Gatekeeper (mSCP: com.apple.systempolicy.control)
+    # ---------------------------------------------------------------
+    - name: CIS — Enable Gatekeeper
+      ansible.builtin.command: spctl --master-enable
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Write Gatekeeper enable to mSCP-checked pref domain
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.systempolicy.control
+        EnableAssessment -bool true
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Login window (mSCP: com.apple.loginwindow)
+    # ---------------------------------------------------------------
+    - name: CIS — Show full name at login (not user list)
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.loginwindow
+        SHOWFULLNAME -bool true
+      changed_when: false
+
+    - name: CIS — Set login window banner text
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.loginwindow
+        LoginwindowText -string "Authorized use only."
+      changed_when: false
+
+    - name: CIS — Disable password hints
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.loginwindow
+        RetriesUntilHint -int 0
+      changed_when: false
+
+    - name: CIS — Disable automatic login
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.loginwindow
+        com.apple.login.mcx.DisableAutoLoginClient -bool true
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — MCX managed settings (mSCP: com.apple.MCX)
+    # Written to /Library/Preferences/com.apple.MCX.plist (already exists).
+    # ---------------------------------------------------------------
+    - name: CIS — Disable guest account via MCX pref
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.MCX
+        DisableGuestAccount -bool true
+      changed_when: false
+
+    - name: CIS — Force internet sharing off via MCX pref
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.MCX
+        forceInternetSharingOff -bool true
+      changed_when: false
+
+    - name: CIS — Set time server via MCX pref
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.MCX
+        timeServer -string "time.apple.com"
+      changed_when: false
+
+    - name: CIS — Also disable guest account via sysadminctl
+      ansible.builtin.command: sysadminctl -guestAccount off
+      changed_when: false
+      failed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Time server (mSCP: com.apple.timed)
+    # ---------------------------------------------------------------
+    - name: CIS — Set NTP time server
+      ansible.builtin.command: systemsetup -setnetworktimeserver time.apple.com
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Enable automatic time sync
+      ansible.builtin.command: systemsetup -setusingnetworktime on
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Write automatic time to mSCP-checked pref domain
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.timed
+        TMAutomaticTimeOnlyEnabled -bool true
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Diagnostics (mSCP: com.apple.SubmitDiagInfo)
+    # ---------------------------------------------------------------
+    - name: CIS — Disable diagnostic submission
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.SubmitDiagInfo
+        AutoSubmit -bool false
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Software update (mSCP: com.apple.SoftwareUpdate)
+    # ---------------------------------------------------------------
+    - name: CIS — Enable automatic app updates
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.SoftwareUpdate
+        AutomaticallyInstallAppUpdates -bool true
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Screensaver (mSCP: com.apple.screensaver)
+    # mSCP runs as root; write to /Library/Preferences so root finds it.
+    # ---------------------------------------------------------------
+    - name: CIS — Set screensaver idle timeout (max 1200s)
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.screensaver
+        idleTime -int 600
+      changed_when: false
+
+    - name: CIS — Require password on screensaver
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.screensaver
+        askForPassword -int 1
+      changed_when: false
+
+    - name: CIS — Require password immediately (no delay)
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.screensaver
+        askForPasswordDelay -int 0
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — applicationaccess managed prefs
+    # mSCP reads these from NSUserDefaults suite com.apple.applicationaccess
+    # which checks /Library/Managed Preferences/ first (MDM-style).
+    # Writing there directly simulates MDM enforcement on a non-MDM machine.
+    # ---------------------------------------------------------------
+    - name: CIS — Create /Library/Managed Preferences directory
+      ansible.builtin.file:
+        path: /Library/Managed\ Preferences
+        state: directory
+        mode: "0755"
+        owner: root
+        group: wheel
+
+    - name: CIS — Disable AirDrop (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowAirDrop -bool false
+      changed_when: false
+
+    - name: CIS — Disable AirPlay receiver (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowAirPlayIncomingRequests -bool false
+      changed_when: false
+
+    - name: CIS — Disable Siri (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowAssistant -bool false
+      changed_when: false
+
+    - name: CIS — Disable external intelligence integrations (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowExternalIntelligenceIntegrations -bool false
+      changed_when: false
+
+    - name: CIS — Disable external intelligence sign-in (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowExternalIntelligenceIntegrationsSignIn -bool false
+      changed_when: false
+
+    - name: CIS — Disable Mail summaries (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowMailSummary -bool false
+      changed_when: false
+
+    - name: CIS — Disable Notes transcription (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowNotesTranscription -bool false
+      changed_when: false
+
+    - name: CIS — Disable Notes transcription summary (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowNotesTranscriptionSummary -bool false
+      changed_when: false
+
+    - name: CIS — Disable personalized advertising (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowApplePersonalizedAdvertising -bool false
+      changed_when: false
+
+    - name: CIS — Disable writing tools (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        allowWritingTools -bool false
+      changed_when: false
+
+    - name: CIS — Enforce on-device dictation (managed pref)
+      ansible.builtin.command: >
+        defaults write "/Library/Managed Preferences/com.apple.applicationaccess"
+        forceOnDeviceOnlyDictation -bool true
+      changed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — User-level prefs (run as brew_user)
+    # mSCP checks these in the current user context; setting system-level
+    # versions ensures they're found when running as root.
+    # ---------------------------------------------------------------
+    - name: CIS — Disable Siri data sharing (user pref)
+      ansible.builtin.command: >
+        su -l {{ brew_user }} -c
+        "defaults write com.apple.assistant.support 'Siri Data Sharing Opt-In Status' -int 2"
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Disable search query data sharing (user pref)
+      ansible.builtin.command: >
+        su -l {{ brew_user }} -c
+        "defaults write com.apple.assistant.support 'Search Queries Data Sharing Status' -int 2"
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Disable assistive voice data donation (user pref)
+      ansible.builtin.command: >
+        su -l {{ brew_user }} -c
+        "defaults write com.apple.Accessibility AXSAudioDonationSiriImprovementEnabled -bool false"
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Enable Terminal secure keyboard entry (user pref)
+      ansible.builtin.command: >
+        su -l {{ brew_user }} -c
+        "defaults write com.apple.Terminal SecureKeyboardEntry -bool true"
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Also write Siri assistant support to system-level for mSCP check
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.assistant.support
+        "Siri Data Sharing Opt-In Status" -int 2
+      changed_when: false
+      failed_when: false
+
+    - name: CIS — Write search queries disable to system-level for mSCP check
+      ansible.builtin.command: >
+        defaults write /Library/Preferences/com.apple.assistant.support
+        "Search Queries Data Sharing Status" -int 2
+      changed_when: false
+      failed_when: false
+
+    # ---------------------------------------------------------------
+    # CIS Level 1 — Run scan to verify
+    # ---------------------------------------------------------------
+    - name: Run scan now
+      ansible.builtin.command: /usr/local/bin/security-daily-scan.sh
+      timeout: 1200
+      changed_when: false
