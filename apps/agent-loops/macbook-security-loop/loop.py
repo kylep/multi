@@ -275,8 +275,9 @@ def poll_operator_directives():
         return
 
     # Append new directives
+    needs_header = not DIRECTIVES_FILE.exists() or DIRECTIVES_FILE.stat().st_size == 0
     with open(DIRECTIVES_FILE, "a") as f:
-        if not DIRECTIVES_FILE.exists() or DIRECTIVES_FILE.stat().st_size == 0:
+        if needs_header:
             f.write("# Operator Directives\n\n")
             f.write("Messages from the operator in #status-updates.\n")
             f.write("These are instructions — follow them.\n\n")
