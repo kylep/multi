@@ -16,3 +16,9 @@ releases:
     chart: ./agent-controller/helm
     needs:
       - vault/vault
+
+  - name: pai-responder
+    namespace: ai-agents
+    chart: ./pai-responder/helm
+    needs:
+      - vault/vault

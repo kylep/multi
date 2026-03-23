@@ -1,0 +1,29 @@
+image:
+  repository: kpericak/ai-agent-runtime
+  tag: "0.4"
+  pullPolicy: Always
+
+discord:
+  guildId: "1482815068352675971"
+
+polling:
+  interval: 30        # seconds between polls
+  reviewInterval: 900  # seconds between periodic reviews (15 min)
+
+vault:
+  role: ai-agents
+  secretPath: secret/ai-agents/pai
+
+storage:
+  size: 100Mi
+  hostPath: /tmp/pai-state
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+
+namespace: ai-agents
