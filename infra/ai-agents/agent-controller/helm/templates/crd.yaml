@@ -45,6 +45,8 @@ spec:
                 readOnly:
                   type: boolean
                   default: false
+                branch:
+                  type: string
                 allowedTools:
                   type: string
             status:
