@@ -485,17 +485,18 @@ func (c *Controller) createJob(ctx context.Context, task *crd.AgentTask) error {
 	if githubToken != "" {
 		cloneURL = fmt.Sprintf("https://x-access-token:%s@github.com/kylep/multi.git", githubToken)
 	}
+	escapedBranch := strings.ReplaceAll(branch, "'", "'\\''")
 	if isWriteAgent {
 		// Fresh clone into writable emptyDir workspace
 		gitSyncArgs = fmt.Sprintf(
 			"git clone -b '%s' %s /workspace/repo || { echo 'FATAL: branch \"%s\" does not exist in remote'; exit 1; }; chown -R %s:%s /workspace/repo",
-			branch, cloneURL, branch, chownUID, chownUID,
+			escapedBranch, cloneURL, escapedBranch, chownUID, chownUID,
 		)
 	} else {
 		// Shared PVC: fetch and reset (owned by UID 1001, no safe.directory needed)
 		gitSyncArgs = fmt.Sprintf(
 			"{ cd /workspace/repo && git fetch origin && git checkout '%s' && git reset --hard origin/'%s' || git clone -b '%s' %s /workspace/repo || { echo 'FATAL: branch \"%s\" does not exist in remote'; exit 1; }; }; chown -R %s:%s /workspace/repo",
-			branch, branch, branch, cloneURL, branch, chownUID, chownUID,
+			escapedBranch, escapedBranch, escapedBranch, cloneURL, escapedBranch, chownUID, chownUID,
 		)
 	}
 

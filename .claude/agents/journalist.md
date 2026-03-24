@@ -162,7 +162,11 @@ Stories matching these topics get promoted to "Just for You":
 
 4. Deduplicate results across all queries. Skip any story already
    covered in the last 5 Discord posts unless there is a material
-   update. If including an update, state what changed.
+   update. Material updates include: funding amount changes, confirmed
+   product launch dates, finalized acquisition terms, revised breach
+   victim counts, new technical disclosures, regulatory filings or
+   legal outcomes, and significant pricing or feature changes. If
+   including an update, state what changed and cite the new source.
 
 5. Apply the significance rubric. Discard anything below threshold.
    Be aggressive about cutting — fewer high-quality items beats
