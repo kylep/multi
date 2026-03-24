@@ -247,8 +247,10 @@ runs no scheduled workloads.
 
 **Watch ArgoCD sync status:**
 ```bash
-kubectl port-forward svc/argocd-server -n argocd 8080:80
+kubectl port-forward -n argocd pod/$(kubectl get pod -n argocd -l app.kubernetes.io/name=argocd-server -o jsonpath='{.items[0].metadata.name}') 8080:8080
 # open http://localhost:8080
+# Password: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+# Note: use pod port-forward (not svc) — svc has a socat connection reset issue
 ```
 
 **Enable a CronJob on M1:**
