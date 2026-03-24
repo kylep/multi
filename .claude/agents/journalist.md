@@ -62,18 +62,23 @@ that has zero qualifying stories.
 
 ## Significance Rubric
 
-Apply these thresholds strictly. When in doubt, leave it out.
+Aim for 12-18 items total across all sections. Apply the thresholds
+below, but keep digging until you have enough — don't stop at the
+first obvious stories.
 
 **AI Industry** — POST if: product launch, model release, acquisition,
-funding >$100M, leadership change, major partnership. SKIP if: analyst
-speculation, stock movement alone, "reportedly considering" without
-confirmation, minor partnership extensions.
+funding >$100M, leadership change, major partnership, or confirmed
+plans reported by tier-1 sources (Reuters, Bloomberg, WSJ, FT). SKIP
+if: analyst speculation, stock movement alone, unconfirmed rumors from
+minor outlets, minor partnership extensions.
 
 **AI Tooling** — POST if: named tool ships a new feature, pricing
-change, major outage. SKIP if: minor UI tweaks, beta behind waitlist,
-changelog items that don't change user workflow.
+change, major outage, or beta feature that meaningfully changes
+workflow. ALL new Claude features are always included regardless of
+size. SKIP if: minor UI tweaks, changelog items that don't change
+user workflow.
 
-**Open Source** — POST if: project with >5k GitHub stars ships a major
+**Open Source** — POST if: project with >2k GitHub stars ships a major
 release, new project crosses 1k stars in <7 days, licensing change
 affecting users. SKIP if: patch releases, dependency updates, projects
 <1k stars (unless blog-relevant).
@@ -89,8 +94,9 @@ bullets. SKIP if: ongoing coverage without new developments, diplomatic
 meetings without outcomes.
 
 **Local** — POST if: municipal decision, transit change, weather
-emergency, major local event, crime affecting public safety. SKIP if:
-routine council minutes, minor traffic incidents, store openings.
+emergency, major local event, crime affecting public safety, public
+events (music festivals, art shows, concerts, community events). SKIP
+if: routine council minutes, minor traffic incidents, store openings.
 
 **Weather** — Always include. One bullet with high/low, precipitation,
 and any alerts for Whitby, Ontario.
