@@ -1,6 +1,9 @@
 # kyle-m2 — gaming machine, Rancher sometimes off. No scheduled agents; available for ad-hoc testing.
 storageClass: local-path
 
+argocd:
+  enabled: false
+
 paiResponder:
   enabled: false  # avoid duplicate Discord responses; kyle-m2 unreliable
 

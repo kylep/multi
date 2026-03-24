@@ -1,6 +1,9 @@
 # M1 — always-on server ("Pai's laptop"). Runs all scheduled agents and pai-responder.
 storageClass: local-path
 
+argocd:
+  enabled: true
+
 paiResponder:
   enabled: true
 

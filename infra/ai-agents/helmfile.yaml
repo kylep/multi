@@ -1,6 +1,8 @@
 repositories:
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
 
 # Environments map to per-cluster values files. Use: helmfile -e m1 apply
 # ArgoCD uses these same files for ongoing GitOps sync (see argocd/).
@@ -16,6 +18,16 @@ environments:
       - environments/kyle-m2.yaml
 ---
 releases:
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd
+    version: 9.4.15
+    condition: argocd.enabled
+    createNamespace: true
+    set:
+      - name: configs.params.server\.insecure
+        value: "true"
+
   - name: vault
     namespace: vault
     chart: hashicorp/vault

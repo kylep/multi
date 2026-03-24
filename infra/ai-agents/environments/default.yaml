@@ -3,6 +3,9 @@
 storageClass: local-path
 
 # Default: all optional workloads disabled. Override in m1.yaml/kyle-m2.yaml.
+argocd:
+  enabled: false
+
 paiResponder:
   enabled: false
 
