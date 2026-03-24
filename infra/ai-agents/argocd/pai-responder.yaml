@@ -1,6 +1,6 @@
 # Deploys pai-responder to every cluster labeled cluster-role=ai-agents.
 # Cluster-specific values (environments/<name>.yaml) control whether it's actually
-# enabled — set paiResponder.enabled: false on M2 to avoid duplicate Discord listeners.
+# enabled — set paiResponder.enabled: false on kyle-m2 to avoid duplicate Discord listeners.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:

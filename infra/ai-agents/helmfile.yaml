@@ -11,9 +11,9 @@ environments:
   m1:
     values:
       - environments/m1.yaml
-  m2:
+  kyle-m2:
     values:
-      - environments/m2.yaml
+      - environments/kyle-m2.yaml
 ---
 releases:
   - name: vault

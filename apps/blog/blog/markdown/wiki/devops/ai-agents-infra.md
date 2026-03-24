@@ -1,6 +1,6 @@
 ---
 title: "AI Agents Infrastructure"
-summary: "How the infra/ai-agents/ stack is organized, deployed, and kept in sync across the M1 and M2 Mac clusters via ArgoCD GitOps."
+summary: "How the infra/ai-agents/ stack is organized, deployed, and kept in sync across the M1 and kyle-m2 Mac clusters via ArgoCD GitOps."
 keywords:
   - kubernetes
   - argocd
@@ -10,7 +10,7 @@ keywords:
   - vault
   - rancher
   - m1
-  - m2
+  - kyle-m2
   - multi-cluster
   - cronjob
   - pai-responder
@@ -29,10 +29,10 @@ Everything that runs inside Rancher on the Mac machines lives in
 | Machine | Role | Rancher |
 |---------|------|---------|
 | **M1** | Always-on server — Pai's dedicated AI workstation | Always up |
-| **M2** | Gaming laptop — development and ad-hoc testing | Rancher sometimes off |
+| **kyle-m2** | Gaming laptop — development and ad-hoc testing | Rancher sometimes off |
 
 ArgoCD (running on M1) watches the `main` branch and auto-syncs both
-clusters on every push. When M2 is offline its apps show as Unknown —
+clusters on every push. When kyle-m2 is offline its apps show as Unknown —
 no action needed.
 
 ## Directory layout
@@ -48,7 +48,7 @@ infra/ai-agents/
 ├── environments/
 │   ├── default.yaml         ← Fallback for manual helmfile runs
 │   ├── m1.yaml              ← M1-specific values (all agents enabled)
-│   └── m2.yaml              ← M2-specific values (all agents disabled)
+│   └── kyle-m2.yaml         ← kyle-m2-specific values (all agents disabled)
 ├── bin/                     ← bootstrap.sh, configure-vault-auth.sh, store-secrets.sh
 └── helmfile.yaml            ← Orchestration (used by bootstrap + ArgoCD fallback)
 ```
@@ -73,7 +73,7 @@ and ResourceQuota (previously owned by the agent-controller).
 Each scheduled agent runs as a native K8s CronJob in `ai-agents` namespace.
 `suspend: true/false` controls whether the schedule fires:
 
-| CronJob | Agent | Schedule (UTC) | M1 | M2 |
+| CronJob | Agent | Schedule (UTC) | M1 | kyle-m2 |
 |---------|-------|---------------|----|----|
 | `journalist` | journalist | 0 12 * * * (8am ET) | enabled | suspended |
 | `pai-morning` | pai | 30 12 * * * (8:30am ET) | enabled | suspended |
@@ -90,7 +90,7 @@ a greeting to `#general` with no git writes.
 
 ## Per-cluster configuration
 
-`environments/m1.yaml` and `environments/m2.yaml` control what runs:
+`environments/m1.yaml` and `environments/kyle-m2.yaml` control what runs:
 
 ```yaml
 # environments/m1.yaml — M1 gets all scheduled agents + pai-responder
@@ -107,7 +107,7 @@ cronjobs:
 ```
 
 ```yaml
-# environments/m2.yaml — M2 gets the stack but no active workloads
+# environments/kyle-m2.yaml — kyle-m2 gets the stack but no active workloads
 paiResponder:
   enabled: false
 
@@ -135,9 +135,9 @@ The **cluster generator** selects every ArgoCD-registered cluster
 labeled `cluster-role=ai-agents` and generates one Application per cluster:
 
 ```
-argocd/vault.yaml           → vault-m1, vault-m2
-argocd/cronjobs.yaml        → ai-agent-cronjobs-m1, ai-agent-cronjobs-m2
-argocd/pai-responder.yaml   → pai-responder-m1, pai-responder-m2
+argocd/vault.yaml           → vault-m1, vault-kyle-m2
+argocd/cronjobs.yaml        → ai-agent-cronjobs-m1, ai-agent-cronjobs-kyle-m2
+argocd/pai-responder.yaml   → pai-responder-m1, pai-responder-kyle-m2
 ```
 
 The cluster name (`{{name}}`) selects the matching values file:
@@ -227,19 +227,19 @@ bash infra/ai-agents/bin/store-secrets.sh
 See [Bootstrap & Recovery](/wiki/devops/bootstrap.html) for full Vault
 walkthrough and secret paths.
 
-## Registering M2
+## Registering kyle-m2
 
 Run once from any machine that has kubeconfig for both clusters:
 
 ```bash
-argocd cluster add <m2-context-name> --name m2
+argocd cluster add <kyle-m2-context-name> --name kyle-m2
 kubectl label secret -n argocd \
   -l argocd.argoproj.io/secret-type=cluster \
   cluster-role=ai-agents --overwrite
 ```
 
-ArgoCD will immediately begin syncing M2. Since `environments/m2.yaml`
-suspends all CronJobs and disables pai-responder, M2 gets Vault and the
+ArgoCD will immediately begin syncing kyle-m2. Since `environments/kyle-m2.yaml`
+suspends all CronJobs and disables pai-responder, kyle-m2 gets Vault and the
 CronJob infrastructure (namespace, ServiceAccount, NetworkPolicy) but
 runs no scheduled workloads.
 

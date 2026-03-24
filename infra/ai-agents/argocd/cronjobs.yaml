@@ -2,7 +2,7 @@
 # Replaces agent-controller + agent-tasks ApplicationSets.
 # Cluster-specific values (environments/<name>.yaml) control which CronJobs are
 # enabled (suspend:false) and their schedules. M1: journalist + pai-morning enabled.
-# M2: all suspended by default.
+# kyle-m2: all suspended by default.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
