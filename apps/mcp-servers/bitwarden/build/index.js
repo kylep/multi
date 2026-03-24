@@ -112,18 +112,24 @@ server.tool("edit_item", "Edit an existing vault item. Fetches the item, applies
 }, async ({ id, name, username, password, uri, notes }) => {
     const raw = await bw("get", "item", id);
     const item = JSON.parse(raw);
+    const hasLoginChanges = username !== undefined || password !== undefined || uri !== undefined;
+    if (hasLoginChanges && item.type !== 1) {
+        throw new Error("Cannot set login fields on non-login items");
+    }
     if (name !== undefined)
         item.name = name;
     if (notes !== undefined)
         item.notes = notes;
-    if (!item.login)
-        item.login = {};
-    if (username !== undefined)
-        item.login.username = username;
-    if (password !== undefined)
-        item.login.password = password;
-    if (uri !== undefined)
-        item.login.uris = [{ match: null, uri }];
+    if (hasLoginChanges) {
+        if (!item.login)
+            item.login = {};
+        if (username !== undefined)
+            item.login.username = username;
+        if (password !== undefined)
+            item.login.password = password;
+        if (uri !== undefined)
+            item.login.uris = [{ match: null, uri }];
+    }
     const encoded = Buffer.from(JSON.stringify(item)).toString("base64");
     const updated = JSON.parse(await bw("edit", "item", id, encoded));
     return {
