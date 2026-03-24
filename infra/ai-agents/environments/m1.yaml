@@ -9,7 +9,3 @@ tasks:
     enabled: true
   paiMorning:
     enabled: true
-  publisher:
-    enabled: false
-  analyst:
-    enabled: false
