@@ -77,7 +77,7 @@ server.tool(
     collectionId: z.string().optional().describe("Filter by collection ID"),
   },
   async ({ search, folderId, collectionId }) => {
-    const args = ["list", "items", "--output", "json"];
+    const args = ["list", "items"];
     if (search) args.push("--search", search);
     if (folderId) args.push("--folderid", folderId);
     if (collectionId) args.push("--collectionid", collectionId);
@@ -98,7 +98,7 @@ server.tool(
     identifier: z.string().describe("Item ID or exact name"),
   },
   async ({ identifier }) => {
-    const raw = await bw("get", "item", identifier, "--output", "json");
+    const raw = await bw("get", "item", identifier);
     const item: VaultItem = JSON.parse(raw);
     return { content: [{ type: "text", text: formatItem(item, true) }] };
   }
@@ -130,7 +130,7 @@ server.tool(
     template.login = loginTemplate;
 
     const encoded = Buffer.from(JSON.stringify(template)).toString("base64");
-    const raw = await bw("create", "item", encoded, "--output", "json");
+    const raw = await bw("create", "item", encoded);
     const created: VaultItem = JSON.parse(raw);
     return {
       content: [{ type: "text", text: `Created item: ${formatItem(created, false)}` }],
@@ -151,7 +151,7 @@ server.tool(
     notes: z.string().optional().describe("New notes"),
   },
   async ({ id, name, username, password, uri, notes }) => {
-    const raw = await bw("get", "item", id, "--output", "json");
+    const raw = await bw("get", "item", id);
     const item = JSON.parse(raw);
 
     if (name !== undefined) item.name = name;
@@ -162,7 +162,7 @@ server.tool(
     if (uri !== undefined) item.login.uris = [{ match: null, uri }];
 
     const encoded = Buffer.from(JSON.stringify(item)).toString("base64");
-    const updated = JSON.parse(await bw("edit", "item", id, encoded, "--output", "json"));
+    const updated = JSON.parse(await bw("edit", "item", id, encoded));
     return {
       content: [{ type: "text", text: `Updated item: ${formatItem(updated, false)}` }],
     };
@@ -210,7 +210,7 @@ server.tool(
   "List all folders in the vault.",
   {},
   async () => {
-    const raw = await bw("list", "folders", "--output", "json");
+    const raw = await bw("list", "folders");
     const folders: Array<{ id: string; name: string }> = JSON.parse(raw);
     const text = folders.map((f) => `- **${f.name}** [${f.id}]`).join("\n");
     return { content: [{ type: "text", text: text || "No folders." }] };

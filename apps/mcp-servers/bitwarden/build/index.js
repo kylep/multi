@@ -53,7 +53,7 @@ server.tool("list_items", "List vault items. Optionally filter by search term, f
     folderId: z.string().optional().describe("Filter by folder ID"),
     collectionId: z.string().optional().describe("Filter by collection ID"),
 }, async ({ search, folderId, collectionId }) => {
-    const args = ["list", "items", "--output", "json"];
+    const args = ["list", "items"];
     if (search)
         args.push("--search", search);
     if (folderId)
@@ -71,7 +71,7 @@ server.tool("list_items", "List vault items. Optionally filter by search term, f
 server.tool("get_item", "Get a single vault item by ID or name, including its password.", {
     identifier: z.string().describe("Item ID or exact name"),
 }, async ({ identifier }) => {
-    const raw = await bw("get", "item", identifier, "--output", "json");
+    const raw = await bw("get", "item", identifier);
     const item = JSON.parse(raw);
     return { content: [{ type: "text", text: formatItem(item, true) }] };
 });
@@ -95,7 +95,7 @@ server.tool("create_item", "Create a new login item in the vault.", {
     loginTemplate.uris = uri ? [{ match: null, uri }] : [];
     template.login = loginTemplate;
     const encoded = Buffer.from(JSON.stringify(template)).toString("base64");
-    const raw = await bw("create", "item", encoded, "--output", "json");
+    const raw = await bw("create", "item", encoded);
     const created = JSON.parse(raw);
     return {
         content: [{ type: "text", text: `Created item: ${formatItem(created, false)}` }],
@@ -110,7 +110,7 @@ server.tool("edit_item", "Edit an existing vault item. Fetches the item, applies
     uri: z.string().optional().describe("New URL (replaces existing URIs)"),
     notes: z.string().optional().describe("New notes"),
 }, async ({ id, name, username, password, uri, notes }) => {
-    const raw = await bw("get", "item", id, "--output", "json");
+    const raw = await bw("get", "item", id);
     const item = JSON.parse(raw);
     if (name !== undefined)
         item.name = name;
@@ -125,7 +125,7 @@ server.tool("edit_item", "Edit an existing vault item. Fetches the item, applies
     if (uri !== undefined)
         item.login.uris = [{ match: null, uri }];
     const encoded = Buffer.from(JSON.stringify(item)).toString("base64");
-    const updated = JSON.parse(await bw("edit", "item", id, encoded, "--output", "json"));
+    const updated = JSON.parse(await bw("edit", "item", id, encoded));
     return {
         content: [{ type: "text", text: `Updated item: ${formatItem(updated, false)}` }],
     };
@@ -159,7 +159,7 @@ server.tool("generate_password", "Generate a secure password using Bitwarden's g
 });
 // --- List folders ---
 server.tool("list_folders", "List all folders in the vault.", {}, async () => {
-    const raw = await bw("list", "folders", "--output", "json");
+    const raw = await bw("list", "folders");
     const folders = JSON.parse(raw);
     const text = folders.map((f) => `- **${f.name}** [${f.id}]`).join("\n");
     return { content: [{ type: "text", text: text || "No folders." }] };
