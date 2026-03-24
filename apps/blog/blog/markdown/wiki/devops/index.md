@@ -20,6 +20,7 @@ configuration management.
 
 - [Ruler](/wiki/devops/ruler.html) — Cross-tool AI rule inventory
 - [CodeRabbit](/wiki/devops/coderabbit.html) — False positive patterns and path_instructions
+- [AI Agents Infrastructure](/wiki/devops/ai-agents-infra.html) — Stack layout, ArgoCD GitOps, per-cluster config, bootstrap
 - [Agent Controller](/wiki/devops/agent-controller.html) — K8s controller for autonomous AI agent runs via CRDs
 - [Bootstrap & Recovery](/wiki/devops/bootstrap.html) — Single-command bootstrap, Vault secrets, post-reboot recovery
 - [Mac Setup Learnings](/wiki/devops/mac-setup-learnings.html) — Gotchas and patterns from the Ansible-managed Mac setup
