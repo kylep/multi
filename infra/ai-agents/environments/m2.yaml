@@ -1,8 +1,8 @@
 # M2 — gaming machine, Rancher sometimes off. No scheduled agents; available for ad-hoc testing.
 storageClass: local-path
 
-# pai-responder: disabled on M2 to avoid duplicate Discord responses and because M2 is unreliable
-enabled: false
+paiResponder:
+  enabled: false  # avoid duplicate Discord responses; M2 unreliable
 
 tasks:
   journalist:

@@ -1,8 +1,8 @@
 # M1 — always-on server ("Pai's laptop"). Runs all scheduled agents and pai-responder.
 storageClass: local-path
 
-# pai-responder: enabled on M1 (primary Discord listener)
-enabled: true
+paiResponder:
+  enabled: true
 
 tasks:
   journalist:

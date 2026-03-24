@@ -75,7 +75,8 @@ files that control what runs on each machine:
 
 ```yaml
 # environments/m1.yaml — M1 gets everything
-enabled: true          # pai-responder Deployment, PVC, ConfigMap
+paiResponder:
+  enabled: true        # pai-responder Deployment, PVC, ConfigMap
 tasks:
   journalist:
     enabled: true      # daily-ai-news AgentTask
@@ -89,7 +90,8 @@ tasks:
 
 ```yaml
 # environments/m2.yaml — M2 gets the stack but no active workloads
-enabled: false         # pai-responder suppressed (avoid duplicate Discord listener)
+paiResponder:
+  enabled: false       # avoid duplicate Discord listener; M2 unreliable
 tasks:
   journalist:
     enabled: false
