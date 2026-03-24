@@ -36,6 +36,13 @@ if ! node scripts/generate-sitemap.mjs; then
   exit 1
 fi
 
+# Generate feed.xml (RSS) in out/
+echo "Generating RSS feed..."
+if ! node scripts/generate-rss.mjs; then
+  echo "RSS feed generation failed"
+  exit 1
+fi
+
 if [[ "$1" == "" ]]; then
   echo "WARNING: output_dir pos arg is reuqired if copying to volume mount"
   exit 0

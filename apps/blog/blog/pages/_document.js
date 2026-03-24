@@ -5,6 +5,7 @@ export default function Document() {
     <Html>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="alternate" type="application/rss+xml" title="Kyle Pericak" href="/feed.xml" />
       </Head>
       <body>
         <Main />

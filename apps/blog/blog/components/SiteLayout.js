@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import HomeIcon from '@mui/icons-material/Home';
+import RssFeedIcon from '@mui/icons-material/RssFeed';
 import { Link } from '@mui/material';
 import { Box } from '@mui/material';
 import BlogSidebar from './BlogSidebar';
@@ -79,6 +80,7 @@ export function SiteNavHeader() {
           <HeaderNavLink href="/index1.html" data-testid="Nav-Link-Blog">Blog</HeaderNavLink>
           <HeaderNavLink href="/wiki.html" data-testid="Nav-Link-Wiki">Wiki</HeaderNavLink>
           <HeaderNavLink href="/about.html" data-testid="Nav-Link-About">About</HeaderNavLink>
+          <HeaderNavLink href="/feed.xml" data-testid="Nav-Link-RSS"><RssFeedIcon sx={{ fontSize: '1.2rem' }} /></HeaderNavLink>
         </ResponsiveRow>
       </Toolbar>
     </AppBar>
