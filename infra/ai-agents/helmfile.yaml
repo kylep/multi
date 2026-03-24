@@ -27,6 +27,8 @@ releases:
   - name: cronjobs
     namespace: ai-agents
     chart: ./cronjobs/helm
+    values:
+      - environments/{{ .Environment.Name }}.yaml
 
   - name: pai-responder
     namespace: ai-agents
@@ -34,3 +36,5 @@ releases:
     condition: paiResponder.enabled
     needs:
       - ai-agents/cronjobs
+    values:
+      - environments/{{ .Environment.Name }}.yaml
