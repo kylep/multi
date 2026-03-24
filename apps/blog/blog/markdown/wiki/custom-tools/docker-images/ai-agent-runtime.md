@@ -83,6 +83,14 @@ interactive onboarding in headless mode.
 **Node.js deps** (google-news MCP server) are no longer used by the
 controller. The journalist agent uses WebSearch instead.
 
+## MCP server dependencies
+
+**Python deps** (Discord MCP server) are installed in the image via pip:
+`mcp[cli]>=1.2.0` and `httpx>=0.27.0`.
+
+**Node.js deps** (google-news MCP server) are no longer used by the
+controller. The journalist agent uses WebSearch instead.
+
 ## K8s usage
 
 The agent controller creates Jobs with this image. An init container
@@ -110,6 +118,20 @@ The controller injects these via a K8s Secret:
 | `RUN_ID` | UUID prefix for correlating Discord messages |
 | `REPO_URL` | Git repo URL for init container |
 | `REPO_BRANCH` | Branch to checkout (default: `main`) |
+
+## Debugging inside the container
+
+```bash
+# Test MCP server startup
+python3 apps/mcp-servers/discord/server.py
+# If import error → pip deps missing from image, rebuild
+
+# Check Claude Code version
+claude --version
+
+# Test a simple headless run
+claude -p "echo hello" --output-format json --allowedTools Write --max-turns 3
+```
 
 ## QA in containers: static server, not next dev
 
