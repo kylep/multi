@@ -49,6 +49,9 @@ spec:
                   type: boolean
                   default: false
                   description: "Whether this agent only reads the repo."
+                branch:
+                  type: string
+                  description: "Git branch to clone. Defaults to main if omitted."
                 allowedTools:
                   type: string
                   description: "Comma-separated --allowedTools for Claude Code permissions."

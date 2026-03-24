@@ -27,6 +27,8 @@ type AgentTaskSpec struct {
 	Trigger string `json:"trigger,omitempty"`
 	// ReadOnly indicates this agent only reads the repo (no git commits).
 	ReadOnly bool `json:"readOnly,omitempty"`
+	// Branch is the git branch to clone. Defaults to "main".
+	Branch string `json:"branch,omitempty"`
 	// AllowedTools is the comma-separated list for --allowedTools.
 	AllowedTools string `json:"allowedTools,omitempty"`
 }
