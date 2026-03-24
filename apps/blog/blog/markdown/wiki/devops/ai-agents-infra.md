@@ -9,7 +9,7 @@ keywords:
   - helmfile
   - vault
   - rancher
-  - m1
+  - pai-m1
   - kyle-m2
   - multi-cluster
   - cronjob
@@ -47,7 +47,7 @@ infra/ai-agents/
 ├── vault/                   ← HashiCorp Vault Helm values + network policy
 ├── environments/
 │   ├── default.yaml         ← Fallback for manual helmfile runs
-│   ├── m1.yaml              ← M1-specific values (all agents enabled)
+│   ├── pai-m1.yaml              ← pai-m1-specific values (all agents enabled)
 │   └── kyle-m2.yaml         ← kyle-m2-specific values (all agents disabled)
 ├── bin/                     ← bootstrap.sh, configure-vault-auth.sh, store-secrets.sh
 └── helmfile.yaml            ← Orchestration (used by bootstrap + ArgoCD fallback)
@@ -90,10 +90,10 @@ a greeting to `#general` with no git writes.
 
 ## Per-cluster configuration
 
-`environments/m1.yaml` and `environments/kyle-m2.yaml` control what runs:
+`environments/pai-m1.yaml` and `environments/kyle-m2.yaml` control what runs:
 
 ```yaml
-# environments/m1.yaml — M1 gets all scheduled agents + pai-responder
+# environments/pai-m1.yaml — pai-m1 gets all scheduled agents + pai-responder
 paiResponder:
   enabled: true
 
@@ -120,7 +120,7 @@ cronjobs:
     schedule: "30 12 * * *"
 ```
 
-To enable a CronJob on M1, flip `enabled: true` in `m1.yaml` and
+To enable a CronJob on pai-m1, flip `enabled: true` in `pai-m1.yaml` and
 merge to `main` — ArgoCD syncs within ~3 minutes.
 
 ## ArgoCD GitOps
@@ -135,9 +135,9 @@ The **cluster generator** selects every ArgoCD-registered cluster
 labeled `cluster-role=ai-agents` and generates one Application per cluster:
 
 ```
-argocd/vault.yaml           → vault-m1, vault-kyle-m2
-argocd/cronjobs.yaml        → ai-agent-cronjobs-m1, ai-agent-cronjobs-kyle-m2
-argocd/pai-responder.yaml   → pai-responder-m1, pai-responder-kyle-m2
+argocd/vault.yaml           → vault-pai-m1, vault-kyle-m2
+argocd/cronjobs.yaml        → ai-agent-cronjobs-pai-m1, ai-agent-cronjobs-kyle-m2
+argocd/pai-responder.yaml   → pai-responder-pai-m1, pai-responder-kyle-m2
 ```
 
 The cluster name (`{{name}}`) selects the matching values file:
@@ -212,7 +212,7 @@ The script is idempotent. On a fresh cluster it:
 2. Deploys Vault via helmfile (needed before ArgoCD can inject secrets)
 3. Waits for Vault ready; prints manual init steps if uninitialized
 4. Applies all ApplicationSets from `argocd/`
-5. Registers the local cluster as `m1` in ArgoCD (requires `argocd` CLI)
+5. Registers the local cluster as 'pai-m1' in ArgoCD (requires `argocd` CLI)
 6. Labels the cluster secret (`cluster-role=ai-agents`)
 
 After bootstrap, Vault must be initialized and secrets stored (one-time):
@@ -252,11 +252,11 @@ kubectl port-forward svc/argocd-server -n argocd 8080:80
 ```
 
 **Enable a CronJob on M1:**
-Edit `environments/m1.yaml`, set `enabled: true`, merge to `main`.
+Edit `environments/pai-m1.yaml`, set `enabled: true`, merge to `main`.
 
 **Force immediate sync:**
 ```bash
-argocd app sync ai-agent-cronjobs-m1
+argocd app sync ai-agent-cronjobs-pai-m1
 ```
 
 **See what's running:**

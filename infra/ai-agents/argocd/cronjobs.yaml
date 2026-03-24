@@ -1,7 +1,7 @@
 # Deploys native K8s CronJobs to every cluster labeled cluster-role=ai-agents.
 # Replaces agent-controller + agent-tasks ApplicationSets.
 # Cluster-specific values (environments/<name>.yaml) control which CronJobs are
-# enabled (suspend:false) and their schedules. M1: journalist + pai-morning enabled.
+# enabled (suspend:false) and their schedules. pai-m1: journalist + pai-morning enabled.
 # kyle-m2: all suspended by default.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet

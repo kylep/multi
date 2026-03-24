@@ -2,7 +2,7 @@
 # StorageClass used by Vault PVC and agent workspace volumes.
 storageClass: local-path
 
-# Default: all optional workloads disabled. Override in m1.yaml/kyle-m2.yaml.
+# Default: all optional workloads disabled. Override in pai-m1.yaml/kyle-m2.yaml.
 argocd:
   enabled: false
 

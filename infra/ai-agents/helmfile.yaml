@@ -4,15 +4,15 @@ repositories:
   - name: argo
     url: https://argoproj.github.io/argo-helm
 
-# Environments map to per-cluster values files. Use: helmfile -e m1 apply
+# Environments map to per-cluster values files. Use: helmfile -e pai-m1 apply
 # ArgoCD uses these same files for ongoing GitOps sync (see argocd/).
 environments:
   default:
     values:
       - environments/default.yaml
-  m1:
+  pai-m1:
     values:
-      - environments/m1.yaml
+      - environments/pai-m1.yaml
   kyle-m2:
     values:
       - environments/kyle-m2.yaml

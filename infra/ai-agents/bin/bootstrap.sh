@@ -63,13 +63,13 @@ kubectl apply -f "$INFRA_DIR/argocd/"
 # Requires: argocd CLI and ArgoCD server accessible
 ARGOCD_SERVER="${ARGOCD_SERVER:-localhost:8080}"
 if command -v argocd >/dev/null; then
-  echo "Registering this cluster in ArgoCD as 'm1'..."
+  echo "Registering this cluster in ArgoCD as 'pai-m1'..."
   ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret \
     -o jsonpath='{.data.password}' | base64 -d)
   argocd login "$ARGOCD_SERVER" --username admin --password "$ARGOCD_PASSWORD" \
     --insecure --grpc-web 2>/dev/null || true
-  argocd cluster add "$(kubectl config current-context)" --name m1 --yes \
-    --insecure 2>/dev/null || echo "Cluster 'm1' already registered (or argocd login failed — label manually)"
+  argocd cluster add "$(kubectl config current-context)" --name pai-m1 --yes \
+    --insecure 2>/dev/null || echo "Cluster 'pai-m1' already registered (or argocd login failed — label manually)"
   # Label the cluster secret so the ApplicationSet generator picks it up
   kubectl label secret -n argocd \
     -l "argocd.argoproj.io/secret-type=cluster" \
@@ -77,7 +77,7 @@ if command -v argocd >/dev/null; then
 else
   echo ""
   echo "=== argocd CLI not found — complete cluster registration manually ==="
-  echo "   argocd cluster add \$(kubectl config current-context) --name m1"
+  echo "   argocd cluster add \$(kubectl config current-context) --name pai-m1"
   echo "   kubectl label secret -n argocd -l argocd.argoproj.io/secret-type=cluster cluster-role=ai-agents"
 fi
 
