@@ -139,7 +139,7 @@ server.tool("delete_item", "Delete a vault item by ID (moves to trash).", {
 });
 // --- Generate password ---
 server.tool("generate_password", "Generate a secure password using Bitwarden's generator.", {
-    length: z.number().optional().default(20).describe("Password length"),
+    length: z.coerce.number().optional().default(20).describe("Password length"),
     uppercase: z.boolean().optional().default(true),
     lowercase: z.boolean().optional().default(true),
     numbers: z.boolean().optional().default(true),
