@@ -1,8 +1,12 @@
-# Deploys the agent-controller to every cluster labeled cluster-role=ai-agents.
+# Deploys native K8s CronJobs to every cluster labeled cluster-role=ai-agents.
+# Replaces agent-controller + agent-tasks ApplicationSets.
+# Cluster-specific values (environments/<name>.yaml) control which CronJobs are
+# enabled (suspend:false) and their schedules. M1: journalist + pai-morning enabled.
+# M2: all suspended by default.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: agent-controller
+  name: ai-agent-cronjobs
   namespace: argocd
 spec:
   generators:
@@ -12,13 +16,16 @@ spec:
             cluster-role: ai-agents
   template:
     metadata:
-      name: "agent-controller-{{name}}"
+      name: "ai-agent-cronjobs-{{name}}"
     spec:
       project: default
       source:
         repoURL: https://github.com/kylep/multi
         targetRevision: main
-        path: infra/ai-agents/agent-controller/helm
+        path: infra/ai-agents/cronjobs/helm
+        helm:
+          valueFiles:
+            - ../../../infra/ai-agents/environments/{{name}}.yaml
       destination:
         server: "{{server}}"
         namespace: ai-agents

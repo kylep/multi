@@ -65,7 +65,7 @@ echo ""
 echo "=== Configuring Kubernetes auth role for ai-agents ==="
 kubectl exec -n vault vault-0 -- \
   sh -c "VAULT_TOKEN=$ROOT_TOKEN vault write auth/kubernetes/role/ai-agents \
-    bound_service_account_names=agent-controller \
+    bound_service_account_names=cronjob-agent \
     bound_service_account_namespaces=ai-agents \
     policies=ai-agents-read \
     ttl=1h"

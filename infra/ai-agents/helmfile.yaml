@@ -14,7 +14,7 @@ environments:
   m2:
     values:
       - environments/m2.yaml
-
+---
 releases:
   - name: vault
     namespace: vault
@@ -24,21 +24,13 @@ releases:
       - vault/values.yaml
     createNamespace: true
 
-  - name: agent-controller
+  - name: cronjobs
     namespace: ai-agents
-    chart: ./agent-controller/helm
-    needs:
-      - vault/vault
+    chart: ./cronjobs/helm
 
   - name: pai-responder
     namespace: ai-agents
     chart: ./pai-responder/helm
-    condition: enabled
+    condition: paiResponder.enabled
     needs:
-      - vault/vault
-
-  - name: agent-tasks
-    namespace: ai-agents
-    chart: ./agent-tasks/helm
-    needs:
-      - ai-agents/agent-controller
+      - ai-agents/cronjobs

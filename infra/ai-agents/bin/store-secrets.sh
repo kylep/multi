@@ -8,6 +8,7 @@ set -euo pipefail
 #   CLAUDE_TOKEN, OPENROUTER_KEY,
 #   GITHUB_TOKEN, GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY_B64 or GITHUB_APP_KEY_FILE, GITHUB_INSTALL_ID, REPO_URL,
 #   DISCORD_TOKEN, DISCORD_GUILD, DISCORD_LOG_CH,
+#   PAI_DISCORD_TOKEN, PAI_CLAUDE_TOKEN, LINEAR_API_KEY,
 #   WEBHOOK_TOKEN
 #
 # Note: secrets passed as env/args to kubectl exec, visible in process listings.
@@ -160,6 +161,7 @@ echo "=== Pai ==="
 EXISTING_PAI=$(get_existing pai)
 prompt_or_env PAI_DISCORD_TOKEN "Pai Discord bot token$(already_set "$EXISTING_PAI" discord_bot_token)" secret
 prompt_or_env PAI_CLAUDE_TOKEN "Pai Claude OAuth token (leave blank to reuse anthropic secret)$(already_set "$EXISTING_PAI" claude_oauth_token)" secret
+prompt_or_env LINEAR_API_KEY "Linear API key$(already_set "$EXISTING_PAI" linear_api_key)" secret
 # Fall back to the shared Claude token if not set separately
 if [ -z "${PAI_CLAUDE_TOKEN:-}" ] && [ -n "${CLAUDE_TOKEN:-}" ]; then
   PAI_CLAUDE_TOKEN="$CLAUDE_TOKEN"
@@ -167,6 +169,7 @@ fi
 PAI_ARGS=""
 [ -n "${PAI_DISCORD_TOKEN:-}" ] && PAI_ARGS="$PAI_ARGS discord_bot_token=$PAI_DISCORD_TOKEN"
 [ -n "${PAI_CLAUDE_TOKEN:-}" ]  && PAI_ARGS="$PAI_ARGS claude_oauth_token=$PAI_CLAUDE_TOKEN"
+[ -n "${LINEAR_API_KEY:-}" ]    && PAI_ARGS="$PAI_ARGS linear_api_key=$LINEAR_API_KEY"
 # shellcheck disable=SC2086
 [ -n "$PAI_ARGS" ]              && kv_store pai $PAI_ARGS
 
@@ -178,3 +181,4 @@ prompt_or_env WEBHOOK_TOKEN "Webhook bearer token$(already_set "$EXISTING_WEBHOO
 
 echo ""
 echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook}"
+echo "  pai: discord_bot_token, claude_oauth_token, linear_api_key"

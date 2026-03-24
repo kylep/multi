@@ -1,6 +1,6 @@
 ---
 title: "Agent Controller"
-summary: "K8s custom controller that orchestrates AI agent runs via AgentTask CRDs. Includes debugging runbook, known issues, and operational procedures."
+summary: "K8s custom controller that orchestrated AI agent runs via AgentTask CRDs. Deprecated — replaced by native K8s CronJobs. Kept in the repo as a reference project."
 keywords:
   - kubernetes
   - controller
@@ -20,10 +20,15 @@ related:
   - wiki/journal
   - wiki/security/claude-code-write-pattern-bug
   - wiki/design-docs/autonomous-publisher/index
+  - wiki/devops/ai-agents-infra
 scope: "Covers the agent controller architecture, CRD spec, Helm deployment, runtime image, debugging, and operational procedures. Does not cover agent definitions or blog content pipeline."
-last_verified: 2026-03-18
+last_verified: 2026-03-23
 ---
 
+> **Deprecated.** The agent-controller is no longer deployed. Scheduled agents now run as
+> native K8s CronJobs (`infra/ai-agents/cronjobs/`). The Go source and Helm chart remain
+> in the repo as a reference project. See [AI Agents Infra](/wiki/devops/ai-agents-infra.html)
+> for the current architecture.
 
 Custom K8s controller that watches `AgentTask` CRDs and creates Jobs
 to run AI agents. Lives in `infra/ai-agents/agent-controller/`.
