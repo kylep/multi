@@ -27,6 +27,7 @@
       - python@3
       - helm
       - helmfile
+      - argocd
       - pre-commit
       - shellcheck
       - ansible  # keep ansible managed by brew for upgrades
