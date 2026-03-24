@@ -1,4 +1,4 @@
-{{- if .Values.tasks.analyst.enabled }}
+{{- if .Values.cronjobs.analyst.enabled }}
 apiVersion: agents.kyle.pericak.com/v1alpha1
 kind: AgentTask
 metadata:

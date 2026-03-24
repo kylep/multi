@@ -4,8 +4,10 @@ storageClass: local-path
 paiResponder:
   enabled: true
 
-tasks:
+cronjobs:
   journalist:
     enabled: true
+    schedule: "0 12 * * *"   # 8am ET
   paiMorning:
     enabled: true
+    schedule: "30 12 * * *"  # 8:30am ET

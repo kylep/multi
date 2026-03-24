@@ -1,6 +1,6 @@
 # Deploys AgentTask CRs to every cluster labeled cluster-role=ai-agents.
-# Cluster-specific values (environments/<name>.yaml) control which tasks are enabled.
-# M1: journalist + pai-morning enabled. M2: all disabled by default.
+# Cluster-specific values (environments/<name>.yaml) control which cronjobs are enabled
+# and their schedules. M1: journalist + pai-morning enabled. M2: all disabled by default.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:

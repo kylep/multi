@@ -4,8 +4,10 @@ storageClass: local-path
 paiResponder:
   enabled: false  # avoid duplicate Discord responses; M2 unreliable
 
-tasks:
+cronjobs:
   journalist:
     enabled: false
+    schedule: "0 12 * * *"
   paiMorning:
     enabled: false
+    schedule: "30 12 * * *"
