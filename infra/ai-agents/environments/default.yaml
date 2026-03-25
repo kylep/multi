@@ -9,6 +9,9 @@ argocd:
 cloudflared:
   enabled: false
 
+openobserve:
+  enabled: false
+
 paiResponder:
   enabled: false
 

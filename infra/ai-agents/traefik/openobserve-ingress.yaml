@@ -1,0 +1,20 @@
+---
+# Exposes OpenObserve UI at obs.pericak.com via Traefik IngressRoute.
+# Protected by Cloudflare Access application 'obs' (pericak-family Allow policy).
+#
+# Cloudflare tunnel hostname obs.pericak.com must be added in the Cloudflare dashboard:
+#   Zero Trust → Networks → Tunnels → pai-m1 → Public Hostnames → obs / pericak.com / HTTP / traefik.kube-system.svc.cluster.local:80
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openobserve
+  namespace: openobserve
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`obs.pericak.com`)
+      kind: Rule
+      services:
+        - name: openobserve-openobserve-standalone
+          port: 5080

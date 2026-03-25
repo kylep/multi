@@ -9,7 +9,8 @@ set -euo pipefail
 #   GITHUB_TOKEN, GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY_B64 or GITHUB_APP_KEY_FILE, GITHUB_INSTALL_ID, REPO_URL,
 #   DISCORD_TOKEN, DISCORD_GUILD, DISCORD_LOG_CH,
 #   PAI_DISCORD_TOKEN, PAI_CLAUDE_TOKEN, LINEAR_API_KEY,
-#   WEBHOOK_TOKEN
+#   WEBHOOK_TOKEN, CLOUDFLARE_TUNNEL_TOKEN,
+#   OPENOBSERVE_ADMIN_EMAIL, OPENOBSERVE_ADMIN_PASSWORD
 #
 # Note: secrets passed as env/args to kubectl exec, visible in process listings.
 # Acceptable for single-node dev. See configure-vault-auth.sh header.
@@ -186,6 +187,18 @@ prompt_or_env CLOUDFLARE_TUNNEL_TOKEN "Cloudflare Tunnel token (pai-m1)$(already
 [ -n "${CLOUDFLARE_TUNNEL_TOKEN:-}" ] && kv_store cloudflare "tunnel_token=$CLOUDFLARE_TUNNEL_TOKEN"
 
 echo ""
-echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook,cloudflare}"
+echo "=== OpenObserve ==="
+EXISTING_OPENOBSERVE=$(get_existing openobserve)
+prompt_or_env OPENOBSERVE_ADMIN_EMAIL "OpenObserve admin email$(already_set "$EXISTING_OPENOBSERVE" root_user_email)"
+prompt_or_env OPENOBSERVE_ADMIN_PASSWORD "OpenObserve admin password$(already_set "$EXISTING_OPENOBSERVE" root_user_password)" secret
+OPENOBSERVE_ARGS=""
+[ -n "${OPENOBSERVE_ADMIN_EMAIL:-}" ]    && OPENOBSERVE_ARGS="$OPENOBSERVE_ARGS root_user_email=$OPENOBSERVE_ADMIN_EMAIL"
+[ -n "${OPENOBSERVE_ADMIN_PASSWORD:-}" ] && OPENOBSERVE_ARGS="$OPENOBSERVE_ARGS root_user_password=$OPENOBSERVE_ADMIN_PASSWORD"
+# shellcheck disable=SC2086
+[ -n "$OPENOBSERVE_ARGS" ] && kv_store openobserve $OPENOBSERVE_ARGS
+
+echo ""
+echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook,cloudflare,openobserve}"
 echo "  pai: discord_bot_token, claude_oauth_token, linear_api_key"
 echo "  cloudflare: tunnel_token"
+echo "  openobserve: root_user_email, root_user_password"

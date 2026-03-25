@@ -79,6 +79,24 @@ if [ -f "$VAULT_CREDS" ]; then
     else
       echo "Cloudflare tunnel token not in Vault — run store-secrets.sh then re-run bootstrap.sh."
     fi
+    # Create openobserve-credentials K8s secret from Vault (idempotent)
+    OZ_EMAIL=$(kubectl exec -n vault vault-0 -- \
+      env "VAULT_TOKEN=$ROOT_TOKEN" \
+      vault kv get -field=root_user_email secret/ai-agents/openobserve 2>/dev/null || echo "")
+    OZ_PASS=$(kubectl exec -n vault vault-0 -- \
+      env "VAULT_TOKEN=$ROOT_TOKEN" \
+      vault kv get -field=root_user_password secret/ai-agents/openobserve 2>/dev/null || echo "")
+    if [ -n "$OZ_EMAIL" ] && [ -n "$OZ_PASS" ]; then
+      echo "Creating openobserve-credentials K8s secret..."
+      kubectl create namespace openobserve --dry-run=client -o yaml | kubectl apply -f -
+      kubectl create secret generic openobserve-credentials \
+        --from-literal=ZO_ROOT_USER_EMAIL="$OZ_EMAIL" \
+        --from-literal=ZO_ROOT_USER_PASSWORD="$OZ_PASS" \
+        -n openobserve \
+        --dry-run=client -o yaml | kubectl apply -f -
+    else
+      echo "OpenObserve credentials not in Vault — run store-secrets.sh then re-run bootstrap.sh."
+    fi
   fi
 fi
 

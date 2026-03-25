@@ -1,0 +1,27 @@
+# OpenObserve standalone deployment values.
+# Credentials come from K8s secret created by bootstrap.sh from Vault.
+# See infra/ai-agents/bin/bootstrap.sh and bin/store-secrets.sh.
+
+auth:
+  existingRootUserSecret:
+    name: openobserve-credentials
+    emailKey: ZO_ROOT_USER_EMAIL
+    passwordKey: ZO_ROOT_USER_PASSWORD
+
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClass: local-path
+  accessModes:
+    - ReadWriteOnce
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 1Gi
+
+# Disable minio — local disk storage only (ZO_LOCAL_MODE_STORAGE: disk)
+minio:
+  enabled: false

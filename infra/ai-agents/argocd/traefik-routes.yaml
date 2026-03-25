@@ -1,4 +1,5 @@
-# Deploys Traefik IngressRoutes for services exposed via pai.pericak.com.
+# Deploys Traefik IngressRoutes for all services exposed via Cloudflare Tunnel hostnames.
+# Picks up all *.yaml files in infra/ai-agents/traefik/ — add new IngressRoute files there.
 # Deploys to the same clusters as traefik (cluster-role=ai-agents).
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -21,7 +22,7 @@ spec:
         targetRevision: main
         path: infra/ai-agents/traefik
         directory:
-          include: "argocd-ingress.yaml"
+          include: "*.yaml"
       destination:
         server: "{{server}}"
         namespace: argocd

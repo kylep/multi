@@ -3,6 +3,8 @@ repositories:
     url: https://helm.releases.hashicorp.com
   - name: argo
     url: https://argoproj.github.io/argo-helm
+  - name: openobserve
+    url: https://charts.openobserve.ai
 
 # Environments map to per-cluster values files. Use: helmfile -e pai-m1 apply
 # ArgoCD uses these same files for ongoing GitOps sync (see argocd/).
@@ -58,3 +60,12 @@ releases:
     chart: ./cloudflared/helm
     condition: cloudflared.enabled
     createNamespace: true
+
+  - name: openobserve
+    namespace: openobserve
+    chart: openobserve/openobserve-standalone
+    version: 0.60.3
+    condition: openobserve.enabled
+    createNamespace: true
+    values:
+      - openobserve/values.yaml
