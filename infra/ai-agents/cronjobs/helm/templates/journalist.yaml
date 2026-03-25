@@ -47,14 +47,16 @@ spec:
             fsGroup: 1001
             seccompProfile:
               type: RuntimeDefault
-          initContainers:
-            - name: github-token
+          containers:
+            - name: agent
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["/bin/sh", "-c"]
               args:
                 - |
                   . /vault/secrets/config
+
+                  # Generate short-lived GitHub installation token from App credentials
                   _header=$(printf '{"alg":"RS256","typ":"JWT"}' \
                     | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
                   _now=$(date +%s)
@@ -67,28 +69,11 @@ spec:
                     | openssl dgst -sha256 -sign /vault/secrets/github-key -binary \
                     | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
                   _jwt="${_header}.${_payload}.${_sig}"
-                  _token=$(curl -sf -X POST \
+                  GITHUB_TOKEN=$(curl -sf -X POST \
                     -H "Authorization: Bearer ${_jwt}" \
                     -H "Accept: application/vnd.github+json" \
                     "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
                     | jq -r '.token')
-                  printf 'export GITHUB_TOKEN="%s"\n' "$_token" > /shared/github-token.sh
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop: ["ALL"]
-              volumeMounts:
-                - name: shared
-                  mountPath: /shared
-          containers:
-            - name: agent
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
-              command: ["/bin/sh", "-c"]
-              args:
-                - |
-                  . /vault/secrets/config
-                  . /shared/github-token.sh
 
                   RUN_ID=$(head -c4 /dev/urandom | xxd -p)
                   curl -sf -X POST \
@@ -138,12 +123,8 @@ spec:
                 capabilities:
                   drop: ["ALL"]
               volumeMounts:
-                - name: shared
-                  mountPath: /shared
                 - name: workspace
                   mountPath: /workspace
           volumes:
-            - name: shared
-              emptyDir: {}
             - name: workspace
               emptyDir: {}
