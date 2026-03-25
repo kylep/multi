@@ -72,7 +72,7 @@ Add two routes — both point to Traefik:
 | Subdomain | `pai` |
 | Domain | `pericak.com` |
 | Type | `HTTP` |
-| URL | `traefik.traefik.svc.cluster.local:80` |
+| URL | `traefik.kube-system.svc.cluster.local:80` |
 
 **Route 2 — webhooks (no Access protection):**
 
@@ -81,7 +81,7 @@ Add two routes — both point to Traefik:
 | Subdomain | `wh` |
 | Domain | `pericak.com` |
 | Type | `HTTP` |
-| URL | `traefik.traefik.svc.cluster.local:80` |
+| URL | `traefik.kube-system.svc.cluster.local:80` |
 
 > Traefik handles hostname + path routing internally. The tunnel always points to Traefik for both hostnames.
 
@@ -96,7 +96,7 @@ Click **Save hostname** after each, then **Done**.
 | `pai.pericak.com` | `pericak-family` Allow policy (One-time PIN) | ArgoCD UI and other authenticated services |
 | `wh.pericak.com` | None — open to internet | Webhooks (GitHub, etc.); application-level secret auth required |
 
-Both hostnames point to `traefik.traefik.svc.cluster.local:80`. Traefik routes by hostname + path internally.
+Both hostnames point to `traefik.kube-system.svc.cluster.local:80`. Traefik routes by hostname + path internally.
 
 > `wh.pericak.com` has no Cloudflare Access application. Anyone can reach it. Webhook handlers **must** verify a shared secret (e.g., `X-Hub-Signature-256` for GitHub) at the application level.
 
@@ -162,20 +162,16 @@ If on a paid plan and want to consolidate to a single hostname with path-scoped 
 
 ---
 
-## Part 3: Deploy Traefik in K8s (IaC)
+## Part 3: Traefik in K8s
 
-Traefik is deployed via ArgoCD (`infra/ai-agents/argocd/traefik.yaml`) and helmfile (`infra/ai-agents/helmfile.yaml`).
+K3s ships Traefik as a built-in component in the `kube-system` namespace. No separate Traefik deployment is needed — it is already running and already has the `ingressroutes.traefik.io` CRDs installed.
 
-Key files:
-- `infra/ai-agents/traefik/values.yaml` — ClusterIP service, port 80, no LoadBalancer
-- `infra/ai-agents/argocd/traefik.yaml` — ApplicationSet targeting `cluster-role=ai-agents` clusters
+Key details:
+- Service: `traefik.kube-system.svc.cluster.local:80`
+- Watches all namespaces for IngressRoute / Middleware resources
+- Managed by K3s's HelmChart controller (do not manage via helmfile)
 
-Manual deploy (if needed before ArgoCD):
-
-```bash
-helm repo add traefik https://traefik.github.io/charts
-helmfile -e pai-m1 apply --selector name=traefik
-```
+The Cloudflare tunnel points to `traefik.kube-system.svc.cluster.local:80`. IngressRoutes in any namespace are picked up automatically.
 
 ---
 

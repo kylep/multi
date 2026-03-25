@@ -3,8 +3,6 @@ repositories:
     url: https://helm.releases.hashicorp.com
   - name: argo
     url: https://argoproj.github.io/argo-helm
-  - name: traefik
-    url: https://traefik.github.io/charts
 
 # Environments map to per-cluster values files. Use: helmfile -e pai-m1 apply
 # ArgoCD uses these same files for ongoing GitOps sync (see argocd/).
@@ -54,15 +52,6 @@ releases:
       - ai-agents/cronjobs
     values:
       - environments/{{ .Environment.Name }}.yaml
-
-  - name: traefik
-    namespace: traefik
-    chart: traefik/traefik
-    version: 34.x.x
-    condition: traefik.enabled
-    createNamespace: true
-    values:
-      - traefik/values.yaml
 
   - name: cloudflared
     namespace: cloudflared

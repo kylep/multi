@@ -4,9 +4,6 @@ storageClass: local-path
 argocd:
   enabled: true
 
-traefik:
-  enabled: true
-
 cloudflared:
   enabled: true
 
