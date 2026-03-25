@@ -1,0 +1,68 @@
+# Vector DaemonSet — collects K8s pod logs and ships to OpenObserve.
+# Credentials injected from the openobserve-credentials K8s secret (created by bootstrap.sh).
+
+role: "Agent"  # DaemonSet mode — runs on every node
+
+# Agent mode doesn't expose any ports — disable the Service to avoid validation errors.
+service:
+  enabled: false
+
+tolerations:
+  - operator: Exists
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+# Inject OpenObserve credentials from K8s secret as env vars.
+# Vector config references them as ${OPENOBSERVE_EMAIL} and ${OPENOBSERVE_PASSWORD}.
+envFrom:
+  - secretRef:
+      name: openobserve-credentials
+
+customConfig:
+  data_dir: /vector-data-dir
+
+  sources:
+    kubernetes_logs:
+      type: kubernetes_logs
+      # Exclude Vector's own logs to avoid loops
+      exclude_paths_glob_patterns:
+        - /var/log/pods/openobserve_vector-*/**/*.log
+
+  transforms:
+    add_cluster_metadata:
+      type: remap
+      inputs: [kubernetes_logs]
+      source: |
+        # Flatten K8s metadata into top-level fields for OpenObserve
+        .k8s_namespace = .kubernetes.pod_namespace
+        .k8s_pod       = .kubernetes.pod_name
+        .k8s_container = .kubernetes.container_name
+        .k8s_node      = .kubernetes.pod_node_name
+        del(.kubernetes)
+        del(.file)
+
+  sinks:
+    openobserve:
+      type: http
+      inputs: [add_cluster_metadata]
+      uri: "http://openobserve-openobserve-standalone.openobserve.svc.cluster.local:5080/api/default/k8s_logs/_json"
+      method: post
+      auth:
+        strategy: basic
+        user: "${ZO_ROOT_USER_EMAIL}"
+        password: "${ZO_ROOT_USER_PASSWORD}"
+      encoding:
+        codec: json
+      framing:
+        method: newline_delimited
+      batch:
+        max_bytes: 1048576
+        timeout_secs: 10
+      request:
+        headers:
+          Content-Type: "application/x-ndjson"
