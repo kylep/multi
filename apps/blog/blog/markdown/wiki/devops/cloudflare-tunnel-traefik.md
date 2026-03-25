@@ -26,6 +26,11 @@ Internet
 
 Allowed users (`pai.pericak.com`): `kyle.pericak@gmail.com`, `kyle@pericak.com`, `kara@pericak.com`
 
+| Hostname | Access protection | Purpose |
+|----------|------------------|---------|
+| `pai.pericak.com` | `pericak-family` Allow policy (One-time PIN) | ArgoCD UI and other authenticated services |
+| `wh.pericak.com` | None — open to internet | Webhooks; application-level secret auth required |
+
 ---
 
 ## Part 0: Zero Trust First-Time Setup
@@ -86,19 +91,6 @@ Add two routes — both point to Traefik:
 > Traefik handles hostname + path routing internally. The tunnel always points to Traefik for both hostnames.
 
 Click **Save hostname** after each, then **Done**.
-
----
-
-## Tunnel Hostnames Summary
-
-| Hostname | Access protection | Purpose |
-|----------|------------------|---------|
-| `pai.pericak.com` | `pericak-family` Allow policy (One-time PIN) | ArgoCD UI and other authenticated services |
-| `wh.pericak.com` | None — open to internet | Webhooks (GitHub, etc.); application-level secret auth required |
-
-Both hostnames point to `traefik.kube-system.svc.cluster.local:80`. Traefik routes by hostname + path internally.
-
-> `wh.pericak.com` has no Cloudflare Access application. Anyone can reach it. Webhook handlers **must** verify a shared secret (e.g., `X-Hub-Signature-256` for GitHub) at the application level.
 
 ---
 
@@ -208,9 +200,11 @@ The local chart is at `infra/ai-agents/cloudflared/helm/`. It runs `cloudflare/c
 
 ## Part 5: Traefik IngressRoutes (IaC)
 
-IngressRoutes are managed by ArgoCD via `infra/ai-agents/argocd/traefik-routes.yaml`, which deploys `infra/ai-agents/traefik/argocd-ingress.yaml`.
+IngressRoutes are managed by ArgoCD via `infra/ai-agents/argocd/traefik-routes.yaml`, which deploys `infra/ai-agents/traefik/argocd-ingress.yaml` from the `main` branch.
 
-The ArgoCD IngressRoute exposes ArgoCD at `pai.pericak.com/argocd`. ArgoCD must be configured with `server.rootpath: /argocd` for the UI to work under a path prefix (this is already set in the ArgoCD helm release via `configs.params.server\.insecure=true`; rootpath requires an additional param).
+The ArgoCD IngressRoute exposes ArgoCD at `pai.pericak.com/argocd`. ArgoCD is configured with `server.rootpath: /argocd` (set in `infra/ai-agents/helmfile.yaml` via `configs.params.server\.rootpath`) so it serves the UI correctly under the path prefix. Do **not** use a strip-prefix middleware — ArgoCD expects to receive the full `/argocd` path.
+
+> **Traefik Middleware gotcha**: If an IngressRoute references a Middleware CRD that doesn't exist in the same namespace, Traefik silently drops the entire route with no 404 or error logged. Always verify the Middleware resource exists before referencing it.
 
 ---
 
@@ -231,14 +225,22 @@ The ArgoCD IngressRoute exposes ArgoCD at `pai.pericak.com/argocd`. ArgoCD must 
 
 ```bash
 # Tunnel should show as healthy in Cloudflare dashboard
-# Zero Trust → Networks → Tunnels → pai-m1 → status: Active
+# Zero Trust → Networks → Connectors → pai-m1 → status: Active
 
-# Locally verify Traefik is up
-kubectl get pods -n traefik
+# Verify K3s Traefik is up (in kube-system, not a separate namespace)
+kubectl get pods -n kube-system -l app.kubernetes.io/name=traefik
 
 # Verify cloudflared is connected
+kubectl get pods -n cloudflared
 kubectl logs -n cloudflared deploy/cloudflared | grep -i "connection"
 
-# Hit ArgoCD remotely (requires Access auth)
+# Check IngressRoute is loaded
+kubectl get ingressroute -n argocd
+
+# Hit ArgoCD remotely — should 302 to Cloudflare Access login
 curl -I https://pai.pericak.com/argocd
+
+# ArgoCD admin password
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 -d && echo
 ```
