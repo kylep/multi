@@ -1,0 +1,9 @@
+image:
+  repository: cloudflare/cloudflared
+  tag: latest
+
+replicas: 2   # Cloudflare recommends 2+ for HA
+
+# K8s Secret name holding tunnelToken key
+# Created by bootstrap.sh from Vault secret/ai-agents/cloudflare
+secretName: cloudflared-token

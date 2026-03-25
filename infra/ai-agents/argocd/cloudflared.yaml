@@ -1,0 +1,39 @@
+# Deploys cloudflared to clusters labeled cloudflare-tunnel=true.
+# Uses a narrower label than cluster-role=ai-agents because each cluster
+# needs its own tunnel token — don't deploy this to clusters without a
+# cloudflared-token secret in the cloudflared namespace.
+#
+# To enable on a cluster:
+#   kubectl label secret -n argocd -l argocd.argoproj.io/secret-type=cluster \
+#     cloudflare-tunnel=true --overwrite
+#
+# The cloudflared-token secret is created by bootstrap.sh from Vault.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cloudflared
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cloudflare-tunnel: "true"
+  template:
+    metadata:
+      name: "cloudflared-{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kylep/multi
+        targetRevision: main
+        path: infra/ai-agents/cloudflared/helm
+      destination:
+        server: "{{server}}"
+        namespace: cloudflared
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

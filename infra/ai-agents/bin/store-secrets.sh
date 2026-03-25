@@ -8,7 +8,9 @@ set -euo pipefail
 #   CLAUDE_TOKEN, OPENROUTER_KEY,
 #   GITHUB_TOKEN, GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY_B64 or GITHUB_APP_KEY_FILE, GITHUB_INSTALL_ID, REPO_URL,
 #   DISCORD_TOKEN, DISCORD_GUILD, DISCORD_LOG_CH,
-#   WEBHOOK_TOKEN
+#   PAI_DISCORD_TOKEN, PAI_CLAUDE_TOKEN, LINEAR_API_KEY,
+#   WEBHOOK_TOKEN, CLOUDFLARE_TUNNEL_TOKEN,
+#   OPENOBSERVE_ADMIN_EMAIL, OPENOBSERVE_ADMIN_PASSWORD
 #
 # Note: secrets passed as env/args to kubectl exec, visible in process listings.
 # Acceptable for single-node dev. See configure-vault-auth.sh header.
@@ -160,6 +162,7 @@ echo "=== Pai ==="
 EXISTING_PAI=$(get_existing pai)
 prompt_or_env PAI_DISCORD_TOKEN "Pai Discord bot token$(already_set "$EXISTING_PAI" discord_bot_token)" secret
 prompt_or_env PAI_CLAUDE_TOKEN "Pai Claude OAuth token (leave blank to reuse anthropic secret)$(already_set "$EXISTING_PAI" claude_oauth_token)" secret
+prompt_or_env LINEAR_API_KEY "Linear API key$(already_set "$EXISTING_PAI" linear_api_key)" secret
 # Fall back to the shared Claude token if not set separately
 if [ -z "${PAI_CLAUDE_TOKEN:-}" ] && [ -n "${CLAUDE_TOKEN:-}" ]; then
   PAI_CLAUDE_TOKEN="$CLAUDE_TOKEN"
@@ -167,6 +170,7 @@ fi
 PAI_ARGS=""
 [ -n "${PAI_DISCORD_TOKEN:-}" ] && PAI_ARGS="$PAI_ARGS discord_bot_token=$PAI_DISCORD_TOKEN"
 [ -n "${PAI_CLAUDE_TOKEN:-}" ]  && PAI_ARGS="$PAI_ARGS claude_oauth_token=$PAI_CLAUDE_TOKEN"
+[ -n "${LINEAR_API_KEY:-}" ]    && PAI_ARGS="$PAI_ARGS linear_api_key=$LINEAR_API_KEY"
 # shellcheck disable=SC2086
 [ -n "$PAI_ARGS" ]              && kv_store pai $PAI_ARGS
 
@@ -177,4 +181,24 @@ prompt_or_env WEBHOOK_TOKEN "Webhook bearer token$(already_set "$EXISTING_WEBHOO
 [ -n "${WEBHOOK_TOKEN:-}" ] && kv_store webhook "webhook_token=$WEBHOOK_TOKEN"
 
 echo ""
-echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook}"
+echo "=== Cloudflare ==="
+EXISTING_CLOUDFLARE=$(get_existing cloudflare)
+prompt_or_env CLOUDFLARE_TUNNEL_TOKEN "Cloudflare Tunnel token (pai-m1)$(already_set "$EXISTING_CLOUDFLARE" tunnel_token)" secret
+[ -n "${CLOUDFLARE_TUNNEL_TOKEN:-}" ] && kv_store cloudflare "tunnel_token=$CLOUDFLARE_TUNNEL_TOKEN"
+
+echo ""
+echo "=== OpenObserve ==="
+EXISTING_OPENOBSERVE=$(get_existing openobserve)
+prompt_or_env OPENOBSERVE_ADMIN_EMAIL "OpenObserve admin email$(already_set "$EXISTING_OPENOBSERVE" root_user_email)"
+prompt_or_env OPENOBSERVE_ADMIN_PASSWORD "OpenObserve admin password$(already_set "$EXISTING_OPENOBSERVE" root_user_password)" secret
+OPENOBSERVE_ARGS=""
+[ -n "${OPENOBSERVE_ADMIN_EMAIL:-}" ]    && OPENOBSERVE_ARGS="$OPENOBSERVE_ARGS root_user_email=$OPENOBSERVE_ADMIN_EMAIL"
+[ -n "${OPENOBSERVE_ADMIN_PASSWORD:-}" ] && OPENOBSERVE_ARGS="$OPENOBSERVE_ARGS root_user_password=$OPENOBSERVE_ADMIN_PASSWORD"
+# shellcheck disable=SC2086
+[ -n "$OPENOBSERVE_ARGS" ] && kv_store openobserve $OPENOBSERVE_ARGS
+
+echo ""
+echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook,cloudflare,openobserve}"
+echo "  pai: discord_bot_token, claude_oauth_token, linear_api_key"
+echo "  cloudflare: tunnel_token"
+echo "  openobserve: root_user_email, root_user_password"

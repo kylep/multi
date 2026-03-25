@@ -2,6 +2,18 @@
 
 Kyle's personal monorepo for hobby projects and shared infrastructure.
 
+## Active areas
+
+These three directories are where most of the work happens:
+
+| Directory | What it is |
+|-----------|------------|
+| [`apps/blog/`](apps/blog/) | NextJS blog + wiki for [kyle.pericak.com](http://kyle.pericak.com). Blog posts and AI-generated wiki journal entries live here. Pai (the AI agent) commits to this repo as part of its daily news digest. |
+| [`infra/ai-agents/`](infra/ai-agents/) | K8s workloads that run inside Rancher on the Mac fleet — Vault, CronJobs for scheduled agents, and the Pai Discord responder. ArgoCD (bootstrapped here) manages ongoing sync to both machines. |
+| [`infra/mac-setup/`](infra/mac-setup/) | Ansible playbook that provisions the Macs themselves — packages, dotfiles, CLAUDE.md. Run this to rebuild a machine from scratch. |
+
+The two Mac machines (M1 server, kyle-m2 laptop) run Rancher. `infra/mac-setup` sets up the machine; `infra/ai-agents` manages what runs inside its cluster.
+
 ## What's in here
 
 | Project | Description | Tech Stack |

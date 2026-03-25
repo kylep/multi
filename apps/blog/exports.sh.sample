@@ -36,3 +36,10 @@ export AI_WEBHOOK_TOKEN=""  # any strong random string for internal webhook auth
 # Pai Discord bot (discord.com/developers/applications/1485425671554596995)
 export PAI_DISCORD_BOT_TOKEN=""  # Discord Developer Portal → Pai app → Bot → Token
 export PAI_DISCORD_APP_ID="1485425671554596995"
+
+# Cloudflare Tunnel — Zero Trust → Networks → Connectors → pai-m1 → token
+export CLOUDFLARE_TUNNEL_TOKEN=""
+
+# OpenObserve admin credentials (stored in Vault via store-secrets.sh)
+export OPENOBSERVE_ADMIN_EMAIL=""   # e.g. admin@pericak.com
+export OPENOBSERVE_ADMIN_PASSWORD=""

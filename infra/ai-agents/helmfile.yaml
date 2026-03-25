@@ -1,8 +1,39 @@
 repositories:
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: openobserve
+    url: https://charts.openobserve.ai
+  - name: vector
+    url: https://helm.vector.dev
 
+# Environments map to per-cluster values files. Use: helmfile -e pai-m1 apply
+# ArgoCD uses these same files for ongoing GitOps sync (see argocd/).
+environments:
+  default:
+    values:
+      - environments/default.yaml
+  pai-m1:
+    values:
+      - environments/pai-m1.yaml
+  kyle-m2:
+    values:
+      - environments/kyle-m2.yaml
+---
 releases:
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd
+    version: 9.4.15
+    condition: argocd.enabled
+    createNamespace: true
+    set:
+      - name: configs.params.server\.insecure
+        value: "true"
+      - name: configs.params.server\.rootpath
+        value: "/argocd"
+
   - name: vault
     namespace: vault
     chart: hashicorp/vault
@@ -11,14 +42,40 @@ releases:
       - vault/values.yaml
     createNamespace: true
 
-  - name: agent-controller
+  - name: cronjobs
     namespace: ai-agents
-    chart: ./agent-controller/helm
-    needs:
-      - vault/vault
+    chart: ./cronjobs/helm
+    values:
+      - environments/{{ .Environment.Name }}.yaml
 
   - name: pai-responder
     namespace: ai-agents
     chart: ./pai-responder/helm
+    condition: paiResponder.enabled
     needs:
-      - vault/vault
+      - ai-agents/cronjobs
+    values:
+      - environments/{{ .Environment.Name }}.yaml
+
+  - name: cloudflared
+    namespace: cloudflared
+    chart: ./cloudflared/helm
+    condition: cloudflared.enabled
+    createNamespace: true
+
+  - name: openobserve
+    namespace: openobserve
+    chart: openobserve/openobserve-standalone
+    version: 0.60.3
+    condition: openobserve.enabled
+    createNamespace: true
+    values:
+      - openobserve/values.yaml
+
+  - name: vector
+    namespace: openobserve
+    chart: vector/vector
+    version: 0.51.0
+    condition: openobserve.enabled
+    values:
+      - openobserve/vector-values.yaml

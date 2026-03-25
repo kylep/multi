@@ -1,0 +1,35 @@
+# Deploys pai-responder to every cluster labeled cluster-role=ai-agents.
+# Cluster-specific values (environments/<name>.yaml) control whether it's actually
+# enabled — set paiResponder.enabled: false on kyle-m2 to avoid duplicate Discord listeners.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: pai-responder
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cluster-role: ai-agents
+  template:
+    metadata:
+      name: "pai-responder-{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kylep/multi
+        targetRevision: main
+        path: infra/ai-agents/pai-responder/helm
+        helm:
+          valueFiles:
+            - ../../../infra/ai-agents/environments/{{name}}.yaml
+      destination:
+        server: "{{server}}"
+        namespace: ai-agents
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

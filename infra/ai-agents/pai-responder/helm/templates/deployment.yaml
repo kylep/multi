@@ -1,3 +1,4 @@
+{{- if .Values.paiResponder.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,7 +27,7 @@ spec:
           export LINEAR_API_KEY="{{`{{ .Data.data.linear_api_key }}`}}"
           {{`{{- end }}`}}
     spec:
-      serviceAccountName: agent-controller
+      serviceAccountName: cronjob-agent
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
@@ -73,3 +74,4 @@ spec:
         - name: pai-script
           configMap:
             name: {{ include "pai-responder.fullname" . }}-script
+{{- end }}

@@ -1,0 +1,22 @@
+# pai-m1 — always-on server ("Pai's laptop"). Runs all scheduled agents and pai-responder.
+storageClass: local-path
+
+argocd:
+  enabled: true
+
+cloudflared:
+  enabled: true
+
+openobserve:
+  enabled: true
+
+paiResponder:
+  enabled: true
+
+cronjobs:
+  journalist:
+    enabled: true
+    schedule: "20 12 * * *"  # 7:20am ET
+  paiMorning:
+    enabled: true
+    schedule: "30 12 * * *"  # 8:30am ET

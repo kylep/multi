@@ -1,0 +1,19 @@
+---
+# Exposes OpenObserve UI at pai.pericak.com/obs via Traefik IngressRoute.
+# Protected by the existing Cloudflare Access application 'pai' (pericak-family Allow policy).
+# OpenObserve is configured with ZO_BASE_URI=/obs so it handles the path prefix itself.
+# Do NOT strip /obs — OpenObserve expects to receive the full path.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openobserve
+  namespace: openobserve
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`pai.pericak.com`) && PathPrefix(`/obs`)
+      kind: Rule
+      services:
+        - name: openobserve-openobserve-standalone
+          port: 5080

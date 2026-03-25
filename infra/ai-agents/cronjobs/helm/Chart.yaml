@@ -1,0 +1,5 @@
+apiVersion: v2
+name: ai-agent-cronjobs
+description: Native K8s CronJobs for scheduled AI agents (journalist, pai-morning).
+type: application
+version: 0.1.0

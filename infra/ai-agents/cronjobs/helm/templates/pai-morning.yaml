@@ -1,0 +1,82 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pai-morning
+  namespace: ai-agents
+spec:
+  schedule: {{ .Values.cronjobs.paiMorning.schedule | quote }}
+  suspend: {{ not .Values.cronjobs.paiMorning.enabled }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 600
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/role: "ai-agents"
+            # Pai bot token + Claude OAuth. Also reads discord_guild_id from
+            # secret/ai-agents/discord since guild ID is shared across bots.
+            vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/pai"
+            vault.hashicorp.com/agent-inject-template-config: |
+              {{`{{- with secret "secret/ai-agents/pai" -}}`}}
+              export DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
+              export CLAUDE_CODE_OAUTH_TOKEN="{{`{{ .Data.data.claude_oauth_token }}`}}"
+              export LINEAR_API_KEY="{{`{{ .Data.data.linear_api_key }}`}}"
+              {{`{{- end -}}`}}
+              {{`{{- with secret "secret/ai-agents/discord" -}}`}}
+              export DISCORD_GUILD_ID="{{`{{ .Data.data.discord_guild_id }}`}}"
+              {{`{{- end -}}`}}
+        spec:
+          serviceAccountName: cronjob-agent
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: agent
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  . /vault/secrets/config
+
+                  # MCP server is named "pai-discord" to match mcp__pai-discord__* tool names.
+                  # DISCORD_BOT_TOKEN (from Vault pai secret) is the Pai bot token.
+                  printf '%s' '{"mcpServers":{"pai-discord":{"type":"stdio","command":"python3","args":["/workspace/repo/apps/mcp-servers/discord/server.py"]}}}' \
+                    > /tmp/mcp.json
+
+                  # Clone public repo so claude can find the pai agent definition.
+                  git clone https://github.com/kylep/multi.git /workspace/repo
+                  cd /workspace/repo
+
+                  claude --agent pai \
+                    -p "Send a creative, fun morning greeting to #general. @mention <@293425741406928906> (penegy) in the message. Be creative and non-repetitive. Some ideas for inspiration (pick one, or do something entirely different): a short joke or pun, something about today's date (holidays, historical events, fun facts, pop culture references like May 4th = Star Wars day), a tiny poem or haiku, a playful motivational one-liner. Keep it to 1-3 sentences. Cute, warm, fun. No emojis." \
+                    --mcp-config /tmp/mcp.json \
+                    --allowedTools "WebSearch,WebFetch,mcp__pai-discord__send_message,mcp__pai-discord__list_channels" \
+                    --output-format stream-json
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: workspace
+                  mountPath: /workspace
+          volumes:
+            - name: workspace
+              emptyDir: {}

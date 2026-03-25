@@ -1,0 +1,17 @@
+# Defaults — all CronJobs suspended. Override per cluster in environments/<name>.yaml.
+cronjobs:
+  journalist:
+    enabled: false
+    schedule: "0 12 * * *"
+  paiMorning:
+    enabled: false
+    schedule: "30 12 * * *"
+
+image:
+  repository: kpericak/ai-agent-runtime
+  tag: "0.4"
+  pullPolicy: Always
+
+repo:
+  url: "https://github.com/kylep/multi.git"
+  branch: main

@@ -1,0 +1,22 @@
+---
+# Exposes ArgoCD UI at pai.pericak.com/argocd via Traefik IngressRoute.
+# ArgoCD is configured with server.rootpath: /argocd so it handles the path prefix itself.
+# Do NOT strip /argocd — ArgoCD expects to receive the full path.
+#
+# Hostname routing:
+#   pai.pericak.com  — Cloudflare Access protected (pericak-family Allow policy)
+#   wh.pericak.com   — No Access protection; open to internet; application-level auth required
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`pai.pericak.com`) && PathPrefix(`/argocd`)
+      kind: Rule
+      services:
+        - name: argocd-server
+          port: 80

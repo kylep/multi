@@ -1,6 +1,6 @@
 ---
 title: "Agent Controller"
-summary: "Docker image for the K8s agent controller that manages AgentTask CRDs."
+summary: "Docker image for the K8s agent controller that managed AgentTask CRDs. Deprecated — controller is no longer deployed; agents now run as native CronJobs."
 keywords:
   - docker
   - agent-controller
@@ -9,11 +9,16 @@ keywords:
 related:
   - wiki/custom-tools/docker-images/index.html
   - wiki/devops/agent-controller.html
+  - wiki/devops/ai-agents-infra.html
 scope: "agent-controller Docker image: build, contents, and deployment."
-last_verified: 2026-03-15
+last_verified: 2026-03-23
 ---
 
-**Image:** `kpericak/agent-controller:0.5`
+> **Deprecated.** The agent-controller image is no longer deployed. Agents now run as
+> native K8s CronJobs using `kpericak/ai-agent-runtime`. The Go source remains in the
+> repo as a reference. See [AI Agents Infra](/wiki/devops/ai-agents-infra.html).
+
+**Image:** `kpericak/agent-controller:0.8`
 **Source:** `infra/ai-agents/agent-controller/`
 **Base:** Alpine 3.21
 

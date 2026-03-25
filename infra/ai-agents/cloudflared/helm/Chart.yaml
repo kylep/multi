@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cloudflared
+version: 0.1.0
+description: Cloudflare tunnel daemon — runs cloudflared as a K8s Deployment

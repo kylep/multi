@@ -1,6 +1,6 @@
 ---
 title: "Agent Controller"
-summary: "K8s custom controller that orchestrates AI agent runs via AgentTask CRDs. Includes debugging runbook, known issues, and operational procedures."
+summary: "K8s custom controller that orchestrated AI agent runs via AgentTask CRDs. Deprecated — replaced by native K8s CronJobs. Kept in the repo as a reference project."
 keywords:
   - kubernetes
   - controller
@@ -20,10 +20,15 @@ related:
   - wiki/journal
   - wiki/security/claude-code-write-pattern-bug
   - wiki/design-docs/autonomous-publisher/index
+  - wiki/devops/ai-agents-infra
 scope: "Covers the agent controller architecture, CRD spec, Helm deployment, runtime image, debugging, and operational procedures. Does not cover agent definitions or blog content pipeline."
-last_verified: 2026-03-18
+last_verified: 2026-03-23
 ---
 
+> **Deprecated.** The agent-controller is no longer deployed. Scheduled agents now run as
+> native K8s CronJobs (`infra/ai-agents/cronjobs/`). The Go source and Helm chart remain
+> in the repo as a reference project. See [AI Agents Infra](/wiki/devops/ai-agents-infra.html)
+> for the current architecture.
 
 Custom K8s controller that watches `AgentTask` CRDs and creates Jobs
 to run AI agents. Lives in `infra/ai-agents/agent-controller/`.
@@ -326,6 +331,155 @@ kubectl -n ai-agents run debug --rm -it --restart=Never \
     }
   }' -- unused
 ```
+
+## Operations
+
+### Force a re-trigger
+
+The controller fires a scheduled job when `lastRunTime` is before
+the most recent scheduled time. To force an immediate trigger, backdate
+`lastRunTime` and set phase to `Pending`:
+
+```bash
+kubectl patch agenttask daily-ai-news -n ai-agents \
+  --type=merge --subresource=status \
+  -p '{"status":{"phase":"Pending","lastRunTime":"2025-01-01T00:00:00Z","jobName":""}}'
+```
+
+The controller reconciles every ~1-2 minutes and will create a new Job
+on the next pass if the schedule says it's time.
+
+### Temporarily change the schedule
+
+Edit the YAML and apply. No controller restart needed — the reconcile
+loop reads the schedule from the CRD each cycle.
+
+```bash
+# Edit schedule field, then:
+kubectl apply -f infra/agent-controller/config/samples/daily-ai-news.yaml
+```
+
+### Kill a stuck job
+
+```bash
+# Find the job name
+kubectl get jobs -n ai-agents
+
+# Delete it — controller will mark the AgentTask as Failed
+kubectl delete job <job-name> -n ai-agents
+```
+
+### Rebuild and deploy the controller
+
+```bash
+cd infra/agent-controller
+docker build -t kpericak/agent-controller:0.X .
+docker push kpericak/agent-controller:0.X
+
+# Update helm/values.yaml with new tag, then:
+helm upgrade agent-controller ./helm -n ai-agents -f ./helm/values.yaml
+```
+
+If helm upgrade fails with a Secret conflict:
+```bash
+kubectl get secret agent-secrets -n ai-agents -o jsonpath='{.metadata.managedFields[*].manager}'
+# Remove the conflicting manager (usually kubectl-patch):
+kubectl patch secret agent-secrets -n ai-agents --type=json \
+  -p='[{"op":"remove","path":"/metadata/managedFields/1"}]'
+# Retry helm upgrade
+```
+
+## Debugging
+
+### Zero logs from agent pod
+
+Claude Code with `--output-format text` buffers all output until
+completion. Zero logs does NOT mean the agent is stuck — it may be
+actively working. Check for activity:
+
+```bash
+# Check if claude process is running
+kubectl exec -n ai-agents <pod> -c agent -- ps aux
+
+# Check conversation log size (grows as agent works)
+kubectl exec -n ai-agents <pod> -c agent -- \
+  find /home/node/.claude/projects -name "*.jsonl" -exec wc -l {} \;
+
+# Check which tools are being called
+kubectl exec -n ai-agents <pod> -c agent -- \
+  grep -o '"name":"[^"]*"' /home/node/.claude/projects/-workspace-repo/*.jsonl \
+  | sort | uniq -c | sort -rn
+```
+
+### Check for permission denials
+
+```bash
+kubectl exec -n ai-agents <pod> -c agent -- \
+  grep 'is_error.*true' /home/node/.claude/projects/-workspace-repo/*.jsonl
+```
+
+Common errors:
+- `"Claude requested permissions to write..."` — allowedTools pattern
+  not matching. Use bare `Write` not `Write(path/**)`
+  ([known bug](/wiki/security/claude-code-write-pattern-bug.html))
+- `"No such tool available: mcp__google-news__..."` — MCP server
+  failed to start. Check if npm deps are installed (see below)
+
+### Debug pod on workspace PVC
+
+When the agent pod is gone (completed/deleted), use a debug pod to
+inspect the workspace:
+
+```bash
+kubectl run debug-agent --image=kpericak/ai-agent-runtime:0.2 \
+  -n ai-agents \
+  --overrides='{
+    "spec":{
+      "containers":[{
+        "name":"debug",
+        "image":"kpericak/ai-agent-runtime:0.2",
+        "command":["tail","-f","/dev/null"],
+        "workingDir":"/workspace/repo",
+        "volumeMounts":[{"name":"workspace","mountPath":"/workspace"}]
+      }],
+      "volumes":[{
+        "name":"workspace",
+        "persistentVolumeClaim":{"claimName":"agent-workspace"}
+      }]
+    }
+  }'
+
+# Inspect workspace
+kubectl exec -n ai-agents debug-agent -- git -C /workspace/repo log --oneline -5
+kubectl exec -n ai-agents debug-agent -- ls /workspace/repo/apps/blog/blog/markdown/wiki/journal/
+
+# Test MCP server startup
+kubectl exec -n ai-agents debug-agent -- node /workspace/repo/apps/mcp-servers/google-news/build/index.js
+kubectl exec -n ai-agents debug-agent -- python3 /workspace/repo/apps/mcp-servers/discord/server.py
+
+# Clean up
+kubectl delete pod debug-agent -n ai-agents
+```
+
+Note: Claude's conversation logs live in `/home/node/.claude/projects/`
+which is on the container's ephemeral filesystem, NOT the PVC. Logs are
+lost when the pod is deleted.
+
+### Verify a run succeeded
+
+Checklist after a job completes:
+
+1. **Journal file exists:**
+   `kubectl exec debug-agent -- ls /workspace/repo/apps/blog/blog/markdown/wiki/journal/YYYY-MM-DD/`
+
+2. **Commit was made:**
+   `kubectl exec debug-agent -- git -C /workspace/repo log --oneline -3`
+
+3. **Discord message posted:**
+   Check `#news` channel — the journalist posts a formatted digest
+
+4. **Controller logged completion:**
+   `kubectl logs -n ai-agents -l app.kubernetes.io/name=agent-controller --tail=20`
 
 ## Key Files
 
