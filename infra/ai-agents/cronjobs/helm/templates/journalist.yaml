@@ -75,7 +75,7 @@ spec:
                     "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
                     | jq -r '.token')
 
-                  RUN_ID=$(head -c4 /dev/urandom | xxd -p)
+                  RUN_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-8)
                   curl -sf -X POST \
                     "https://discord.com/api/v10/channels/${DISCORD_LOG_CHANNEL_ID}/messages" \
                     -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
@@ -96,6 +96,7 @@ spec:
                     -p "Search for yesterday's most notable AI news, announcements, and releases. Write a digest to the wiki journal. Determine today's date, create the directory apps/blog/blog/markdown/wiki/journal/YYYY-MM-DD/, and write ai-news.md there with proper wiki frontmatter. Include source URLs for every item. Commit with message 'journal: AI news digest for YYYY-MM-DD'. After committing, post a Discord message to #news using the Discord output format defined in your agent instructions. Include 2-6 stories (up to 7 only if each is genuinely unique and noteworthy). Start with the overview line — keep it witty, one sentence, no emojis." \
                     --mcp-config /tmp/mcp.json \
                     --allowedTools "WebSearch,WebFetch,Read,Glob,Grep,Write,Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git config user.name *),Bash(git config user.email *),Bash(git commit --no-verify *),Bash(date *),mcp__discord__send_message,mcp__discord__list_channels" \
+                    --verbose \
                     --output-format stream-json
                   STATUS=$?
 
