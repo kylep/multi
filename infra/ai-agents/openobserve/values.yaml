@@ -5,6 +5,10 @@
 config:
   ZO_BASE_URI: "/obs"
 
+probes:
+  enabled: true
+  path: /obs/healthz
+
 auth:
   existingRootUserSecret:
     name: openobserve-credentials
