@@ -50,7 +50,7 @@ customConfig:
     openobserve:
       type: http
       inputs: [add_cluster_metadata]
-      uri: "http://openobserve-openobserve-standalone.openobserve.svc.cluster.local:5080/api/default/k8s_logs/_json"
+      uri: "http://openobserve-openobserve-standalone.openobserve.svc.cluster.local:5080/obs/api/default/k8s_logs/_json"
       method: post
       auth:
         strategy: basic
@@ -58,11 +58,9 @@ customConfig:
         password: "${ZO_ROOT_USER_PASSWORD}"
       encoding:
         codec: json
-      framing:
-        method: newline_delimited
       batch:
         max_bytes: 1048576
         timeout_secs: 10
       request:
         headers:
-          Content-Type: "application/x-ndjson"
+          Content-Type: "application/json"
