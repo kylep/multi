@@ -1,0 +1,36 @@
+state={
+	id=332
+	name="STATE_332"
+	
+	state_category = gigalopolis
+
+	resources = {
+		oil = 500
+		aluminium = 500
+		rubber = 500
+		tungsten = 500
+		steel = 500
+		chromium = 500
+	}
+
+	history={
+		owner = ENG
+		buildings = {
+			infrastructure = 1
+
+			12503 = {
+				naval_base = 1
+			}
+		}
+		add_core_of = CAN
+
+	}
+
+	provinces={
+		1426 1785 4720 4787 12503 13165 13180 
+	}
+	manpower = 10000000
+	buildings_max_level_factor=1.000
+
+	local_supplies=0.0 
+}

@@ -1,0 +1,38 @@
+state = {
+	id = 740
+	name = "STATE_740"
+	manpower = 10000000
+	
+	state_category = gigalopolis
+
+	resources = {
+		oil = 500
+		aluminium = 500
+		rubber = 500
+		tungsten = 500
+		steel = 500
+		chromium = 500
+	}
+
+	history = {
+
+		owner = CAN
+		add_core_of = CAN
+
+		buildings = {
+			infrastructure = 1
+		}
+
+		victory_points = {
+			7259 2 
+		}
+		
+	}
+
+	provinces = {
+		7259 1214 12259 12272 1420 
+	}
+	
+
+	local_supplies = 0.0 
+}

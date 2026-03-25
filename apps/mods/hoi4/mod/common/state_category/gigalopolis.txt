@@ -1,0 +1,8 @@
+state_categories={
+	gigalopolis = {
+		local_building_slots = 50
+
+			color = { 255 0 255 }
+
+	}
+}
