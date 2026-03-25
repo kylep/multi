@@ -2,6 +2,9 @@
 # Credentials come from K8s secret created by bootstrap.sh from Vault.
 # See infra/ai-agents/bin/bootstrap.sh and bin/store-secrets.sh.
 
+config:
+  ZO_BASE_URI: "/obs"
+
 auth:
   existingRootUserSecret:
     name: openobserve-credentials

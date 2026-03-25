@@ -19,17 +19,16 @@ Internet
   → wh.pericak.com  → Cloudflare Tunnel (no Access) → Traefik → webhook handler
 ```
 
-- **Cloudflare Tunnel**: outbound-only connection from the cluster to Cloudflare's edge. No inbound firewall rules needed. One tunnel (`pai-m1`), three public hostnames.
+- **Cloudflare Tunnel**: outbound-only connection from the cluster to Cloudflare's edge. No inbound firewall rules needed. One tunnel (`pai-m1`), two public hostnames.
 - **Traefik**: in-cluster reverse proxy. Routes by hostname + path prefix.
-- **Cloudflare Access** (pai.pericak.com and obs.pericak.com): zero-trust auth at the Cloudflare edge. Auth method: **One-time PIN** (email-based — Google OAuth requires mandatory 2-step verification as of March 2026, which is unusable for family members).
+- **Cloudflare Access** (pai.pericak.com only): zero-trust auth at the Cloudflare edge. Auth method: **One-time PIN** (email-based — Google OAuth requires mandatory 2-step verification as of March 2026, which is unusable for family members).
 - **wh.pericak.com**: open to internet — no Cloudflare Access. Webhook handlers must verify a shared secret.
 
-Allowed users (`pai.pericak.com`, `obs.pericak.com`): `kyle.pericak@gmail.com`, `kyle@pericak.com`, `kara@pericak.com`
+Allowed users (`pai.pericak.com`): `kyle.pericak@gmail.com`, `kyle@pericak.com`, `kara@pericak.com`
 
 | Hostname | Access protection | Purpose |
 |----------|------------------|---------|
-| `pai.pericak.com` | `pericak-family` Allow policy (One-time PIN) | ArgoCD UI and other authenticated services |
-| `obs.pericak.com` | `pericak-family` Allow policy (One-time PIN) | OpenObserve observability UI |
+| `pai.pericak.com` | `pericak-family` Allow policy (One-time PIN) | ArgoCD UI, OpenObserve, and other authenticated services |
 | `wh.pericak.com` | None — open to internet | Webhooks; application-level secret auth required |
 
 ---

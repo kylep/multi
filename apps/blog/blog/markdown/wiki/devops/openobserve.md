@@ -1,6 +1,6 @@
 ---
 title: "OpenObserve: Observability on K8s"
-summary: "How OpenObserve is deployed to the pai-m1 K8s cluster — Helm chart, Vault-backed credentials, Traefik IngressRoute, and Cloudflare Access."
+summary: "How OpenObserve is deployed to the pai-m1 K8s cluster — Helm chart, Vault-backed credentials, Traefik IngressRoute at pai.pericak.com/obs."
 tags:
   - devops
   - observability
@@ -10,39 +10,17 @@ tags:
 
 # OpenObserve: Observability on K8s
 
-OpenObserve is an observability platform for logs, metrics, and traces. It runs on the `pai-m1` cluster as a standalone deployment (single-replica, local disk storage).
+OpenObserve is an observability platform for logs, metrics, and traces. It runs on the `pai-m1` cluster as a standalone deployment (single-replica, local disk storage), accessible at `pai.pericak.com/obs` behind the existing Cloudflare Access gate.
 
 ## Architecture
 
 ```
-Internet → obs.pericak.com → Cloudflare Access (pericak-family) → Cloudflare Tunnel (pai-m1) → Traefik → openobserve svc (openobserve ns)
+Internet → pai.pericak.com/obs → Cloudflare Access (pericak-family) → Cloudflare Tunnel (pai-m1) → Traefik → openobserve svc
 ```
 
-| Hostname | Access protection | Purpose |
-|----------|------------------|---------|
-| `obs.pericak.com` | `pericak-family` Allow policy (One-time PIN) | OpenObserve UI |
+OpenObserve is configured with `ZO_BASE_URI=/obs` so it serves the UI correctly under the path prefix. Do not use a strip-prefix middleware — OpenObserve expects to receive the full `/obs` path (same pattern as ArgoCD with `server.rootpath`).
 
----
-
-## Part 0: Cloudflare dashboard steps (imperative)
-
-### 0.1 Add tunnel hostname
-
-Zero Trust → Networks → Tunnels → `pai-m1` → Public Hostnames → Add:
-
-| Field | Value |
-|-------|-------|
-| Subdomain | `obs` |
-| Domain | `pericak.com` |
-| Type | `HTTP` |
-| URL | `traefik.kube-system.svc.cluster.local:80` |
-
-### 0.2 Create Access application
-
-Zero Trust → Access controls → Applications → Add → Self-hosted:
-- **Application name**: `obs`
-- **Application domain**: subdomain `obs`, domain `pericak.com`
-- Assign existing policy: `pericak-family` (Allow, One-time PIN)
+No new Cloudflare tunnel hostname or Access application is needed — `pai.pericak.com` already covers it.
 
 ---
 
@@ -96,9 +74,14 @@ auth:
 
 ## Deployment
 
-OpenObserve is deployed via `helmfile -e pai-m1 apply` (or ArgoCD if an ApplicationSet is added later). It is disabled on all other environments via `openobserve.enabled: false` in `environments/default.yaml`.
+```bash
+# Store credentials in Vault first (see above), then:
+helmfile -f infra/ai-agents/helmfile.yaml -e pai-m1 apply --selector name=openobserve
+```
 
-Storage: 10Gi PVC on `local-path` StorageClass (K3s default). Data directory: `/data` inside the pod.
+OpenObserve is disabled on all other environments via `openobserve.enabled: false` in `environments/default.yaml`.
+
+Storage: 10Gi PVC on `local-path` StorageClass (K3s default).
 
 ---
 
@@ -112,12 +95,12 @@ kubectl get pvc -n openobserve
 # Check IngressRoute is loaded by Traefik
 kubectl get ingressroute -n openobserve
 
-# Verify remote access (should 302 to Cloudflare Access login)
-curl -I https://obs.pericak.com
+# Verify remote access (should 302 to Cloudflare Access login if not authenticated)
+curl -I https://pai.pericak.com/obs
 
 # Port-forward for local access (bypasses Cloudflare)
 kubectl port-forward svc/openobserve-openobserve-standalone -n openobserve 5080:5080
-# Then open http://localhost:5080
+# Then open http://localhost:5080/obs
 ```
 
 ---
@@ -125,7 +108,8 @@ kubectl port-forward svc/openobserve-openobserve-standalone -n openobserve 5080:
 ## Future: Log ingestion
 
 To ship K8s pod logs to OpenObserve, deploy a log forwarder as a DaemonSet. Options:
-- **Vector** — lightweight, native OpenObserve support
-- **Fluent Bit** — widely used, Loki-compatible output plugin works with OpenObserve HTTP ingest
+- **Vector** — lightweight, native OpenObserve HTTP ingest support
+- **Fluent Bit** — widely used, HTTP output plugin works with OpenObserve
 
-The OpenObserve HTTP ingest endpoint is `http://openobserve-openobserve-standalone.openobserve.svc.cluster.local:5080/api/default/default/_json`.
+HTTP ingest endpoint (in-cluster):
+`http://openobserve-openobserve-standalone.openobserve.svc.cluster.local:5080/api/default/default/_json`
