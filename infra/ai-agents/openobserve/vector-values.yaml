@@ -32,6 +32,13 @@ customConfig:
       # Exclude Vector's own logs to avoid loops
       exclude_paths_glob_patterns:
         - /var/log/pods/openobserve_vector-*/**/*.log
+      # Merge multi-line log entries (e.g. Python tracebacks).
+      # Any line starting with a timestamp begins a new logical entry;
+      # continuation lines (indented, "Traceback", etc.) are appended to it.
+      multiline:
+        start_pattern: '^\d{4}-\d{2}-\d{2}'
+        mode: halt_before
+        timeout_ms: 5000
 
   transforms:
     add_cluster_metadata:
