@@ -32,18 +32,26 @@ customConfig:
       # Exclude Vector's own logs to avoid loops
       exclude_paths_glob_patterns:
         - /var/log/pods/openobserve_vector-*/**/*.log
-      # Merge multi-line log entries (e.g. Python tracebacks).
-      # Any line starting with a timestamp begins a new logical entry;
-      # continuation lines (indented, "Traceback", etc.) are appended to it.
-      multiline:
-        start_pattern: '^\d{4}-\d{2}-\d{2}'
-        mode: halt_before
-        timeout_ms: 5000
 
   transforms:
+    # Merge multi-line log entries (e.g. Python tracebacks).
+    # Lines starting with a timestamp begin a new logical entry;
+    # continuation lines are merged into the previous entry (5s timeout).
+    merge_multiline:
+      type: reduce
+      inputs: [kubernetes_logs]
+      group_by:
+        - file
+      merge_strategies:
+        message: concat_newline
+      starts_when:
+        type: vrl
+        source: |
+          match(string!(.message), r'^\d{4}-\d{2}-\d{2}') == true
+      expire_after_ms: 5000
     add_cluster_metadata:
       type: remap
-      inputs: [kubernetes_logs]
+      inputs: [merge_multiline]
       source: |
         # Flatten K8s metadata into top-level fields for OpenObserve
         .k8s_namespace = .kubernetes.pod_namespace
@@ -52,6 +60,13 @@ customConfig:
         .k8s_node      = .kubernetes.pod_node_name
         del(.kubernetes)
         del(.file)
+        # Extract log level from message (e.g. "2026-03-25T12:00:00 INFO ..." or "[ERROR] ...")
+        parsed, err = parse_regex(.message, r'(?i)(?:^[\d\-T:Z\.\+]+ |\[)(?P<level>DEBUG|INFO|WARNING|WARN|ERROR|CRITICAL|FATAL)[\] ]')
+        if err == null {
+          .log_level = downcase(string!(parsed.level))
+        } else {
+          .log_level = "unknown"
+        }
 
   sinks:
     openobserve:

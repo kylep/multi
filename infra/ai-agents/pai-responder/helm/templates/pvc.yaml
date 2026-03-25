@@ -1,32 +1,15 @@
 {{- if .Values.paiResponder.enabled }}
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: {{ include "pai-responder.fullname" . }}-state
-  labels:
-    {{- include "pai-responder.labels" . | nindent 4 }}
-spec:
-  capacity:
-    storage: {{ .Values.storage.size }}
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: {{ .Values.storage.hostPath }}
-    type: DirectoryOrCreate
-  persistentVolumeReclaimPolicy: Retain
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "pai-responder.fullname" . }}-state
   labels:
     {{- include "pai-responder.labels" . | nindent 4 }}
 spec:
-  storageClassName: ""
+  storageClassName: local-path
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.storage.size }}
-  volumeName: {{ include "pai-responder.fullname" . }}-state
 {{- end }}
