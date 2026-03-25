@@ -2,6 +2,13 @@
 
 <!-- Agent definitions in .claude/agents/*.md -->
 
+# Verify your work
+
+Never present work to the user without verifying it first. If you edit
+a config file, run it. If you write code, build/test it. If you change
+a playbook, run it. The user should not have to ask "did you test this?"
+— verification is your responsibility before reporting completion.
+
 # Bash rules
 
 Never use `sleep` commands longer than 30 seconds. If you need to wait
