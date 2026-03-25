@@ -706,6 +706,32 @@
         create: true
         mode: "0644"
 
+    # ---------------------------------------------------------------
+    # Oh My Zsh — framework for zsh configuration
+    # ---------------------------------------------------------------
+    - name: Check if Oh My Zsh is installed
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['env']['HOME'] }}/.oh-my-zsh"
+      register: omz_dir
+
+    - name: Download Oh My Zsh install script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+        dest: /tmp/omz-install.sh
+        mode: "0755"
+      when: not omz_dir.stat.exists
+
+    - name: Install Oh My Zsh (unattended)
+      ansible.builtin.command: /tmp/omz-install.sh --unattended
+      environment:
+        KEEP_ZSHRC: "yes"
+      when: not omz_dir.stat.exists
+
+    - name: Clean up Oh My Zsh install script
+      ansible.builtin.file:
+        path: /tmp/omz-install.sh
+        state: absent
+
     # Enable Homebrew cryptographic attestation verification.
     # Homebrew 5.1.0+ with gh CLI installed supports attestation
     # checks on bottles via GitHub's artifact attestation API.
