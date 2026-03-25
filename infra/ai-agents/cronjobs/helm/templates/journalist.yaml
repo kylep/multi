@@ -85,12 +85,16 @@ spec:
                   printf '%s' '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["/workspace/repo/apps/mcp-servers/discord/server.py"]}}}' \
                     > /tmp/mcp.json
 
+                  TODAY=$(date +%Y-%m-%d)
+                  BRANCH="news-${TODAY}"
+
                   git clone \
                     "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git" \
                     /workspace/repo
                   cd /workspace/repo
                   git config user.name "PericakAI (Pai)"
                   git config user.email "pericakai@gmail.com"
+                  git checkout -b "${BRANCH}"
 
                   claude --agent journalist \
                     -p "Search for yesterday's most notable AI news, announcements, and releases. Write a digest to the wiki journal. Determine today's date, create the directory apps/blog/blog/markdown/wiki/journal/YYYY-MM-DD/, and write ai-news.md there with proper wiki frontmatter. Include source URLs for every item. Commit with message 'journal: AI news digest for YYYY-MM-DD'. After committing, post a Discord message to #news using the Discord output format defined in your agent instructions. Include 2-6 stories (up to 7 only if each is genuinely unique and noteworthy). Start with the overview line — keep it witty, one sentence, no emojis." \
@@ -101,7 +105,12 @@ spec:
                   STATUS=$?
 
                   if [ $STATUS -eq 0 ]; then
-                    git push origin HEAD
+                    git push origin "${BRANCH}"
+                    curl -sf -X POST \
+                      -H "Authorization: token ${GITHUB_TOKEN}" \
+                      -H "Accept: application/vnd.github+json" \
+                      "https://api.github.com/repos/kylep/multi/pulls" \
+                      -d "{\"title\":\"journal: AI news digest for ${TODAY}\",\"body\":\"Automated daily AI news digest.\",\"head\":\"${BRANCH}\",\"base\":\"main\"}" || true
                     MSG="\u2713 ${RUN_ID} | agent=journalist | done"
                   else
                     MSG="\u2717 ${RUN_ID} | agent=journalist | failed"
