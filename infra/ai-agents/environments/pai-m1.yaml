@@ -16,7 +16,7 @@ paiResponder:
 cronjobs:
   journalist:
     enabled: true
-    schedule: "20 12 * * *"  # 7:20am ET
+    schedule: "0 12 * * *"   # 8am ET (12:00 UTC, EDT=UTC-4)
   paiMorning:
     enabled: true
     schedule: "30 12 * * *"  # 8:30am ET
