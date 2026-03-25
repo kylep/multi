@@ -1,0 +1,57 @@
+name: Auto-merge wiki-only PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'apps/blog/blog/markdown/wiki/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR only changes wiki markdown
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FILES=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files --jq '.[].filename')
+          echo "Changed files:"
+          echo "$FILES"
+
+          NON_WIKI=false
+          while IFS= read -r file; do
+            if [[ ! "$file" =~ ^apps/blog/blog/markdown/wiki/.*\.md$ ]]; then
+              echo "Non-wiki file: $file"
+              NON_WIKI=true
+            fi
+          done <<< "$FILES"
+
+          if [ "$NON_WIKI" = "true" ]; then
+            echo "wiki_only=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "wiki_only=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Approve PR
+        if: steps.check.outputs.wiki_only == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
+            -f event=APPROVE \
+            -f body="Auto-approved: wiki markdown only changes."
+
+      - name: Merge PR
+        if: steps.check.outputs.wiki_only == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --squash \
+            --delete-branch
