@@ -1,0 +1,33 @@
+# Deploys Traefik IngressRoutes for services exposed via pai.pericak.com.
+# Deploys to the same clusters as traefik (cluster-role=ai-agents).
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: traefik-routes
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cluster-role: ai-agents
+  template:
+    metadata:
+      name: "traefik-routes-{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kylep/multi
+        targetRevision: main
+        path: infra/ai-agents/traefik
+        directory:
+          include: "argocd-ingress.yaml"
+      destination:
+        server: "{{server}}"
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

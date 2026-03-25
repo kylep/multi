@@ -6,6 +6,12 @@ storageClass: local-path
 argocd:
   enabled: false
 
+traefik:
+  enabled: false
+
+cloudflared:
+  enabled: false
+
 paiResponder:
   enabled: false
 

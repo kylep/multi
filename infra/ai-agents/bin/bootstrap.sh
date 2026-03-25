@@ -55,11 +55,38 @@ else
   bash "$SCRIPT_DIR/configure-vault-auth.sh"
 fi
 
-# 6. Apply ArgoCD ApplicationSets (ArgoCD takes over all releases from here)
+# 6. Create cloudflared-token K8s secret from Vault (idempotent)
+VAULT_CREDS="$HOME/.vault-init"
+if [ -f "$VAULT_CREDS" ]; then
+  if grep -q '"root_token"' "$VAULT_CREDS" 2>/dev/null; then
+    ROOT_TOKEN=$(jq -r '.root_token' "$VAULT_CREDS")
+  else
+    ROOT_TOKEN=$(grep ROOT_TOKEN "$VAULT_CREDS" | cut -d= -f2)
+  fi
+  SEALED=$(kubectl exec -n vault vault-0 -- vault status -format=json 2>/dev/null \
+    | jq -r '.sealed' 2>/dev/null || echo "true")
+  if [ "$SEALED" = "false" ]; then
+    TUNNEL_TOKEN=$(kubectl exec -n vault vault-0 -- \
+      env "VAULT_TOKEN=$ROOT_TOKEN" \
+      vault kv get -field=tunnel_token secret/ai-agents/cloudflare 2>/dev/null || echo "")
+    if [ -n "$TUNNEL_TOKEN" ]; then
+      echo "Creating cloudflared-token K8s secret..."
+      kubectl create namespace cloudflared --dry-run=client -o yaml | kubectl apply -f -
+      kubectl create secret generic cloudflared-token \
+        --from-literal=tunnelToken="$TUNNEL_TOKEN" \
+        -n cloudflared \
+        --dry-run=client -o yaml | kubectl apply -f -
+    else
+      echo "Cloudflare tunnel token not in Vault — run store-secrets.sh then re-run bootstrap.sh."
+    fi
+  fi
+fi
+
+# 7. Apply ArgoCD ApplicationSets (ArgoCD takes over all releases from here)
 echo "Applying ArgoCD ApplicationSets..."
 kubectl apply -f "$INFRA_DIR/argocd/"
 
-# 7. Register this cluster in ArgoCD and label it for the cluster generator
+# 8. Register this cluster in ArgoCD and label it for the cluster generator
 # Requires: argocd CLI and ArgoCD server accessible
 ARGOCD_SERVER="${ARGOCD_SERVER:-localhost:8080}"
 if command -v argocd >/dev/null; then
@@ -70,18 +97,20 @@ if command -v argocd >/dev/null; then
     --insecure --grpc-web 2>/dev/null || true
   argocd cluster add "$(kubectl config current-context)" --name pai-m1 --yes \
     --insecure 2>/dev/null || echo "Cluster 'pai-m1' already registered (or argocd login failed — label manually)"
-  # Label the cluster secret so the ApplicationSet generator picks it up
+  # Label the cluster secret so the ApplicationSet generators pick it up
+  # cluster-role=ai-agents: all workloads (cronjobs, traefik, pai-responder)
+  # cloudflare-tunnel=true: cloudflared deployment (pai-m1 only — each cluster needs its own token)
   kubectl label secret -n argocd \
     -l "argocd.argoproj.io/secret-type=cluster" \
-    cluster-role=ai-agents --overwrite 2>/dev/null || true
+    cluster-role=ai-agents cloudflare-tunnel=true --overwrite 2>/dev/null || true
 else
   echo ""
   echo "=== argocd CLI not found — complete cluster registration manually ==="
   echo "   argocd cluster add \$(kubectl config current-context) --name pai-m1"
-  echo "   kubectl label secret -n argocd -l argocd.argoproj.io/secret-type=cluster cluster-role=ai-agents"
+  echo "   kubectl label secret -n argocd -l argocd.argoproj.io/secret-type=cluster cluster-role=ai-agents cloudflare-tunnel=true"
 fi
 
-# 8. Report status
+# 9. Report status
 echo ""
 echo "=== Status ==="
 kubectl get pods -n argocd

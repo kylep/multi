@@ -180,5 +180,12 @@ prompt_or_env WEBHOOK_TOKEN "Webhook bearer token$(already_set "$EXISTING_WEBHOO
 [ -n "${WEBHOOK_TOKEN:-}" ] && kv_store webhook "webhook_token=$WEBHOOK_TOKEN"
 
 echo ""
-echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook}"
+echo "=== Cloudflare ==="
+EXISTING_CLOUDFLARE=$(get_existing cloudflare)
+prompt_or_env CLOUDFLARE_TUNNEL_TOKEN "Cloudflare Tunnel token (pai-m1)$(already_set "$EXISTING_CLOUDFLARE" tunnel_token)" secret
+[ -n "${CLOUDFLARE_TUNNEL_TOKEN:-}" ] && kv_store cloudflare "tunnel_token=$CLOUDFLARE_TUNNEL_TOKEN"
+
+echo ""
+echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook,cloudflare}"
 echo "  pai: discord_bot_token, claude_oauth_token, linear_api_key"
+echo "  cloudflare: tunnel_token"
