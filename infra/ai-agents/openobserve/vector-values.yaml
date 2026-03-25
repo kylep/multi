@@ -60,6 +60,13 @@ customConfig:
         .k8s_node      = .kubernetes.pod_node_name
         del(.kubernetes)
         del(.file)
+        # Extract log level from message (e.g. "2026-03-25T12:00:00 INFO ..." or "[ERROR] ...")
+        parsed, err = parse_regex(.message, r'(?i)(?:^[\d\-T:Z\.\+]+ |\[)(?P<level>DEBUG|INFO|WARNING|WARN|ERROR|CRITICAL|FATAL)[\] ]')
+        if err == null {
+          .log_level = downcase(string!(parsed.level))
+        } else {
+          .log_level = "unknown"
+        }
 
   sinks:
     openobserve:
