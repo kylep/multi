@@ -1,0 +1,30 @@
+state={
+	id=683
+	name="STATE_683"
+	resources = {
+		oil = 500
+		aluminium = 500
+		rubber = 500
+		tungsten = 500
+		steel = 500
+		chromium = 500
+	}
+
+	history={
+		owner = CAN
+		buildings = {
+			infrastructure = 1
+
+		}
+		add_core_of = CAN
+
+	}
+
+	provinces={
+		2947 8962 10721 13188 13190 13191 
+	}
+	manpower = 10000000
+	buildings_max_level_factor=1.000
+	state_category = gigalopolis
+	local_supplies=0.000
+}

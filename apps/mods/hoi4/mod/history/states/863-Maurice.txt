@@ -1,0 +1,37 @@
+state = {
+	id = 863
+	name = "STATE_863"
+	manpower = 10000000
+	state_category = gigalopolis
+
+	resources = {
+		oil = 500
+		aluminium = 500
+		rubber = 500
+		tungsten = 500
+		steel = 500
+		chromium = 500
+	}
+	
+	history = {
+	
+		owner = CAN
+		add_core_of = CAN
+		add_core_of = QUE
+
+		victory_points = {
+			12223 1
+		}
+
+		buildings = {
+			infrastructure = 2
+		}
+
+	}
+	
+	provinces = {
+		1356 4419 4769 7893 12223 13160 
+	}
+	buildings_max_level_factor = 1.000
+	local_supplies = 0.000
+}

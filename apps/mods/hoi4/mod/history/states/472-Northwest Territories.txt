@@ -1,0 +1,31 @@
+state={
+	id=472
+	name="STATE_472"
+
+	history={
+		owner = CAN
+		buildings = {
+			infrastructure = 1
+
+		}
+		add_core_of = CAN
+
+	}
+
+	provinces={
+		2407 2976 4272 7696 7830 7858 7901 8653 10527 10703 13075 13167 13189 13192 
+	}
+	manpower = 10000000
+	buildings_max_level_factor=1.000
+	state_category = gigalopolis
+
+	resources = {
+		oil = 500
+		aluminium = 500
+		rubber = 500
+		tungsten = 500
+		steel = 500
+		chromium = 500
+	}
+	local_supplies=0.000
+}
