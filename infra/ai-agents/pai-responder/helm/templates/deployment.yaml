@@ -42,22 +42,57 @@ spec:
           args:
             - |
               . /vault/secrets/config
-              exec python3 /opt/pai/poll-loop.py
+              export PYTHONPATH=/opt/pai
+              exec python3 /opt/pai/gateway.py
           env:
             - name: DISCORD_GUILD_ID
               value: {{ .Values.discord.guildId | quote }}
-            - name: POLL_INTERVAL
-              value: {{ .Values.polling.interval | quote }}
             - name: REVIEW_INTERVAL
-              value: {{ .Values.polling.reviewInterval | quote }}
+              value: {{ .Values.gateway.reviewInterval | quote }}
+            - name: REVIEW_ENABLED
+              value: {{ .Values.gateway.reviewEnabled | quote }}
+            - name: IDLE_TIMEOUT
+              value: {{ .Values.gateway.idleTimeout | quote }}
+            - name: MAX_THREAD_AGE
+              value: {{ .Values.gateway.maxThreadAge | quote }}
             - name: STATE_PATH
               value: /data/state.json
+            - name: HEALTH_PORT
+              value: "8080"
+          ports:
+            - name: health
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 10
           volumeMounts:
             - name: pai-state
               mountPath: /data
             - name: pai-script
-              mountPath: /opt/pai/poll-loop.py
-              subPath: poll-loop.py
+              mountPath: /opt/pai/gateway.py
+              subPath: gateway.py
+            - name: pai-script
+              mountPath: /opt/pai/transcript.py
+              subPath: transcript.py
+            - name: pai-script
+              mountPath: /opt/pai/thread_manager.py
+              subPath: thread_manager.py
+            - name: pai-script
+              mountPath: /opt/pai/memory_store.py
+              subPath: memory_store.py
+            - name: pai-script
+              mountPath: /opt/pai/memory_mcp.py
+              subPath: memory_mcp.py
             - name: pai-script
               mountPath: /opt/discord-mcp/server.py
               subPath: discord-mcp-server.py

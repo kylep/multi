@@ -23,7 +23,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 RUN npm install -g @anthropic-ai/claude-code @playwright/mcp
 
 # Python MCP dependencies
-RUN pip install --no-cache-dir --break-system-packages "mcp[cli]>=1.2.0" "httpx>=0.27.0"
+RUN pip install --no-cache-dir --break-system-packages "mcp[cli]>=1.2.0" "httpx>=0.27.0" "discord.py>=2.4.0" "aiohttp>=3.9.0"
 
 # OpenCode binary
 ARG OPENCODE_VERSION=0.0.55

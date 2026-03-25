@@ -6,8 +6,16 @@ metadata:
   labels:
     {{- include "pai-responder.labels" . | nindent 4 }}
 data:
-  poll-loop.py: |
-{{ .Files.Get "files/poll-loop.py" | indent 4 }}
+  gateway.py: |
+{{ .Files.Get "files/gateway.py" | indent 4 }}
+  transcript.py: |
+{{ .Files.Get "files/transcript.py" | indent 4 }}
+  thread_manager.py: |
+{{ .Files.Get "files/thread_manager.py" | indent 4 }}
+  memory_store.py: |
+{{ .Files.Get "files/memory_store.py" | indent 4 }}
+  memory_mcp.py: |
+{{ .Files.Get "files/memory_mcp.py" | indent 4 }}
   discord-mcp-server.py: |
 {{ .Files.Get "files/discord-mcp-server.py" | indent 4 }}
 {{- end }}
