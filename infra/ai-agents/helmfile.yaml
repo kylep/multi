@@ -29,6 +29,8 @@ releases:
     set:
       - name: configs.params.server\.insecure
         value: "true"
+      - name: configs.params.server\.rootpath
+        value: "/argocd"
 
   - name: vault
     namespace: vault
