@@ -15,19 +15,16 @@ tags:
 
 ```
 Internet
-  → Cloudflare Access (auth gate — One-time PIN)
-  → Cloudflare Tunnel (cloudflared pod in K8s, outbound-only)
-  → Traefik (in-cluster reverse proxy — routes by path)
-  → Target service (ArgoCD, webhooks, etc.)
+  → pai.pericak.com → Cloudflare Access (One-time PIN auth) → Cloudflare Tunnel → Traefik → service
+  → wh.pericak.com  → Cloudflare Tunnel (no Access) → Traefik → webhook handler
 ```
 
-- **Domain**: `pai.pericak.com` (single hostname for all services)
-- **Cloudflare Tunnel**: outbound-only connection from the cluster to Cloudflare's edge. No inbound firewall rules needed.
-- **Traefik**: in-cluster reverse proxy. One tunnel entry point, many backends routed by path prefix.
-- **Cloudflare Access**: zero-trust auth at the Cloudflare edge. Requests are rejected before reaching the cluster unless authenticated. Auth method: **One-time PIN** (email-based — used because Google OAuth requires mandatory 2-step verification as of March 2026).
+- **Cloudflare Tunnel**: outbound-only connection from the cluster to Cloudflare's edge. No inbound firewall rules needed. One tunnel (`pai-m1`), two public hostnames.
+- **Traefik**: in-cluster reverse proxy. Routes by hostname + path prefix.
+- **Cloudflare Access** (pai.pericak.com only): zero-trust auth at the Cloudflare edge. Auth method: **One-time PIN** (email-based — Google OAuth requires mandatory 2-step verification as of March 2026, which is unusable for family members).
+- **wh.pericak.com**: open to internet — no Cloudflare Access. Webhook handlers must verify a shared secret.
 
-Allowed users: `kyle.pericak@gmail.com`, `kyle@pericak.com`, `kara@pericak.com`
-Bypass (no auth): `/webhooks/*` paths
+Allowed users (`pai.pericak.com`): `kyle.pericak@gmail.com`, `kyle@pericak.com`, `kara@pericak.com`
 
 ---
 
@@ -66,7 +63,9 @@ If this is the first time using Zero Trust on this account, Cloudflare will show
 
 ### 1.3 Configure public hostnames
 
-Add a route for the `pai` entry point:
+Add two routes — both point to Traefik:
+
+**Route 1 — authenticated services:**
 
 | Field | Value |
 |-------|-------|
@@ -75,9 +74,31 @@ Add a route for the `pai` entry point:
 | Type | `HTTP` |
 | URL | `traefik.traefik.svc.cluster.local:80` |
 
-> Traefik handles path-based routing internally. The tunnel always points to Traefik.
+**Route 2 — webhooks (no Access protection):**
 
-Click **Save hostname**, then **Done**.
+| Field | Value |
+|-------|-------|
+| Subdomain | `wh` |
+| Domain | `pericak.com` |
+| Type | `HTTP` |
+| URL | `traefik.traefik.svc.cluster.local:80` |
+
+> Traefik handles hostname + path routing internally. The tunnel always points to Traefik for both hostnames.
+
+Click **Save hostname** after each, then **Done**.
+
+---
+
+## Tunnel Hostnames Summary
+
+| Hostname | Access protection | Purpose |
+|----------|------------------|---------|
+| `pai.pericak.com` | `pericak-family` Allow policy (One-time PIN) | ArgoCD UI and other authenticated services |
+| `wh.pericak.com` | None — open to internet | Webhooks (GitHub, etc.); application-level secret auth required |
+
+Both hostnames point to `traefik.traefik.svc.cluster.local:80`. Traefik routes by hostname + path internally.
+
+> `wh.pericak.com` has no Cloudflare Access application. Anyone can reach it. Webhook handlers **must** verify a shared secret (e.g., `X-Hub-Signature-256` for GitHub) at the application level.
 
 ---
 
@@ -122,13 +143,17 @@ One-time PIN is built-in to Cloudflare Access — no external IdP setup needed. 
 4. Check `pericak-family` → click **Confirm**
 5. Click **Save application**
 
-### 2.5 Webhook bypass — free plan limitation
+### 2.5 Webhook bypass — free plan limitation and workaround
 
 The Cloudflare free plan does not support path-scoped Access policies. You cannot restrict a Bypass policy to `/webhooks/*` only — it would bypass auth for **all** traffic to the application.
 
-**Current state**: The `webhooks-bypass` policy (Action: Bypass, Everyone) exists as a reusable policy but is **not assigned** to the `pai` application. Webhook callers must authenticate via Cloudflare Access, or webhook auth must be implemented at the application level (e.g., verify a shared secret header in the webhook handler).
+**Solution**: Use a second tunnel hostname (`wh.pericak.com`) with **no Access application**. Webhook senders call `wh.pericak.com`; Traefik routes by hostname. No Cloudflare Access challenge is triggered for `wh.pericak.com` because there is no Access application protecting it.
 
-If on a paid plan and want to add path-scoped bypass:
+**Security**: `wh.pericak.com` is open to the internet. Webhook handlers **must** verify a shared secret at the application level (e.g., verify `X-Hub-Signature-256` for GitHub webhooks).
+
+The `webhooks-bypass` policy (Action: Bypass, Everyone) exists as a reusable policy but is **not assigned** to any application — it's kept as a reference in case of a paid plan upgrade.
+
+If on a paid plan and want to consolidate to a single hostname with path-scoped bypass:
 1. **Access controls** → **Applications** → **pai** → **Configure** → **Policies**
 2. **Select existing policies** → check `webhooks-bypass` → **Confirm**
 3. Set path scope to `/webhooks/*`
@@ -195,11 +220,14 @@ The ArgoCD IngressRoute exposes ArgoCD at `pai.pericak.com/argocd`. ArgoCD must 
 
 ## Adding new routes
 
-To expose a new service:
+**Authenticated service** (user-facing, requires login):
+1. Add an `IngressRoute` matching `Host(`pai.pericak.com`) && PathPrefix(`/your-path`)` in the target namespace
+2. Protected automatically by the existing `pai.pericak.com` Access application (`pericak-family` Allow policy)
 
-1. Add a path-based `IngressRoute` for `pai.pericak.com` in the relevant namespace (or add to `traefik/argocd-ingress.yaml`)
-2. For webhook endpoints: Cloudflare Access will still challenge the request (see Section 2.5 — free plan limitation). Implement webhook auth at the application level using a shared secret header.
-3. For authenticated services: protected automatically by the existing `pai.pericak.com` Access application (`pericak-family` Allow policy)
+**Webhook endpoint** (machine-to-machine, no Cloudflare Access):
+1. Add an `IngressRoute` matching `Host(`wh.pericak.com`) && PathPrefix(`/your-webhook`)` in the target namespace
+2. No Cloudflare Access challenge — traffic reaches the pod directly
+3. **Must** verify a shared secret at the application level (e.g., `X-Hub-Signature-256` for GitHub)
 
 ---
 
