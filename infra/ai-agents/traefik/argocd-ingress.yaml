@@ -1,21 +1,11 @@
 ---
 # Exposes ArgoCD UI at pai.pericak.com/argocd via Traefik IngressRoute.
-# Requires Traefik CRDs installed (from the traefik Helm release).
-# ArgoCD must be configured with server.rootpath: /argocd for the UI to work.
+# ArgoCD is configured with server.rootpath: /argocd so it handles the path prefix itself.
+# Do NOT strip /argocd — ArgoCD expects to receive the full path.
 #
 # Hostname routing:
 #   pai.pericak.com  — Cloudflare Access protected (pericak-family Allow policy)
 #   wh.pericak.com   — No Access protection; open to internet; application-level auth required
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: argocd-strip-prefix
-  namespace: argocd
-spec:
-  stripPrefix:
-    prefixes:
-      - /argocd
----
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -27,8 +17,6 @@ spec:
   routes:
     - match: Host(`pai.pericak.com`) && PathPrefix(`/argocd`)
       kind: Rule
-      middlewares:
-        - name: argocd-strip-prefix
       services:
         - name: argocd-server
           port: 80
