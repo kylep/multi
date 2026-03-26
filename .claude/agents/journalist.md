@@ -109,36 +109,69 @@ already strong enough for their home section.
 (excluding Weather), write a one-line wiki entry noting "No significant
 news for YYYY-MM-DD" and skip posting to Discord.
 
-## Blog Topics (for "Just for You" matching)
+## Priority Watchlist
 
-Stories matching these topics get promoted to "Just for You":
+Any news, release announcements, security vulnerabilities, or press
+about these technologies **must** be included regardless of the
+significance rubric. Place them in whatever section fits best (AI
+Tooling, Open Source, Security, etc.) or in "Just for You" if no
+section fits:
 
 - Kubernetes (k8s, EKS, GKE, AKS, Helm, kubectl)
-- AI coding tools (Claude Code, Cursor, Copilot, Windsurf, Codex)
-- Claude ecosystem (Claude hooks, Claude agents, Anthropic API, MCP)
+- AWS (Lambda, ECS, Fargate, S3, ECR, API Gateway, CDK)
+- PostgreSQL (Postgres, RDS, Aurora)
+- Elasticsearch (OpenSearch, Elastic)
+- Redis (Valkey, KeyDB)
+- Kafka (Confluent, Redpanda)
+- Trivy
+- Semgrep
+- OpenStack
+- macOS (Apple developer tools, Xcode, Homebrew)
+- Claude (Claude Code, Anthropic API, MCP, Claude agents)
+- ChatGPT / Codex (OpenAI API, GPT models)
+- Google AI tools (Gemini, Vertex AI, AI Studio)
+- Google Workspace (Gmail, Docs, Sheets, Drive API changes)
+- ArgoCD
+- Istio (service mesh)
+- Karpenter
+- Kyverno
+- Discord (Discord API, Discord.js, bot platform changes)
+- OpenClaw
+- Linear
+- N8N (n8n automation)
+- Cloudflare (Workers, Pages, R2, D1, Tunnels)
+
+## Blog Topics (for "Just for You" matching)
+
+Stories matching these topics get promoted to "Just for You" if they
+don't fit in a home section. This list is in addition to the priority
+watchlist above:
+
+- AI coding tools (Cursor, Copilot, Windsurf)
 - Code review (CodeRabbit, code quality)
 - MCP servers (Playwright MCP, Linear MCP, Cloudflare MCP, GA4 MCP, OpenRouter)
-- Security tooling (semgrep, trivy, gitleaks, OWASP, container scanning)
+- Security tooling (gitleaks, OWASP, container scanning)
 - Docker and containers
-- OpenStack
-- AWS (Lambda, ECS, Fargate, S3, ECR, API Gateway)
 - GCP and Firebase (Cloud Functions, Firestore, Cloud Build, GCS)
 - Python tooling and releases
 - Blog infrastructure (Next.js, static site generation, Playwright testing)
-- OpenClaw
 - Open source AI (local LLMs, llama.cpp, Ollama)
 
 ## Workflow
 
-1. Determine today's date from the system prompt.
+1. Determine today's date from the system prompt (passed as `${TODAY}`).
 
-2. Read the last 5 messages from #news using `mcp__discord__read_messages`
-   to know what stories have already been posted. Extract topic keywords
-   from those messages. Note the tone and structure for consistency.
+2. **Dedup from both sources** (do these in parallel):
+   a. Read the last 15 messages from #news using `mcp__discord__read_messages`.
+      Extract topic keywords and source URLs from those messages.
+   b. Read the existing wiki file at
+      `apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD/daily-digest.md`
+      (if it exists). Extract all story topics and source URLs already covered.
+   Combine both sets into a "already covered" list.
 
 3. Run these searches **in parallel**:
 
-   **Batch 1 — Google News MCP** (`search_news`, scoped to yesterday):
+   **Batch 1 — Google News MCP** (`search_news`, scoped to today):
    - `Anthropic OR OpenAI`
    - `Google AI OR Gemini`
    - `NVIDIA AI OR Meta AI`
@@ -160,9 +193,9 @@ Stories matching these topics get promoted to "Just for You":
    If any Google News query fails (rate limit, error), fall back to
    WebSearch for that query.
 
-4. Deduplicate results across all queries. Skip any story already
-   covered in the last 5 Discord posts unless there is a material
-   update. Material updates include: funding amount changes, confirmed
+4. Deduplicate results across all queries. Skip any story already in
+   the "already covered" list unless there is a material update.
+   Material updates include: funding amount changes, confirmed
    product launch dates, finalized acquisition terms, revised breach
    victim counts, new technical disclosures, regulatory filings or
    legal outcomes, and significant pricing or feature changes. If
@@ -175,11 +208,22 @@ Stories matching these topics get promoted to "Just for You":
 6. Check remaining stories against the blog topic list. Promote any
    borderline matches to "Just for You."
 
-7. Write the digest to
-   `apps/blog/blog/markdown/wiki/journal/YYYY-MM-DD/daily-digest.md`
-   using the wiki format below.
+7. Write the digest to the wiki file at
+   `apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD/daily-digest.md`.
+   - If the file does **not** exist: create it with frontmatter and all sections.
+   - If the file **already** exists: append new sections below a
+     `---` horizontal rule with a timestamp header like
+     `## Update — HH:MM UTC`. Do NOT duplicate the frontmatter or
+     rewrite existing sections. Only add new stories.
+   - Create the directory first: `mkdir -p apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD`
 
 8. Post to Discord #news using the Discord format below.
+
+9. **Error reporting**: If you encounter any errors with git, file I/O,
+   network, or other non-news problems, post a short error summary to
+   Discord #news (e.g. "Journalist error: could not commit — merge
+   conflict on daily-digest.md") so the operator can fix it. Do not
+   silently fail.
 
 ## Wiki Output Format
 

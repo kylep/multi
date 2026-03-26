@@ -1,8 +1,15 @@
 # Defaults — all CronJobs suspended. Override per cluster in environments/<name>.yaml.
 cronjobs:
   journalist:
-    enabled: false
-    schedule: "0 12 * * *"
+    morning:
+      enabled: false
+      schedule: "0 10 * * *"   # 6:00 AM EDT / 10:00 UTC
+    noon:
+      enabled: false
+      schedule: "0 16 * * *"   # 12:00 PM EDT / 16:00 UTC
+    evening:
+      enabled: false
+      schedule: "0 22 * * *"   # 6:00 PM EDT / 22:00 UTC
   paiMorning:
     enabled: false
     schedule: "30 12 * * *"
