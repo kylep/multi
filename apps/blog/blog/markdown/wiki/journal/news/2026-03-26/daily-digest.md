@@ -43,3 +43,29 @@ last_verified: 2026-03-26
 ## Just for You
 
 - [Ramp](https://ramp.com/velocity/ai-index-march-2026) The Ramp AI Index for March 2026 shows business AI adoption at a record 47.6% of companies. Anthropic's share grew 4.9 percentage points to 24.4%, now winning roughly 70% of head-to-head enterprise sales contests against OpenAI among first-time buyers, while OpenAI's adoption share fell 1.5 points.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Tooling
+
+- [GitHub Changelog](https://github.blog/changelog/2026-03-25-github-copilot-for-jira-public-preview-enhancements/) GitHub expanded Copilot coding agent for Jira with model selection directly from Jira, automatic Jira ticket number inclusion in PR titles and branch names, and Confluence context via the Atlassian MCP server. Enhancements are live in the public preview.
+
+- [India TV News](https://www.indiatvnews.com/technology/news/google-gemini-gets-major-upgrade-create-3-minute-ai-songs-with-lyria-3-pro-2026-03-26-1035135) Google launched Lyria 3 Pro in the Gemini app, enabling AI music generation up to 3 minutes with improved structure and customization. Available to paid Gemini users and accessible to developers via Google AI Studio and the Gemini API.
+
+## Security
+
+- [CISA](https://www.cisa.gov/news-events/directives/ed-26-03-mitigate-vulnerabilities-cisco-sd-wan-systems) Cisco SD-WAN CVE-2026-20127 (CVSS 10.0): authentication bypass in Catalyst SD-WAN Controller and Manager allowing unauthenticated remote takeover, exploited since at least 2023 by threat actor UAT-8616. CISA Emergency Directive 26-03 final remediation deadline is today (March 26). No workaround; upgrade to a patched release.
+
+- [Sophos](https://www.sophos.com/en-us/blog/oracle-vulnerability-cve-2026-21992-impacts-core-products) Oracle CVE-2026-21992 (CVSS 9.8): unauthenticated HTTP-based remote code execution in Oracle Identity Manager and Oracle Web Services Manager. No active exploitation reported; patch available via Oracle's March 2026 Critical Patch Update.
+
+## Local
+
+- [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) Durham Region police are seeking four suspects linked to more than 20 break-and-enters across Whitby since last year.
+
+## Just for You
+
+- [AWS News Blog](https://aws.amazon.com/blogs/aws/announcing-amazon-eks-capabilities-for-workload-orchestration-and-cloud-resource-management/) Amazon EKS Capabilities launched at KubeCon EU 2026 — fully managed Argo CD, AWS Controllers for Kubernetes, and Kube Resource Orchestrator run in AWS-owned accounts, removing in-cluster installation, patching, and scaling burden. Includes IAM Identity Center SSO and AWS Secrets Manager integration.
+
+- [Kubernetes Blog](https://kubernetes.io/blog/2026/03/20/ingress2gateway-1-0-release/) Ingress-NGINX reaches end-of-life on March 31, 2026 — no further patches or security fixes after that date. Ingress2Gateway 1.0 shipped March 20, now supporting 30+ common annotations to assist migration to Gateway API.
