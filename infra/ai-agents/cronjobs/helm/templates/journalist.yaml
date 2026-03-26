@@ -1,11 +1,13 @@
+{{- range $name, $cfg := .Values.cronjobs.journalist }}
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: journalist
+  name: journalist-{{ $name }}
   namespace: ai-agents
 spec:
-  schedule: {{ .Values.cronjobs.journalist.schedule | quote }}
-  suspend: {{ not .Values.cronjobs.journalist.enabled }}
+  schedule: {{ $cfg.schedule | quote }}
+  suspend: {{ not $cfg.enabled }}
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
@@ -19,7 +21,6 @@ spec:
           annotations:
             vault.hashicorp.com/agent-inject: "true"
             vault.hashicorp.com/role: "ai-agents"
-            # config: shell-sourceable env vars from three Vault paths
             vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/discord"
             vault.hashicorp.com/agent-inject-template-config: |
               {{`{{- with secret "secret/ai-agents/discord" -}}`}}
@@ -34,7 +35,6 @@ spec:
               {{`{{- with secret "secret/ai-agents/anthropic" -}}`}}
               export CLAUDE_CODE_OAUTH_TOKEN="{{`{{ .Data.data.claude_oauth_token }}`}}"
               {{`{{- end -}}`}}
-            # github-key: raw PEM written to a dedicated file (multiline-safe)
             vault.hashicorp.com/agent-inject-secret-github-key: "secret/ai-agents/github"
             vault.hashicorp.com/agent-inject-template-github-key: |
               {{`{{- with secret "secret/ai-agents/github" -}}{{ .Data.data.github_app_private_key }}{{- end -}}`}}
@@ -49,77 +49,98 @@ spec:
               type: RuntimeDefault
           containers:
             - name: agent
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
               command: ["/bin/sh", "-c"]
               args:
                 - |
+                  set -e
                   . /vault/secrets/config
 
-                  # Generate short-lived GitHub installation token from App credentials
-                  _header=$(printf '{"alg":"RS256","typ":"JWT"}' \
-                    | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
-                  _now=$(date +%s)
-                  _iat=$((_now - 60))
-                  _exp=$((_now + 300))
-                  _payload=$(printf '{"iss":"%s","iat":%d,"exp":%d}' \
-                    "$GITHUB_APP_ID" "$_iat" "$_exp" \
-                    | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
-                  _sig=$(printf '%s.%s' "$_header" "$_payload" \
-                    | openssl dgst -sha256 -sign /vault/secrets/github-key -binary \
-                    | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
-                  _jwt="${_header}.${_payload}.${_sig}"
-                  GITHUB_TOKEN=$(curl -sf -X POST \
-                    -H "Authorization: Bearer ${_jwt}" \
-                    -H "Accept: application/vnd.github+json" \
-                    "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
-                    | jq -r '.token')
+                  # --- GitHub token ---
+                  gen_token() {
+                    _header=$(printf '{"alg":"RS256","typ":"JWT"}' \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    _now=$(date +%s); _iat=$((_now - 60)); _exp=$((_now + 300))
+                    _payload=$(printf '{"iss":"%s","iat":%d,"exp":%d}' \
+                      "$GITHUB_APP_ID" "$_iat" "$_exp" \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    _sig=$(printf '%s.%s' "$_header" "$_payload" \
+                      | openssl dgst -sha256 -sign /vault/secrets/github-key -binary \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    curl -sf -X POST \
+                      -H "Authorization: Bearer ${_header}.${_payload}.${_sig}" \
+                      -H "Accept: application/vnd.github+json" \
+                      "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
+                      | jq -r '.token'
+                  }
+                  GITHUB_TOKEN=$(gen_token)
 
                   RUN_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-8)
-                  curl -sf -X POST \
-                    "https://discord.com/api/v10/channels/${DISCORD_LOG_CHANNEL_ID}/messages" \
-                    -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
-                    -H "Content-Type: application/json" \
-                    -d "{\"content\":\"\u25b6 ${RUN_ID} | agent=journalist | started\"}" || true
-
-                  printf '%s' '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["/workspace/repo/apps/mcp-servers/discord/server.py"]}}}' \
-                    > /tmp/mcp.json
-
-                  TODAY=$(date +%Y-%m-%d)
+                  TODAY=$(date -u +%Y-%m-%d)
                   BRANCH="news-${TODAY}"
+                  AGENT_NAME="journalist-{{ $name }}"
 
-                  git clone \
-                    "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git" \
-                    /workspace/repo
+                  discord_post() {
+                    curl -sf -X POST \
+                      "https://discord.com/api/v10/channels/${DISCORD_LOG_CHANNEL_ID}/messages" \
+                      -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"content\":\"$1\"}" || true
+                  }
+                  discord_post "\u25b6 ${RUN_ID} | agent=${AGENT_NAME} | started"
+
+                  # --- Clone and set up branch ---
+                  git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git" /workspace/repo
                   cd /workspace/repo
                   git config user.name "PericakAI (Pai)"
                   git config user.email "pericakai@gmail.com"
-                  git checkout -b "${BRANCH}"
 
+                  # Check if today's branch exists on remote
+                  if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
+                    git fetch origin "${BRANCH}"
+                    git checkout "${BRANCH}"
+                    git merge origin/main --no-edit || true
+                  else
+                    git checkout -b "${BRANCH}"
+                  fi
+
+                  # --- MCP config ---
+                  printf '%s' '{"mcpServers":{"discord":{"type":"stdio","command":"python3","args":["/workspace/repo/apps/mcp-servers/discord/server.py"]}}}' \
+                    > /tmp/mcp.json
+
+                  # --- Run journalist agent ---
                   claude --agent journalist \
-                    -p "Search for yesterday's most notable AI news, announcements, and releases. Write a digest to the wiki journal. Determine today's date, create the directory apps/blog/blog/markdown/wiki/journal/YYYY-MM-DD/, and write ai-news.md there with proper wiki frontmatter. Include source URLs for every item. Commit with message 'journal: AI news digest for YYYY-MM-DD'. After committing, post a Discord message to #news using the Discord output format defined in your agent instructions. Include 2-6 stories (up to 7 only if each is genuinely unique and noteworthy). Start with the overview line — keep it witty, one sentence, no emojis." \
+                    -p "Run a news update. Today is ${TODAY}. Write to the wiki at apps/blog/blog/markdown/wiki/journal/news/${TODAY}/daily-digest.md — create the file if it does not exist, or append new sections if it does. Check both Discord #news (last 15 messages) and the existing wiki file for stories already covered so you do not post duplicates. Collect the news, write to the wiki, commit, then post to Discord #news. If you encounter any errors with git, file I/O, or other non-news problems, post a short error summary to Discord #news so the operator can fix it. Commit message: 'journal: AI news digest for ${TODAY}'." \
                     --mcp-config /tmp/mcp.json \
-                    --allowedTools "WebSearch,WebFetch,Read,Glob,Grep,Write,Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git config user.name *),Bash(git config user.email *),Bash(git commit --no-verify *),Bash(date *),mcp__discord__send_message,mcp__discord__list_channels" \
+                    --allowedTools "WebSearch,WebFetch,Read,Glob,Grep,Write,Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/news/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git config user.name *),Bash(git config user.email *),Bash(git commit --no-verify *),Bash(date *),mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \
                     --verbose \
                     --output-format stream-json
                   STATUS=$?
 
                   if [ $STATUS -eq 0 ]; then
-                    git push origin "${BRANCH}"
-                    curl -sf -X POST \
+                    GITHUB_TOKEN=$(gen_token)
+                    git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git"
+                    git push origin "${BRANCH}" || git push --force-with-lease origin "${BRANCH}"
+
+                    # Create PR if one doesn't already exist
+                    EXISTING_PR=$(curl -sf \
                       -H "Authorization: token ${GITHUB_TOKEN}" \
                       -H "Accept: application/vnd.github+json" \
-                      "https://api.github.com/repos/kylep/multi/pulls" \
-                      -d "{\"title\":\"journal: AI news digest for ${TODAY}\",\"body\":\"Automated daily AI news digest.\",\"head\":\"${BRANCH}\",\"base\":\"main\"}" || true
-                    MSG="\u2713 ${RUN_ID} | agent=journalist | done"
+                      "https://api.github.com/repos/kylep/multi/pulls?head=kylep:${BRANCH}&state=open" \
+                      | jq 'length')
+                    if [ "${EXISTING_PR}" = "0" ]; then
+                      curl -sf -X POST \
+                        -H "Authorization: token ${GITHUB_TOKEN}" \
+                        -H "Accept: application/vnd.github+json" \
+                        "https://api.github.com/repos/kylep/multi/pulls" \
+                        -d "{\"title\":\"journal: AI news digest for ${TODAY}\",\"body\":\"Automated daily AI news digest (3x daily).\",\"head\":\"${BRANCH}\",\"base\":\"main\"}" || true
+                    fi
+                    MSG="\u2713 ${RUN_ID} | agent=${AGENT_NAME} | done"
                   else
-                    MSG="\u2717 ${RUN_ID} | agent=journalist | failed"
+                    MSG="\u2717 ${RUN_ID} | agent=${AGENT_NAME} | failed (exit ${STATUS})"
                   fi
-                  curl -sf -X POST \
-                    "https://discord.com/api/v10/channels/${DISCORD_LOG_CHANNEL_ID}/messages" \
-                    -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
-                    -H "Content-Type: application/json" \
-                    -d "{\"content\":\"${MSG}\"}" || true
+                  discord_post "${MSG}"
                   exit $STATUS
               resources:
                 requests:
@@ -138,3 +159,4 @@ spec:
           volumes:
             - name: workspace
               emptyDir: {}
+{{- end }}
