@@ -19,7 +19,7 @@ cronjobs:
 
 image:
   repository: kpericak/ai-agent-runtime
-  tag: "0.4"
+  tag: "0.5"
   pullPolicy: Always
 
 repo:
