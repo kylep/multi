@@ -23,7 +23,7 @@ spec:
         path: infra/ai-agents/pai-responder/helm
         helm:
           valueFiles:
-            - ../../../infra/ai-agents/environments/{{name}}.yaml
+            - ../../environments/{{name}}.yaml
       destination:
         server: "{{server}}"
         namespace: ai-agents
