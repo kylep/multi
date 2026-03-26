@@ -3,6 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: kpericak/ai-agent-runtime:0.3
+    image: kpericak/ai-agent-runtime:0.5
     stdin_open: true
     tty: true
