@@ -61,15 +61,13 @@ Error, ImagePullBackOff, Pending, Terminating (stuck > 5min).
 
 **Expected namespaces and workloads:**
 
-| Namespace | Workloads |
-|-----------|-----------|
-| `argocd` | argocd-server, argocd-repo-server, argocd-redis, argocd-applicationset-controller, argocd-notifications-controller |
-| `ai-agents` | pai-responder |
-| `openobserve` | openobserve-standalone, vector |
-| `vault` | vault, vault-agent-injector |
-| `cloudflared` | cloudflared |
-| `kube-system` | coredns, traefik, local-path-provisioner, metrics-server |
-| `blog-staging` | blog |
+- argocd: argocd-server, argocd-repo-server, argocd-redis, argocd-applicationset-controller, argocd-notifications-controller
+- ai-agents: pai-responder
+- openobserve: openobserve-standalone, vector
+- vault: vault, vault-agent-injector
+- cloudflared: cloudflared
+- kube-system: coredns, traefik, local-path-provisioner, metrics-server
+- blog-staging: blog
 
 If a workload from this list is missing entirely, that is also an issue.
 
