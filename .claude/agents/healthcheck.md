@@ -36,6 +36,16 @@ when something is wrong.
 Always start by running `date -u && date` to establish current UTC and
 local time. Use this when interpreting timestamps in logs and K8s events.
 
+## State Change Detection
+
+Before running checks, read the last 5 messages from #status-updates
+(channel ID: 1484017412306239578) to find your most recent health check
+post. Parse which checks were OK and which were FAIL in that post.
+This is your **previous state**.
+
+After running all checks, compare current results against previous state.
+Only post to Discord if there are **state changes** (OK→FAIL or FAIL→OK).
+
 ## Checklist
 
 Run these checks in order. Collect all issues before filing any bugs.
@@ -59,6 +69,7 @@ Error, ImagePullBackOff, Pending, Terminating (stuck > 5min).
 | `vault` | vault, vault-agent-injector |
 | `cloudflared` | cloudflared |
 | `kube-system` | coredns, traefik, local-path-provisioner, metrics-server |
+| `blog-staging` | blog |
 
 If a workload from this list is missing entirely, that is also an issue.
 
@@ -69,7 +80,8 @@ kubectl get applications -n argocd -o custom-columns=NAME:.metadata.name,SYNC:.s
 ```
 
 Every application should be `Synced` + `Healthy`. Flag: `OutOfSync`,
-`Degraded`, `Missing`, `Unknown`.
+`Degraded`, `Missing`, `Unknown`. Note: `Progressing` is acceptable
+for blog-staging (the init container build takes ~60s).
 
 ### 3. CronJob Health
 
@@ -78,8 +90,10 @@ kubectl get jobs -n ai-agents --sort-by=.metadata.creationTimestamp -o custom-co
 ```
 
 Check the most recent job for each CronJob (journalist-morning,
-journalist-noon, journalist-evening, pai-morning). The latest run
-should show `Complete`. Flag: `Failed`, or no recent run in 24h.
+journalist-noon, journalist-evening, pai-morning, healthcheck).
+The latest run should show `Complete`. Flag: `Failed`, or no recent
+run in 24h. Ignore manually-triggered jobs (names ending in `-manual`
+or `-test` or `-v2` etc).
 
 ### 4. OpenObserve Error Scan
 
@@ -109,6 +123,39 @@ unauthenticated health endpoint — no token needed.
 Use `o2_list_streams` to verify `k8s_logs` stream exists and has
 recent documents. If doc count is 0 or the stream is missing,
 Vector ingestion is broken.
+
+## Discord Output
+
+Post to #status-updates (channel ID: 1484017412306239578).
+
+**Only post if there are state changes.** Compare each check's result
+(OK or FAIL) against the previous health check post.
+
+If there are state changes, post a message listing ONLY the transitions:
+
+```
+Health check — YYYY-MM-DD HH:MM UTC
+🔴 Pod Health: OK → FAIL — blog-staging/blog Init:Error (OOM)
+🟢 Vault Status: FAIL → OK — unsealed, initialized
+```
+
+Use 🔴 for OK→FAIL transitions and 🟢 for FAIL→OK transitions.
+Keep each line to one sentence with the key detail.
+
+**If all checks are the same as last time, do not post anything.**
+
+**If this is the first run (no previous health check found in Discord),
+post the full state as initial baseline:**
+
+```
+Health check — YYYY-MM-DD HH:MM UTC (initial)
+Pod Health: OK
+ArgoCD Sync: OK
+CronJob Health: FAIL — journalist-morning no recent run
+Log Errors: OK
+Vault Status: OK
+Log Ingestion: OK
+```
 
 ## Bug Filing to Linear
 
@@ -148,31 +195,9 @@ After collecting all issues from the checks above:
 - **Max 5 issues per run** — batch related errors into a single issue
   (e.g., if 3 pods in the same namespace are failing, that's 1 issue)
 
-## Output
-
-End every run with a summary table:
-
-```
-## Health Check Summary — YYYY-MM-DD HH:MM UTC
-
-| Check              | Status | Details |
-|--------------------|--------|---------|
-| Pod Health         | OK/FAIL | ... |
-| ArgoCD Sync        | OK/FAIL | ... |
-| CronJob Health     | OK/FAIL | ... |
-| Log Errors (1h)    | OK/FAIL | N errors in M namespaces |
-| Vault Status       | OK/FAIL | ... |
-| Log Ingestion      | OK/FAIL | ... |
-
-**Linear actions**: Created PER-XX, commented on PER-YY
-```
-
-If everything is healthy, output the table with all OK and:
-"All systems healthy. No Linear issues filed."
-
 ## Rules
 
 - Never modify infrastructure, deployments, or configs. Read-only checks only.
 - Never delete or close Linear issues. Only create or comment.
 - If kubectl or OpenObserve is unreachable, report that as the first issue.
-- Be concise. The summary table is the primary output.
+- Be concise. No tables. State changes only.
