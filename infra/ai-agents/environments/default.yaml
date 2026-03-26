@@ -23,6 +23,8 @@ cronjobs:
       enabled: false
     evening:
       enabled: false
+  healthcheck:
+    enabled: false
   paiMorning:
     enabled: false
     schedule: "30 12 * * *"

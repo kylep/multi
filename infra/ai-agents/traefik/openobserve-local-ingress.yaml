@@ -1,0 +1,17 @@
+---
+# Exposes OpenObserve at http://localhost/obs for local access (no Cloudflare).
+# Used by MCP servers and CLI tools running on the same machine as K8s.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openobserve-local
+  namespace: openobserve
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`localhost`) && PathPrefix(`/obs`)
+      kind: Rule
+      services:
+        - name: openobserve-openobserve-standalone
+          port: 5080

@@ -1,0 +1,13 @@
+[project]
+name = "openobserve-mcp"
+version = "0.1.0"
+description = "MCP server for querying OpenObserve logs, streams, and alerts"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=1.2.0",
+    "httpx>=0.27.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,144 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: healthcheck
+  namespace: ai-agents
+spec:
+  schedule: {{ .Values.cronjobs.healthcheck.schedule | quote }}
+  suspend: {{ not .Values.cronjobs.healthcheck.enabled }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 900
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/role: "ai-agents"
+            vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/discord"
+            vault.hashicorp.com/agent-inject-template-config: |
+              {{`{{- with secret "secret/ai-agents/discord" -}}`}}
+              export DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
+              export DISCORD_GUILD_ID="{{`{{ .Data.data.discord_guild_id }}`}}"
+              export DISCORD_LOG_CHANNEL_ID="{{`{{ .Data.data.discord_log_channel_id }}`}}"
+              {{`{{- end -}}`}}
+              {{`{{- with secret "secret/ai-agents/openobserve" -}}`}}
+              export O2_EMAIL="{{`{{ .Data.data.root_user_email }}`}}"
+              export O2_PASSWORD="{{`{{ .Data.data.root_user_password }}`}}"
+              {{`{{- end -}}`}}
+              {{`{{- with secret "secret/ai-agents/pai" -}}`}}
+              export LINEAR_API_KEY="{{`{{ .Data.data.linear_api_key }}`}}"
+              {{`{{- end -}}`}}
+              {{`{{- with secret "secret/ai-agents/anthropic" -}}`}}
+              export CLAUDE_CODE_OAUTH_TOKEN="{{`{{ .Data.data.claude_oauth_token }}`}}"
+              {{`{{- end -}}`}}
+        spec:
+          serviceAccountName: cronjob-agent
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: agent
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  . /vault/secrets/config
+
+                  RUN_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-8)
+                  STATUS_CHANNEL="${DISCORD_LOG_CHANNEL_ID}"
+
+                  discord_post() {
+                    curl -sf -X POST \
+                      "https://discord.com/api/v10/channels/${STATUS_CHANNEL}/messages" \
+                      -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"content\":\"$1\"}" || true
+                  }
+                  discord_post "\u25b6 ${RUN_ID} | agent=healthcheck | started"
+
+                  # Build O2 token from Vault creds
+                  O2_TOKEN=$(printf '%s:%s' "$O2_EMAIL" "$O2_PASSWORD" | base64 -w0)
+                  O2_URL="http://openobserve-openobserve-standalone.openobserve.svc.cluster.local:5080/obs"
+
+                  # Clone repo for agent definition
+                  git clone --depth 1 https://github.com/kylep/multi.git /workspace/repo
+                  cd /workspace/repo
+
+                  # MCP config: OpenObserve + Linear + Discord
+                  cat > /tmp/mcp.json << MCPEOF
+                  {
+                    "mcpServers": {
+                      "openobserve": {
+                        "type": "stdio",
+                        "command": "python3",
+                        "args": ["/workspace/repo/apps/mcp-servers/openobserve/server.py"],
+                        "env": {
+                          "O2_URL": "${O2_URL}",
+                          "O2_TOKEN": "${O2_TOKEN}",
+                          "O2_ORG": "default"
+                        }
+                      },
+                      "linear-server": {
+                        "type": "stdio",
+                        "command": "npx",
+                        "args": ["-y", "@hatcloud/linear-mcp"],
+                        "env": {
+                          "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+                        }
+                      },
+                      "discord": {
+                        "type": "stdio",
+                        "command": "python3",
+                        "args": ["/workspace/repo/apps/mcp-servers/discord/server.py"],
+                        "env": {
+                          "DISCORD_BOT_TOKEN": "${DISCORD_BOT_TOKEN}",
+                          "DISCORD_GUILD_ID": "${DISCORD_GUILD_ID}"
+                        }
+                      }
+                    }
+                  }
+                  MCPEOF
+
+                  claude --agent healthcheck \
+                    -p "Run a full health check. Post the summary table to Discord #status-updates (channel ID: 1484017412306239578) using the Discord MCP send_message tool. If any issues are found, file them to Linear following your dedup process." \
+                    --mcp-config /tmp/mcp.json \
+                    --allowedTools "Bash(kubectl *),Bash(date *),mcp__openobserve__*,mcp__linear-server__*,mcp__discord__send_message,mcp__discord__read_messages" \
+                    --verbose \
+                    --output-format stream-json
+                  STATUS=$?
+
+                  if [ $STATUS -eq 0 ]; then
+                    MSG="\u2713 ${RUN_ID} | agent=healthcheck | done"
+                  else
+                    MSG="\u2717 ${RUN_ID} | agent=healthcheck | failed (exit ${STATUS})"
+                  fi
+                  discord_post "${MSG}"
+                  exit $STATUS
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: workspace
+                  mountPath: /workspace
+          volumes:
+            - name: workspace
+              emptyDir: {}

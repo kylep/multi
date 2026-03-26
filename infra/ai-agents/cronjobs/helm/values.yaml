@@ -10,6 +10,9 @@ cronjobs:
     evening:
       enabled: false
       schedule: "0 22 * * *"   # 6:00 PM EDT / 22:00 UTC
+  healthcheck:
+    enabled: false
+    schedule: "0 13 * * *"   # 9:00 AM EDT / 13:00 UTC
   paiMorning:
     enabled: false
     schedule: "30 12 * * *"
