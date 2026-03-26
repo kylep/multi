@@ -1,0 +1,4 @@
+apiVersion: v2
+name: blog-staging
+description: Staging blog on pai.pericak.com with local registry and Kaniko builds
+version: 0.1.0

@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blog-build-cache
+  namespace: blog-staging
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.registry.storageClass }}
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: blog-builder
+  namespace: blog-staging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: blog-builder
+  namespace: blog-staging
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: blog-builder
+  namespace: blog-staging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: blog-builder
+subjects:
+  - kind: ServiceAccount
+    name: blog-builder
+    namespace: blog-staging
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: blog-build
+  namespace: blog-staging
+spec:
+  schedule: {{ .Values.build.schedule | quote }}
+  timeZone: "UTC"
+  startingDeadlineSeconds: 300
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 600
+      ttlSecondsAfterFinished: 300
+      template:
+        spec:
+          serviceAccountName: blog-builder
+          restartPolicy: Never
+          initContainers:
+            # 1. Check if main has new commits since last build
+            - name: check-commits
+              image: alpine/git:latest
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  LAST=$(cat /cache/last-built-commit 2>/dev/null || echo "none")
+                  HEAD=$(git ls-remote {{ .Values.build.repo }} refs/heads/{{ .Values.build.branch }} | cut -f1)
+                  echo "Last built: $LAST"
+                  echo "Remote HEAD: $HEAD"
+                  if [ "$LAST" = "$HEAD" ]; then
+                    echo "No new commits. Skipping."
+                    exit 1
+                  fi
+                  echo "$HEAD" > /cache/pending-commit
+                  echo "$HEAD" | cut -c1-7 > /cache/pending-short
+              volumeMounts:
+                - name: cache
+                  mountPath: /cache
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+            # 2. Build and push with Kaniko
+            - name: build
+              image: gcr.io/kaniko-project/executor:latest
+              args:
+                - --context=git://{{ .Values.build.repo | trimPrefix "https://" }}#refs/heads/{{ .Values.build.branch }}
+                - --dockerfile={{ .Values.build.dockerfile }}
+                - --destination={{ .Values.blog.image }}:latest
+                - --insecure
+                - --insecure-registry=registry.blog-staging.svc.cluster.local:5000
+                - --cache=false
+                - --single-snapshot
+              volumeMounts:
+                - name: cache
+                  mountPath: /cache
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: 2000m
+                  memory: 3Gi
+          containers:
+            # 3. Record commit hash and restart blog deployment
+            - name: finalize
+              image: bitnami/kubectl:latest
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  cp /cache/pending-commit /cache/last-built-commit
+                  SHORT=$(cat /cache/pending-short)
+                  echo "Build complete for $SHORT. Restarting blog deployment."
+                  kubectl -n blog-staging rollout restart deployment/blog
+              volumeMounts:
+                - name: cache
+                  mountPath: /cache
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+          volumes:
+            - name: cache
+              persistentVolumeClaim:
+                claimName: blog-build-cache
