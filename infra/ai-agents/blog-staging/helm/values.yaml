@@ -1,22 +1,10 @@
-# Blog staging deployment values
-registry:
-  storage: 30Gi
-  storageClass: local-path
-  # Max tags to keep per image during garbage collection
-  keepTags: 3
-  gcSchedule: "0 4 * * *"  # 4 AM UTC daily
-
 blog:
   replicas: 1
-  image: registry.blog-staging.svc.cluster.local:5000/blog-staging
-  tag: latest
+  repo: https://github.com/kylep/multi.git
+  branch: main
 
 build:
   # Poll git every 5 minutes for new commits
   schedule: "*/5 * * * *"
-  repo: https://github.com/kylep/multi.git
-  branch: main
-  dockerfile: apps/blog/Dockerfile.staging
-  context: .
 
 hostname: pai.pericak.com
