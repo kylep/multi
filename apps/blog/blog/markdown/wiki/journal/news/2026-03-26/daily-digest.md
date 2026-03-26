@@ -91,3 +91,15 @@ last_verified: 2026-03-26
 ## Local
 
 - [GlobeNewswire](https://www.globenewswire.com/news-release/2026/03/26/3262899/0/en/local-news-returns-to-print-metroland-and-torstar-launch-monthly-print-newspapers-across-greater-toronto-area.html) Metroland and Torstar relaunched monthly print editions in four Durham and Halton communities today, including Whitby This Week. Papers will be available at public pickup locations; Metroland is also hiring 20 editorial interns across Ontario.
+
+---
+
+## Update — 23:30 UTC
+
+## Security
+
+- [CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) CISA added Langflow CVE-2026-33017 to the Known Exploited Vulnerabilities catalog on March 25. Federal civilian agencies must patch by April 8. The code injection flaw in Langflow (all versions through 1.8.1) saw working exploits in the wild within 20 hours of disclosure.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/one-line-kubernetes-fix-saved-600-hours-a-year/) Cloudflare published a post-mortem on a Kubernetes persistent volume bottleneck that caused 30-minute Atlantis restarts. Changing `fsGroupChangePolicy` from `Always` to `OnRootMismatch` cut restart time to 30 seconds and reclaimed roughly 600 hours of engineering time per year.
