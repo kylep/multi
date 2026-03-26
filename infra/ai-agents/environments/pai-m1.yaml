@@ -24,6 +24,9 @@ cronjobs:
     evening:
       enabled: true
       schedule: "0 22 * * *"   # 6:00 PM EDT (22:00 UTC)
+  healthcheck:
+    enabled: true
+    schedule: "0 11,17,23 * * *"  # 7am, 1pm, 7pm EDT (every 6h)
   paiMorning:
     enabled: true
     schedule: "30 12 * * *"  # 8:30am ET
