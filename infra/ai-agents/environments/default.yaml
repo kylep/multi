@@ -17,8 +17,12 @@ paiResponder:
 
 cronjobs:
   journalist:
-    enabled: false
-    schedule: "0 12 * * *"
+    morning:
+      enabled: false
+    noon:
+      enabled: false
+    evening:
+      enabled: false
   paiMorning:
     enabled: false
     schedule: "30 12 * * *"
