@@ -4,15 +4,17 @@ paiResponder:
 
 image:
   repository: kpericak/ai-agent-runtime
-  tag: "0.4"
+  tag: "0.5"
   pullPolicy: Always
 
 discord:
   guildId: "1482815068352675971"
 
-polling:
-  interval: 30        # seconds between polls
-  reviewInterval: 900  # seconds between periodic reviews (15 min)
+gateway:
+  reviewInterval: 900      # seconds between periodic reviews (15 min)
+  reviewEnabled: "true"
+  idleTimeout: 3600        # thread idle timeout (1 hour)
+  maxThreadAge: 86400      # max thread binding age (24 hours)
 
 vault:
   role: ai-agents
