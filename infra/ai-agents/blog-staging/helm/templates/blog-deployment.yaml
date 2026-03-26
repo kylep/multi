@@ -36,11 +36,11 @@ spec:
               mountPath: /output
           resources:
             requests:
-              cpu: 200m
-              memory: 512Mi
+              cpu: 100m
+              memory: 256Mi
             limits:
               cpu: 1000m
-              memory: 1536Mi
+              memory: 512Mi
       containers:
         - name: nginx
           image: nginx:alpine
