@@ -1,0 +1,31 @@
+# Deploys the staging blog (local registry + Kaniko builder + nginx) to pai.pericak.com.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: blog-staging
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cluster-role: ai-agents
+  template:
+    metadata:
+      name: "blog-staging-{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kylep/multi
+        targetRevision: main
+        path: infra/ai-agents/blog-staging/helm
+        helm: {}
+      destination:
+        server: "{{server}}"
+        namespace: blog-staging
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

@@ -1,0 +1,19 @@
+---
+# Catch-all route for pai.pericak.com — serves the staging blog.
+# Lower priority than /argocd and /obs routes (shorter rule = lower default priority).
+# Protected by existing Cloudflare Access application 'pai' (pericak-family Allow policy).
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: blog-staging
+  namespace: blog-staging
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`{{ .Values.hostname }}`)
+      kind: Rule
+      priority: 1
+      services:
+        - name: blog
+          port: 80
