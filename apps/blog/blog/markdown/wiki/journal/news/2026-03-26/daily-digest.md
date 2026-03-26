@@ -69,3 +69,25 @@ last_verified: 2026-03-26
 - [AWS News Blog](https://aws.amazon.com/blogs/aws/announcing-amazon-eks-capabilities-for-workload-orchestration-and-cloud-resource-management/) Amazon EKS Capabilities launched at KubeCon EU 2026 — fully managed Argo CD, AWS Controllers for Kubernetes, and Kube Resource Orchestrator run in AWS-owned accounts, removing in-cluster installation, patching, and scaling burden. Includes IAM Identity Center SSO and AWS Secrets Manager integration.
 
 - [Kubernetes Blog](https://kubernetes.io/blog/2026/03/20/ingress2gateway-1-0-release/) Ingress-NGINX reaches end-of-life on March 31, 2026 — no further patches or security fixes after that date. Ingress2Gateway 1.0 shipped March 20, now supporting 30+ common annotations to assist migration to Gateway API.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Axios](https://www.axios.com/2026/03/26/anthropic-pentagon-ai-deal) Axios outlines a potential path to reviving an Anthropic-Pentagon deal: Anthropic agreeing to lawful-use parameters, a financial contribution to Trump Accounts, and investor Brad Gerstner as possible mediator. Judge Rita Lin has not yet ruled; the 180-day phase-out clock is still running.
+
+## AI Tooling
+
+- [Claude Code Changelog](https://code.claude.com/docs/en/changelog) Claude Code shipped a broad Windows release today — PowerShell tool available as opt-in preview, WSL2 voice mode fixed on Windows 11, startup with unauthenticated MCP servers is ~600ms faster, and a new `--channels` research preview lets MCP servers push messages into sessions.
+
+- [CNBC](https://www.cnbc.com/2026/03/24/openai-revamps-shopping-experience-in-chatgpt-after-instant-checkout.html) OpenAI discontinued Instant Checkout after low conversion rates and limited inventory, replacing it with retailer-built in-ChatGPT app experiences. Walmart's Sparky agent now handles full purchase flows inside ChatGPT; Target, Sephora, Lowe's, and others are live on the new Agentic Commerce Protocol.
+
+## Security
+
+- [CrowdStrike](https://www.crowdstrike.com/en-us/blog/patch-tuesday-analysis-march-2026/) CVE-2026-21536 (CVSS 9.8): unauthenticated RCE in Microsoft Devices Pricing Program via unrestricted file upload — no user interaction required. Patched in March 2026 Patch Tuesday; not yet confirmed exploited in the wild.
+
+## Local
+
+- [GlobeNewswire](https://www.globenewswire.com/news-release/2026/03/26/3262899/0/en/local-news-returns-to-print-metroland-and-torstar-launch-monthly-print-newspapers-across-greater-toronto-area.html) Metroland and Torstar relaunched monthly print editions in four Durham and Halton communities today, including Whitby This Week. Papers will be available at public pickup locations; Metroland is also hiring 20 editorial interns across Ontario.
