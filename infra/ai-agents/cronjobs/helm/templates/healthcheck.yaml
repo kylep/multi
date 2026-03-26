@@ -115,7 +115,7 @@ spec:
                   claude --agent healthcheck \
                     -p "Run a full health check. Post the summary table to Discord #status-updates (channel ID: 1484017412306239578) using the Discord MCP send_message tool. If any issues are found, file them to Linear following your dedup process." \
                     --mcp-config /tmp/mcp.json \
-                    --allowedTools "Bash(kubectl *),Bash(date *),mcp__openobserve__*,mcp__linear-server__*,mcp__discord__send_message,mcp__discord__read_messages" \
+                    --allowedTools "Bash(kubectl *),Bash(date *),Bash(curl *),mcp__openobserve__*,mcp__linear-server__*,mcp__discord__send_message,mcp__discord__read_messages" \
                     --verbose \
                     --output-format stream-json
                   STATUS=$?

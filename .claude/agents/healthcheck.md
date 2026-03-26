@@ -97,11 +97,12 @@ Ignore known noise:
 ### 5. Vault Status
 
 ```bash
-kubectl exec -n vault vault-0 -- vault status -format=json 2>/dev/null | jq '{sealed, initialized}'
+curl -sf http://vault.vault.svc.cluster.local:8200/v1/sys/health | jq '{sealed: .sealed, initialized: .initialized}'
 ```
 
 Should be `sealed: false, initialized: true`. If sealed, this is
-critical — all secret injection will fail.
+critical — all secret injection will fail. This uses Vault's
+unauthenticated health endpoint — no token needed.
 
 ### 6. OpenObserve Ingestion Check
 
