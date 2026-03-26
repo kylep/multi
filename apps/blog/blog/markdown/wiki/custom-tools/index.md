@@ -15,20 +15,10 @@ scope: "Index of custom tools: MCP servers, skills, and container images built f
 last_verified: 2026-03-15
 ---
 
-Custom tools that extend what the agent team can do. MCP servers
-expose external APIs as tools. OpenClaw skills give agents
-step-by-step playbooks. Docker images package runtimes and scanners.
-
-## MCP Servers
-
-Source: `apps/mcp-servers/`
-
-| Server | Language | Tools | Purpose |
-|--------|----------|-------|---------|
-| [Discord](/wiki/custom-tools/discord-mcp.html) | Python | 13 | Read/write Discord messages, threads, reactions |
-| [OpenRouter](/wiki/custom-tools/openrouter-mcp.html) | TypeScript | 2 | Check API usage and model pricing |
-| [Google News](/wiki/custom-tools/google-news-mcp.html) | TypeScript | 2 | Search news via GNews API (journalist agent) |
-| [CC Usage](/wiki/custom-tools/cc-usage-mcp.html) | TypeScript | 2 | Track Claude Code token usage and estimated costs |
+Custom tools that extend what the agent team can do. OpenClaw skills
+give agents step-by-step playbooks. Docker images package runtimes
+and scanners. MCP servers have moved to their own section:
+[MCP Servers](/wiki/mcp-servers/index.html).
 
 ## Skills
 
