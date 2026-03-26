@@ -7,6 +7,8 @@ metadata:
   namespace: ai-agents
 spec:
   schedule: {{ $cfg.schedule | quote }}
+  timeZone: "UTC"
+  startingDeadlineSeconds: 3600
   suspend: {{ not $cfg.enabled }}
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3

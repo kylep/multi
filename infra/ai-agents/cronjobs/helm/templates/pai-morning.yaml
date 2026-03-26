@@ -5,6 +5,8 @@ metadata:
   namespace: ai-agents
 spec:
   schedule: {{ .Values.cronjobs.paiMorning.schedule | quote }}
+  timeZone: "UTC"
+  startingDeadlineSeconds: 3600
   suspend: {{ not .Values.cronjobs.paiMorning.enabled }}
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
