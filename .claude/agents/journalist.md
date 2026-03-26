@@ -109,23 +109,52 @@ already strong enough for their home section.
 (excluding Weather), write a one-line wiki entry noting "No significant
 news for YYYY-MM-DD" and skip posting to Discord.
 
-## Blog Topics (for "Just for You" matching)
+## Priority Watchlist
 
-Stories matching these topics get promoted to "Just for You":
+Any news, release announcements, security vulnerabilities, or press
+about these technologies **must** be included regardless of the
+significance rubric. Place them in whatever section fits best (AI
+Tooling, Open Source, Security, etc.) or in "Just for You" if no
+section fits:
 
 - Kubernetes (k8s, EKS, GKE, AKS, Helm, kubectl)
-- AI coding tools (Claude Code, Cursor, Copilot, Windsurf, Codex)
-- Claude ecosystem (Claude hooks, Claude agents, Anthropic API, MCP)
+- AWS (Lambda, ECS, Fargate, S3, ECR, API Gateway, CDK)
+- PostgreSQL (Postgres, RDS, Aurora)
+- Elasticsearch (OpenSearch, Elastic)
+- Redis (Valkey, KeyDB)
+- Kafka (Confluent, Redpanda)
+- Trivy
+- Semgrep
+- OpenStack
+- macOS (Apple developer tools, Xcode, Homebrew)
+- Claude (Claude Code, Anthropic API, MCP, Claude agents)
+- ChatGPT / Codex (OpenAI API, GPT models)
+- Google AI tools (Gemini, Vertex AI, AI Studio)
+- Google Workspace (Gmail, Docs, Sheets, Drive API changes)
+- ArgoCD
+- Istio (service mesh)
+- Karpenter
+- Kyverno
+- Discord (Discord API, Discord.js, bot platform changes)
+- OpenClaw
+- Linear
+- N8N (n8n automation)
+- Cloudflare (Workers, Pages, R2, D1, Tunnels)
+
+## Blog Topics (for "Just for You" matching)
+
+Stories matching these topics get promoted to "Just for You" if they
+don't fit in a home section. This list is in addition to the priority
+watchlist above:
+
+- AI coding tools (Cursor, Copilot, Windsurf)
 - Code review (CodeRabbit, code quality)
 - MCP servers (Playwright MCP, Linear MCP, Cloudflare MCP, GA4 MCP, OpenRouter)
-- Security tooling (semgrep, trivy, gitleaks, OWASP, container scanning)
+- Security tooling (gitleaks, OWASP, container scanning)
 - Docker and containers
-- OpenStack
-- AWS (Lambda, ECS, Fargate, S3, ECR, API Gateway)
 - GCP and Firebase (Cloud Functions, Firestore, Cloud Build, GCS)
 - Python tooling and releases
 - Blog infrastructure (Next.js, static site generation, Playwright testing)
-- OpenClaw
 - Open source AI (local LLMs, llama.cpp, Ollama)
 
 ## Workflow
