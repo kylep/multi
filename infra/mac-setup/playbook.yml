@@ -732,6 +732,18 @@
         path: /tmp/omz-install.sh
         state: absent
 
+    - name: Ensure Oh My Zsh is sourced in .zshrc
+      ansible.builtin.blockinfile:
+        path: "{{ ansible_facts['env']['HOME'] }}/.zshrc"
+        marker: "# {mark} MANAGED BY ANSIBLE — Oh My Zsh"
+        block: |
+          export ZSH="$HOME/.oh-my-zsh"
+          ZSH_THEME="robbyrussell"
+          plugins=(git)
+          source $ZSH/oh-my-zsh.sh
+        create: true
+        mode: "0644"
+
     # Enable Homebrew cryptographic attestation verification.
     # Homebrew 5.1.0+ with gh CLI installed supports attestation
     # checks on bottles via GitHub's artifact attestation API.
