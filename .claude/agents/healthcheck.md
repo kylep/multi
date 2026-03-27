@@ -133,12 +133,12 @@ If there are state changes, post a message listing ONLY the transitions:
 
 ```
 Health check — YYYY-MM-DD HH:MM UTC
-🔴 Pod Health: OK → FAIL — blog-staging/blog Init:Error (OOM)
-🟢 Vault Status: FAIL → OK — unsealed, initialized
+🔴 blog-staging/blog Init:Error (OOM)
+🟢 kubectl restored — API server reachable
 ```
 
-Use 🔴 for OK→FAIL transitions and 🟢 for FAIL→OK transitions.
-Keep each line to one sentence with the key detail.
+Use 🔴 for new failures and 🟢 for recoveries.
+Keep each line short — just the key detail, no "OK → FAIL" labels.
 
 **If all checks are the same as last time, do not post anything.**
 
@@ -147,12 +147,12 @@ post the full state as initial baseline:**
 
 ```
 Health check — YYYY-MM-DD HH:MM UTC (initial)
-Pod Health: OK
-ArgoCD Sync: OK
-CronJob Health: FAIL — journalist-morning no recent run
-Log Errors: OK
-Vault Status: OK
-Log Ingestion: OK
+🟢 Pod Health
+🟢 ArgoCD Sync
+🔴 journalist-morning no recent run
+🟢 Log Errors
+🟢 Vault
+🟢 Log Ingestion
 ```
 
 ## Bug Filing to Linear
