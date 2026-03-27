@@ -2,6 +2,26 @@
 
 <!-- Agent definitions in .claude/agents/*.md -->
 
+# Testing without merging
+
+Do not rely on merge-and-deploy to verify changes. Merging requires
+human approval and is the slowest feedback loop available. Instead:
+
+- **K8s manifests**: `kubectl apply -f` directly, test, then revert
+  with `kubectl apply` of the original. Only open the PR after
+  confirming the fix works.
+- **Helm charts**: `helm template` to verify rendering, then
+  `kubectl apply` the rendered output to test in-cluster.
+- **Docker images**: build and push the image first, update the
+  running deployment directly, verify, then commit the Dockerfile
+  and tag change.
+- **Agent prompts**: run the agent locally with `claude --agent X`
+  to test the new prompt before committing.
+
+The only time merge-to-test is acceptable is when you are
+specifically testing merge automation itself (CI triggers,
+ArgoCD sync behavior, GitHub Actions).
+
 # Verify your work
 
 Never present work to the user without verifying it first. If you edit
