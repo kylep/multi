@@ -69,3 +69,19 @@ last_verified: 2026-03-27
 ## Geopolitics
 
 - [NPR](https://www.npr.org/2026/03/26/nx-s1-5761882/iran-war-peace-conditions) Trump extended the Hormuz deadline by 10 days to April 6, citing partial Iranian cooperation. Iran's Foreign Minister said Tehran is not in negotiations and countered with five conditions including recognition of Iranian sovereignty over the strait. Israel killed the IRGC's navy commander and vowed to intensify strikes. The closure enters its fourth week with Brent crude above $110/barrel.
+
+---
+
+## Update — 19:00 UTC
+
+## AI Tooling
+
+- [The Register](https://www.theregister.com/2026/03/26/anthropic_tweaks_usage_limits/) Anthropic adjusted Claude session limits during peak hours (05:00–11:00 PT) for Free, Pro, and Max subscribers, shifting from clock-based to token-based accounting. About 7% of users will hit limits sooner than before; overall weekly allowances are unchanged. The change was announced via an X thread rather than a formal notice, drawing user backlash over the lack of advance communication.
+
+- [Cloudflare Blog](https://blog.cloudflare.com/workflow-diagrams/) Cloudflare published a technical post today on how it uses AST parsing to render Workflows code as visual step diagrams in the dashboard, showing sequences, parallel steps, conditionals, and loops. The visualizer is in beta for all TypeScript and JavaScript Workers.
+
+- [OpenAI Developers](https://developers.openai.com/codex/changelog) OpenAI shipped a broad Codex release today adding first-class plugins, multi-agent v2 workflows with readable path-based agent addressing, improved image handling, and app-server TUI capabilities including shell commands and remote websocket connections. GPT-5.1-Codex-Max, a new frontier agentic coding model supporting multi-context-window compaction, is now available across CLI, IDE extension, cloud, and code review surfaces.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/03/27/nx-s1-5763491/judge-venezuela-maduro-legal-costs-us-drug-trafficking) Former Venezuelan president Nicolas Maduro and his wife Cilia Flores appeared in Manhattan federal court on drug trafficking charges. Judge Alvin Hellerstein questioned the Treasury Department's decision to revoke a license allowing Venezuela to fund the couple's legal defense, noting Maduro presents no ongoing national security threat from custody. No trial date has been set.
