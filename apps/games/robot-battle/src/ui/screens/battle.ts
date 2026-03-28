@@ -248,11 +248,11 @@ async function playerTurn(
     );
 
     const choices: Choice[] = [];
-    choices.push({ label: hasWeapons ? "1. Attack" : "1. Attack (no weapons)", value: "attack" });
-    choices.push({ label: hasConsumables ? "2. Use Item" : "2. Use Item (none)", value: "item" });
-    choices.push({ label: "3. Rest", value: "rest" });
-    choices.push({ label: "4. Surrender", value: "surrender" });
-    choices.push({ label: "5. Auto-Battle", value: "auto" });
+    choices.push({ label: "1. Auto-Battle", value: "auto" });
+    choices.push({ label: hasWeapons ? "2. Attack" : "2. Attack (no weapons)", value: "attack" });
+    choices.push({ label: hasConsumables ? "3. Use Item" : "3. Use Item (none)", value: "item" });
+    choices.push({ label: "4. Rest", value: "rest" });
+    choices.push({ label: "5. Surrender", value: "surrender" });
 
     const choice = await terminal.promptChoice("Choose your action:", choices);
 
