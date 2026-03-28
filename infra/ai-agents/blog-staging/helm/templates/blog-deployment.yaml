@@ -22,9 +22,20 @@ spec:
               set -e
               apk add --no-cache git >/dev/null 2>&1
               git clone --depth 1 -b {{ .Values.blog.branch }} {{ .Values.blog.repo }} /tmp/repo
-              cd /tmp/repo/apps/blog
+              cd /tmp/repo
               git config --global --add safe.directory /tmp/repo
-              cd blog
+              # Build games that embed in the blog (only if source exists)
+              if [ -f apps/games/robot-battle/package.json ]; then
+                echo "Building robot-battle..."
+                cd apps/games/robot-battle
+                npm install --maxsockets=1 --loglevel=warn
+                npm run build
+                mkdir -p /tmp/repo/apps/blog/blog/public/games/robot-battle
+                cp -r dist/* /tmp/repo/apps/blog/blog/public/games/robot-battle/
+                cd /tmp/repo
+              fi
+              # Build blog
+              cd apps/blog/blog
               npm install --maxsockets=1 --loglevel=warn
               npm run build
               cp out/index1.html out/index.html
