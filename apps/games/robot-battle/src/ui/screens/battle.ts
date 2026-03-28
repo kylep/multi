@@ -77,7 +77,7 @@ export async function battleScreen(
       endTurn(battle);
     }
 
-    await terminal.promptContinue();
+    await terminal.promptChoice("", [{ label: "Continue", value: "ok" }]);
   }
 
   // Battle ended
@@ -146,14 +146,6 @@ function printNextLevelPreview(terminal: Terminal, state: GameState): void {
 
 async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void> {
   while (battle.winner === null) {
-    terminal.clear();
-    terminal.print("");
-    printBattleStatus(terminal, battle);
-    terminal.print("");
-    terminal.print("[AUTO-BATTLE]", "t-yellow t-bold");
-
-    await delay(250);
-
     // AI picks both actions
     const playerAction = aiPlanAction(battle, true);
     battle.playerAction = playerAction;
@@ -164,7 +156,12 @@ async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void
     const rng = createRng();
     resolveTurn(battle, rng);
 
-    // Show results
+    // Clear and render everything at once (no blank flash)
+    terminal.clear();
+    terminal.print("");
+    printBattleStatus(terminal, battle);
+    terminal.print("");
+    terminal.print("[AUTO-BATTLE]", "t-yellow t-bold");
     terminal.print("");
     printTurnLog(terminal, battle);
 
@@ -172,7 +169,8 @@ async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void
       endTurn(battle);
     }
 
-    await delay(250);
+    // Pause with content visible
+    await delay(500);
   }
 }
 
