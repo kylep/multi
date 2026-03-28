@@ -167,9 +167,17 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
     ? `<div class="t-dim">(none)</div>`
     : weapons.map((w) => `<div class="t-green">${esc(w.name)} — ${w.damage}dmg, ${w.accuracy}%acc</div>`).join("");
 
+  // Group gear by name (for stackable items like Shotgun Shell)
+  const gearCounts = new Map<string, { gear: typeof gear[0]; count: number }>();
+  for (const g of gear) {
+    const existing = gearCounts.get(g.name);
+    if (existing) existing.count++;
+    else gearCounts.set(g.name, { gear: g, count: 1 });
+  }
+
   const gearHtml = gear.length === 0
     ? `<div class="t-dim">(none)</div>`
-    : gear.map((g) => {
+    : [...gearCounts.values()].map(({ gear: g, count }) => {
       const fx: string[] = [];
       if (g.healthBonus) fx.push(`+${g.healthBonus}HP`);
       if (g.energyBonus) fx.push(`+${g.energyBonus}EN`);
@@ -178,7 +186,9 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
       if (g.handsBonus) fx.push(`+${g.handsBonus}H`);
       if (g.dodgeBonus) fx.push(`+${g.dodgeBonus}Dodge`);
       if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}%$`);
-      return `<div class="t-cyan">${esc(g.name)} — ${fx.join(", ")}</div>`;
+      const countStr = count > 1 ? ` x${count}` : "";
+      const fxStr = fx.length > 0 ? ` — ${fx.join(", ")}` : "";
+      return `<div class="t-cyan">${esc(g.name)}${countStr}${fxStr}</div>`;
     }).join("");
 
   terminal.printHTML(`<div class="battle-layout"><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Weapons</div>${weaponHtml}</div><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Gear</div>${gearHtml}</div></div>`);

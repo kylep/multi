@@ -55,9 +55,17 @@ export async function showRobotStats(terminal: Terminal, state: GameState): Prom
       `<div class="t-green">${esc(w.name)} &mdash; ${w.damage} dmg, ${w.accuracy}% acc, ${w.energyCost} en, ${w.hands}h</div>`
     ).join("");
 
+  // Group gear by name for stack display
+  const gearCounts = new Map<string, { g: typeof gear[0]; count: number }>();
+  for (const g of gear) {
+    const existing = gearCounts.get(g.name);
+    if (existing) existing.count++;
+    else gearCounts.set(g.name, { g, count: 1 });
+  }
+
   const gearHtml = gear.length === 0
     ? `<div class="t-dim">(none)</div>`
-    : gear.map((g) => {
+    : [...gearCounts.values()].map(({ g, count }) => {
       const fx: string[] = [];
       if (g.healthBonus) fx.push(`+${g.healthBonus} HP`);
       if (g.energyBonus) fx.push(`+${g.energyBonus} Energy`);
@@ -66,7 +74,9 @@ export async function showRobotStats(terminal: Terminal, state: GameState): Prom
       if (g.handsBonus) fx.push(`+${g.handsBonus} Hands`);
       if (g.dodgeBonus) fx.push(`+${g.dodgeBonus} Dodge`);
       if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}% Money`);
-      return `<div class="t-cyan">${esc(g.name)} &mdash; ${fx.join(", ")}</div>`;
+      const countStr = count > 1 ? ` x${count}` : "";
+      const fxStr = fx.length > 0 ? ` &mdash; ${fx.join(", ")}` : "";
+      return `<div class="t-cyan">${esc(g.name)}${countStr}${fxStr}</div>`;
     }).join("");
 
   terminal.printHTML(`
