@@ -14,14 +14,16 @@ export async function startGame(
 ): Promise<void> {
   const registry = loadAssets();
 
-  // Outer loop: title screen → game → quit returns here
   while (true) {
     terminal.clear();
-    terminal.print("=============================", "t-yellow t-bold");
-    terminal.print("       ROBOT BATTLE", "t-yellow t-bold");
-    terminal.print("=============================", "t-yellow t-bold");
-    terminal.print(`v${packageJson.version}`, "t-dim");
-    terminal.print("");
+    terminal.printHTML(`
+      <div class="title-center">
+        <div class="t-yellow t-bold" style="font-size:20px">╔═══════════════════════════╗</div>
+        <div class="t-yellow t-bold" style="font-size:24px">ROBOT BATTLE</div>
+        <div class="t-yellow t-bold" style="font-size:20px">╚═══════════════════════════╝</div>
+        <div class="t-dim" style="margin-top:4px">v${packageJson.version}</div>
+      </div>
+    `);
 
     const state = createGameState(registry);
 
@@ -31,11 +33,10 @@ export async function startGame(
         const choice = await terminal.promptChoice("", [
           { label: `Continue: ${saved.name} Lv.${saved.level}`, value: "continue" },
           { label: "New Game", value: "new" },
-        ]);
+        ], "row");
 
         if (choice === "continue") {
           state.player = saved;
-          // Sync health/energy to max on load
           state.player.health = getEffectiveMaxHealth(state.player);
           state.player.energy = getEffectiveMaxEnergy(state.player);
         } else {
@@ -46,7 +47,6 @@ export async function startGame(
           saveGame(storage, state.player!);
         }
       } else {
-        // Corrupted save — treat as no save
         deleteSave(storage);
         const name = await terminal.promptText("Name your robot: ");
         const playerName = name.trim() || "RoboPlayer";
@@ -65,6 +65,5 @@ export async function startGame(
 
     const save = () => saveGame(storage, state.player!);
     await mainMenu(terminal, state, save);
-    // mainMenu returns when user quits → loop back to title
   }
 }

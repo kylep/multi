@@ -177,16 +177,12 @@ async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void
 // ── Display helpers ──
 
 function printTurnLog(terminal: Terminal, battle: BattleState): void {
-  terminal.print("---- Turn Resolution ----", "t-yellow t-bold");
-  for (const msg of battle.currentTurnLog) {
-    if (msg.includes("hits for")) {
-      terminal.print(msg, "t-red");
-    } else if (msg.includes("destroyed")) {
-      terminal.print(msg, "t-red t-bold");
-    } else {
-      terminal.print(msg);
-    }
-  }
+  const logLines = battle.currentTurnLog.map((msg) => {
+    if (msg.includes("hits for")) return `<div class="t-red">${esc(msg)}</div>`;
+    if (msg.includes("destroyed")) return `<div class="t-red t-bold">${esc(msg)}</div>`;
+    return `<div>${esc(msg)}</div>`;
+  }).join("");
+  terminal.printHTML(`<div class="panel" style="margin-top:8px"><div class="t-yellow t-bold">Turn Resolution</div>${logLines}</div>`);
 }
 
 function printBattleStatus(terminal: Terminal, battle: BattleState): void {
@@ -197,25 +193,31 @@ function printBattleStatus(terminal: Terminal, battle: BattleState): void {
   const pMaxEn = getEffectiveMaxEnergy(p.robot);
   const eMaxEn = getEffectiveMaxEnergy(e.robot);
 
-  terminal.print(`FIGHT #${battle.fightNumber}: vs ${e.robot.name}`, "t-yellow t-bold");
-  terminal.print("");
-  terminal.print(`=== Turn ${battle.turnNumber} ===`, "t-yellow t-bold");
-  terminal.print("");
-  terminal.print(`${p.robot.name} (You)`, "t-magenta");
-  terminal.print(`  Health: ${hpBar(p.currentHealth, pMaxHp)} ${p.currentHealth}/${pMaxHp}`, "t-cyan");
-  terminal.print(`  Energy: ${hpBar(p.currentEnergy, pMaxEn)} ${p.currentEnergy}/${pMaxEn}`, "t-yellow");
-  terminal.print("");
-  terminal.print(`${e.robot.name} (Enemy)`, "t-magenta");
-  terminal.print(`  Health: ${hpBar(e.currentHealth, eMaxHp)} ${e.currentHealth}/${eMaxHp}`, "t-cyan");
-  terminal.print(`  Energy: ${hpBar(e.currentEnergy, eMaxEn)} ${e.currentEnergy}/${eMaxEn}`, "t-yellow");
+  terminal.printHTML(`<div class="t-yellow t-bold">FIGHT #${battle.fightNumber}: vs ${esc(e.robot.name)} &mdash; Turn ${battle.turnNumber}</div>`);
 
-  if (battle.lastTurnLog.length > 0) {
-    terminal.print("");
-    terminal.print("-- Last Turn --", "t-dim");
-    for (const msg of battle.lastTurnLog) {
-      terminal.print(`  ${msg}`, "t-dim");
-    }
-  }
+  const lastTurnHtml = battle.lastTurnLog.length > 0
+    ? `<div class="t-dim" style="margin-top:6px;font-size:13px">${battle.lastTurnLog.map((m) => esc(m)).join("<br>")}</div>`
+    : "";
+
+  terminal.printHTML(`
+    <div class="battle-layout">
+      <div class="panel">
+        <div class="t-magenta t-bold">${esc(p.robot.name)} (You)</div>
+        <div class="t-cyan">HP: ${hpBar(p.currentHealth, pMaxHp)} ${p.currentHealth}/${pMaxHp}</div>
+        <div class="t-yellow">EN: ${hpBar(p.currentEnergy, pMaxEn)} ${p.currentEnergy}/${pMaxEn}</div>
+      </div>
+      <div class="panel">
+        <div class="t-magenta t-bold">${esc(e.robot.name)} (Enemy)</div>
+        <div class="t-cyan">HP: ${hpBar(e.currentHealth, eMaxHp)} ${e.currentHealth}/${eMaxHp}</div>
+        <div class="t-yellow">EN: ${hpBar(e.currentEnergy, eMaxEn)} ${e.currentEnergy}/${eMaxEn}</div>
+      </div>
+    </div>
+    ${lastTurnHtml}
+  `);
+}
+
+function esc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function hpBar(current: number, max: number, width = 20): string {
@@ -248,13 +250,13 @@ async function playerTurn(
     );
 
     const choices: Choice[] = [];
-    choices.push({ label: "1. Auto-Battle", value: "auto" });
-    choices.push({ label: hasWeapons ? "2. Attack" : "2. Attack (no weapons)", value: "attack" });
-    choices.push({ label: hasConsumables ? "3. Use Item" : "3. Use Item (none)", value: "item" });
-    choices.push({ label: "4. Rest", value: "rest" });
-    choices.push({ label: "5. Surrender", value: "surrender" });
+    choices.push({ label: "Auto", value: "auto" });
+    choices.push({ label: hasWeapons ? "Attack" : "Attack (none)", value: "attack" });
+    choices.push({ label: hasConsumables ? "Item" : "Item (none)", value: "item" });
+    choices.push({ label: "Rest", value: "rest" });
+    choices.push({ label: "Surrender", value: "surrender" });
 
-    const choice = await terminal.promptChoice("Choose your action:", choices);
+    const choice = await terminal.promptChoice("", choices, "row");
 
     if (choice === "auto") return "auto";
 

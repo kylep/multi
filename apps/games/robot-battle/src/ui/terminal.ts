@@ -3,6 +3,8 @@
 export interface Choice {
   label: string;
   value: string;
+  subtitle?: string;
+  disabled?: boolean;
 }
 
 export interface Span {
@@ -10,12 +12,15 @@ export interface Span {
   css?: string;
 }
 
+export type ChoiceLayout = "list" | "grid" | "row";
+
 export interface Terminal {
   print(text: string, cssClass?: string): void;
   printLine(spans: Span[]): void;
+  printHTML(html: string): void;
   clear(): void;
   promptText(prompt: string): Promise<string>;
-  promptChoice(prompt: string, choices: Choice[]): Promise<string>;
+  promptChoice(prompt: string, choices: Choice[], layout?: ChoiceLayout): Promise<string>;
   promptContinue(seconds?: number): Promise<void>;
   promptConfirm(message: string, confirmLabel?: string, cancelLabel?: string): Promise<boolean>;
 }
@@ -27,7 +32,6 @@ export function createDomTerminal(root: HTMLElement): Terminal {
   root.appendChild(output);
 
   function scrollToBottom(): void {
-    // Scroll both the output div and the window
     output.scrollTop = output.scrollHeight;
     window.scrollTo(0, document.body.scrollHeight);
   }
@@ -50,6 +54,13 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         line.appendChild(el);
       }
       output.appendChild(line);
+      scrollToBottom();
+    },
+
+    printHTML(html: string): void {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      output.appendChild(div);
       scrollToBottom();
     },
 
@@ -77,7 +88,6 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         output.appendChild(wrapper);
         input.focus();
 
-        // Refocus on any keypress if input lost focus
         const refocus = (e: KeyboardEvent) => {
           if (document.activeElement !== input && e.key.length === 1) {
             input.focus();
@@ -90,7 +100,6 @@ export function createDomTerminal(root: HTMLElement): Terminal {
             e.preventDefault();
             document.removeEventListener("keydown", refocus);
             const value = input.value;
-            // Replace input with echoed text
             wrapper.remove();
             terminal.print(`${prompt}${value}`);
             resolve(value);
@@ -101,99 +110,268 @@ export function createDomTerminal(root: HTMLElement): Terminal {
       });
     },
 
-    promptChoice(prompt: string, choices: Choice[]): Promise<string> {
+    promptChoice(prompt: string, choices: Choice[], layout: ChoiceLayout = "list"): Promise<string> {
       return new Promise((resolve) => {
         if (prompt) terminal.print(prompt);
 
-        const list = document.createElement("div");
-        list.className = "terminal-choice-list";
-        list.setAttribute("data-testid", "choice-prompt");
-
         let selectedIndex = 0;
+        // Skip disabled items for initial selection
+        while (selectedIndex < choices.length && choices[selectedIndex].disabled) {
+          selectedIndex++;
+        }
+        if (selectedIndex >= choices.length) selectedIndex = 0;
 
-        const items: HTMLDivElement[] = [];
-        for (let i = 0; i < choices.length; i++) {
-          const item = document.createElement("div");
-          const isBack = choices[i].value === "back";
-          item.className = isBack ? "terminal-choice-item terminal-choice-back" : "terminal-choice-item";
-          item.setAttribute("data-testid", `choice-${choices[i].value}`);
-          item.textContent = choices[i].label;
+        if (layout === "grid") {
+          // ── Grid layout: 2-column card grid ──
+          const grid = document.createElement("div");
+          grid.className = "card-grid";
+          grid.setAttribute("data-testid", "choice-prompt");
 
-          item.addEventListener("click", () => {
-            selectedIndex = i;
+          const cards: HTMLDivElement[] = [];
+          for (let i = 0; i < choices.length; i++) {
+            const card = document.createElement("div");
+            card.className = choices[i].disabled ? "card disabled" : "card";
+            card.setAttribute("data-testid", `choice-${choices[i].value}`);
+
+            const title = document.createElement("div");
+            title.className = "card-title";
+            title.textContent = choices[i].label;
+            card.appendChild(title);
+
+            if (choices[i].subtitle) {
+              const sub = document.createElement("div");
+              sub.className = "card-subtitle";
+              sub.textContent = choices[i].subtitle!;
+              card.appendChild(sub);
+            }
+
+            if (!choices[i].disabled) {
+              card.addEventListener("click", () => {
+                selectedIndex = i;
+                updateSelection();
+                confirm();
+              });
+            }
+
+            grid.appendChild(card);
+            cards.push(card);
+          }
+
+          output.appendChild(grid);
+
+          function updateSelection(): void {
+            for (let i = 0; i < cards.length; i++) {
+              if (choices[i].disabled) continue;
+              cards[i].classList.toggle("selected", i === selectedIndex);
+            }
+          }
+
+          function confirm(): void {
+            document.removeEventListener("keydown", onKey);
+            resolve(choices[selectedIndex].value);
+            scrollToBottom();
+          }
+
+          function onKey(e: KeyboardEvent): void {
+            const cols = 2;
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+              e.preventDefault();
+              let next = selectedIndex;
+              const step = e.key === "ArrowDown" ? cols : 1;
+              for (let tries = 0; tries < choices.length; tries++) {
+                next = (next + step) % choices.length;
+                if (!choices[next].disabled) { selectedIndex = next; break; }
+              }
+              updateSelection();
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+              e.preventDefault();
+              let next = selectedIndex;
+              const step = e.key === "ArrowUp" ? cols : 1;
+              for (let tries = 0; tries < choices.length; tries++) {
+                next = (next - step + choices.length) % choices.length;
+                if (!choices[next].disabled) { selectedIndex = next; break; }
+              }
+              updateSelection();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              if (!choices[selectedIndex].disabled) confirm();
+            } else if (e.key === "Escape") {
+              const backIdx = choices.findIndex((c) => c.value === "back");
+              if (backIdx !== -1) { selectedIndex = backIdx; confirm(); }
+            } else if (e.key >= "1" && e.key <= "9") {
+              const num = parseInt(e.key, 10) - 1;
+              if (num < choices.length && !choices[num].disabled) {
+                selectedIndex = num;
+                updateSelection();
+                confirm();
+              }
+            }
+          }
+
+          requestAnimationFrame(() => {
             updateSelection();
-            confirm();
+            document.addEventListener("keydown", onKey);
           });
 
-          list.appendChild(item);
-          items.push(item);
-        }
+          scrollToBottom();
 
-        output.appendChild(list);
+        } else if (layout === "row") {
+          // ── Row layout: horizontal buttons ──
+          const row = document.createElement("div");
+          row.className = "button-row";
+          row.setAttribute("data-testid", "choice-prompt");
 
-        function updateSelection(): void {
-          for (let i = 0; i < items.length; i++) {
-            items[i].classList.toggle("selected", i === selectedIndex);
-            // Show > marker for selected item
-            const choice = choices[i];
-            if (i === selectedIndex) {
-              items[i].textContent = `> ${choice.label}`;
-            } else {
-              items[i].textContent = `  ${choice.label}`;
+          const btns: HTMLDivElement[] = [];
+          for (let i = 0; i < choices.length; i++) {
+            const btn = document.createElement("div");
+            const isBack = choices[i].value === "back";
+            const isFirst = i === 0;
+            let cls = "btn";
+            if (isBack) cls += " btn-secondary";
+            else if (isFirst) cls += " btn-primary";
+            btn.className = cls;
+            btn.setAttribute("data-testid", `choice-${choices[i].value}`);
+            btn.textContent = choices[i].label;
+
+            btn.addEventListener("click", () => {
+              selectedIndex = i;
+              confirm();
+            });
+
+            row.appendChild(btn);
+            btns.push(btn);
+          }
+
+          output.appendChild(row);
+
+          function updateSelection(): void {
+            for (let i = 0; i < btns.length; i++) {
+              btns[i].classList.toggle("selected", i === selectedIndex);
             }
           }
-          // Scroll selected item into view
-          items[selectedIndex]?.scrollIntoView({ block: "nearest" });
-        }
 
-        function confirm(): void {
-          document.removeEventListener("keydown", onKey);
-          const selected = choices[selectedIndex];
-          // Freeze the list as history (remove interactivity)
-          for (const item of items) {
-            item.style.cursor = "default";
-            item.replaceWith(item.cloneNode(true));
+          function confirm(): void {
+            document.removeEventListener("keydown", onKey);
+            resolve(choices[selectedIndex].value);
+            scrollToBottom();
           }
-          resolve(selected.value);
+
+          function onKey(e: KeyboardEvent): void {
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+              e.preventDefault();
+              selectedIndex = (selectedIndex + 1) % choices.length;
+              updateSelection();
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+              e.preventDefault();
+              selectedIndex = (selectedIndex - 1 + choices.length) % choices.length;
+              updateSelection();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              confirm();
+            } else if (e.key === "Escape") {
+              const backIdx = choices.findIndex((c) => c.value === "back");
+              if (backIdx !== -1) { selectedIndex = backIdx; confirm(); }
+            } else if (e.key >= "1" && e.key <= "9") {
+              const num = parseInt(e.key, 10) - 1;
+              if (num < choices.length) {
+                selectedIndex = num;
+                confirm();
+              }
+            }
+          }
+
+          requestAnimationFrame(() => {
+            updateSelection();
+            document.addEventListener("keydown", onKey);
+          });
+
+          scrollToBottom();
+
+        } else {
+          // ── List layout: vertical inline (current behavior) ──
+          const list = document.createElement("div");
+          list.className = "terminal-choice-list";
+          list.setAttribute("data-testid", "choice-prompt");
+
+          const items: HTMLDivElement[] = [];
+          for (let i = 0; i < choices.length; i++) {
+            const item = document.createElement("div");
+            const isBack = choices[i].value === "back";
+            item.className = isBack ? "terminal-choice-item terminal-choice-back" : "terminal-choice-item";
+            item.setAttribute("data-testid", `choice-${choices[i].value}`);
+            item.textContent = choices[i].label;
+
+            item.addEventListener("click", () => {
+              selectedIndex = i;
+              updateSelection();
+              confirm();
+            });
+
+            list.appendChild(item);
+            items.push(item);
+          }
+
+          output.appendChild(list);
+
+          function updateSelection(): void {
+            for (let i = 0; i < items.length; i++) {
+              items[i].classList.toggle("selected", i === selectedIndex);
+              const choice = choices[i];
+              if (i === selectedIndex) {
+                items[i].textContent = `> ${choice.label}`;
+              } else {
+                items[i].textContent = `  ${choice.label}`;
+              }
+            }
+            items[selectedIndex]?.scrollIntoView({ block: "nearest" });
+          }
+
+          function confirm(): void {
+            document.removeEventListener("keydown", onKey);
+            for (const item of items) {
+              item.style.cursor = "default";
+              item.replaceWith(item.cloneNode(true));
+            }
+            resolve(choices[selectedIndex].value);
+            scrollToBottom();
+          }
+
+          function onKey(e: KeyboardEvent): void {
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              selectedIndex = (selectedIndex + 1) % choices.length;
+              updateSelection();
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              selectedIndex = (selectedIndex - 1 + choices.length) % choices.length;
+              updateSelection();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              confirm();
+            } else if (e.key === "Escape") {
+              const backIdx = choices.findIndex((c) => c.value === "back");
+              if (backIdx !== -1) {
+                selectedIndex = backIdx;
+                updateSelection();
+                confirm();
+              }
+            } else if (e.key >= "1" && e.key <= "9") {
+              const num = parseInt(e.key, 10) - 1;
+              if (num < choices.length) {
+                selectedIndex = num;
+                updateSelection();
+                confirm();
+              }
+            }
+          }
+
+          requestAnimationFrame(() => {
+            updateSelection();
+            document.addEventListener("keydown", onKey);
+          });
+
           scrollToBottom();
         }
-
-        function onKey(e: KeyboardEvent): void {
-          if (e.key === "ArrowDown") {
-            e.preventDefault();
-            selectedIndex = (selectedIndex + 1) % choices.length;
-            updateSelection();
-          } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            selectedIndex = (selectedIndex - 1 + choices.length) % choices.length;
-            updateSelection();
-          } else if (e.key === "Enter") {
-            e.preventDefault();
-            confirm();
-          } else if (e.key === "Escape") {
-            const backIdx = choices.findIndex((c) => c.value === "back");
-            if (backIdx !== -1) {
-              selectedIndex = backIdx;
-              updateSelection();
-              confirm();
-            }
-          } else if (e.key >= "1" && e.key <= "9") {
-            const num = parseInt(e.key, 10) - 1;
-            if (num < choices.length) {
-              selectedIndex = num;
-              updateSelection();
-              confirm();
-            }
-          }
-        }
-
-        // Defer to avoid Enter keyup from prior prompt
-        requestAnimationFrame(() => {
-          updateSelection();
-          document.addEventListener("keydown", onKey);
-        });
-
-        scrollToBottom();
       });
     },
 
@@ -236,7 +414,6 @@ export function createDomTerminal(root: HTMLElement): Terminal {
           }
         }
 
-        // Defer to avoid Enter from prior action
         requestAnimationFrame(() => {
           document.addEventListener("keydown", onKey);
         });

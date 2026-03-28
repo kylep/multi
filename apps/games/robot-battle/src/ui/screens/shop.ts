@@ -11,22 +11,28 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
   const player = state.player!;
 
   while (true) {
-    // Auto-heal in shop
     player.health = getEffectiveMaxHealth(player);
     player.energy = getEffectiveMaxEnergy(player);
 
     terminal.clear();
-    terminal.print("");
-    terminal.print("=== SHOP ===", "t-yellow t-bold");
-    terminal.print(`Level: ${player.level} | Money: $${player.money} | Inventory: ${player.inventory.length}/${player.inventorySize}`);
-    terminal.print("");
+    terminal.printHTML(`
+      <div class="panel-header">
+        <span class="t-yellow t-bold">SHOP</span>
+        &nbsp;&nbsp;
+        <span class="t-yellow">$${player.money}</span>
+        &nbsp;&nbsp;
+        <span>Inventory: ${player.inventory.length}/${player.inventorySize}</span>
+        &nbsp;&nbsp;
+        <span class="t-dim">Lv.${player.level}</span>
+      </div>
+    `);
 
-    const choice = await terminal.promptChoice("What would you like to do?", [
-      { label: "1. Buy", value: "buy" },
-      { label: "2. Sell", value: "sell" },
-      { label: "3. Inventory", value: "inventory" },
-      { label: "4. Back", value: "back" },
-    ]);
+    const choice = await terminal.promptChoice("", [
+      { label: "Buy", value: "buy" },
+      { label: "Sell", value: "sell" },
+      { label: "Inventory", value: "inventory" },
+      { label: "Back", value: "back" },
+    ], "row");
 
     if (choice === "back") break;
     if (choice === "buy") await buyMenu(terminal, state);
@@ -43,45 +49,45 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
 
   while (true) {
     terminal.clear();
-    terminal.print("");
-    terminal.print("=== BUY ===", "t-yellow t-bold");
-    terminal.print(`Level: ${player.level} | Money: $${player.money} | Inventory: ${player.inventory.length}/${player.inventorySize}`);
-    terminal.print("");
+    terminal.printHTML(`
+      <div class="panel-header">
+        <span class="t-yellow t-bold">BUY</span>
+        &nbsp;&nbsp;
+        <span class="t-yellow">$${player.money}</span>
+        &nbsp;&nbsp;
+        <span>Inventory: ${player.inventory.length}/${player.inventorySize}</span>
+      </div>
+    `);
 
     const available = listAvailableItems(state);
 
-    const choices: Choice[] = [{ label: "B. Back", value: "back" }];
+    const choices: Choice[] = [];
     for (let i = 0; i < available.length; i++) {
       const item = available[i];
       const check = canBuy(state, item);
-      const status = check.ok ? "" : ` [${check.reason}]`;
       choices.push({
-        label: `${i + 1}. ${item.name} - $${item.moneyCost}${status}\n     ${itemSummary(item)}`,
+        label: `${item.name} — $${item.moneyCost}`,
         value: String(i),
+        subtitle: itemSummary(item) + (check.ok ? "" : ` [${check.reason}]`),
+        disabled: !check.ok,
       });
     }
+    choices.push({ label: "Back", value: "back" });
 
-    const choice = await terminal.promptChoice("Select an item to buy:", choices);
+    const choice = await terminal.promptChoice("", choices, "grid");
 
     if (choice === "back") break;
 
     const idx = parseInt(choice, 10);
     if (idx >= 0 && idx < available.length) {
       const item = available[idx];
-      const check = canBuy(state, item);
-
-      if (!check.ok) {
-        // Error already shown in the choice label — just loop back
-      } else {
-        const confirmed = await terminal.promptConfirm(
-          `Buy ${item.name} for $${item.moneyCost}?`,
-          "Buy",
-          "Cancel",
-        );
-        if (confirmed) {
-          const result = buyItem(state, item);
-          terminal.print(result.message, result.success ? "t-green" : "t-red");
-        }
+      const confirmed = await terminal.promptConfirm(
+        `Buy ${item.name} for $${item.moneyCost}?`,
+        "Buy",
+        "Cancel",
+      );
+      if (confirmed) {
+        buyItem(state, item);
       }
     }
   }
@@ -92,27 +98,34 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
 
   while (true) {
     terminal.clear();
-    terminal.print("");
-    terminal.print("=== SELL ===", "t-yellow t-bold");
-    terminal.print(`Level: ${player.level} | Money: $${player.money} | Inventory: ${player.inventory.length}/${player.inventorySize}`);
-    terminal.print("");
+    terminal.printHTML(`
+      <div class="panel-header">
+        <span class="t-yellow t-bold">SELL</span>
+        &nbsp;&nbsp;
+        <span class="t-yellow">$${player.money}</span>
+        &nbsp;&nbsp;
+        <span>Inventory: ${player.inventory.length}/${player.inventorySize}</span>
+      </div>
+    `);
 
     if (player.inventory.length === 0) {
-      terminal.print("(No items to sell)");
+      terminal.print("(No items to sell)", "t-dim");
       await terminal.promptContinue(0);
       break;
     }
 
-    const choices: Choice[] = [{ label: "B. Back", value: "back" }];
+    const choices: Choice[] = [];
     for (let i = 0; i < player.inventory.length; i++) {
       const item = player.inventory[i];
       choices.push({
-        label: `${i + 1}. ${item.name} - $${getSellPrice(item)}`,
+        label: `${item.name} — $${getSellPrice(item)}`,
         value: String(i),
+        subtitle: itemSummary(item),
       });
     }
+    choices.push({ label: "Back", value: "back" });
 
-    const choice = await terminal.promptChoice("Select an item to sell:", choices);
+    const choice = await terminal.promptChoice("", choices, "grid");
 
     if (choice === "back") break;
 
@@ -125,8 +138,7 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
         "Cancel",
       );
       if (confirmed) {
-        const result = sellItem(state, item);
-        terminal.print(result.message, result.success ? "t-green" : "t-red");
+        sellItem(state, item);
       }
     }
   }
@@ -161,34 +173,4 @@ function itemSummary(item: Item): string {
     return parts.length ? parts.join(", ") : item.description;
   }
   return "";
-}
-
-function showItemDetails(terminal: Terminal, item: Item): void {
-  terminal.print("");
-  terminal.print(`  ${item.description}`, "t-dim");
-  if (item.itemType === "weapon") {
-    const w = item as Weapon;
-    terminal.print(`  Damage: ${w.damage} | Energy: ${w.energyCost} | Accuracy: ${w.accuracy} | Hands: ${w.hands}`, "t-dim");
-  } else if (item.itemType === "gear") {
-    const g = item as Gear;
-    const effects: string[] = [];
-    if (g.healthBonus) effects.push(`+${g.healthBonus} HP`);
-    if (g.energyBonus) effects.push(`+${g.energyBonus} Energy`);
-    if (g.defenceBonus) effects.push(`+${g.defenceBonus} Def`);
-    if (g.attackBonus) effects.push(`+${g.attackBonus}% Atk`);
-    if (g.handsBonus) effects.push(`+${g.handsBonus} Hands`);
-    if (g.dodgeBonus) effects.push(`+${g.dodgeBonus} Dodge`);
-    if (g.moneyBonusPercent) effects.push(`+${g.moneyBonusPercent}% Money`);
-    if (effects.length) terminal.print(`  Effects: ${effects.join(", ")}`, "t-dim");
-  } else if (item.itemType === "consumable") {
-    const c = item as Consumable;
-    const effects: string[] = [];
-    if (c.healthRestore) effects.push(`+${c.healthRestore} HP`);
-    if (c.energyRestore) effects.push(`+${c.energyRestore} Energy`);
-    if (c.tempDefence) effects.push(`+${c.tempDefence} Temp Def`);
-    if (c.tempAttack) effects.push(`+${c.tempAttack}% Temp Atk`);
-    if (c.damage) effects.push(`${c.damage} Dmg`);
-    if (c.enemyDodgeReduction) effects.push(`-${c.enemyDodgeReduction} Dodge`);
-    if (effects.length) terminal.print(`  Effects: ${effects.join(", ")}`, "t-dim");
-  }
 }

@@ -2,7 +2,6 @@
 
 import type { Terminal } from "../terminal";
 import type { GameState } from "../../engine/state";
-import type { Weapon, Gear, Consumable } from "../../engine/types";
 import {
   getEffectiveAttack,
   getEffectiveDefence,
@@ -15,69 +14,80 @@ import {
   getConsumables,
 } from "../../engine/robot";
 
+function esc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 export async function showRobotStats(terminal: Terminal, state: GameState): Promise<void> {
   const player = state.player!;
 
-  terminal.print("");
-  terminal.print(`=== ${player.name} ===`, "t-blue t-bold");
-  terminal.print("");
+  terminal.printHTML(`
+    <div class="panel-header">
+      <span class="t-blue t-bold" style="font-size:18px">${esc(player.name)}</span>
+      &nbsp;&nbsp;
+      <span class="t-magenta">Lv.${player.level}</span>
+      &nbsp;
+      <span class="t-magenta t-dim">XP ${player.exp}/10</span>
+      &nbsp;&nbsp;
+      <span class="t-yellow">$${player.money}</span>
+      &nbsp;&nbsp;
+      <span class="t-dim">${player.wins}W / ${player.fights}F</span>
+    </div>
+  `);
 
-  // Stats line
-  terminal.printLine([
-    { text: `Lv.${player.level}`, css: "t-magenta t-bold" },
-    { text: `  XP ${player.exp}/10`, css: "t-magenta" },
-    { text: "  |  " },
-    { text: `$${player.money}`, css: "t-yellow" },
-    { text: "  |  " },
-    { text: `${player.wins}W/${player.fights}F`, css: "t-dim" },
-  ]);
-  terminal.print("");
+  // Combat stats panel
+  terminal.printHTML(`
+    <div class="panel">
+      <div class="t-yellow t-bold">Stats</div>
+      <div class="t-cyan">HP: ${player.health}/${getEffectiveMaxHealth(player)} &nbsp; Energy: ${player.energy}/${getEffectiveMaxEnergy(player)}</div>
+      <div>Attack: ${getEffectiveAttack(player)}% &nbsp; Defence: ${getEffectiveDefence(player)} &nbsp; Dodge: ${getEffectiveDodge(player)} &nbsp; Hands: ${getEffectiveHands(player)}</div>
+    </div>
+  `);
 
-  // Combat stats
-  terminal.print("-- Stats --", "t-yellow t-bold");
-  terminal.print(`  HP: ${player.health}/${getEffectiveMaxHealth(player)}   Energy: ${player.energy}/${getEffectiveMaxEnergy(player)}`, "t-cyan");
-  terminal.print(`  Attack: ${getEffectiveAttack(player)}%   Defence: ${getEffectiveDefence(player)}   Dodge: ${getEffectiveDodge(player)}   Hands: ${getEffectiveHands(player)}`);
-  terminal.print("");
-
-  // Weapons
+  // Equipment panels side by side
   const weapons = getWeapons(player);
-  terminal.print("-- Weapons --", "t-yellow t-bold");
-  if (weapons.length === 0) {
-    terminal.print("  (none)", "t-dim");
-  } else {
-    for (const w of weapons) {
-      terminal.print(`  ${w.name}  ${w.damage} dmg, ${w.accuracy}% acc, ${w.energyCost} energy, ${w.hands}h`, "t-green");
-    }
-  }
-
-  // Gear
   const gear = getGear(player);
-  terminal.print("-- Gear --", "t-yellow t-bold");
-  if (gear.length === 0) {
-    terminal.print("  (none)", "t-dim");
-  } else {
-    for (const g of gear) {
-      const effects: string[] = [];
-      if (g.healthBonus) effects.push(`+${g.healthBonus} HP`);
-      if (g.energyBonus) effects.push(`+${g.energyBonus} Energy`);
-      if (g.defenceBonus) effects.push(`+${g.defenceBonus} Def`);
-      if (g.attackBonus) effects.push(`+${g.attackBonus}% Atk`);
-      if (g.handsBonus) effects.push(`+${g.handsBonus} Hands`);
-      if (g.dodgeBonus) effects.push(`+${g.dodgeBonus} Dodge`);
-      if (g.moneyBonusPercent) effects.push(`+${g.moneyBonusPercent}% Money`);
-      terminal.print(`  ${g.name}  ${effects.join(", ")}`, "t-cyan");
-    }
-  }
-
-  // Consumables
   const consumables = getConsumables(player);
+
+  const weaponHtml = weapons.length === 0
+    ? `<div class="t-dim">(none)</div>`
+    : weapons.map((w) =>
+      `<div class="t-green">${esc(w.name)} &mdash; ${w.damage} dmg, ${w.accuracy}% acc, ${w.energyCost} en, ${w.hands}h</div>`
+    ).join("");
+
+  const gearHtml = gear.length === 0
+    ? `<div class="t-dim">(none)</div>`
+    : gear.map((g) => {
+      const fx: string[] = [];
+      if (g.healthBonus) fx.push(`+${g.healthBonus} HP`);
+      if (g.energyBonus) fx.push(`+${g.energyBonus} Energy`);
+      if (g.defenceBonus) fx.push(`+${g.defenceBonus} Def`);
+      if (g.attackBonus) fx.push(`+${g.attackBonus}% Atk`);
+      if (g.handsBonus) fx.push(`+${g.handsBonus} Hands`);
+      if (g.dodgeBonus) fx.push(`+${g.dodgeBonus} Dodge`);
+      if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}% Money`);
+      return `<div class="t-cyan">${esc(g.name)} &mdash; ${fx.join(", ")}</div>`;
+    }).join("");
+
+  terminal.printHTML(`
+    <div class="battle-layout">
+      <div class="panel">
+        <div class="t-yellow t-bold">Weapons</div>
+        ${weaponHtml}
+      </div>
+      <div class="panel">
+        <div class="t-yellow t-bold">Gear</div>
+        ${gearHtml}
+      </div>
+    </div>
+  `);
+
   if (consumables.length > 0) {
-    terminal.print("-- Items --", "t-yellow t-bold");
-    for (const c of consumables) {
-      terminal.print(`  ${c.name}  ${c.description}`, "t-green");
-    }
+    const conHtml = consumables.map((c) =>
+      `<div class="t-green">${esc(c.name)} &mdash; ${esc(c.description)}</div>`
+    ).join("");
+    terminal.printHTML(`<div class="panel"><div class="t-yellow t-bold">Items</div>${conHtml}</div>`);
   }
 
-  terminal.print("");
   terminal.print(`Inventory: ${player.inventory.length}/${player.inventorySize}`, "t-dim");
 }

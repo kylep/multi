@@ -13,7 +13,7 @@ test.describe("Shop", () => {
     await enterGame(page);
     await page.getByTestId("choice-shop").click();
 
-    await expect(page.getByText("=== SHOP ===")).toBeVisible();
+    await expect(page.getByText("SHOP")).toBeVisible();
     await expect(page.getByTestId("choice-buy")).toBeVisible();
     await expect(page.getByTestId("choice-sell")).toBeVisible();
     await expect(page.getByTestId("choice-back")).toBeVisible();
@@ -25,7 +25,7 @@ test.describe("Shop", () => {
     await page.getByTestId("choice-buy").click();
 
     await expect(page.getByText("Wrench")).toBeVisible();
-    await expect(page.getByText("2 dmg, 90% acc, 2 energy, 1h")).toBeVisible();
+    await expect(page.getByText("2 dmg")).toBeVisible();
   });
 
   test("can buy a Stick", async ({ page }) => {
@@ -33,12 +33,12 @@ test.describe("Shop", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
 
-    // Click the Stick choice item, then confirm in modal
+    // Click the Stick card, confirm in modal
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
 
-    // Buy menu re-renders — verify money decreased in header
-    await expect(page.getByText("Money: $50")).toBeVisible();
+    // Buy menu re-renders — verify money decreased
+    await expect(page.getByText("$50", { exact: true })).toBeVisible();
   });
 
   test("can sell an item after buying", async ({ page }) => {
@@ -58,7 +58,7 @@ test.describe("Shop", () => {
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
 
-    // Sell menu re-renders — verify money increased in header
-    await expect(page.getByText("Money: $75")).toBeVisible();
+    // Verify money increased
+    await expect(page.getByText("$75")).toBeVisible();
   });
 });

@@ -2,7 +2,6 @@
 
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
-import type { Weapon } from "../../engine/types";
 import {
   getEffectiveDefence,
   getEffectiveDodge,
@@ -21,25 +20,28 @@ export async function mainMenu(
   while (true) {
     terminal.clear();
     const player = state.player!;
-    terminal.printLine([
-      { text: player.name, css: "t-blue t-bold" },
-      { text: "  |  " },
-      { text: `$${player.money}`, css: "t-yellow" },
-      { text: "  |  " },
-      { text: `Lv.${player.level} XP ${player.exp}/10`, css: "t-magenta" },
-    ]);
-    terminal.print("");
 
-    const choice = await terminal.promptChoice("What would you like to do?", [
-      { label: "1. Fight", value: "fight" },
-      { label: "2. Shop", value: "shop" },
-      { label: "3. Inspect Robot", value: "inspect" },
-      { label: "4. Quit", value: "quit" },
-    ]);
+    // Player stats header panel
+    terminal.printHTML(`
+      <div class="panel-header">
+        <span class="t-blue t-bold">${player.name}</span>
+        &nbsp;&nbsp;
+        <span class="t-yellow">$${player.money}</span>
+        &nbsp;&nbsp;
+        <span class="t-magenta">Lv.${player.level} XP ${player.exp}/10</span>
+        &nbsp;&nbsp;
+        <span class="t-dim">${player.wins}W / ${player.fights}F</span>
+      </div>
+    `);
 
-    if (choice === "quit") {
-      break;
-    }
+    const choice = await terminal.promptChoice("", [
+      { label: "Fight", value: "fight", subtitle: "Battle enemies" },
+      { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
+      { label: "Inspect Robot", value: "inspect", subtitle: "View stats & inventory" },
+      { label: "Quit", value: "quit", subtitle: "Return to title" },
+    ], "grid");
+
+    if (choice === "quit") break;
 
     if (choice === "fight") {
       await fightMenu(terminal, state);
@@ -62,12 +64,6 @@ function getDifficulty(playerLevel: number, enemyLevel: number): string {
   return "Deadly";
 }
 
-function difficultyClass(tag: string): string {
-  if (tag === "Easy") return "t-green";
-  if (tag === "Fair") return "t-yellow";
-  return "t-red";
-}
-
 async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
   const player = state.player!;
   const enemies = Array.from(state.registry.enemies.entries());
@@ -79,21 +75,21 @@ async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
 
   while (true) {
     terminal.clear();
-    terminal.print("");
-    terminal.print("=== CHOOSE YOUR OPPONENT ===", "t-yellow t-bold");
-    terminal.print("");
+    terminal.printHTML(`<div class="panel-header">CHOOSE YOUR OPPONENT</div>`);
 
-    const choices: Choice[] = [{ label: "Back", value: "back" }];
-    for (let i = 0; i < enemies.length; i++) {
-      const [name, enemy] = enemies[i];
+    const choices: Choice[] = [];
+    for (const [name, enemy] of enemies) {
       const tag = getDifficulty(player.level, enemy.level);
       choices.push({
-        label: `${i + 1}. ${name} (Lv${enemy.level}) [${tag}]`,
+        label: `${name} (Lv.${enemy.level})`,
         value: name,
+        subtitle: `[${tag}] $${enemy.reward}, ${enemy.expReward} XP`,
       });
     }
+    choices.push({ label: "Back", value: "back", subtitle: "Return to menu" });
 
-    const choice = await terminal.promptChoice("", choices);
+    const choice = await terminal.promptChoice("", choices, "grid");
+
     if (choice === "back") return;
 
     const shouldFight = await enemyDetailScreen(terminal, state, choice);
@@ -101,7 +97,6 @@ async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
       await battleScreen(terminal, state, choice);
       return;
     }
-    // else loop back to enemy list
   }
 }
 
@@ -125,21 +120,25 @@ async function enemyDetailScreen(
     : "None";
 
   terminal.clear();
-  terminal.print("");
-  terminal.print(`=== ${enemyName} ===`, "t-yellow t-bold");
-  terminal.print(`Level ${enemyDef.level}`, difficultyClass(tag));
-  terminal.print("");
-  terminal.print(enemyDef.description, "t-dim");
-  terminal.print("");
-  terminal.print(`HP: ${hp} | Dodge: ${dodge} | Defence: ${def}`, "t-cyan");
-  terminal.print(`Weapons: ${weaponStr}`);
-  terminal.print(`Reward: $${enemyDef.reward} | XP: ${enemyDef.expReward}`, "t-magenta");
-  terminal.print("");
+  terminal.printHTML(`
+    <div class="panel">
+      <div class="t-yellow t-bold" style="font-size:18px">${enemyName}</div>
+      <div class="t-dim">Level ${enemyDef.level} &bull; [${tag}]</div>
+      <div style="margin-top:8px">${enemyDef.description}</div>
+      <div style="margin-top:8px">
+        <span class="t-cyan">HP: ${hp}</span> &nbsp;
+        <span>Dodge: ${dodge}</span> &nbsp;
+        <span>Defence: ${def}</span>
+      </div>
+      <div>Weapons: ${weaponStr}</div>
+      <div class="t-magenta" style="margin-top:4px">Reward: $${enemyDef.reward} &nbsp; XP: ${enemyDef.expReward}</div>
+    </div>
+  `);
 
   const choice = await terminal.promptChoice("", [
     { label: "Fight!", value: "fight" },
     { label: "Back", value: "back" },
-  ]);
+  ], "row");
 
   return choice === "fight";
 }
