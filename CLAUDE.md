@@ -139,8 +139,14 @@ No review needed for markdown-only blog post changes.
 
 ## Branching
 
-Never commit directly to `main`. Always create a new branch and open a PR against
-`main` for review instead.
+Branch protection is enabled on `main`. All changes must go through pull requests.
+Never commit directly to `main`.
+
+When creating PRs, always assign them to `kylep`:
+
+```bash
+gh pr create --base main --assignee kylep
+```
 
 ## Branch naming
 

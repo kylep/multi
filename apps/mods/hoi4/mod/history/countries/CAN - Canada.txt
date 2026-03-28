@@ -159,6 +159,10 @@ if = {
 
 add_ideas = CAN_elbows_up
 
+every_country = {
+	add_opinion_modifier = { target = CAN modifier = loves_canada }
+}
+
 if = {
 	limit = { NOT = { has_dlc = "Together for Victory" } }
 	set_cosmetic_tag = CAN_ALY

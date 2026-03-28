@@ -18,9 +18,10 @@ if [ ! -d "$HOI4_MOD_DIR" ]; then
     exit 1
 fi
 
-# Write the outer .mod file with absolute path
+# Write the outer .mod file with absolute path, reading version from descriptor.mod
+MOD_VERSION=$(grep '^version=' "$MOD_ROOT/mod/descriptor.mod" | head -1 | sed 's/version=//' | tr -d '"')
 cat > "$HOI4_MOD_DIR/$MOD_NAME.mod" <<EOF
-version="1.0.0"
+version="$MOD_VERSION"
 tags={
 	"Alternative History"
 	"Balance"

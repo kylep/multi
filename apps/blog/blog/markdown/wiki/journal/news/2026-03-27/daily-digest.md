@@ -47,3 +47,41 @@ last_verified: 2026-03-27
 ## Just for You
 
 - [CNCF](https://www.cncf.io/announcements/2026/03/24/cncf-and-slashdata-report-finds-platform-engineering-tools-maturing-as-organizations-prepare-for-ai-driven-infrastructure/) The CNCF Q1 2026 Technology Radar, based on 400+ professional developers, placed ArgoCD in the 'Adopt' category alongside GitHub Actions and Jenkins. The report notes platform engineering tooling is maturing in anticipation of AI-driven infrastructure.
+
+---
+
+## Update — 15:00 UTC
+
+## AI Industry
+
+- [MacRumors](https://www.macrumors.com/2026/03/26/apple-ios-27-siri-chatbot-integration/) Apple plans to open Siri to third-party AI assistants in iOS 27 via a new Extensions system, letting users route requests to Claude, Gemini, or other installed AI apps instead of ChatGPT alone. The feature is expected to be announced at WWDC 2026 on June 8 and releases in fall with iOS 27.
+
+- [Axios](https://www.axios.com/2026/03/26/sam-altman-openai-anthropic-pentagon) Sam Altman told OpenAI staff he attempted to help Anthropic during the Pentagon clash, framing himself as a peacemaker while OpenAI secured the federal AI contracts Anthropic lost. A leaked Dario Amodei memo called Altman's account "straight up lies."
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-live/) Google launched Gemini 3.1 Flash Live on March 26, a real-time voice model supporting 90+ languages with SynthID watermarking on all audio output. It powers Search Live globally in 200+ countries, improves tool use scores by 20% over the prior generation, and is available to developers via the Gemini Live API in Google AI Studio.
+
+## Security
+
+- [Sansec](https://sansec.io/research/magento-polyshell) PolyShell (APSB25-94): unauthenticated unrestricted file upload in Magento Open Source and Adobe Commerce through version 2.4.9-alpha2 allows RCE or account takeover via stored XSS. Mass exploitation started March 19; Sansec reports 56.7% of vulnerable stores have been hit, including a major automaker's e-commerce site. No production patch exists yet — only in 2.4.9-beta1.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/03/26/nx-s1-5761882/iran-war-peace-conditions) Trump extended the Hormuz deadline by 10 days to April 6, citing partial Iranian cooperation. Iran's Foreign Minister said Tehran is not in negotiations and countered with five conditions including recognition of Iranian sovereignty over the strait. Israel killed the IRGC's navy commander and vowed to intensify strikes. The closure enters its fourth week with Brent crude above $110/barrel.
+
+---
+
+## Update — 19:00 UTC
+
+## AI Tooling
+
+- [The Register](https://www.theregister.com/2026/03/26/anthropic_tweaks_usage_limits/) Anthropic adjusted Claude session limits during peak hours (05:00–11:00 PT) for Free, Pro, and Max subscribers, shifting from clock-based to token-based accounting. About 7% of users will hit limits sooner than before; overall weekly allowances are unchanged. The change was announced via an X thread rather than a formal notice, drawing user backlash over the lack of advance communication.
+
+- [Cloudflare Blog](https://blog.cloudflare.com/workflow-diagrams/) Cloudflare published a technical post today on how it uses AST parsing to render Workflows code as visual step diagrams in the dashboard, showing sequences, parallel steps, conditionals, and loops. The visualizer is in beta for all TypeScript and JavaScript Workers.
+
+- [OpenAI Developers](https://developers.openai.com/codex/changelog) OpenAI shipped a broad Codex release today adding first-class plugins, multi-agent v2 workflows with readable path-based agent addressing, improved image handling, and app-server TUI capabilities including shell commands and remote websocket connections. GPT-5.1-Codex-Max, a new frontier agentic coding model supporting multi-context-window compaction, is now available across CLI, IDE extension, cloud, and code review surfaces.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/03/27/nx-s1-5763491/judge-venezuela-maduro-legal-costs-us-drug-trafficking) Former Venezuelan president Nicolas Maduro and his wife Cilia Flores appeared in Manhattan federal court on drug trafficking charges. Judge Alvin Hellerstein questioned the Treasury Department's decision to revoke a license allowing Venezuela to fund the couple's legal defense, noting Maduro presents no ongoing national security threat from custody. No trial date has been set.

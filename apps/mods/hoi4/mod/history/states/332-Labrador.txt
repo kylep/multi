@@ -11,6 +11,7 @@ state={
 		tungsten = 500
 		steel = 500
 		chromium = 500
+		coal = 500
 	}
 
 	history={
