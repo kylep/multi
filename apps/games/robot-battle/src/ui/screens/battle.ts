@@ -106,7 +106,7 @@ export async function battleScreen(
   } else {
     if (battle.player.currentHealth > 0) {
       terminal.print("*** SURRENDERED ***", "t-yellow");
-      terminal.print("You retreated from battle. No rewards earned.");
+      terminal.print("You retreated from battle.");
     } else {
       terminal.print("*** DEFEAT ***", "t-red t-bold");
       showBattleSummary(terminal, battle);

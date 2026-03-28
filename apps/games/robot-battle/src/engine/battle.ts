@@ -131,7 +131,7 @@ export function executeAttack(
     const hitChance = calculateHitChance(weapon.accuracy, battleDodge(defender));
     const roll = rng.random();
 
-    if (roll <= hitChance) {
+    if (roll < hitChance) {
       const damage = calculateDamage(weapon, attacker, defender);
       totalDamage += damage;
       defender.currentHealth -= damage;
