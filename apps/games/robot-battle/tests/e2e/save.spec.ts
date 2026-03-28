@@ -40,7 +40,7 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
     await page.getByText("Stick", { exact: false }).first().click();
-    await page.getByTestId("choice-ok").click();
+    await page.getByTestId("confirm-true").click();
     await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 
@@ -63,7 +63,7 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
     await page.getByText("Stick", { exact: false }).first().click();
-    await page.getByTestId("choice-ok").click();
+    await page.getByTestId("confirm-true").click();
     await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 
@@ -72,7 +72,7 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-MiniBot").click();
     await page.getByTestId("choice-fight").click();
     await page.getByTestId("choice-surrender").click();
-    await page.getByTestId("choice-yes").click();
+    await page.getByTestId("confirm-true").click();
     await page.getByTestId("choice-continue").click();
 
     // Reload and continue
@@ -91,7 +91,7 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
     await page.getByText("Stick", { exact: false }).first().click();
-    await page.getByTestId("choice-ok").click();
+    await page.getByTestId("confirm-true").click();
     await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 

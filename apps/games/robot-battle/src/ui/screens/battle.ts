@@ -77,7 +77,7 @@ export async function battleScreen(
       endTurn(battle);
     }
 
-    await terminal.promptChoice("", [{ label: "Continue", value: "ok" }]);
+    await terminal.promptContinue(0);
   }
 
   // Battle ended
@@ -259,11 +259,8 @@ async function playerTurn(
     if (choice === "auto") return "auto";
 
     if (choice === "surrender") {
-      const confirm = await terminal.promptChoice("Are you sure?", [
-        { label: "Yes", value: "yes" },
-        { label: "No", value: "no" },
-      ]);
-      if (confirm === "yes") {
+      const confirmed = await terminal.promptConfirm("Surrender this fight?", "Yes", "No");
+      if (confirmed) {
         battle.winner = "enemy";
         return "surrendered";
       }

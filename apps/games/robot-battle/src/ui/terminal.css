@@ -100,3 +100,54 @@ body {
   background: #33ff33;
   color: #0a0a0a;
 }
+
+/* Modal overlay for confirmations */
+.terminal-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.terminal-modal {
+  background: #0a0a0a;
+  border: 2px solid #33ff33;
+  border-radius: 8px;
+  padding: 24px 32px;
+  min-width: 300px;
+  text-align: center;
+}
+
+.terminal-modal-message {
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.terminal-modal-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.terminal-modal-btn {
+  padding: 8px 24px;
+  border: 1px solid #33ff33;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.terminal-modal-btn.selected {
+  background: #1a3a1a;
+  font-weight: bold;
+}
+
+.terminal-modal-btn:hover {
+  background: #33ff33;
+  color: #0a0a0a;
+}

@@ -42,7 +42,7 @@ test.describe("Combat", () => {
     await startBattle(page, "MiniBot");
 
     await page.getByTestId("choice-surrender").click();
-    await page.getByTestId("choice-yes").click();
+    await page.getByTestId("confirm-true").click();
 
     await expect(page.getByText("SURRENDERED")).toBeVisible();
   });
@@ -140,7 +140,7 @@ test.describe("Combat", () => {
     await startBattle(page, "MiniBot");
 
     await page.getByTestId("choice-surrender").click();
-    await page.getByTestId("choice-yes").click();
+    await page.getByTestId("confirm-true").click();
 
     await expect(page.getByText("+$10 consolation")).toBeVisible();
     await page.getByTestId("choice-continue").click();
@@ -190,7 +190,7 @@ test.describe("Combat", () => {
     await startBattle(page, "MiniBot");
 
     await page.getByTestId("choice-surrender").click();
-    await page.getByTestId("choice-yes").click();
+    await page.getByTestId("confirm-true").click();
 
     // Wait for continue countdown (should show [Continue X])
     await expect(page.getByTestId("choice-continue")).toBeVisible();

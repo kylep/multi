@@ -70,20 +70,17 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
       const item = available[idx];
       const check = canBuy(state, item);
 
-      showItemDetails(terminal, item);
-
       if (!check.ok) {
-        terminal.print(check.reason, "t-red");
-        await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
+        await terminal.promptConfirm(`${item.name}: ${check.reason}`, "OK", "OK");
       } else {
-        const confirm = await terminal.promptChoice(`Buy ${item.name} for $${item.moneyCost}?`, [
-          { label: "Buy", value: "buy" },
-          { label: "Cancel", value: "cancel" },
-        ]);
-        if (confirm === "buy") {
+        const confirmed = await terminal.promptConfirm(
+          `Buy ${item.name} for $${item.moneyCost}?`,
+          "Buy",
+          "Cancel",
+        );
+        if (confirmed) {
           const result = buyItem(state, item);
           terminal.print(result.message, result.success ? "t-green" : "t-red");
-          await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
         }
       }
     }
@@ -122,13 +119,15 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
     const idx = parseInt(choice, 10);
     if (idx >= 0 && idx < player.inventory.length) {
       const item = player.inventory[idx];
-      const result = sellItem(state, item);
-      if (result.success) {
-        terminal.print(result.message, "t-green");
-      } else {
-        terminal.print(result.message, "t-red");
+      const confirmed = await terminal.promptConfirm(
+        `Sell ${item.name} for $${getSellPrice(item)}?`,
+        "Sell",
+        "Cancel",
+      );
+      if (confirmed) {
+        const result = sellItem(state, item);
+        terminal.print(result.message, result.success ? "t-green" : "t-red");
       }
-      await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
     }
   }
 }

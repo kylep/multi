@@ -17,6 +17,7 @@ export interface Terminal {
   promptText(prompt: string): Promise<string>;
   promptChoice(prompt: string, choices: Choice[]): Promise<string>;
   promptContinue(seconds?: number): Promise<void>;
+  promptConfirm(message: string, confirmLabel?: string, cancelLabel?: string): Promise<boolean>;
 }
 
 export function createDomTerminal(root: HTMLElement): Terminal {
@@ -201,7 +202,7 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         btn.className = "terminal-continue";
         btn.setAttribute("data-testid", "choice-continue");
         let remaining = seconds;
-        btn.textContent = `[Continue ${remaining}]`;
+        btn.textContent = seconds > 0 ? `[Continue ${remaining}]` : "[Continue]";
 
         output.appendChild(btn);
         scrollToBottom();
@@ -218,14 +219,14 @@ export function createDomTerminal(root: HTMLElement): Terminal {
           resolve();
         }
 
-        const timer = setInterval(() => {
+        const timer = seconds > 0 ? setInterval(() => {
           remaining -= 1;
           if (remaining <= 0) {
             done();
           } else {
             btn.textContent = `[Continue ${remaining}]`;
           }
-        }, 1000);
+        }, 1000) : 0;
 
         function onKey(e: KeyboardEvent): void {
           if (e.key === "Enter" || e.key === " ") {
@@ -240,6 +241,82 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         });
 
         btn.addEventListener("click", done);
+      });
+    },
+
+    promptConfirm(
+      message: string,
+      confirmLabel = "Buy",
+      cancelLabel = "Cancel",
+    ): Promise<boolean> {
+      return new Promise((resolve) => {
+        const overlay = document.createElement("div");
+        overlay.className = "terminal-modal-overlay";
+
+        const modal = document.createElement("div");
+        modal.className = "terminal-modal";
+
+        const msg = document.createElement("div");
+        msg.className = "terminal-modal-message";
+        msg.textContent = message;
+        modal.appendChild(msg);
+
+        const buttons = document.createElement("div");
+        buttons.className = "terminal-modal-buttons";
+
+        let selectedIdx = 0;
+        const opts = [
+          { label: confirmLabel, value: true },
+          { label: cancelLabel, value: false },
+        ];
+
+        const btnEls: HTMLDivElement[] = [];
+        for (let i = 0; i < opts.length; i++) {
+          const b = document.createElement("div");
+          b.className = "terminal-modal-btn";
+          b.setAttribute("data-testid", `confirm-${opts[i].value}`);
+          b.textContent = opts[i].label;
+          b.addEventListener("click", () => {
+            finish(opts[i].value);
+          });
+          buttons.appendChild(b);
+          btnEls.push(b);
+        }
+
+        modal.appendChild(buttons);
+        overlay.appendChild(modal);
+        root.appendChild(overlay);
+
+        function updateSelection(): void {
+          for (let i = 0; i < btnEls.length; i++) {
+            btnEls[i].classList.toggle("selected", i === selectedIdx);
+          }
+        }
+
+        function finish(value: boolean): void {
+          document.removeEventListener("keydown", onKey);
+          overlay.remove();
+          resolve(value);
+        }
+
+        function onKey(e: KeyboardEvent): void {
+          if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+            e.preventDefault();
+            selectedIdx = selectedIdx === 0 ? 1 : 0;
+            updateSelection();
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            finish(opts[selectedIdx].value);
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            finish(false);
+          }
+        }
+
+        requestAnimationFrame(() => {
+          updateSelection();
+          document.addEventListener("keydown", onKey);
+        });
       });
     },
   };
