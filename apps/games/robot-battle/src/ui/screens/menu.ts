@@ -20,6 +20,10 @@ export async function mainMenu(
 ): Promise<void> {
   while (true) {
     terminal.clear();
+    const player = state.player!;
+    terminal.print(player.name, "t-blue t-bold");
+    terminal.print(`$${player.money}`, "t-yellow");
+    terminal.print(`Level ${player.level} - XP ${player.exp}/10`, "t-magenta");
     terminal.print("");
 
     const choice = await terminal.promptChoice("What would you like to do?", [

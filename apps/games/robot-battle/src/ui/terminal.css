@@ -57,6 +57,7 @@ body {
 }
 
 /* Color classes for styled output */
+.t-blue { color: #4488ff; }
 .t-red { color: #ff4444; }
 .t-green { color: #33ff33; }
 .t-yellow { color: #ffff33; }
