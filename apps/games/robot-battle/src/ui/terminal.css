@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0a;
+  color: #33ff33;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  line-height: 1.4;
+  min-height: 100vh;
+}
+
+#terminal {
+  display: grid;
+  grid-template-areas:
+    "output"
+    "input";
+  grid-template-rows: 1fr auto;
+  min-height: 100vh;
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.terminal-output {
+  grid-area: output;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+.terminal-input-line {
+  grid-area: input;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #1a3a1a;
+}
+
+.terminal-prompt {
+  color: #33ff33;
+  flex-shrink: 0;
+}
+
+.terminal-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #33ff33;
+  font-family: inherit;
+  font-size: inherit;
+  flex: 1;
+  caret-color: #33ff33;
+}
+
+.terminal-input::placeholder {
+  color: #1a5a1a;
+}
+
+/* Color classes for styled output */
+.t-red { color: #ff4444; }
+.t-green { color: #33ff33; }
+.t-yellow { color: #ffff33; }
+.t-cyan { color: #33ffff; }
+.t-magenta { color: #ff33ff; }
+.t-bold { font-weight: bold; }
+.t-dim { opacity: 0.6; }
+
+/* Choice buttons for touch-friendly input */
+.terminal-choices {
+  grid-area: input;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #1a3a1a;
+}
+
+.terminal-choice {
+  background: #1a3a1a;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.terminal-choice:hover,
+.terminal-choice:focus {
+  background: #33ff33;
+  color: #0a0a0a;
+}

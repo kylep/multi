@@ -1,0 +1,31 @@
+{
+  "enemies": {
+    "MiniBot": {
+      "level": 1,
+      "weapons": ["Stick"],
+      "gear": ["Cardboard Armor"],
+      "consumables": [],
+      "reward": 50,
+      "expReward": 2,
+      "description": "A shoebox sized cardboard box robot with a stick. He's gonna whack you!"
+    },
+    "Sparky": {
+      "level": 3,
+      "weapons": ["Shock Rod"],
+      "gear": ["Small Battery", "Small Computer Chip"],
+      "consumables": [],
+      "reward": 80,
+      "expReward": 3,
+      "description": "A hyperactive robot that crackles with electricity. Zap zap!"
+    },
+    "Firebot": {
+      "level": 5,
+      "weapons": ["Flame Thrower"],
+      "gear": ["Gold Computer Chip"],
+      "consumables": [],
+      "reward": 150,
+      "expReward": 5,
+      "description": "A shiny robot with a flame thrower."
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "defaultRobotStats": {
+    "health": 10,
+    "maxHealth": 10,
+    "energy": 20,
+    "maxEnergy": 20,
+    "defence": 0,
+    "attack": 0,
+    "hands": 2,
+    "dodge": 0,
+    "inventorySize": 4
+  },
+  "startingMoney": 100
+}
