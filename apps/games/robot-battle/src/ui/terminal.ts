@@ -5,8 +5,14 @@ export interface Choice {
   value: string;
 }
 
+export interface Span {
+  text: string;
+  css?: string;
+}
+
 export interface Terminal {
   print(text: string, cssClass?: string): void;
+  printLine(spans: Span[]): void;
   clear(): void;
   promptText(prompt: string): Promise<string>;
   promptChoice(prompt: string, choices: Choice[]): Promise<string>;
@@ -30,6 +36,18 @@ export function createDomTerminal(root: HTMLElement): Terminal {
       const line = document.createElement("div");
       if (cssClass) line.className = cssClass;
       line.textContent = text;
+      output.appendChild(line);
+      scrollToBottom();
+    },
+
+    printLine(spans: Span[]): void {
+      const line = document.createElement("div");
+      for (const span of spans) {
+        const el = document.createElement("span");
+        if (span.css) el.className = span.css;
+        el.textContent = span.text;
+        line.appendChild(el);
+      }
       output.appendChild(line);
       scrollToBottom();
     },

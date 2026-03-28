@@ -21,9 +21,13 @@ export async function mainMenu(
   while (true) {
     terminal.clear();
     const player = state.player!;
-    terminal.print(player.name, "t-blue t-bold");
-    terminal.print(`$${player.money}`, "t-yellow");
-    terminal.print(`Level ${player.level} - XP ${player.exp}/10`, "t-magenta");
+    terminal.printLine([
+      { text: player.name, css: "t-blue t-bold" },
+      { text: "  |  " },
+      { text: `$${player.money}`, css: "t-yellow" },
+      { text: "  |  " },
+      { text: `Lv.${player.level} XP ${player.exp}/10`, css: "t-magenta" },
+    ]);
     terminal.print("");
 
     const choice = await terminal.promptChoice("What would you like to do?", [
