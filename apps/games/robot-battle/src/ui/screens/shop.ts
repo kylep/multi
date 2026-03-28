@@ -68,14 +68,24 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
     const idx = parseInt(choice, 10);
     if (idx >= 0 && idx < available.length) {
       const item = available[idx];
-      const result = buyItem(state, item);
-      if (result.success) {
-        terminal.print(result.message, "t-green");
-      } else {
-        terminal.print(result.message, "t-red");
-      }
+      const check = canBuy(state, item);
+
       showItemDetails(terminal, item);
-      await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
+
+      if (!check.ok) {
+        terminal.print(check.reason, "t-red");
+        await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
+      } else {
+        const confirm = await terminal.promptChoice(`Buy ${item.name} for $${item.moneyCost}?`, [
+          { label: "Buy", value: "buy" },
+          { label: "Cancel", value: "cancel" },
+        ]);
+        if (confirm === "buy") {
+          const result = buyItem(state, item);
+          terminal.print(result.message, result.success ? "t-green" : "t-red");
+          await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
+        }
+      }
     }
   }
 }
