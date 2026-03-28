@@ -219,7 +219,8 @@ function printBattleStatus(terminal: Terminal, battle: BattleState): void {
 
 function hpBar(current: number, max: number, width = 20): string {
   if (max === 0) return "[" + "░".repeat(width) + "]";
-  const filled = Math.round((current / max) * width);
+  const ratio = Math.min(1, Math.max(0, current / max));
+  const filled = Math.round(ratio * width);
   return "[" + "█".repeat(filled) + "░".repeat(width - filled) + "]";
 }
 

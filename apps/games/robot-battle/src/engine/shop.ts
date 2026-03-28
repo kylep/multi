@@ -36,7 +36,7 @@ export function buyItem(state: GameState, item: Item): ShopResult {
 
   const player = state.player!;
   player.money -= item.moneyCost;
-  // Deep copy the item so each purchase is a unique instance
+  // Shallow copy so each purchase is a unique instance
   player.inventory.push({ ...item });
 
   return {

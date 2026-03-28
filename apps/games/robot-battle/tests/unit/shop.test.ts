@@ -14,6 +14,7 @@ describe("listAvailableItems", () => {
   it("returns items at or below player level", () => {
     const state = setup();
     const items = listAvailableItems(state);
+    expect(items.length).toBeGreaterThan(0);
     expect(items.every((i) => i.level <= state.player!.level)).toBe(true);
   });
 });

@@ -65,7 +65,7 @@ test.describe("Save & Load", () => {
     // Buy a Stick
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
-    page.locator("button", { hasText: "Stick" }).click();
+    await page.locator("button", { hasText: "Stick" }).click();
     await page.getByTestId("text-input").press("Enter");
     await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
@@ -94,7 +94,7 @@ test.describe("Save & Load", () => {
     // Buy a Stick
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
-    page.locator("button", { hasText: "Stick" }).click();
+    await page.locator("button", { hasText: "Stick" }).click();
     await page.getByTestId("text-input").press("Enter");
     await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click(); // triggers save

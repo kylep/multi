@@ -53,6 +53,7 @@ describe("loadAssets", () => {
 
   it("getItemsForLevel filters correctly", () => {
     const level0 = registry.getItemsForLevel(0);
+    expect(level0.length).toBeGreaterThan(0);
     expect(level0.every((i) => i.level <= 0)).toBe(true);
     const level5 = registry.getItemsForLevel(5);
     expect(level5.length).toBeGreaterThan(level0.length);

@@ -17,6 +17,7 @@ export function createRng(seed?: number): Rng {
   return {
     random: next,
     choice<T>(arr: T[]): T {
+      if (arr.length === 0) throw new Error("Cannot choose from an empty array");
       return arr[Math.floor(next() * arr.length)];
     },
   };

@@ -212,6 +212,7 @@ describe("checkVictory", () => {
     const battle = createBattle(makeRobot(), makeRobot());
     battle.player.currentHealth = 0;
     expect(checkVictory(battle)).toBe("enemy");
+    expect(battle.winner).toBe("enemy");
   });
 
   it("returns null when both alive", () => {
