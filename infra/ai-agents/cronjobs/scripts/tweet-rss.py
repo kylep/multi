@@ -24,15 +24,8 @@ UTM_PARAMS = {
     "utm_campaign": "blog_post",
 }
 
-# Category → hashtags mapping
-HASHTAGS = {
-    "ai": ["#AI", "#LLM"],
-    "dev": ["#Dev", "#SoftwareEngineering"],
-    "cloud": ["#Cloud", "#DevOps"],
-    "development": ["#Dev", "#Coding"],
-    "systems administration": ["#SysAdmin", "#DevOps"],
-}
-DEFAULT_HASHTAGS = ["#Blog"]
+# Max hashtags per tweet
+MAX_HASHTAGS = 4
 
 TWEET_API = "https://api.x.com/2/tweets"
 
@@ -75,26 +68,29 @@ def parse_feed(url):
         title = item.findtext("title", "").strip()
         link = item.findtext("link", "").strip()
         desc = item.findtext("description", "").strip()
-        category = item.findtext("category", "").strip().lower()
+        tags = [c.text.strip() for c in item.findall("category") if c.text]
         if guid and title and link:
             items.append({
                 "guid": guid,
                 "title": title,
                 "link": link,
                 "description": desc,
-                "category": category,
+                "tags": tags,
             })
     return items
 
 
 def format_tweet(item):
     title = item["title"]
+    # Strip @ from titles — tweets starting with @ are hidden as replies
+    title = title.replace("@", "")
     desc = item["description"]
     link = add_utm(item["link"])
-    category = item["category"]
 
-    tags = HASHTAGS.get(category, DEFAULT_HASHTAGS)
-    hashtag_str = " ".join(tags)
+    # Use post tags as hashtags (skip generic category like "dev", "cloud")
+    skip = {"dev", "cloud", "development", "systems administration", "reference pages"}
+    tags = [f"#{t.replace('-', '').replace(' ', '')}" for t in item["tags"] if t.lower() not in skip]
+    hashtag_str = " ".join(tags[:MAX_HASHTAGS])
 
     # Build tweet: title + description + hashtags + link
     # X limit is 280 chars. URLs count as 23 chars (t.co wrapping).
@@ -108,7 +104,8 @@ def format_tweet(item):
             if len(desc) > max_desc:
                 desc = desc[: max_desc - 1] + "\u2026"
             parts.append(desc)
-    parts.append(hashtag_str)
+    if hashtag_str:
+        parts.append(hashtag_str)
     parts.append(link)
     return "\n\n".join(parts)
 
