@@ -170,7 +170,7 @@ async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void
     }
 
     // Pause with content visible
-    await delay(500);
+    await delay(175);
   }
 }
 
@@ -234,6 +234,13 @@ async function playerTurn(
   const player = battle.player;
   const suggested = aiPlanAction(battle, true);
 
+  function redrawBattle(): void {
+    terminal.clear();
+    terminal.print("");
+    printBattleStatus(terminal, battle);
+    terminal.print("");
+  }
+
   while (true) {
     const hasWeapons = getWeapons(player.robot).length > 0;
     const hasConsumables = getConsumables(player.robot).some(
@@ -260,23 +267,28 @@ async function playerTurn(
         battle.winner = "enemy";
         return "surrendered";
       }
+      redrawBattle();
       continue;
     }
 
     if (choice === "attack") {
       if (!hasWeapons) {
+        redrawBattle();
         terminal.print("You have no weapons!", "t-red");
         continue;
       }
       const planned = await playerPlanAttack(terminal, battle, suggested);
       if (planned) return "continue";
+      redrawBattle();
     } else if (choice === "item") {
       if (!hasConsumables) {
+        redrawBattle();
         terminal.print("No usable items!", "t-red");
         continue;
       }
       await playerUseItem(terminal, battle);
       if (battle.winner) return "continue";
+      redrawBattle();
     } else if (choice === "rest") {
       planRest(battle, true);
       terminal.print("You prepare to rest...");
