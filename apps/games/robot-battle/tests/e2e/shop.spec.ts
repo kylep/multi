@@ -46,7 +46,7 @@ test.describe("Shop", () => {
     // Buy a Stick first
     await page.getByTestId("choice-buy").click();
     await page.getByText("Stick", { exact: false }).first().click();
-    await page.getByTestId("choice-continue").click();
+    await page.getByTestId("choice-ok").click();
 
     // Go back to shop menu
     await page.getByTestId("choice-back").click();

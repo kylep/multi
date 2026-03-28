@@ -22,7 +22,7 @@ import {
   getWeapons,
 } from "../../engine/robot";
 import { awardExp, awardMoney, recordFight } from "../../engine/state";
-import { showRobotStats } from "./inspect";
+
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -84,37 +84,40 @@ export async function battleScreen(
   recordTurnSnapshot(battle);
   terminal.print("");
 
+  const turns = battle.turnHistory.length;
+  const playerHp = Math.max(0, battle.player.currentHealth);
+  const playerMax = getEffectiveMaxHealth(player);
+
   if (battle.winner === "player") {
     terminal.print("*** VICTORY! ***", "t-green t-bold");
-    showBattleSummary(terminal, battle);
+    terminal.print(`Won in ${turns} turns with ${playerHp}/${playerMax} HP remaining`, "t-dim");
     recordFight(state, true);
 
     terminal.print("");
-    terminal.print("-- Rewards --", "t-yellow t-bold");
     const leveled = awardExp(state, enemyDef.expReward);
-    terminal.print(`+${enemyDef.expReward} exp`, "t-green");
     const actual = awardMoney(state, enemyDef.reward);
-    terminal.print(`+$${actual}`, "t-green");
+    terminal.print(`  +${enemyDef.expReward} exp   +$${actual}`, "t-green t-bold");
+
     if (leveled) {
       terminal.print("");
-      terminal.print(`*** LEVEL UP! You are now level ${player.level}! ***`, "t-green t-bold");
+      terminal.print(`*** LEVEL UP! Now level ${player.level}! ***`, "t-yellow t-bold");
     }
 
-    printNextLevelPreview(terminal, state);
     terminal.print("");
-    await showRobotStats(terminal, state);
+    terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
+    printNextLevelPreview(terminal, state);
   } else {
     if (battle.player.currentHealth > 0) {
       terminal.print("*** SURRENDERED ***", "t-yellow");
-      terminal.print("You retreated from battle.");
     } else {
       terminal.print("*** DEFEAT ***", "t-red t-bold");
-      showBattleSummary(terminal, battle);
-      terminal.print("Your robot was destroyed... but it's been rebuilt!");
+      terminal.print(`Lasted ${turns} turns`, "t-dim");
     }
     recordFight(state, false);
     player.money += 10;
-    terminal.print(`+$10 consolation`, "t-green");
+    terminal.print(`  +$10 consolation`, "t-green");
+    terminal.print("");
+    terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
     printNextLevelPreview(terminal, state);
   }
 
@@ -224,17 +227,6 @@ function hpBar(current: number, max: number, width = 20): string {
   return "[" + "█".repeat(filled) + "░".repeat(width - filled) + "]";
 }
 
-function showBattleSummary(terminal: Terminal, battle: BattleState): void {
-  if (battle.turnHistory.length === 0) return;
-  terminal.print("");
-  terminal.print("-- Battle Summary --", "t-yellow t-bold");
-  for (const snap of battle.turnHistory) {
-    terminal.print(
-      `Turn ${snap.turn}: ${battle.player.robot.name} ${snap.playerHp}/${snap.playerMaxHp}, ${battle.enemy.robot.name} ${snap.enemyHp}/${snap.enemyMaxHp}`,
-    );
-  }
-}
-
 // ── Player turn ──
 
 async function playerTurn(
@@ -294,48 +286,82 @@ async function playerPlanAttack(
     return false;
   }
 
-  terminal.print("");
-  terminal.print("Select weapons to attack with:");
-  for (let i = 0; i < weapons.length; i++) {
-    const w = weapons[i];
-    const notes: string[] = [];
-    if (w.energyCost > player.currentEnergy) notes.push("not enough energy");
-    for (const req of w.requirements) {
-      if (!player.robot.inventory.some((it) => it.name === req)) notes.push(`needs ${req}`);
-    }
-    const status = notes.length ? ` (${notes.join(", ")})` : "";
-    terminal.print(`  ${i + 1}. ${w.name} - ${w.damage} dmg, ${w.hands}h, ${w.energyCost} energy${status}`);
-  }
-  terminal.print(`Available hands: ${getEffectiveHands(player.robot)}`);
-
-  const input = await terminal.promptText("Weapons (comma-separated numbers, e.g. 1,2): ");
-
-  if (input.toLowerCase() === "back" || input === "") return false;
-
-  const indices = input.split(",").map((s) => parseInt(s.trim(), 10) - 1);
-  const selectedWeapons: Weapon[] = [];
-  for (const idx of indices) {
-    if (idx >= 0 && idx < weapons.length) {
-      selectedWeapons.push(weapons[idx]);
-    } else {
-      terminal.print(`Invalid weapon number: ${idx + 1}`, "t-red");
+  // If only one weapon, auto-select it
+  if (weapons.length === 1) {
+    const result = planAttack(battle, [weapons[0]], true);
+    if (!result.success) {
+      terminal.print(result.message, "t-red");
       return false;
     }
+    terminal.print(`You prepare to attack with ${weapons[0].name}...`);
+    return true;
   }
 
-  if (new Set(indices).size !== indices.length) {
-    terminal.print("You can only use each weapon once per attack", "t-red");
-    return false;
+  // Multiple weapons — let player toggle which ones to use
+  const selected = new Set<number>();
+  // Pre-select what the AI would pick
+  for (const sw of suggested.weapons) {
+    const idx = weapons.indexOf(sw);
+    if (idx !== -1) selected.add(idx);
   }
 
-  const result = planAttack(battle, selectedWeapons, true);
-  if (!result.success) {
-    terminal.print(result.message, "t-red");
-    return false;
-  }
+  const availableHands = getEffectiveHands(player.robot);
 
-  terminal.print(`You prepare to attack with ${selectedWeapons.map((w) => w.name).join(", ")}...`);
-  return true;
+  while (true) {
+    const choices: Choice[] = [];
+    for (let i = 0; i < weapons.length; i++) {
+      const w = weapons[i];
+      const check = selected.has(i) ? "[x]" : "[ ]";
+      const notes: string[] = [];
+      if (w.energyCost > player.currentEnergy) notes.push("no energy");
+      for (const req of w.requirements) {
+        if (!player.robot.inventory.some((it) => it.name === req)) notes.push(`needs ${req}`);
+      }
+      const status = notes.length ? ` (${notes.join(", ")})` : "";
+      choices.push({
+        label: `${check} ${w.name} - ${w.damage} dmg, ${w.hands}h, ${w.energyCost} energy${status}`,
+        value: `toggle-${i}`,
+      });
+    }
+
+    const usedHands = [...selected].reduce((s, i) => s + weapons[i].hands, 0);
+    const usedEnergy = [...selected].reduce((s, i) => s + weapons[i].energyCost, 0);
+
+    choices.push({
+      label: `>> Attack (${usedHands}/${availableHands} hands, ${usedEnergy} energy)`,
+      value: "confirm",
+    });
+    choices.push({ label: "Back", value: "back" });
+
+    const choice = await terminal.promptChoice("Select weapons:", choices);
+
+    if (choice === "back") return false;
+
+    if (choice.startsWith("toggle-")) {
+      const idx = parseInt(choice.slice(7), 10);
+      if (selected.has(idx)) {
+        selected.delete(idx);
+      } else {
+        selected.add(idx);
+      }
+      continue;
+    }
+
+    if (choice === "confirm") {
+      const selectedWeapons = [...selected].map((i) => weapons[i]);
+      if (selectedWeapons.length === 0) {
+        terminal.print("Select at least one weapon!", "t-red");
+        continue;
+      }
+      const result = planAttack(battle, selectedWeapons, true);
+      if (!result.success) {
+        terminal.print(result.message, "t-red");
+        continue;
+      }
+      terminal.print(`You prepare to attack with ${selectedWeapons.map((w) => w.name).join(", ")}...`);
+      return true;
+    }
+  }
 }
 
 async function playerUseItem(terminal: Terminal, battle: BattleState): Promise<void> {

@@ -31,9 +31,8 @@ test.describe("Combat", () => {
     await enterGameWithWeapon(page);
     await startBattle(page, "MiniBot");
 
+    // With only 1 weapon (Stick), Attack auto-selects it
     await page.getByTestId("choice-attack").click();
-    await page.getByTestId("text-input").fill("1");
-    await page.keyboard.press("Enter");
 
     await expect(page.getByText("Turn Resolution")).toBeVisible({ timeout: 5000 });
   });

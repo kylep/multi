@@ -75,7 +75,7 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
         terminal.print(result.message, "t-red");
       }
       showItemDetails(terminal, item);
-      await terminal.promptContinue();
+      await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
     }
   }
 }
@@ -118,7 +118,7 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
       } else {
         terminal.print(result.message, "t-red");
       }
-      await terminal.promptContinue();
+      await terminal.promptChoice("", [{ label: "OK", value: "ok" }]);
     }
   }
 }
