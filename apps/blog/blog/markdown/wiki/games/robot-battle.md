@@ -10,6 +10,10 @@ scope: "Robot Battle web game: how to develop, test, deploy, and extend."
 last_verified: 2026-03-28
 ---
 
+## Play
+
+[Play Robot Battle](/games/robot-battle/index.html)
+
 ## What it is
 
 A turn-based robot combat game played in the browser. Name your robot,
@@ -32,8 +36,8 @@ TypeScript at `apps/games/robot-battle/`.
 cd apps/games/robot-battle
 npm install
 npm run dev          # dev server on :5173
-npx vitest run       # unit tests (43 tests)
-npx playwright test  # E2E tests (11 tests)
+npx vitest run       # unit tests (61 tests)
+npx playwright test  # E2E tests (28 tests)
 ```
 
 ## Deploy to blog
