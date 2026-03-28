@@ -111,15 +111,15 @@ export async function battleScreen(
     terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
     printNextLevelPreview(terminal, state);
   } else {
+    recordFight(state, false);
     if (battle.player.currentHealth > 0) {
       terminal.print("*** SURRENDERED ***", "t-yellow");
     } else {
       terminal.print("*** DEFEAT ***", "t-red t-bold");
       terminal.print(`Lasted ${turns} turns`, "t-dim");
+      player.money += 10;
+      terminal.print(`  +$10 consolation`, "t-green");
     }
-    recordFight(state, false);
-    player.money += 10;
-    terminal.print(`  +$10 consolation`, "t-green");
     terminal.print("");
     terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
     printNextLevelPreview(terminal, state);
