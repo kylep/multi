@@ -14,17 +14,20 @@ function shopHeader(terminal: Terminal, state: GameState, activeTab: string): vo
   terminal.printHTML(
     `<div class="panel-header" style="margin-bottom:0"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${player.inventory.length}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
   );
-  const tabs = ["Buy", "Sell", "Inventory", "Back"];
-  const tabHtml = tabs.map((t) => {
-    const val = t.toLowerCase();
-    const isActive = val === activeTab;
-    const isBack = val === "back";
-    let cls = "btn";
-    if (isActive) cls += " btn-primary";
-    else if (isBack) cls += " btn-secondary";
-    return `<span class="${cls}" style="display:inline-block;padding:4px 16px;margin:0 4px 0 0;cursor:default;font-size:14px">${t}</span>`;
-  }).join("");
-  terminal.printHTML(`<div style="margin:2px 0 8px 0">${tabHtml}</div>`);
+  // Only show static tab bar on sub-screens (buy/sell)
+  if (activeTab) {
+    const tabs = ["Buy", "Sell", "Back"];
+    const tabHtml = tabs.map((t) => {
+      const val = t.toLowerCase();
+      const isActive = val === activeTab;
+      const isBack = val === "back";
+      let cls = "btn";
+      if (isActive) cls += " btn-primary";
+      else if (isBack) cls += " btn-secondary";
+      return `<span class="${cls}" style="display:inline-block;padding:4px 16px;margin:0 4px 0 0;cursor:default;font-size:14px">${t}</span>`;
+    }).join("");
+    terminal.printHTML(`<div style="margin:2px 0 8px 0">${tabHtml}</div>`);
+  }
 }
 
 export async function shopScreen(terminal: Terminal, state: GameState): Promise<void> {
@@ -36,7 +39,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
 
     terminal.clear();
     shopHeader(terminal, state, "");
-
+    // Main shop: tabs are the interactive choices (no static tab bar)
     const choice = await terminal.promptChoice("", [
       { label: "Buy", value: "buy" },
       { label: "Sell", value: "sell" },
