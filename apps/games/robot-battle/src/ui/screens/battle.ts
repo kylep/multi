@@ -69,7 +69,10 @@ export async function battleScreen(
     const rng = createRng();
     resolveTurn(battle, rng);
 
-    // Display results
+    // Clear and show turn results as a fresh screen
+    terminal.clear();
+    terminal.print("");
+    printBattleStatus(terminal, battle);
     terminal.print("");
     printTurnLog(terminal, battle);
 
@@ -80,8 +83,9 @@ export async function battleScreen(
     await terminal.promptContinue(0);
   }
 
-  // Battle ended
+  // Battle ended — fresh screen for results
   recordTurnSnapshot(battle);
+  terminal.clear();
   terminal.print("");
 
   const turns = battle.turnHistory.length;
@@ -331,48 +335,41 @@ async function playerPlanAttack(
   const availableHands = getEffectiveHands(player.robot);
 
   while (true) {
-    // Redraw battle status to avoid stacking weapon lists
+    // Fresh screen for weapon selection
     terminal.clear();
     terminal.print("");
     printBattleStatus(terminal, battle);
     terminal.print("");
 
-    const choices: Choice[] = [];
-    for (let i = 0; i < weapons.length; i++) {
-      const w = weapons[i];
-      const check = selected.has(i) ? "[x]" : "[ ]";
-      const notes: string[] = [];
-      if (w.energyCost > player.currentEnergy) notes.push("no energy");
-      for (const req of w.requirements) {
-        if (!player.robot.inventory.some((it) => it.name === req)) notes.push(`needs ${req}`);
-      }
-      const status = notes.length ? ` (${notes.join(", ")})` : "";
-      choices.push({
-        label: `${check} ${w.name} - ${w.damage} dmg, ${w.hands}h, ${w.energyCost} energy${status}`,
-        value: `toggle-${i}`,
-      });
-    }
-
     const usedHands = [...selected].reduce((s, i) => s + weapons[i].hands, 0);
     const usedEnergy = [...selected].reduce((s, i) => s + weapons[i].energyCost, 0);
 
-    choices.push({
-      label: `>> Attack (${usedHands}/${availableHands} hands, ${usedEnergy} energy)`,
+    // Weapon toggles as grid cards
+    const weaponChoices: Choice[] = [];
+    for (let i = 0; i < weapons.length; i++) {
+      const w = weapons[i];
+      const check = selected.has(i) ? "[x]" : "[ ]";
+      weaponChoices.push({
+        label: `${check} ${w.name}`,
+        value: `toggle-${i}`,
+        subtitle: `${w.damage} dmg, ${w.hands}h, ${w.energyCost} en`,
+      });
+    }
+    // Attack and Back as extra cards in the grid
+    weaponChoices.push({
+      label: `Attack (${usedHands}/${availableHands}h, ${usedEnergy} en)`,
       value: "confirm",
     });
-    choices.push({ label: "Back", value: "back" });
+    weaponChoices.push({ label: "Back", value: "back" });
 
-    const choice = await terminal.promptChoice("Select weapons:", choices);
+    const choice = await terminal.promptChoice("Select weapons:", weaponChoices, "grid");
 
     if (choice === "back") return false;
 
     if (choice.startsWith("toggle-")) {
       const idx = parseInt(choice.slice(7), 10);
-      if (selected.has(idx)) {
-        selected.delete(idx);
-      } else {
-        selected.add(idx);
-      }
+      if (selected.has(idx)) selected.delete(idx);
+      else selected.add(idx);
       continue;
     }
 
