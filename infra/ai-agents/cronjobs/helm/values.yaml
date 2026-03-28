@@ -16,6 +16,9 @@ cronjobs:
   paiMorning:
     enabled: false
     schedule: "30 12 * * *"
+  tweetRss:
+    enabled: false
+    schedule: "*/15 * * * *"  # every 15 min
 
 image:
   repository: kpericak/ai-agent-runtime

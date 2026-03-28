@@ -8,54 +8,25 @@ Build a lightweight script that polls the RSS feed and posts to X.
 Runs as a CronJob in the ai-agents namespace, managed by ArgoCD
 like everything else. No GitHub Actions dependency.
 
-## Tweet format options
+## Tweet format
 
-Four formats to choose from (or combine):
+Title + description + hashtags + UTM link:
 
-### 1. Title + link (simple)
-```
-Building an AI Agent Org Chart
-https://kyle.pericak.com/agent-org-chart.html?utm_source=twitter&utm_medium=social&utm_campaign=blog_post
-```
-Clean, lets the link preview card do the work. X renders og:image
-and og:description automatically.
-
-### 2. Title + description excerpt + link
 ```
 Building an AI Agent Org Chart
 
 How I organized 10 Claude Code agents into a functional team with
 specialized roles and delegation patterns.
 
-https://kyle.pericak.com/agent-org-chart.html?utm_source=twitter&utm_medium=social&utm_campaign=blog_post
-```
-More context for the reader. Description pulled from RSS `<description>`.
-
-### 3. Title + hashtags + link
-```
-Building an AI Agent Org Chart
-
-#AI #ClaudeCode #DevOps
+#AI #LLM
 
 https://kyle.pericak.com/agent-org-chart.html?utm_source=twitter&utm_medium=social&utm_campaign=blog_post
 ```
-Hashtags derived from post tags/categories in the RSS feed if
-available, or from a static mapping of common topics.
 
-### 4. Title + one-liner hook + link
-```
-New post: Building an AI Agent Org Chart
-
-10 agents, 4 top-level, 6 subagents. Here's how delegation actually works.
-
-https://kyle.pericak.com/agent-org-chart.html?utm_source=twitter&utm_medium=social&utm_campaign=blog_post
-```
-Requires a `tweet` or `hook` field in the blog post frontmatter.
-More work per post but best engagement. Could be AI-generated at
-build time as a future enhancement.
-
-**Recommendation:** Start with option 2 (title + description + link).
-It's fully automated from RSS data, no per-post work needed.
+- Description pulled from RSS `<description>` field
+- Hashtags mapped from RSS `<category>`: ai→#AI #LLM, dev→#Dev
+  #SoftwareEngineering, cloud→#Cloud #DevOps
+- Fully automated, no per-post work needed
 
 ## UTM parameters
 
@@ -182,11 +153,25 @@ $0/month. X API free tier + existing K8s infra.
 - `requests-oauthlib` Python package (add to runtime image or
   pip install in CronJob)
 
-## Implementation order
+## Implementation status
 
-1. Create X Developer account, generate credentials, store in Vault
-2. Write Python script (RSS parse → dedup → tweet → save state)
-3. Test locally: `python3 tweet-rss.py --dry-run`
-4. Add CronJob template + PVC to helm chart
-5. kubectl apply and test in-cluster
-6. Commit and PR once verified
+Script and CronJob template are built and tested (dry run locally
+and in K8s pod). Disabled by default until X API credentials exist.
+
+**To enable:**
+
+1. Create X Developer account, generate credentials
+2. Store in Vault: `vault kv put secret/ai-agents/twitter api_key=... api_key_secret=... access_token=... access_token_secret=...`
+3. Add to `environments/pai-m1.yaml`:
+   ```yaml
+   cronjobs:
+     tweetRss:
+       enabled: true
+       schedule: "*/15 * * * *"
+   ```
+4. ArgoCD will deploy the CronJob automatically
+
+**Files:**
+- Script: `infra/ai-agents/cronjobs/scripts/tweet-rss.py`
+- CronJob: `infra/ai-agents/cronjobs/helm/templates/tweet-rss.yaml`
+- Values: `infra/ai-agents/cronjobs/helm/values.yaml` (tweetRss section)
