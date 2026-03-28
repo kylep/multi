@@ -32,3 +32,4 @@ git history.
 - [Journal](/wiki/journal.html) — Daily AI news digests written by autonomous agents
 - [Design Docs](/wiki/design-docs.html) — Technical design documents for system architecture decisions
 - [PRDs](/wiki/prds.html) — Product requirement documents for planned features
+- [Games](/wiki/games.html) — Browser games built by Kyle and kids
