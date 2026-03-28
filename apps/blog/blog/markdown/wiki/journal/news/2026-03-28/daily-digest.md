@@ -37,3 +37,19 @@ last_verified: 2026-03-28
 ## Weather
 
 - Whitby: 3°C high, -7°C overnight. 40% chance of flurries throughout the day. No alerts. [(Environment Canada)](https://weather.gc.ca/en/location/index.html?coords=43.898,-78.939)
+
+---
+
+## Update — 18:00 UTC
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/innovation-and-ai/products/gemini-app/gemini-drop-updates-march-2026/) Google's March 2026 Gemini Drop makes Personal Intelligence free for all US Gemini users, connecting Gmail, Google Photos, and YouTube to surface personalized help. The feature was previously paywalled for paid subscribers.
+
+## Open Source
+
+- [Releasebot](https://releasebot.io/updates/openclaw) OpenClaw 2026.3.24 ships a new public plugin SDK replacing the previous extension-api, a Matrix messaging channel backed by the official matrix-js-sdk, and bundled web-search plugins (Exa, Tavily, Firecrawl). ClawHub is now the primary install path for all plugins.
+
+## Just for You
+
+- [AWS Dev Blog](https://dev.to/devops_descent/march-2026-aws-highlights-4jmb) March AWS highlights: Lambda Managed Instances adds Rust support, bringing native-performance serverless to the runtime. Amazon MSK adds Graviton3 support for Kafka in the Africa (Cape Town) region, expanding low-cost streaming to emerging-region deployments.
