@@ -246,14 +246,20 @@ async function playerTurn(
   }
 
   while (true) {
-    const hasWeapons = getWeapons(player.robot).length > 0;
+    const weapons = getWeapons(player.robot);
+    const hasWeapons = weapons.length > 0;
+    const canAffordAny = hasWeapons && weapons.some((w) => w.energyCost <= player.currentEnergy);
     const hasConsumables = getConsumables(player.robot).some(
       (c) => !player.consumablesUsed.includes(c.name),
     );
 
+    let attackLabel = "Attack";
+    if (!hasWeapons) attackLabel = "Attack (none)";
+    else if (!canAffordAny) attackLabel = "Attack (no energy!)";
+
     const choices: Choice[] = [];
     choices.push({ label: "Auto", value: "auto" });
-    choices.push({ label: hasWeapons ? "Attack" : "Attack (none)", value: "attack" });
+    choices.push({ label: attackLabel, value: "attack" });
     choices.push({ label: hasConsumables ? "Item" : "Item (none)", value: "item" });
     choices.push({ label: "Rest", value: "rest" });
     choices.push({ label: "Surrender", value: "surrender" });
@@ -276,6 +282,11 @@ async function playerTurn(
       if (!hasWeapons) {
         redrawBattle();
         terminal.print("You have no weapons!", "t-red");
+        continue;
+      }
+      if (!canAffordAny) {
+        redrawBattle();
+        terminal.print("Not enough energy! Rest to recover.", "t-red");
         continue;
       }
       const planned = await playerPlanAttack(terminal, battle, suggested);
