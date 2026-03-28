@@ -12,7 +12,7 @@
     "Sparky": {
       "level": 3,
       "weapons": ["Shock Rod"],
-      "gear": ["Small Battery", "Small Computer Chip"],
+      "gear": ["Cardboard Armor", "Small Battery", "Small Computer Chip"],
       "consumables": [],
       "reward": 80,
       "expReward": 3,
@@ -21,7 +21,7 @@
     "Firebot": {
       "level": 5,
       "weapons": ["Flame Thrower"],
-      "gear": ["Gold Computer Chip"],
+      "gear": ["Wooden Armor", "Gold Computer Chip"],
       "consumables": [],
       "reward": 150,
       "expReward": 5,

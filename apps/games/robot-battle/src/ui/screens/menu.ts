@@ -49,7 +49,7 @@ export async function mainMenu(
       save?.();
     } else if (choice === "inspect") {
       await showRobotStats(terminal, state);
-      await terminal.promptContinue();
+      await terminal.promptContinue(0);
     }
   }
 }

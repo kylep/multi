@@ -33,7 +33,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
     else if (choice === "sell") await sellMenu(terminal, state);
     else if (choice === "inventory") {
       await showRobotStats(terminal, state);
-      await terminal.promptContinue();
+      await terminal.promptContinue(0);
     }
   }
 }
@@ -71,7 +71,7 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
       const check = canBuy(state, item);
 
       if (!check.ok) {
-        await terminal.promptConfirm(`${item.name}: ${check.reason}`, "OK", "OK");
+        // Error already shown in the choice label — just loop back
       } else {
         const confirmed = await terminal.promptConfirm(
           `Buy ${item.name} for $${item.moneyCost}?`,
@@ -99,7 +99,7 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
 
     if (player.inventory.length === 0) {
       terminal.print("(No items to sell)");
-      await terminal.promptContinue();
+      await terminal.promptContinue(0);
       break;
     }
 
