@@ -19,6 +19,15 @@ test.describe("Shop", () => {
     await expect(page.getByTestId("choice-back")).toBeVisible();
   });
 
+  test("Wrench visible in buy menu with stats", async ({ page }) => {
+    await enterGame(page);
+    await page.getByTestId("choice-shop").click();
+    await page.getByTestId("choice-buy").click();
+
+    await expect(page.locator("button", { hasText: "Wrench" })).toBeVisible();
+    await expect(page.getByText("2 dmg, 90% acc, 2 energy, 1h")).toBeVisible();
+  });
+
   test("can buy a Stick", async ({ page }) => {
     await enterGame(page);
     await page.getByTestId("choice-shop").click();

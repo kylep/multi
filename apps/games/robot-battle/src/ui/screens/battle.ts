@@ -100,6 +100,7 @@ export async function battleScreen(
       terminal.print(`*** LEVEL UP! You are now level ${player.level}! ***`, "t-green t-bold");
     }
 
+    printNextLevelPreview(terminal, state);
     terminal.print("");
     await showRobotStats(terminal, state);
   } else {
@@ -112,6 +113,9 @@ export async function battleScreen(
       terminal.print("Your robot was destroyed... but it's been rebuilt!");
     }
     recordFight(state, false);
+    player.money += 10;
+    terminal.print(`+$10 consolation`, "t-green");
+    printNextLevelPreview(terminal, state);
   }
 
   // Reset health/energy
@@ -119,6 +123,20 @@ export async function battleScreen(
   player.energy = getEffectiveMaxEnergy(player);
 
   await terminal.promptText("Press Enter to continue...");
+}
+
+function printNextLevelPreview(terminal: Terminal, state: GameState): void {
+  const player = state.player!;
+  const nextLevelItems = state.registry.getAllItems().filter(
+    (i) => i.level === player.level + 1,
+  );
+  if (nextLevelItems.length > 0) {
+    terminal.print("");
+    terminal.print(
+      `Next level unlocks: ${nextLevelItems.map((i) => i.name).join(", ")}`,
+      "t-cyan",
+    );
+  }
 }
 
 // ── Auto-Battle ──
@@ -131,7 +149,7 @@ async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void
     terminal.print("");
     terminal.print("[AUTO-BATTLE]", "t-yellow t-bold");
 
-    await delay(750);
+    await delay(250);
 
     // AI picks both actions
     const playerAction = aiPlanAction(battle, true);
@@ -151,7 +169,7 @@ async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void
       endTurn(battle);
     }
 
-    await delay(750);
+    await delay(250);
   }
 }
 

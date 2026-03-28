@@ -70,9 +70,10 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 
-    // Fight and surrender
+    // Fight and surrender (enemy list → detail → Fight! → surrender)
     await page.getByTestId("choice-fight").click();
     await page.getByTestId("choice-MiniBot").click();
+    await page.getByTestId("choice-fight").click(); // Fight! on detail screen
     await page.getByTestId("choice-surrender").click();
     await page.getByTestId("choice-yes").click();
     await page.getByTestId("text-input").press("Enter"); // dismiss battle result

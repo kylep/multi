@@ -5,11 +5,19 @@ describe("loadAssets", () => {
   const registry = loadAssets();
 
   it("loads weapons", () => {
-    expect(registry.weapons.size).toBeGreaterThanOrEqual(6);
+    expect(registry.weapons.size).toBeGreaterThanOrEqual(7);
     const stick = registry.weapons.get("Stick")!;
     expect(stick.damage).toBe(1);
     expect(stick.accuracy).toBe(80);
     expect(stick.hands).toBe(1);
+  });
+
+  it("loads Wrench weapon", () => {
+    const wrench = registry.weapons.get("Wrench")!;
+    expect(wrench.damage).toBe(2);
+    expect(wrench.accuracy).toBe(90);
+    expect(wrench.energyCost).toBe(2);
+    expect(wrench.moneyCost).toBe(75);
   });
 
   it("loads gear including Wooden Armor (not nested under Cardboard)", () => {

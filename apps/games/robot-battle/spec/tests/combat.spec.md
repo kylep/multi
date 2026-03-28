@@ -43,7 +43,7 @@
 ## E2E Tests (tests/e2e/combat.spec.ts)
 
 ### Start Battle
-- Navigate: name robot → shop → buy Stick → back → fight → MiniBot
+- Navigate: name robot → fight → MiniBot (player starts with free Stick)
 - Verify: "FIGHT #1: vs MiniBot" and "Turn 1" visible
 
 ### Attack
@@ -57,3 +57,24 @@
 ### Rest
 - Click Rest
 - Verify: "You prepare to rest..." visible
+
+### Enemy select shows difficulty tags
+- Navigate to fight menu
+- Verify: difficulty tag visible (e.g. "[Fair]" for MiniBot at level 1)
+
+### Enemy detail screen
+- Click an enemy from the list
+- Verify: detail screen shows HP, dodge, defence, weapon name + damage, reward
+- Verify: Fight and Back buttons visible
+- Click Back → returns to enemy list
+
+### Loss earns $10 consolation
+- Start with $100, surrender a fight
+- Verify: money is $110 after returning to main menu
+
+### HP clamp in battle summary
+- Battle summary never shows negative HP values
+
+### Level-up unlock preview
+- Win enough fights to approach level 2
+- Verify: after a win, "Next level:" text shows upcoming item unlocks

@@ -9,6 +9,7 @@ import {
   executeRest,
   planAttack,
   planRest,
+  recordTurnSnapshot,
   resolveTurn,
   useConsumable,
 } from "../../src/engine/battle";
@@ -216,6 +217,18 @@ describe("checkVictory", () => {
   it("returns null when both alive", () => {
     const battle = createBattle(makeRobot(), makeRobot());
     expect(checkVictory(battle)).toBeNull();
+  });
+});
+
+describe("recordTurnSnapshot", () => {
+  it("clamps HP to 0 (never negative)", () => {
+    const battle = createBattle(makeRobot(), makeRobot());
+    battle.player.currentHealth = -5;
+    battle.enemy.currentHealth = -3;
+    recordTurnSnapshot(battle);
+    const snap = battle.turnHistory[0];
+    expect(snap.playerHp).toBe(0);
+    expect(snap.enemyHp).toBe(0);
   });
 });
 

@@ -157,7 +157,7 @@ function itemSummary(item: Item): string {
     if (c.enemyDodgeReduction) parts.push(`-${c.enemyDodgeReduction} Dodge`);
     return parts.length ? parts.join(", ") : item.description;
   }
-  return item.description;
+  return "";
 }
 
 function showItemDetails(terminal: Terminal, item: Item): void {

@@ -9,6 +9,15 @@
       "hands": 1,
       "description": "It's just a stick. Hard to use and not very strong."
     },
+    "Wrench": {
+      "level": 0,
+      "damage": 2,
+      "moneyCost": 75,
+      "energyCost": 2,
+      "accuracy": 90,
+      "hands": 1,
+      "description": "A heavy wrench. Hits harder than a stick."
+    },
     "Sword": {
       "level": 2,
       "damage": 10,

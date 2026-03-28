@@ -32,6 +32,10 @@
 - Verify: item descriptions and stat summaries visible in the list
   (e.g. "1 dmg, 80% acc" for Stick)
 
+### Buy menu includes Wrench
+- Open Buy menu at level 0
+- Verify: Wrench listed with "2 dmg, 90% acc, 2 energy, 1h"
+
 ### Buy a Stick
 - Click Buy → click Stick button
 - Verify: "Bought Stick for $50" message

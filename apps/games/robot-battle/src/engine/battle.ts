@@ -240,9 +240,9 @@ export function checkVictory(battle: BattleState): "player" | "enemy" | null {
 export function recordTurnSnapshot(battle: BattleState): void {
   const snapshot: TurnSnapshot = {
     turn: battle.turnNumber,
-    playerHp: battle.player.currentHealth,
+    playerHp: Math.max(0, battle.player.currentHealth),
     playerMaxHp: getEffectiveMaxHealth(battle.player.robot),
-    enemyHp: battle.enemy.currentHealth,
+    enemyHp: Math.max(0, battle.enemy.currentHealth),
     enemyMaxHp: getEffectiveMaxHealth(battle.enemy.robot),
   };
   battle.turnHistory.push(snapshot);

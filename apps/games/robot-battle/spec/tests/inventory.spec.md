@@ -23,7 +23,7 @@
 ## Unit Tests (tests/unit/data.test.ts)
 
 ### Load Assets
-- Loads all 6 weapons
+- Loads all 7 weapons (including Wrench)
 - Loads gear including Wooden Armor (fixed nesting bug from YAML)
 - Loads consumables (Repair Kit, Grenade, Throwing Net)
 - Loads 3 enemies
