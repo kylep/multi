@@ -16,7 +16,6 @@ ideas = {
 				political_power_gain = 3
 				stability_factor = 0.25
 				war_support_factor = 0.25
-				research_slots = 1
 			}
 		}
 	}
