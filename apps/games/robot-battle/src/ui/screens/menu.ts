@@ -50,8 +50,9 @@ export async function mainMenu(
       await shopScreen(terminal, state);
       save?.();
     } else if (choice === "inspect") {
+      terminal.clear();
       await showRobotStats(terminal, state);
-      await terminal.promptContinue(0);
+      await terminal.promptChoice("", [{ label: "Back", value: "back" }], "row");
     }
   }
 }

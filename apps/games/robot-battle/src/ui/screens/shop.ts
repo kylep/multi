@@ -7,27 +7,13 @@ import { buyItem, canBuy, getSellPrice, listAvailableItems, sellItem } from "../
 import { getEffectiveMaxEnergy, getEffectiveMaxHealth } from "../../engine/robot";
 import { showRobotStats } from "./inspect";
 
-function shopHeader(terminal: Terminal, state: GameState, activeTab: string): void {
+function shopHeader(terminal: Terminal, state: GameState, label: string): void {
   const player = state.player!;
   const invFull = player.inventory.length >= player.inventorySize;
   const invClass = invFull ? "t-red t-bold" : "";
   terminal.printHTML(
-    `<div class="panel-header" style="margin-bottom:0"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${player.inventory.length}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
+    `<div class="panel-header"><span class="t-yellow t-bold">${label}</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${player.inventory.length}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
   );
-  // Only show static tab bar on sub-screens (buy/sell)
-  if (activeTab) {
-    const tabs = ["Buy", "Sell", "Back"];
-    const tabHtml = tabs.map((t) => {
-      const val = t.toLowerCase();
-      const isActive = val === activeTab;
-      const isBack = val === "back";
-      let cls = "btn";
-      if (isActive) cls += " btn-primary";
-      else if (isBack) cls += " btn-secondary";
-      return `<span class="${cls}" style="display:inline-block;padding:4px 16px;margin:0 4px 0 0;cursor:default;font-size:14px">${t}</span>`;
-    }).join("");
-    terminal.printHTML(`<div style="margin:2px 0 8px 0">${tabHtml}</div>`);
-  }
 }
 
 export async function shopScreen(terminal: Terminal, state: GameState): Promise<void> {
@@ -38,8 +24,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
     player.energy = getEffectiveMaxEnergy(player);
 
     terminal.clear();
-    shopHeader(terminal, state, "");
-    // Main shop: tabs are the interactive choices (no static tab bar)
+    shopHeader(terminal, state, "SHOP");
     const choice = await terminal.promptChoice("", [
       { label: "Buy", value: "buy" },
       { label: "Sell", value: "sell" },
@@ -51,8 +36,10 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
     if (choice === "buy") await buyMenu(terminal, state);
     else if (choice === "sell") await sellMenu(terminal, state);
     else if (choice === "inventory") {
+      terminal.clear();
+      shopHeader(terminal, state, "INVENTORY");
       await showRobotStats(terminal, state);
-      await terminal.promptContinue(0);
+      await terminal.promptChoice("", [{ label: "Back to Shop", value: "back" }], "row");
     }
   }
 }
@@ -62,7 +49,7 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
 
   while (true) {
     terminal.clear();
-    shopHeader(terminal, state, "buy");
+    shopHeader(terminal, state, "BUY");
 
     const available = listAvailableItems(state);
 
@@ -103,7 +90,7 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
 
   while (true) {
     terminal.clear();
-    shopHeader(terminal, state, "sell");
+    shopHeader(terminal, state, "SELL");
 
     if (player.inventory.length === 0) {
       terminal.print("(No items to sell)", "t-dim");

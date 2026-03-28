@@ -79,7 +79,7 @@
     },
     "Wooden Armor": {
       "level": 2,
-      "moneyCost": 100,
+      "moneyCost": 600,
       "healthBonus": 25,
       "description": "This armor was a tree once. The lorax disapproves."
     },
