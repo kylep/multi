@@ -41,7 +41,7 @@ export async function mainMenu(
       save?.();
     } else if (choice === "inspect") {
       await showRobotStats(terminal, state);
-      await terminal.promptText("Press Enter to continue...");
+      await terminal.promptContinue();
     }
   }
 }

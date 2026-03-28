@@ -57,6 +57,6 @@ test.describe("Main Menu", () => {
 
     // Should be back at title screen with Continue option
     await expect(page.getByText("ROBOT BATTLE")).toBeVisible();
-    await expect(page.locator("button", { hasText: "Continue" })).toBeVisible();
+    await expect(page.getByText("Continue")).toBeVisible();
   });
 });

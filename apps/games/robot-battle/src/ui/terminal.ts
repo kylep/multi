@@ -10,35 +10,25 @@ export interface Terminal {
   clear(): void;
   promptText(prompt: string): Promise<string>;
   promptChoice(prompt: string, choices: Choice[]): Promise<string>;
+  promptContinue(seconds?: number): Promise<void>;
 }
 
 export function createDomTerminal(root: HTMLElement): Terminal {
-  // Create output area
   const output = document.createElement("div");
   output.className = "terminal-output";
   output.setAttribute("data-testid", "terminal-output");
   root.appendChild(output);
 
-  // Placeholder for input area (swapped per prompt)
-  let inputArea: HTMLElement | null = null;
-
-  function removeInputArea(): void {
-    if (inputArea) {
-      inputArea.remove();
-      inputArea = null;
-    }
-  }
-
   function scrollToBottom(): void {
+    // Scroll both the output div and the window
     output.scrollTop = output.scrollHeight;
+    window.scrollTo(0, document.body.scrollHeight);
   }
 
   const terminal: Terminal = {
     print(text: string, cssClass?: string): void {
       const line = document.createElement("div");
-      if (cssClass) {
-        line.className = cssClass;
-      }
+      if (cssClass) line.className = cssClass;
       line.textContent = text;
       output.appendChild(line);
       scrollToBottom();
@@ -50,8 +40,6 @@ export function createDomTerminal(root: HTMLElement): Terminal {
 
     promptText(prompt: string): Promise<string> {
       return new Promise((resolve) => {
-        removeInputArea();
-
         const wrapper = document.createElement("div");
         wrapper.className = "terminal-input-line";
         wrapper.setAttribute("data-testid", "text-prompt");
@@ -67,57 +55,173 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         input.setAttribute("data-testid", "text-input");
         wrapper.appendChild(input);
 
-        root.appendChild(wrapper);
-        inputArea = wrapper;
+        output.appendChild(wrapper);
         input.focus();
+
+        // Refocus on any keypress if input lost focus
+        const refocus = (e: KeyboardEvent) => {
+          if (document.activeElement !== input && e.key.length === 1) {
+            input.focus();
+          }
+        };
+        document.addEventListener("keydown", refocus);
 
         input.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
             e.preventDefault();
+            document.removeEventListener("keydown", refocus);
             const value = input.value;
-            // Echo the prompt + answer into output
+            // Replace input with echoed text
+            wrapper.remove();
             terminal.print(`${prompt}${value}`);
-            removeInputArea();
             resolve(value);
           }
         });
+
+        scrollToBottom();
       });
     },
 
     promptChoice(prompt: string, choices: Choice[]): Promise<string> {
       return new Promise((resolve) => {
-        removeInputArea();
+        if (prompt) terminal.print(prompt);
 
-        // Print the prompt text
-        if (prompt) {
-          terminal.print(prompt);
-        }
+        const list = document.createElement("div");
+        list.className = "terminal-choice-list";
+        list.setAttribute("data-testid", "choice-prompt");
 
-        const wrapper = document.createElement("div");
-        wrapper.className = "terminal-choices";
-        wrapper.setAttribute("data-testid", "choice-prompt");
+        let selectedIndex = 0;
 
-        for (const choice of choices) {
-          const btn = document.createElement("button");
-          btn.className = "terminal-choice";
-          btn.textContent = choice.label;
-          btn.setAttribute("data-testid", `choice-${choice.value}`);
-          btn.addEventListener("click", () => {
-            terminal.print(`> ${choice.label}`);
-            removeInputArea();
-            resolve(choice.value);
+        const items: HTMLDivElement[] = [];
+        for (let i = 0; i < choices.length; i++) {
+          const item = document.createElement("div");
+          item.className = "terminal-choice-item";
+          item.setAttribute("data-testid", `choice-${choices[i].value}`);
+          item.textContent = choices[i].label;
+
+          item.addEventListener("click", () => {
+            selectedIndex = i;
+            updateSelection();
+            confirm();
           });
-          wrapper.appendChild(btn);
+
+          list.appendChild(item);
+          items.push(item);
         }
 
-        root.appendChild(wrapper);
-        inputArea = wrapper;
+        output.appendChild(list);
 
-        // Focus first button for keyboard nav (defer to avoid Enter keyup from prior input)
+        function updateSelection(): void {
+          for (let i = 0; i < items.length; i++) {
+            items[i].classList.toggle("selected", i === selectedIndex);
+            // Show > marker for selected item
+            const choice = choices[i];
+            if (i === selectedIndex) {
+              items[i].textContent = `> ${choice.label}`;
+            } else {
+              items[i].textContent = `  ${choice.label}`;
+            }
+          }
+          // Scroll selected item into view
+          items[selectedIndex]?.scrollIntoView({ block: "nearest" });
+        }
+
+        function confirm(): void {
+          document.removeEventListener("keydown", onKey);
+          const selected = choices[selectedIndex];
+          // Freeze the list as history (remove interactivity)
+          for (const item of items) {
+            item.style.cursor = "default";
+            item.replaceWith(item.cloneNode(true));
+          }
+          resolve(selected.value);
+          scrollToBottom();
+        }
+
+        function onKey(e: KeyboardEvent): void {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex + 1) % choices.length;
+            updateSelection();
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + choices.length) % choices.length;
+            updateSelection();
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            confirm();
+          } else if (e.key === "Escape") {
+            const backIdx = choices.findIndex((c) => c.value === "back");
+            if (backIdx !== -1) {
+              selectedIndex = backIdx;
+              updateSelection();
+              confirm();
+            }
+          } else if (e.key >= "1" && e.key <= "9") {
+            const num = parseInt(e.key, 10) - 1;
+            if (num < choices.length) {
+              selectedIndex = num;
+              updateSelection();
+              confirm();
+            }
+          }
+        }
+
+        // Defer to avoid Enter keyup from prior prompt
         requestAnimationFrame(() => {
-          const firstBtn = wrapper.querySelector("button");
-          if (firstBtn) firstBtn.focus();
+          updateSelection();
+          document.addEventListener("keydown", onKey);
         });
+
+        scrollToBottom();
+      });
+    },
+
+    promptContinue(seconds = 5): Promise<void> {
+      return new Promise((resolve) => {
+        const btn = document.createElement("div");
+        btn.className = "terminal-continue";
+        btn.setAttribute("data-testid", "choice-continue");
+        let remaining = seconds;
+        btn.textContent = `[Continue ${remaining}]`;
+
+        output.appendChild(btn);
+        scrollToBottom();
+
+        let resolved = false;
+
+        function done(): void {
+          if (resolved) return;
+          resolved = true;
+          clearInterval(timer);
+          document.removeEventListener("keydown", onKey);
+          btn.textContent = "[Continue]";
+          btn.style.cursor = "default";
+          resolve();
+        }
+
+        const timer = setInterval(() => {
+          remaining -= 1;
+          if (remaining <= 0) {
+            done();
+          } else {
+            btn.textContent = `[Continue ${remaining}]`;
+          }
+        }, 1000);
+
+        function onKey(e: KeyboardEvent): void {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            done();
+          }
+        }
+
+        // Defer to avoid Enter from prior action
+        requestAnimationFrame(() => {
+          document.addEventListener("keydown", onKey);
+        });
+
+        btn.addEventListener("click", done);
       });
     },
   };

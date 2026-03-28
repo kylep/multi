@@ -108,8 +108,8 @@ test.describe("Combat", () => {
     await enterGameWithWeapon(page);
     await page.getByTestId("choice-fight").click();
 
-    await expect(page.locator("button", { hasText: "[Fair]" })).toBeVisible();
-    await expect(page.locator("button", { hasText: "[Hard]" })).toBeVisible();
+    await expect(page.getByText("[Fair]")).toBeVisible();
+    await expect(page.getByText("[Hard]")).toBeVisible();
   });
 
   test("enemy detail screen shows stats and weapons", async ({ page }) => {
@@ -117,7 +117,6 @@ test.describe("Combat", () => {
     await page.getByTestId("choice-fight").click();
     await page.getByTestId("choice-MiniBot").click();
 
-    // Detail screen
     await expect(page.getByText("=== MiniBot ===")).toBeVisible();
     await expect(page.getByText("HP: 15 | Dodge: 0 | Defence: 0")).toBeVisible();
     await expect(page.getByText("Weapons: Stick (1 dmg)")).toBeVisible();
@@ -131,10 +130,8 @@ test.describe("Combat", () => {
     await page.getByTestId("choice-fight").click();
     await page.getByTestId("choice-MiniBot").click();
 
-    // On detail screen, click Back
     await page.getByTestId("choice-back").click();
 
-    // Should be back at enemy list
     await expect(page.getByText("CHOOSE YOUR OPPONENT")).toBeVisible();
     await expect(page.getByTestId("choice-MiniBot")).toBeVisible();
   });
@@ -147,7 +144,7 @@ test.describe("Combat", () => {
     await page.getByTestId("choice-yes").click();
 
     await expect(page.getByText("+$10 consolation")).toBeVisible();
-    await page.getByTestId("text-input").press("Enter");
+    await page.getByTestId("choice-continue").click();
 
     await page.getByTestId("choice-inspect").click();
     await expect(page.getByText("Money: $110")).toBeVisible();
@@ -163,5 +160,46 @@ test.describe("Combat", () => {
     ).toBeVisible({ timeout: 30000 });
 
     await expect(page.getByText("Next level unlocks:")).toBeVisible();
+  });
+
+  test("keyboard arrow nav works on choices", async ({ page }) => {
+    await enterGameWithWeapon(page);
+
+    // Wait for keyboard listener to attach (requestAnimationFrame)
+    await page.waitForTimeout(100);
+
+    // Arrow down to Shop (index 1), then Enter
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    await expect(page.getByText("=== SHOP ===")).toBeVisible();
+  });
+
+  test("number key shortcut selects choice", async ({ page }) => {
+    await enterGameWithWeapon(page);
+
+    await page.waitForTimeout(100);
+
+    // Press "2" to go to Shop
+    await page.keyboard.press("2");
+
+    await expect(page.getByText("=== SHOP ===")).toBeVisible();
+  });
+
+  test("continue countdown auto-dismisses", async ({ page }) => {
+    await enterGameWithWeapon(page);
+    await startBattle(page, "MiniBot");
+
+    await page.getByTestId("choice-surrender").click();
+    await page.getByTestId("choice-yes").click();
+
+    // Wait for continue countdown (should show [Continue X])
+    await expect(page.getByTestId("choice-continue")).toBeVisible();
+
+    // Wait 6 seconds for auto-dismiss
+    await page.waitForTimeout(6000);
+
+    // Should be back at main menu
+    await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 5000 });
   });
 });

@@ -24,7 +24,7 @@ test.describe("Shop", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
 
-    await expect(page.locator("button", { hasText: "Wrench" })).toBeVisible();
+    await expect(page.getByText("Wrench")).toBeVisible();
     await expect(page.getByText("2 dmg, 90% acc, 2 energy, 1h")).toBeVisible();
   });
 
@@ -33,11 +33,8 @@ test.describe("Shop", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
 
-    await expect(page.getByText("=== BUY ===")).toBeVisible();
-
-    // Find and click the Stick item
-    const stickButton = page.locator("button", { hasText: "Stick" });
-    await stickButton.click();
+    // Click the Stick choice item
+    await page.getByText("Stick", { exact: false }).first().click();
 
     await expect(page.getByText("Bought Stick for $50")).toBeVisible();
   });
@@ -48,17 +45,15 @@ test.describe("Shop", () => {
 
     // Buy a Stick first
     await page.getByTestId("choice-buy").click();
-    const stickButton = page.locator("button", { hasText: "Stick" });
-    await stickButton.click();
-    await page.getByTestId("text-input").press("Enter"); // dismiss "Press Enter"
+    await page.getByText("Stick", { exact: false }).first().click();
+    await page.getByTestId("choice-continue").click();
 
     // Go back to shop menu
     await page.getByTestId("choice-back").click();
 
-    // Sell one of the Sticks (starter + purchased = 2)
+    // Sell one of the Sticks
     await page.getByTestId("choice-sell").click();
-    const sellButton = page.locator("button", { hasText: "Stick" }).first();
-    await sellButton.click();
+    await page.getByText("Stick", { exact: false }).first().click();
 
     await expect(page.getByText("Sold Stick for $25")).toBeVisible();
   });

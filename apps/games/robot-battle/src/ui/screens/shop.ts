@@ -33,7 +33,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
     else if (choice === "sell") await sellMenu(terminal, state);
     else if (choice === "inventory") {
       await showRobotStats(terminal, state);
-      await terminal.promptText("Press Enter to continue...");
+      await terminal.promptContinue();
     }
   }
 }
@@ -50,19 +50,13 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
 
     const available = listAvailableItems(state);
 
+    const choices: Choice[] = [{ label: "B. Back", value: "back" }];
     for (let i = 0; i < available.length; i++) {
       const item = available[i];
       const check = canBuy(state, item);
       const status = check.ok ? "" : ` [${check.reason}]`;
-      terminal.print(`${i + 1}. ${item.name} - $${item.moneyCost}${status}`);
-      terminal.print(`   ${itemSummary(item)}`, "t-dim");
-    }
-    terminal.print("");
-
-    const choices: Choice[] = [{ label: "B. Back", value: "back" }];
-    for (let i = 0; i < available.length; i++) {
       choices.push({
-        label: `${i + 1}. ${available[i].name} - $${available[i].moneyCost}`,
+        label: `${i + 1}. ${item.name} - $${item.moneyCost}${status}\n     ${itemSummary(item)}`,
         value: String(i),
       });
     }
@@ -81,7 +75,7 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
         terminal.print(result.message, "t-red");
       }
       showItemDetails(terminal, item);
-      await terminal.promptText("Press Enter to continue...");
+      await terminal.promptContinue();
     }
   }
 }
@@ -98,7 +92,7 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
 
     if (player.inventory.length === 0) {
       terminal.print("(No items to sell)");
-      await terminal.promptText("Press Enter to go back...");
+      await terminal.promptContinue();
       break;
     }
 
@@ -124,7 +118,7 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
       } else {
         terminal.print(result.message, "t-red");
       }
-      await terminal.promptText("Press Enter to continue...");
+      await terminal.promptContinue();
     }
   }
 }

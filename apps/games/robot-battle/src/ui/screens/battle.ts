@@ -77,7 +77,7 @@ export async function battleScreen(
       endTurn(battle);
     }
 
-    await terminal.promptText("Press Enter to continue...");
+    await terminal.promptContinue();
   }
 
   // Battle ended
@@ -122,7 +122,7 @@ export async function battleScreen(
   player.health = getEffectiveMaxHealth(player);
   player.energy = getEffectiveMaxEnergy(player);
 
-  await terminal.promptText("Press Enter to continue...");
+  await terminal.promptContinue();
 }
 
 function printNextLevelPreview(terminal: Terminal, state: GameState): void {
