@@ -235,13 +235,19 @@ async function playerTurn(
   const suggested = aiPlanAction(battle, true);
 
   while (true) {
-    const choice = await terminal.promptChoice("Choose your action:", [
-      { label: "1. Attack", value: "attack" },
-      { label: "2. Use Item", value: "item" },
-      { label: "3. Rest", value: "rest" },
-      { label: "4. Surrender", value: "surrender" },
-      { label: "5. Auto-Battle", value: "auto" },
-    ]);
+    const hasWeapons = getWeapons(player.robot).length > 0;
+    const hasConsumables = getConsumables(player.robot).some(
+      (c) => !player.consumablesUsed.includes(c.name),
+    );
+
+    const choices: Choice[] = [];
+    choices.push({ label: hasWeapons ? "1. Attack" : "1. Attack (no weapons)", value: "attack" });
+    choices.push({ label: hasConsumables ? "2. Use Item" : "2. Use Item (none)", value: "item" });
+    choices.push({ label: "3. Rest", value: "rest" });
+    choices.push({ label: "4. Surrender", value: "surrender" });
+    choices.push({ label: "5. Auto-Battle", value: "auto" });
+
+    const choice = await terminal.promptChoice("Choose your action:", choices);
 
     if (choice === "auto") return "auto";
 
@@ -258,9 +264,17 @@ async function playerTurn(
     }
 
     if (choice === "attack") {
+      if (!hasWeapons) {
+        terminal.print("You have no weapons!", "t-red");
+        continue;
+      }
       const planned = await playerPlanAttack(terminal, battle, suggested);
       if (planned) return "continue";
     } else if (choice === "item") {
+      if (!hasConsumables) {
+        terminal.print("No usable items!", "t-red");
+        continue;
+      }
       await playerUseItem(terminal, battle);
       if (battle.winner) return "continue";
     } else if (choice === "rest") {
