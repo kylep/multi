@@ -20,7 +20,7 @@
     },
     "Sword": {
       "level": 2,
-      "damage": 10,
+      "damage": 5,
       "moneyCost": 150,
       "energyCost": 5,
       "accuracy": 100,
@@ -79,7 +79,7 @@
     },
     "Wooden Armor": {
       "level": 2,
-      "moneyCost": 600,
+      "moneyCost": 100,
       "healthBonus": 25,
       "description": "This armor was a tree once. The lorax disapproves."
     },

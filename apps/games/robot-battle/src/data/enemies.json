@@ -12,20 +12,47 @@
     "Sparky": {
       "level": 3,
       "weapons": ["Shock Rod"],
-      "gear": ["Small Battery", "Small Computer Chip"],
+      "gear": ["Cardboard Armor", "Small Battery", "Small Computer Chip"],
       "consumables": [],
       "reward": 80,
       "expReward": 3,
       "description": "A hyperactive robot that crackles with electricity. Zap zap!"
     },
+    "Rustclaw": {
+      "level": 4,
+      "weapons": ["Wrench", "Wrench"],
+      "gear": ["Cardboard Armor", "Third Arm", "Propeller"],
+      "consumables": [],
+      "reward": 120,
+      "expReward": 4,
+      "description": "A scrappy junkyard bot with two wrenches and a propeller. Double trouble!"
+    },
     "Firebot": {
       "level": 5,
       "weapons": ["Flame Thrower"],
-      "gear": ["Gold Computer Chip"],
+      "gear": ["Wooden Armor", "Gold Computer Chip"],
       "consumables": [],
       "reward": 150,
       "expReward": 5,
-      "description": "A shiny robot with a flame thrower."
+      "description": "A shiny robot with a flame thrower. Fire hot."
+    },
+    "Voltank": {
+      "level": 7,
+      "weapons": ["Sawed-off Shotgun", "Shock Rod"],
+      "gear": ["Wooden Armor", "Medium Battery", "Fourth Arm", "Small Computer Chip", "Shotgun Shell"],
+      "consumables": [],
+      "reward": 250,
+      "expReward": 7,
+      "description": "A heavily armored tank with a shotgun. Watch out for the blast!"
+    },
+    "Omega": {
+      "level": 10,
+      "weapons": ["Lightsabre"],
+      "gear": ["Big Battery", "Gold Computer Chip", "Power Chip"],
+      "consumables": ["Grenade"],
+      "reward": 500,
+      "expReward": 10,
+      "description": "The ultimate fighting machine. Bzzzzt."
     }
   }
 }

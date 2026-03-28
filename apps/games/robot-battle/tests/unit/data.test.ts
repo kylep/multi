@@ -32,10 +32,13 @@ describe("loadAssets", () => {
   });
 
   it("loads enemies", () => {
-    expect(registry.enemies.size).toBe(3);
+    expect(registry.enemies.size).toBe(6);
     expect(registry.enemies.has("MiniBot")).toBe(true);
     expect(registry.enemies.has("Sparky")).toBe(true);
+    expect(registry.enemies.has("Rustclaw")).toBe(true);
     expect(registry.enemies.has("Firebot")).toBe(true);
+    expect(registry.enemies.has("Voltank")).toBe(true);
+    expect(registry.enemies.has("Omega")).toBe(true);
   });
 
   it("loads config defaults", () => {

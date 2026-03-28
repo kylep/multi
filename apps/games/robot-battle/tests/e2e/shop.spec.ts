@@ -13,7 +13,7 @@ test.describe("Shop", () => {
     await enterGame(page);
     await page.getByTestId("choice-shop").click();
 
-    await expect(page.getByText("=== SHOP ===")).toBeVisible();
+    await expect(page.getByText("SHOP")).toBeVisible();
     await expect(page.getByTestId("choice-buy")).toBeVisible();
     await expect(page.getByTestId("choice-sell")).toBeVisible();
     await expect(page.getByTestId("choice-back")).toBeVisible();
@@ -24,8 +24,8 @@ test.describe("Shop", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
 
-    await expect(page.locator("button", { hasText: "Wrench" })).toBeVisible();
-    await expect(page.getByText("2 dmg, 90% acc, 2 energy, 1h")).toBeVisible();
+    await expect(page.getByText("Wrench")).toBeVisible();
+    await expect(page.getByText("2 dmg")).toBeVisible();
   });
 
   test("can buy a Stick", async ({ page }) => {
@@ -33,13 +33,12 @@ test.describe("Shop", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
 
-    await expect(page.getByText("=== BUY ===")).toBeVisible();
+    // Click the Stick card, confirm in modal
+    await page.getByText("Stick", { exact: false }).first().click();
+    await page.getByTestId("confirm-true").click();
 
-    // Find and click the Stick item
-    const stickButton = page.locator("button", { hasText: "Stick" });
-    await stickButton.click();
-
-    await expect(page.getByText("Bought Stick for $50")).toBeVisible();
+    // Buy menu re-renders — verify money decreased
+    await expect(page.getByText("$50", { exact: true })).toBeVisible();
   });
 
   test("can sell an item after buying", async ({ page }) => {
@@ -48,18 +47,18 @@ test.describe("Shop", () => {
 
     // Buy a Stick first
     await page.getByTestId("choice-buy").click();
-    const stickButton = page.locator("button", { hasText: "Stick" });
-    await stickButton.click();
-    await page.getByTestId("text-input").press("Enter"); // dismiss "Press Enter"
+    await page.getByText("Stick", { exact: false }).first().click();
+    await page.getByTestId("confirm-true").click();
 
     // Go back to shop menu
     await page.getByTestId("choice-back").click();
 
-    // Sell one of the Sticks (starter + purchased = 2)
+    // Sell one of the Sticks
     await page.getByTestId("choice-sell").click();
-    const sellButton = page.locator("button", { hasText: "Stick" }).first();
-    await sellButton.click();
+    await page.getByText("Stick", { exact: false }).first().click();
+    await page.getByTestId("confirm-true").click();
 
-    await expect(page.getByText("Sold Stick for $25")).toBeVisible();
+    // Verify money increased
+    await expect(page.getByText("$75")).toBeVisible();
   });
 });

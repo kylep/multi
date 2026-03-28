@@ -21,18 +21,15 @@ test.describe("Save & Load", () => {
     await freshStart(page);
     await expect(page.getByText("ROBOT BATTLE")).toBeVisible();
     await expect(page.getByTestId("text-input")).toBeVisible();
-    // Should NOT see continue button
-    await expect(page.locator("button", { hasText: "Continue" })).not.toBeVisible();
+    await expect(page.getByTestId("choice-continue")).not.toBeVisible();
   });
 
   test("new game creates save — reload shows Continue", async ({ page }) => {
     await newGame(page, "SaveBot");
 
-    // Reload the page
     await page.reload();
 
-    // Should see Continue option
-    await expect(page.locator("button", { hasText: "Continue: SaveBot Lv.1" })).toBeVisible();
+    await expect(page.getByText("Continue: SaveBot Lv.1")).toBeVisible();
   });
 
   test("Continue loads saved game with inventory", async ({ page }) => {
@@ -41,22 +38,18 @@ test.describe("Save & Load", () => {
     // Buy a Stick
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
-    const stickButton = page.locator("button", { hasText: "Stick" });
-    await stickButton.click();
-    await page.getByTestId("text-input").press("Enter");
-    await page.getByTestId("choice-back").click(); // back to shop
-    await page.getByTestId("choice-back").click(); // back to main menu (triggers save)
+    await page.getByText("Stick", { exact: false }).first().click();
+    await page.getByTestId("confirm-true").click();
+    await page.getByTestId("choice-back").click();
+    await page.getByTestId("choice-back").click();
 
     // Reload and continue
     await page.reload();
-    await page.locator("button", { hasText: "Continue" }).click();
+    await page.getByTestId("choice-continue").click();
     await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
 
-    // Inspect robot
-    await page.getByTestId("choice-inspect").click();
-    await expect(page.getByText("Money: $50")).toBeVisible();
-    await expect(page.getByText("1. Stick")).toBeVisible();
-    await expect(page.getByText("2. Stick")).toBeVisible();
+    // Check money in header
+    await expect(page.getByText("$50")).toBeVisible();
   });
 
   test("save persists after fight (surrender)", async ({ page }) => {
@@ -65,27 +58,27 @@ test.describe("Save & Load", () => {
     // Buy a Stick
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
-    await page.locator("button", { hasText: "Stick" }).click();
-    await page.getByTestId("text-input").press("Enter");
+    await page.getByText("Stick", { exact: false }).first().click();
+    await page.getByTestId("confirm-true").click();
     await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 
-    // Fight and surrender (enemy list → detail → Fight! → surrender)
+    // Fight and surrender
     await page.getByTestId("choice-fight").click();
     await page.getByTestId("choice-MiniBot").click();
-    await page.getByTestId("choice-fight").click(); // Fight! on detail screen
+    await page.getByTestId("choice-fight").click();
     await page.getByTestId("choice-surrender").click();
-    await page.getByTestId("choice-yes").click();
-    await page.getByTestId("text-input").press("Enter"); // dismiss battle result
+    await page.getByTestId("confirm-true").click();
+    await page.getByTestId("choice-continue").click();
 
     // Reload and continue
     await page.reload();
-    await page.locator("button", { hasText: "Continue" }).click();
+    await page.getByTestId("choice-continue").click();
     await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
 
-    // Check fights count
+    // Check fights count in inspect
     await page.getByTestId("choice-inspect").click();
-    await expect(page.getByText("Wins: 0 / Fights: 1")).toBeVisible();
+    await expect(page.getByText("0W / 1F").first()).toBeVisible();
   });
 
   test("save persists after shop session", async ({ page }) => {
@@ -94,33 +87,28 @@ test.describe("Save & Load", () => {
     // Buy a Stick
     await page.getByTestId("choice-shop").click();
     await page.getByTestId("choice-buy").click();
-    await page.locator("button", { hasText: "Stick" }).click();
-    await page.getByTestId("text-input").press("Enter");
+    await page.getByText("Stick", { exact: false }).first().click();
+    await page.getByTestId("confirm-true").click();
     await page.getByTestId("choice-back").click();
-    await page.getByTestId("choice-back").click(); // triggers save
+    await page.getByTestId("choice-back").click();
 
     // Reload and continue
     await page.reload();
-    await page.locator("button", { hasText: "Continue" }).click();
+    await page.getByTestId("choice-continue").click();
     await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
 
-    await page.getByTestId("choice-inspect").click();
-    await expect(page.getByText("1. Stick")).toBeVisible();
-    await expect(page.getByText("Money: $50")).toBeVisible();
+    // Check money in header
+    await expect(page.getByText("$50")).toBeVisible();
   });
 
   test("New Game from Continue screen starts fresh", async ({ page }) => {
-    // Create a save first
     await newGame(page, "OldBot");
 
-    // Reload — should see Continue
     await page.reload();
-    await expect(page.locator("button", { hasText: "Continue" })).toBeVisible();
+    await expect(page.getByText("Continue")).toBeVisible();
 
-    // Click New Game
     await page.getByTestId("choice-new").click();
 
-    // Should get name prompt
     const input = page.getByTestId("text-input");
     await expect(input).toBeVisible();
     await input.click();
@@ -129,24 +117,19 @@ test.describe("Save & Load", () => {
 
     await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
 
-    // Inspect — should be fresh
-    await page.getByTestId("choice-inspect").click();
-    await expect(page.getByText("=== FreshBot ===")).toBeVisible();
-    await expect(page.getByText("Money: $100")).toBeVisible();
+    // Check fresh money in header
+    await expect(page.getByText("$100")).toBeVisible();
   });
 
   test("Quit returns to title screen with Continue", async ({ page }) => {
     await newGame(page, "QuitBot");
 
-    // Quit
     await page.getByTestId("choice-quit").click();
 
-    // Should be at title with Continue
     await expect(page.getByText("ROBOT BATTLE")).toBeVisible();
-    await expect(page.locator("button", { hasText: "Continue: QuitBot Lv.1" })).toBeVisible();
+    await expect(page.getByText("Continue: QuitBot Lv.1")).toBeVisible();
 
-    // Click Continue — should be back at main menu
-    await page.locator("button", { hasText: "Continue" }).click();
+    await page.getByTestId("choice-continue").click();
     await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
   });
 });

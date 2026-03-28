@@ -13,7 +13,6 @@ async function enterName(page: import("@playwright/test").Page, name: string) {
   await input.click();
   await input.fill(name);
   await page.keyboard.press("Enter");
-  // Wait for main menu choices to appear
   await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
 }
 
@@ -28,7 +27,6 @@ test.describe("Main Menu", () => {
     await input.fill("E2EBot");
     await page.keyboard.press("Enter");
 
-    // Main menu choices appear
     await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
   });
 
@@ -46,8 +44,8 @@ test.describe("Main Menu", () => {
 
     await page.getByTestId("choice-inspect").click();
 
-    await expect(page.getByText("=== E2EBot ===")).toBeVisible();
-    await expect(page.getByText("Money: $100")).toBeVisible();
+    await expect(page.getByText("E2EBot").first()).toBeVisible();
+    await expect(page.getByText("$100").first()).toBeVisible();
   });
 
   test("quit returns to title screen", async ({ page }) => {
@@ -55,8 +53,7 @@ test.describe("Main Menu", () => {
 
     await page.getByTestId("choice-quit").click();
 
-    // Should be back at title screen with Continue option
     await expect(page.getByText("ROBOT BATTLE")).toBeVisible();
-    await expect(page.locator("button", { hasText: "Continue" })).toBeVisible();
+    await expect(page.getByText("Continue")).toBeVisible();
   });
 });
