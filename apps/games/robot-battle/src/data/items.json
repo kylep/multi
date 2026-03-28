@@ -1,0 +1,175 @@
+{
+  "weapons": {
+    "Stick": {
+      "level": 0,
+      "damage": 1,
+      "moneyCost": 50,
+      "energyCost": 1,
+      "accuracy": 80,
+      "hands": 1,
+      "description": "It's just a stick. Hard to use and not very strong."
+    },
+    "Wrench": {
+      "level": 0,
+      "damage": 2,
+      "moneyCost": 75,
+      "energyCost": 2,
+      "accuracy": 90,
+      "hands": 1,
+      "description": "A heavy wrench. Hits harder than a stick."
+    },
+    "Sword": {
+      "level": 2,
+      "damage": 10,
+      "moneyCost": 150,
+      "energyCost": 5,
+      "accuracy": 100,
+      "hands": 2,
+      "description": "Metal single-edged longsword with a sharp blade."
+    },
+    "Sawed-off Shotgun": {
+      "level": 5,
+      "damage": 15,
+      "moneyCost": 300,
+      "energyCost": 0,
+      "accuracy": 150,
+      "hands": 1,
+      "requirements": ["Shotgun Shell"],
+      "description": "A small gauge shotgun. Loud!"
+    },
+    "Flame Thrower": {
+      "level": 5,
+      "damage": 10,
+      "moneyCost": 150,
+      "energyCost": 0,
+      "accuracy": 90,
+      "hands": 2,
+      "description": "Fire hot"
+    },
+    "Shock Rod": {
+      "level": 3,
+      "damage": 5,
+      "moneyCost": 200,
+      "energyCost": 3,
+      "accuracy": 95,
+      "hands": 1,
+      "description": "An electrified rod that delivers a shocking blow. Zap!"
+    },
+    "Lightsabre": {
+      "level": 10,
+      "damage": 30,
+      "moneyCost": 1000,
+      "energyCost": 20,
+      "accuracy": 90,
+      "hands": 2,
+      "description": "A laser sword. Very expensive! Bzzzzt."
+    }
+  },
+  "gear": {
+    "Shotgun Shell": {
+      "level": 5,
+      "moneyCost": 30,
+      "description": "Allows you to fire a Shotgun weapon once. Consumed when fired."
+    },
+    "Cardboard Armor": {
+      "level": 0,
+      "moneyCost": 100,
+      "healthBonus": 5,
+      "description": "Cheapest possible armor for a robot. Even a stick could break it."
+    },
+    "Wooden Armor": {
+      "level": 2,
+      "moneyCost": 600,
+      "healthBonus": 25,
+      "description": "This armor was a tree once. The lorax disapproves."
+    },
+    "Third Arm": {
+      "level": 2,
+      "moneyCost": 150,
+      "handsBonus": 1,
+      "description": "More hands, more weapons"
+    },
+    "Fourth Arm": {
+      "level": 5,
+      "moneyCost": 250,
+      "handsBonus": 1,
+      "requirements": ["Third Arm"],
+      "description": "Even more arms, even more weapons"
+    },
+    "Fifth Arm": {
+      "level": 5,
+      "moneyCost": 350,
+      "handsBonus": 1,
+      "requirements": ["Fourth Arm"],
+      "description": "This is just silly. Who needs 5 arms?"
+    },
+    "Gold Computer Chip": {
+      "level": 3,
+      "moneyCost": 40,
+      "defenceBonus": 1,
+      "description": "A computer chip that teaches the robot how to defend itself. Protect the face!"
+    },
+    "Small Computer Chip": {
+      "level": 3,
+      "moneyCost": 40,
+      "dodgeBonus": 10,
+      "description": "A computer chip that teaches the robot how to dodge. If you can dodge a wrench..."
+    },
+    "Power Chip": {
+      "level": 3,
+      "moneyCost": 60,
+      "attackBonus": 10,
+      "description": "A computer chip that boosts attack power. Your attacks deal 10% more damage!"
+    },
+    "Money Maker": {
+      "level": 0,
+      "moneyCost": 100,
+      "moneyBonusPercent": 20,
+      "description": "Earn more money from winning. It takes money to make money!"
+    },
+    "Propeller": {
+      "level": 1,
+      "moneyCost": 50,
+      "dodgeBonus": 10,
+      "description": "A spinning propeller that helps the robot dodge attacks."
+    },
+    "Small Battery": {
+      "level": 1,
+      "moneyCost": 50,
+      "energyBonus": 5,
+      "description": "A small battery that increases energy capacity."
+    },
+    "Medium Battery": {
+      "level": 4,
+      "moneyCost": 150,
+      "energyBonus": 20,
+      "description": "A medium battery that increases energy capacity."
+    },
+    "Big Battery": {
+      "level": 7,
+      "moneyCost": 350,
+      "energyBonus": 25,
+      "description": "A big battery that increases energy capacity."
+    }
+  },
+  "consumables": {
+    "Repair Kit": {
+      "level": 2,
+      "moneyCost": 30,
+      "healthRestore": 10,
+      "description": "Repairs the robot. Can even leave it stronger than it started (for one battle)."
+    },
+    "Grenade": {
+      "level": 8,
+      "moneyCost": 100,
+      "damage": 30,
+      "description": "A small bomb you can launch at the enemy."
+    },
+    "Throwing Net": {
+      "level": 4,
+      "moneyCost": 100,
+      "enemyDodgeReduction": 30,
+      "description": "It's a net. You throw it. Destroys the net."
+    }
+  }
+}
