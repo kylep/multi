@@ -130,7 +130,11 @@ export function createDomTerminal(root: HTMLElement): Terminal {
           const cards: HTMLDivElement[] = [];
           for (let i = 0; i < choices.length; i++) {
             const card = document.createElement("div");
-            card.className = choices[i].disabled ? "card disabled" : "card";
+            const isBack = choices[i].value === "back";
+            let cardClass = "card";
+            if (choices[i].disabled) cardClass += " disabled";
+            if (isBack) cardClass += " card-back";
+            card.className = cardClass;
             card.setAttribute("data-testid", `choice-${choices[i].value}`);
 
             const title = document.createElement("div");

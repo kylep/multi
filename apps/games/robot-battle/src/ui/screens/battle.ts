@@ -149,18 +149,16 @@ function printNextLevelPreview(terminal: Terminal, state: GameState): void {
 // ── Auto-Battle ──
 
 async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void> {
+  let turnDelay = 250;
   while (battle.winner === null) {
-    // AI picks both actions
     const playerAction = aiPlanAction(battle, true);
     battle.playerAction = playerAction;
     const enemyAction = aiPlanAction(battle, false);
     battle.enemyAction = enemyAction;
 
-    // Resolve
     const rng = createRng();
     resolveTurn(battle, rng);
 
-    // Clear and render everything at once (no blank flash)
     terminal.clear();
     terminal.print("");
     printBattleStatus(terminal, battle);
@@ -173,8 +171,8 @@ async function autoBattle(terminal: Terminal, battle: BattleState): Promise<void
       endTurn(battle);
     }
 
-    // Pause with content visible
-    await delay(175);
+    await delay(turnDelay);
+    turnDelay = Math.max(150, turnDelay - 5);
   }
 }
 
@@ -356,9 +354,11 @@ async function playerPlanAttack(
       });
     }
     // Attack and Back as extra cards in the grid
+    const canAttack = selected.size > 0 && usedHands <= availableHands && usedEnergy <= player.currentEnergy;
     weaponChoices.push({
       label: `Attack (${usedHands}/${availableHands}h, ${usedEnergy} en)`,
       value: "confirm",
+      disabled: !canAttack,
     });
     weaponChoices.push({ label: "Back", value: "back" });
 
