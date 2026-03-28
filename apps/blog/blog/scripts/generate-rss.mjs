@@ -26,8 +26,9 @@ function getPosts() {
   return files.map(f => {
     const raw = fs.readFileSync(path.join(postsDir, f), 'utf8'); // nosemgrep: path-join-resolve-traversal
     const { data } = matter(raw);
-    const slug = f.replace('.md', '');
-    return { slug, ...data };
+    const fileSlug = f.replace('.md', '');
+    const frontmatterSlug = data.slug;
+    return { ...data, slug: fileSlug, frontmatterSlug };
   }).filter(p => p.status !== 'draft' && p.title && p.date);
 }
 
