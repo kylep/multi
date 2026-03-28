@@ -210,6 +210,38 @@ persisted.
 The `version` field allows future migration if the save format changes.
 If the version doesn't match, the save is discarded (treated as no save).
 
+## Versioning
+
+The game uses semver (`MAJOR.MINOR.PATCH`) tracked in `package.json`.
+The version is the single source of truth — no separate version file.
+
+### Display
+
+The version is shown on the title screen below the game title:
+
+```
+=============================
+       ROBOT BATTLE
+=============================
+v0.2.0
+
+[Continue: Bolt Lv.3]  [New Game]
+```
+
+### When to bump
+
+- **PATCH**: bug fixes, balance tweaks, new items/enemies
+- **MINOR**: new features (e.g., new screen, new mechanic)
+- **MAJOR**: breaking save format changes (save version also bumps)
+
+### Cache busting
+
+Vite content-hashes JS/CSS filenames automatically (`index-CjOT3fiV.js`).
+The `index.html` file itself is not hashed — it relies on the serving
+layer (nginx `no-cache` for staging, GCS default for prod). If stale
+HTML becomes a problem, add `Cache-Control: no-cache` to the nginx
+config for `/games/` paths.
+
 ## UI
 
 Browser-based terminal aesthetic — green text on black background, monospace

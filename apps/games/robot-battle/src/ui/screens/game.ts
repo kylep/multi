@@ -6,6 +6,7 @@ import { createGameState, createPlayer } from "../../engine/state";
 import { deleteSave, hasSave, loadGame, saveGame, type SaveStorage } from "../../engine/save";
 import { getEffectiveMaxEnergy, getEffectiveMaxHealth } from "../../engine/robot";
 import { mainMenu } from "./menu";
+import packageJson from "../../../package.json";
 
 export async function startGame(
   terminal: Terminal,
@@ -19,6 +20,7 @@ export async function startGame(
     terminal.print("=============================", "t-yellow t-bold");
     terminal.print("       ROBOT BATTLE", "t-yellow t-bold");
     terminal.print("=============================", "t-yellow t-bold");
+    terminal.print(`v${packageJson.version}`, "t-dim");
     terminal.print("");
 
     const state = createGameState(registry);
