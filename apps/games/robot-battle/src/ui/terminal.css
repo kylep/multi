@@ -86,6 +86,15 @@ body {
   background: #1a3a1a;
 }
 
+.terminal-choice-back {
+  border: 1px solid #ffff33;
+  color: #ffff33;
+  display: inline-block;
+  padding: 4px 16px;
+  margin: 4px 0;
+  border-radius: 4px;
+}
+
 /* Continue button (inline) */
 .terminal-continue {
   display: inline-block;

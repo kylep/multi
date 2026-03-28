@@ -114,7 +114,8 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         const items: HTMLDivElement[] = [];
         for (let i = 0; i < choices.length; i++) {
           const item = document.createElement("div");
-          item.className = "terminal-choice-item";
+          const isBack = choices[i].value === "back";
+          item.className = isBack ? "terminal-choice-item terminal-choice-back" : "terminal-choice-item";
           item.setAttribute("data-testid", `choice-${choices[i].value}`);
           item.textContent = choices[i].label;
 
