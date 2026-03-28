@@ -42,13 +42,45 @@ npx playwright test  # E2E tests (28 tests)
 
 ## Deploy to blog
 
+### Staging (ArgoCD)
+
+Automatic — the blog's initContainer builds the game from source on
+every deploy. Merging to main triggers a rebuild within 5 minutes.
+
+### Production (GCS)
+
 ```bash
-cd apps/games/robot-battle
-bin/deploy-to-blog.sh
+cd ~/gh/multi/apps/games/robot-battle && bin/deploy-to-blog.sh
+cd ~/gh/multi/apps/blog && bin/build-blog-files.sh && bin/prod-deploy.sh
 ```
 
-This builds the game and copies the output to `apps/blog/blog/public/games/robot-battle/`.
-The game is then served at `/games/robot-battle/index.html` on the blog.
+Use absolute paths — `cd` chaining breaks relative paths between
+sub-projects.
+
+### Cache busting
+
+Vite content-hashes JS/CSS filenames, so those are always cache-busted.
+However, `index.html` itself is not hashed. GCS defaults to
+`Cache-Control: public, max-age=3600` (1 hour), and Cloudflare edge
+caches respect that.
+
+After deploying, the old `index.html` may be served for up to an hour.
+To force immediate update:
+
+```bash
+# Force re-upload with no-cache header
+gsutil -h "Cache-Control:no-cache,no-store,must-revalidate" \
+  cp apps/blog/blog/out/games/robot-battle/index.html \
+  gs://kyle.pericak.com/games/robot-battle/index.html
+```
+
+To verify the new version is on GCS (bypassing edge cache):
+```bash
+curl -s "https://kyle.pericak.com/games/robot-battle/index.html?v=bust" | head -8
+```
+
+The `?v=bust` query string bypasses edge cache. Users can also
+hard-refresh (Cmd+Shift+R) once the edge cache expires.
 
 ## Architecture
 
