@@ -331,6 +331,12 @@ async function playerPlanAttack(
   const availableHands = getEffectiveHands(player.robot);
 
   while (true) {
+    // Redraw battle status to avoid stacking weapon lists
+    terminal.clear();
+    terminal.print("");
+    printBattleStatus(terminal, battle);
+    terminal.print("");
+
     const choices: Choice[] = [];
     for (let i = 0; i < weapons.length; i++) {
       const w = weapons[i];
