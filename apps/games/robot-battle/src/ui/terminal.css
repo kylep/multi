@@ -43,16 +43,18 @@ body {
 .panel {
   border: 1px solid #33ff33;
   border-radius: 4px;
-  padding: 12px 16px;
-  margin: 8px 0;
+  padding: 8px 12px;
+  margin: 4px 0;
+  white-space: normal;
 }
 
 .panel-header {
   border: 1px solid #33ff33;
   border-radius: 4px;
-  padding: 10px 16px;
-  margin: 8px 0;
+  padding: 8px 12px;
+  margin: 4px 0;
   background: #0d1a0d;
+  white-space: normal;
 }
 
 /* === Cards — clickable bordered items === */
@@ -89,6 +91,19 @@ body {
 .card.disabled:hover {
   border-color: #1a5a1a;
   background: transparent;
+}
+
+.card-back {
+  border-color: #ffff33;
+  color: #ffff33;
+}
+
+.card-back .card-title {
+  color: #ffff33;
+}
+
+.card-back .card-subtitle {
+  color: #ffff3399;
 }
 
 .card-title {
@@ -153,8 +168,8 @@ body {
 .battle-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 8px 0;
+  gap: 8px;
+  margin: 4px 0;
 }
 
 /* === Text input (name entry) === */
