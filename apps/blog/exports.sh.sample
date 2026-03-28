@@ -43,3 +43,9 @@ export CLOUDFLARE_TUNNEL_TOKEN=""
 # OpenObserve admin credentials (stored in Vault via store-secrets.sh)
 export OPENOBSERVE_ADMIN_EMAIL=""   # e.g. admin@pericak.com
 export OPENOBSERVE_ADMIN_PASSWORD=""
+
+# X/Twitter API — developer.x.com → App → Keys and tokens (OAuth 1.0a)
+export TWITTER_API_KEY=""           # Consumer Key (API Key)
+export TWITTER_API_KEY_SECRET=""    # Consumer Secret (API Key Secret)
+export TWITTER_ACCESS_TOKEN=""      # Access Token
+export TWITTER_ACCESS_TOKEN_SECRET=""  # Access Token Secret

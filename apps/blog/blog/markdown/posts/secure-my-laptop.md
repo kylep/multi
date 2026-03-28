@@ -2,8 +2,8 @@
 title: "@Ralph Secure My Laptop"
 summary: I went on vacation while Claude had bonus tokens. Made my first Ralph-like loop to improve laptop security IaC.
 slug: ralph-secure-my-laptop
-category: dev
-tags: AI-Agents, security, macOS, Ansible, Claude-Code, CIS
+category: ai
+tags: AI, OpenClaw, Ralph, security, macOS, Ansible, Claude-Code, CIS
 date: 2026-03-22
 status: published
 image: secure-my-laptop.png

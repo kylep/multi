@@ -2,116 +2,176 @@
 
 Auto-tweet new blog posts when they're published to kyle.pericak.com.
 
-## Recommended approach: GitHub Action + X API free tier
+## Approach: custom script as K8s CronJob (ArgoCD-managed)
 
-Use `azu/rss-to-twitter` GitHub Action on a cron schedule. The free
-X API tier allows 500 posts/month which is more than enough for blog
-post volume.
+Build a lightweight script that polls the RSS feed and posts to X.
+Runs as a CronJob in the ai-agents namespace, managed by ArgoCD
+like everything else. No GitHub Actions dependency.
 
-### Why this over alternatives
+## Tweet format
 
-- **dlvr.it** ($0-$10/mo) — works but adds another SaaS dependency
-  and brands links on the free plan. No control over tweet format.
-- **Zapier** ($0-$20/mo) — overkill for a single RSS-to-tweet flow.
-  Charges per task.
-- **IFTTT** ($3-$9/mo) — cheap but minimal formatting control.
-- **n8n self-hosted** — already on the backlog (PER-49) as an
-  exploration item. Could replace this later but adds deployment
-  complexity for a simple use case.
-- **Buffer** ($5/mo/channel) — good for scheduling but RSS
-  auto-publish needs Zapier as glue.
-
-The GitHub Action approach costs $0, runs in existing CI infra, and
-gives full control over tweet content formatting.
-
-## Implementation plan
-
-### 1. X API setup
-
-- Create X Developer App at developer.x.com
-- Select "Free" tier (500 posts/month, sufficient for blog volume)
-- Set app permissions to "Read and Write"
-- Generate OAuth 1.0a credentials:
-  - API Key + API Secret
-  - Access Token + Access Token Secret
-- Important: if you change permissions after generating tokens,
-  you must regenerate the Access Token pair
-
-### 2. GitHub secrets
-
-Store in the `kylep/multi` repo secrets:
+Title + description + hashtags + UTM link:
 
 ```
-TWITTER_API_KEY
-TWITTER_API_KEY_SECRET
-TWITTER_ACCESS_TOKEN
-TWITTER_ACCESS_TOKEN_SECRET
+Building an AI Agent Org Chart
+
+How I organized 10 Claude Code agents into a functional team with
+specialized roles and delegation patterns.
+
+#AI #LLM
+
+https://kyle.pericak.com/agent-org-chart.html?utm_source=twitter&utm_medium=social&utm_campaign=blog_post
 ```
 
-### 3. GitHub Action workflow
+- Description pulled from RSS `<description>` field
+- Hashtags mapped from RSS `<category>`: ai→#AI #LLM, dev→#Dev
+  #SoftwareEngineering, cloud→#Cloud #DevOps
+- Fully automated, no per-post work needed
 
-Create `.github/workflows/tweet-new-posts.yml`:
+## UTM parameters
 
-```yaml
-name: Tweet new blog posts
-on:
-  schedule:
-    - cron: '*/30 * * * *'  # every 30 min
-  workflow_dispatch: {}
+Append to every link posted:
 
-jobs:
-  tweet:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: azu/rss-to-twitter@v2
-        with:
-          rss_url: "https://kyle.pericak.com/feed.xml"
-          twitter_api_key: ${{ secrets.TWITTER_API_KEY }}
-          twitter_api_key_secret: ${{ secrets.TWITTER_API_KEY_SECRET }}
-          twitter_access_token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-          twitter_access_token_secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+```
+?utm_source=twitter&utm_medium=social&utm_campaign=blog_post
 ```
 
-The action tracks which items have been posted using GitHub Actions
-cache, so it won't double-post on subsequent runs.
+- `utm_source=twitter` — matches GA4 Default Channel Grouping for
+  "Organic Social" (lowercase, consistent)
+- `utm_medium=social` — required for GA4 to classify as social traffic
+- `utm_campaign=blog_post` — groups all auto-posted tweets together
 
-### 4. Tweet format
+GA4 picks these up automatically — no configuration needed. Traffic
+shows up in Reports > Acquisition > Traffic Acquisition under
+"twitter / social". UTM values are case-sensitive so always lowercase.
 
-Default format from `azu/rss-to-twitter` is `{title} {link}`. This
-is fine for blog syndication — X will render the link preview card
-from the page's og:image and og:description meta tags.
+Optional: add `utm_content=<post-slug>` per tweet to track which
+specific posts drive traffic.
 
-If custom formatting is needed, the action supports a `format`
-parameter for templates.
+## Deduplication (critical)
 
-### 5. Account setup
+Use a persistent file on a PVC tracking posted item GUIDs:
 
-- Add "Posts automatically from kyle.pericak.com" to bio (X
-  automation policy recommends labeling automated accounts)
-- RSS-to-tweet syndication is explicitly permitted by X's automation
-  rules — no suspension risk for this use case
+```
+# /cache/posted-guids
+https://kyle.pericak.com/agent-org-chart.html
+https://kyle.pericak.com/ai-security-toolkit.html
+```
 
-## Risks and gotchas
+On each run:
+1. Parse RSS feed, extract all item GUIDs (usually the post URL)
+2. Load posted-guids from PVC
+3. For each item not in posted-guids: post tweet, append GUID
+4. Save updated posted-guids
 
-- **X API free tier rate limits**: the "1 request per 24 hours" limit
-  reported on some endpoints may affect polling. The tweet-creation
-  endpoint itself allows 500/month on free tier. If rate limiting
-  becomes an issue, the cron can be reduced to once per hour.
-- **Token regeneration**: if app permissions are changed in the X
-  Developer Portal, tokens must be regenerated or auth fails silently.
-- **RSS feed must exist**: depends on the RSS feed at
-  kyle.pericak.com/feed.xml being up to date. The blog build already
-  generates this via `generate-rss.mjs`.
-- **`azu/rss-to-twitter` maintenance**: last release was April 2024.
-  TypeScript-based, 42 stars. If it goes unmaintained, the fallback
-  is `ethomson/send-tweet-action` combined with RSS parsing in a
-  shell step.
+This is more robust than timestamp-based filtering because:
+- Survives RSS feed regeneration (timestamps can shift)
+- Survives CronJob gaps (won't re-post old items after downtime)
+- Handles RSS feeds that don't guarantee chronological order
+- Simple to inspect and manually edit if needed
+
+## Architecture
+
+```
+CronJob (every 15 min)
+  → curl RSS feed
+  → diff against /cache/posted-guids
+  → for new items:
+      → format tweet (title + desc + UTM link)
+      → POST to X API v2
+      → append GUID to posted-guids
+  → exit
+```
+
+### Components
+
+- **Script**: `infra/ai-agents/cronjobs/scripts/tweet-rss.sh`
+  (or Python if OAuth 1.0a signing is painful in shell)
+- **CronJob template**: `infra/ai-agents/cronjobs/helm/templates/tweet-rss.yaml`
+- **PVC**: `tweet-rss-state` (10Mi, stores posted-guids)
+- **Secrets**: X API OAuth 1.0a credentials in Vault at
+  `secret/ai-agents/twitter`
+- **Image**: `kpericak/ai-agent-runtime:0.5` (has curl, jq, python3)
+
+### X API v2 auth
+
+OAuth 1.0a signature is required for `POST /2/tweets`. This is
+complex in shell (HMAC-SHA1 signing). Two options:
+
+1. **Python script** using `requests-oauthlib` — clean, well-documented
+2. **Shell with openssl** — possible but fragile
+
+Recommend Python. The runtime image already has python3 + pip.
+Add `requests-oauthlib` to the image or pip install at runtime.
+
+### Vault secrets
+
+Store at `secret/ai-agents/twitter`:
+```
+twitter_api_key
+twitter_api_key_secret
+twitter_access_token
+twitter_access_token_secret
+```
+
+### CronJob schedule
+
+Every 15 minutes. The RSS feed is small, the check is fast, and
+15 min is a reasonable delay between publishing and tweeting.
+
+## X API setup
+
+1. Go to developer.x.com, create a project + app
+2. Select Free tier (500 tweets/month — more than enough)
+3. Set permissions to "Read and Write"
+4. Generate OAuth 1.0a credentials (4 tokens)
+5. **Important**: regenerate Access Token after any permission change
+6. Store all 4 in Vault
+
+## Risks
+
+- **X API free tier rate limits**: 500 tweets/month is plenty.
+  The 1-req/24h limit on some endpoints may not apply to tweet
+  creation — needs verification during implementation.
+- **OAuth 1.0a complexity**: every request needs HMAC-SHA1 signed
+  headers. Use a library, don't hand-roll.
+- **Feed format changes**: if the RSS feed structure changes (e.g.,
+  GUID format), dedup could break. Use the canonical link URL as
+  GUID for stability.
+- **Token expiry**: X API tokens don't expire by default but can
+  be revoked. Monitor for 401 errors.
 
 ## Cost
 
-$0/month. Uses X API free tier + GitHub Actions (free for public repos).
+$0/month. X API free tier + existing K8s infra.
 
 ## Dependencies
 
-- RSS feed at kyle.pericak.com/feed.xml (already exists)
-- X Developer account with free tier API access
+- RSS feed at kyle.pericak.com/feed.xml (exists)
+- X Developer account with free tier API access (need to set up)
+- Vault secret for API credentials (need to create)
+- `requests-oauthlib` Python package (add to runtime image or
+  pip install in CronJob)
+
+## Implementation status
+
+Script and CronJob template are built and tested (dry run locally
+and in K8s pod). Disabled by default until X API credentials exist.
+
+**To enable:**
+
+1. Create X Developer account, generate credentials
+2. Store in Vault: `vault kv put secret/ai-agents/twitter api_key=... api_key_secret=... access_token=... access_token_secret=...`
+3. Add to `environments/pai-m1.yaml`:
+   ```yaml
+   cronjobs:
+     tweetRss:
+       enabled: true
+       schedule: "*/15 * * * *"
+   ```
+4. ArgoCD will deploy the CronJob automatically
+
+**Files:**
+- Script: `infra/ai-agents/cronjobs/scripts/tweet-rss.py`
+- CronJob: `infra/ai-agents/cronjobs/helm/templates/tweet-rss.yaml`
+- Values: `infra/ai-agents/cronjobs/helm/values.yaml` (tweetRss section)

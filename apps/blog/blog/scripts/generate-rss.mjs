@@ -26,8 +26,9 @@ function getPosts() {
   return files.map(f => {
     const raw = fs.readFileSync(path.join(postsDir, f), 'utf8'); // nosemgrep: path-join-resolve-traversal
     const { data } = matter(raw);
-    const slug = f.replace('.md', '');
-    return { slug, ...data };
+    const fileSlug = f.replace('.md', '');
+    const frontmatterSlug = data.slug;
+    return { ...data, slug: fileSlug, frontmatterSlug };
   }).filter(p => p.status !== 'draft' && p.title && p.date);
 }
 
@@ -61,9 +62,13 @@ function generateRss() {
 
   const itemsXml = items.map(p => {
     const link = `${SITE_URL}/${encodeURIComponent(p.slug)}.html`;
-    const categoryXml = p.category
-      ? `\n      <category>${escapeXml(p.category)}</category>`
-      : '';
+    const cats = [];
+    if (p.category) cats.push(p.category);
+    if (p.tags) {
+      const tagList = Array.isArray(p.tags) ? p.tags : String(p.tags).split(',').map(t => t.trim());
+      cats.push(...tagList);
+    }
+    const categoryXml = cats.map(c => `\n      <category>${escapeXml(c)}</category>`).join('');
 
     return `    <item>
       <title>${escapeXml(p.title)}</title>
