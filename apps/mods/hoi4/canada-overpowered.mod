@@ -7,4 +7,4 @@ tags={
 }
 picture="thumbnail.png"
 supported_version="1.17.*"
-version="1.0.0"
+version="1.1.0"
