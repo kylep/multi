@@ -35,7 +35,7 @@ export async function battleScreen(
   state: GameState,
   enemyName: string,
   sound?: SoundPlayer,
-): Promise<"continue" | "fight-again"> {
+): Promise<"continue" | "fight-again" | "shop"> {
   const player = state.player!;
   const enemyDef = state.registry.enemies.get(enemyName)!;
   const enemyRobot = state.registry.createEnemyRobot(enemyName);
@@ -108,9 +108,9 @@ export async function battleScreen(
   if (battle.winner === "player") {
     recordFight(state, true);
     sound?.victory();
-    // Easy enemies (below player level) give 50% gold and 0 XP
+    // Easy enemies (below player level) give 50% gold and 50% XP
     const isEasy = enemyDef.level < player.level;
-    const xpReward = isEasy ? 0 : enemyDef.expReward;
+    const xpReward = isEasy ? Math.floor(enemyDef.expReward / 2) : enemyDef.expReward;
     let goldReward = isEasy ? Math.floor(enemyDef.reward / 2) : enemyDef.reward;
 
     // First challenge mode win against this enemy: double money
@@ -121,12 +121,14 @@ export async function battleScreen(
     const leveled = awardExp(state, xpReward);
     const actual = awardMoney(state, goldReward);
 
-    // Track defeated enemies
-    if (!player.defeatedEnemies.includes(enemyName)) {
-      player.defeatedEnemies.push(enemyName);
-    }
-    if (isChallenge && !player.challengeDefeatedEnemies.includes(enemyName)) {
-      player.challengeDefeatedEnemies.push(enemyName);
+    // Track defeated enemies (not in sandbox — badges are a normal-mode reward)
+    if (player.settings.mode !== "sandbox") {
+      if (!player.defeatedEnemies.includes(enemyName)) {
+        player.defeatedEnemies.push(enemyName);
+      }
+      if (isChallenge && !player.challengeDefeatedEnemies.includes(enemyName)) {
+        player.challengeDefeatedEnemies.push(enemyName);
+      }
     }
 
     if (leveled) sound?.levelUp();
@@ -147,21 +149,26 @@ export async function battleScreen(
       rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span>${firstChallengeWin ? ` <span class="t-yellow">(2x challenge bonus!)</span>` : ""} &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
       if (leveled) {
         rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
+        const unlocked = getLevelUnlockPreview(state, player.level);
+        if (unlocked) rewardsHtml += `<div class="t-yellow">Unlocked: ${unlocked}</div>`;
       }
       rewardsHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
-      const nextPreview = getNextLevelPreview(state);
-      if (nextPreview) rewardsHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
+      if (!leveled) {
+        const nextPreview = getLevelUnlockPreview(state, player.level + 1);
+        if (nextPreview) rewardsHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
+      }
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${rewardsHtml}</div>`);
 
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
         { label: "Fight Again", value: "fight-again" },
+        { label: "Shop", value: "shop" },
         { label: "Battle Log", value: "log" },
       ], "row");
       if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
       player.health = getEffectiveMaxHealth(player);
       player.energy = getEffectiveMaxEnergy(player);
-      return choice as "continue" | "fight-again";
+      return choice as "continue" | "fight-again" | "shop";
     }
   } else {
     recordFight(state, false);
@@ -184,20 +191,21 @@ export async function battleScreen(
         : `<div>Destroyed by <span class="t-yellow t-bold">${enemyName}</span> after <span class="t-cyan">${turns}</span> ${turns === 1 ? "turn" : "turns"}</div>`;
       if (!surrendered) infoHtml += `<div style="margin-top:4px"><span class="t-green">+$10 consolation</span></div>`;
       infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
-      const nextPreview = getNextLevelPreview(state);
+      const nextPreview = getLevelUnlockPreview(state, player.level + 1);
       if (nextPreview) infoHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${infoHtml}</div>`);
 
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
         { label: "Fight Again", value: "fight-again" },
+        { label: "Shop", value: "shop" },
         { label: "Battle Log", value: "log" },
       ], "row");
       if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
       // Reset health/energy before returning
       player.health = getEffectiveMaxHealth(player);
       player.energy = getEffectiveMaxEnergy(player);
-      return choice as "continue" | "fight-again";
+      return choice as "continue" | "fight-again" | "shop";
     }
   }
 
@@ -207,13 +215,10 @@ export async function battleScreen(
   return "continue";
 }
 
-function getNextLevelPreview(state: GameState): string | null {
-  const player = state.player!;
-  const nextLevelItems = state.registry.getAllItems().filter(
-    (i) => i.level === player.level + 1,
-  );
-  if (nextLevelItems.length === 0) return null;
-  return nextLevelItems.map((i) => i.name).join(", ");
+function getLevelUnlockPreview(state: GameState, level: number): string | null {
+  const items = state.registry.getAllItems().filter((i) => i.level === level);
+  if (items.length === 0) return null;
+  return items.map((i) => i.name).join(", ");
 }
 
 async function showBattleLog(

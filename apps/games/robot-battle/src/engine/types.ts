@@ -38,6 +38,7 @@ export interface Consumable extends ItemBase {
   tempDefence: number;
   tempAttack: number;
   damage: number;
+  damageBlock: number;
   enemyDodgeReduction: number;
 }
 
@@ -61,7 +62,7 @@ export interface Robot {
   inventorySize: number;
   inventory: Item[];
   upgrades: string[];
-  settings: { mode: "oliver" | "lucas"; oliverChallenge: boolean };
+  settings: { mode: "oliver" | "lucas" | "sandbox"; oliverChallenge: boolean };
   defeatedEnemies: string[];
   challengeDefeatedEnemies: string[];
 }
@@ -85,6 +86,7 @@ export interface BattleRobot {
   tempDefence: number;
   tempAttack: number;
   tempDodgeReduction: number;
+  damageBlock: number;
   consumablesUsed: string[];
 }
 

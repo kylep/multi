@@ -63,6 +63,15 @@
       "expReward": 7,
       "description": "A heavily armored tank with a shotgun. Watch out for the blast!"
     },
+    "Shredder": {
+      "level": 8,
+      "weapons": ["Laser Gun"],
+      "gear": ["Steel Armor", "Medium Battery", "Power Chip"],
+      "consumables": ["Blast Shield"],
+      "reward": 400,
+      "expReward": 8,
+      "description": "A sleek bot with a laser gun and a blast shield. Precise and well-protected."
+    },
     "Boombox": {
       "level": 9,
       "weapons": ["Flame Thrower"],

@@ -19,6 +19,10 @@ echo "=== Step 3: Build blog ==="
 cd "$BLOG_DIR"
 bin/build-blog-files.sh
 
+GAME_VERSION=$(grep '"version"' "$GAME_DIR/package.json" | sed 's/.*"version": *"\([^"]*\)".*/\1/')
+echo ""
+echo "=== Deploying Robot Battle v${GAME_VERSION} ==="
+
 echo ""
 echo "=== Step 4: Deploy to GCS ==="
 bin/prod-deploy.sh

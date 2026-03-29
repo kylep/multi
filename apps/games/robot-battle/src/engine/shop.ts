@@ -35,9 +35,10 @@ function isAmmoGear(item: Item): boolean {
 
 export function canBuy(state: GameState, item: Item): { ok: boolean; reason: string } {
   const player = state.player!;
+  const sandbox = player.settings.mode === "sandbox";
 
-  if (item.level > player.level) return { ok: false, reason: `Requires level ${item.level}` };
-  if (player.money < item.moneyCost)
+  if (!sandbox && item.level > player.level) return { ok: false, reason: `Requires level ${item.level}` };
+  if (!sandbox && player.money < item.moneyCost)
     return { ok: false, reason: `Not enough money (need ${item.moneyCost}, have ${player.money})` };
 
   for (const req of item.requirements) {
@@ -66,14 +67,15 @@ export function buyItem(state: GameState, item: Item): ShopResult {
   if (!check.ok) return { success: false, message: check.reason, moneySpent: 0, moneyGained: 0 };
 
   const player = state.player!;
-  player.money -= item.moneyCost;
+  const sandbox = player.settings.mode === "sandbox";
+  if (!sandbox) player.money -= item.moneyCost;
   // Shallow copy so each purchase is a unique instance
   player.inventory.push({ ...item });
 
   return {
     success: true,
-    message: `Bought ${item.name} for $${item.moneyCost}`,
-    moneySpent: item.moneyCost,
+    message: sandbox ? `Got ${item.name}` : `Bought ${item.name} for $${item.moneyCost}`,
+    moneySpent: sandbox ? 0 : item.moneyCost,
     moneyGained: 0,
   };
 }
