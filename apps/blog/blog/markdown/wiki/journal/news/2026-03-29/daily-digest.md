@@ -67,3 +67,23 @@ last_verified: 2026-03-29
 ## Just for You
 
 - [GitHub](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.2.8, v3.3.5, and v3.1.13 all patch grpc-go CVE-2026-33186 across three active release branches simultaneously. All Argo CD container images are signed with cosign and meet SLSA Level 3 supply-chain security requirements.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Ramp](https://ramp.com/velocity/ai-business-adoption-accelerates-led-by-anthropic) The Ramp AI Index for March 2026 shows Anthropic winning 70% of head-to-head matchups against OpenAI among first-time business buyers. One in four businesses on Ramp now pays for Anthropic — up 4.9 percentage points month-over-month to 24.4%. OpenAI's adoption rate fell 1.5%, its largest single-month decline since tracking began.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/03/trivy-hack-spreads-infostealer-via.html) CVE-2026-33634 (CVSS 9.4): TeamPCP compromised Trivy's GitHub Actions release pipeline on March 19, force-pushing malicious commits to 76 of 77 version tags in `trivy-action` and all 7 tags in `setup-trivy`. The payload ran a credential stealer silently before each legitimate scan, exfiltrating SSH keys, cloud tokens, and Kubernetes secrets. CISA added the CVE to its KEV catalog March 26. Pin all GitHub Actions to full commit SHAs and rotate any credentials that passed through affected pipelines.
+
+- [The Hacker News](https://thehackernews.com/2026/03/teampcp-backdoors-litellm-versions.html) LiteLLM versions 1.82.7 and 1.82.8 on PyPI were backdoored on March 24 as a downstream consequence of the Trivy compromise. TeamPCP used stolen PyPI credentials to inject a three-stage payload that harvests credentials, attempts Kubernetes cluster lateral movement, and installs a persistent systemd backdoor. LiteLLM has over 3.4 million daily downloads; affected packages have been removed from PyPI and BerriAI has paused new releases pending a Mandiant supply-chain review.
+
+- [The Hacker News](https://thehackernews.com/2026/03/critical-langflow-flaw-cve-2026-33017.html) CVE-2026-33017 (CVSS 9.3): unauthenticated remote code execution in Langflow via the public flow build endpoint, which passes attacker-controlled Python to `exec()` with no sandboxing. Attackers built working exploits within 20 hours of disclosure and began scanning honeypots before any public PoC existed. CISA added it to the KEV catalog March 25 with a federal remediation deadline of April 8. Patch to Langflow v1.9.0 or disable public endpoint exposure.
+
+## Local
+
+- [Globe Newswire](https://www.globenewswire.com/news-release/2026/03/26/3262899/0/en/local-news-returns-to-print-metroland-and-torstar-launch-monthly-print-newspapers-across-greater-toronto-area.html) Torstar and Metroland announced the return of *Whitby This Week* as a monthly print publication, part of a broader relaunch of community papers across the GTA including Oshawa, Oakville, and Burlington. The paper will be available at pick-up locations across Whitby; Metroland is also hiring 20 editorial interns across Ontario.
