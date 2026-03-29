@@ -26,7 +26,7 @@
 - Loads all 7 weapons (including Wrench)
 - Loads gear including Wooden Armor (fixed nesting bug from YAML)
 - Loads consumables (Repair Kit, Grenade, Throwing Net)
-- Loads 3 enemies
+- Loads 6 enemies
 
 ### Get Item
 - Finds items by name across all types
@@ -37,4 +37,4 @@
 
 ### Create Enemy Robot
 - Populates inventory from enemy definition
-- MiniBot has 3 items: Stick + Cardboard Armor + Propeller
+- MiniBot has 2 items: Stick + Cardboard Armor

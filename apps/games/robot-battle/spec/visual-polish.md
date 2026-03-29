@@ -196,10 +196,10 @@ construct HTML structures using the panel/card classes.
 |---|------|-------|----|---------|----------|--------|----|
 | 1 | MiniBot | 1 | 15 | Stick (1 dmg) | Cardboard Armor | $50 | 2 |
 | 2 | Sparky | 3 | 15 | Shock Rod (5 dmg) | Cardboard Armor, Small Battery, Small Computer Chip | $80 | 3 |
-| 3 | Rustclaw | 4 | 20 | Wrench (2 dmg) x2 | Cardboard Armor, Third Arm, Propeller | $120 | 4 |
+| 3 | Rustclaw | 4 | 15 | Wrench (2 dmg) x2 | Cardboard Armor, Third Arm, Propeller | $120 | 4 |
 | 4 | Firebot | 5 | 35 | Flame Thrower (10 dmg) | Wooden Armor, Gold Computer Chip | $150 | 5 |
-| 5 | Voltank | 7 | 45 | Shock Rod (5 dmg), Sawed-off Shotgun (15 dmg) | Wooden Armor, Medium Battery, Fourth Arm, Small Computer Chip | $250 | 7 |
-| 6 | Omega | 10 | 60 | Lightsabre (30 dmg) | Big Battery, Gold Computer Chip, Power Chip | $500 | 10 |
+| 5 | Voltank | 7 | 35 | Sawed-off Shotgun (15 dmg), Shock Rod (5 dmg) | Wooden Armor, Medium Battery, Fourth Arm, Small Computer Chip, Shotgun Shell | $250 | 7 |
+| 6 | Omega | 10 | 10 | Lightsabre (30 dmg) | Big Battery, Gold Computer Chip, Power Chip | $500 | 10 |
 
 **Rustclaw** (new, level 4): A scrappy dual-wielding bot. Has two Wrenches
 and a Third Arm (3 hands total). Hits twice per turn for 2 dmg each.
@@ -216,7 +216,7 @@ gives +25 energy to sustain it longer. Power Chip boosts damage further.
 ### Progression design
 
 - **Lv.1 player vs MiniBot**: Even fight (both have Stick + Cardboard Armor).
-  Win rate ~50%. Need 5 wins ($250 total) to afford Sword upgrade.
+  Win rate ~50%. Need 1 win ($50 reward + $100 start = $150) to afford Sword.
 - **Lv.2 with Sword vs Sparky**: Sword (5 dmg) vs Sparky's 15 HP + 10 dodge.
   Challenging but winnable. Need several wins to afford gear upgrades.
 - **Lv.3-4 with gear vs Rustclaw**: Need good gear (armor + dodge) to
@@ -230,12 +230,8 @@ gives +25 energy to sustain it longer. Power Chip boosts damage further.
 
 ### New items needed
 
-**Voltank's gear** — needs Shotgun Shells in inventory (already exists
-as a gear item that gets consumed). Give Voltank 2x Shotgun Shell in
-consumables or gear.
-
 No new items needed beyond what's already defined — the existing item
-set covers the full progression if balanced correctly.
+set covers the full progression.
 
 ### Enemies JSON additions
 
