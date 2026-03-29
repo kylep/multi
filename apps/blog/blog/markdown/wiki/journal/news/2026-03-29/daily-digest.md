@@ -35,3 +35,35 @@ last_verified: 2026-03-29
 - [Cloudflare Blog](https://blog.cloudflare.com/ai-security-for-apps-ga/) Cloudflare AI Security for Apps reached general availability March 11. The reverse-proxy layer auto-discovers LLM-powered endpoints, detects prompt injection and PII exposure, and integrates with WAF rules. AI endpoint discovery is free for all plan tiers including Free and Pro.
 
 - [AWS EKS Docs](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions-standard.html) Kubernetes 1.35 is now available on Amazon EKS. The release deprecates cgroup v1 support — the kubelet refuses to start by default on nodes still using cgroup v1. Teams should audit node groups and plan migration before upgrading.
+
+---
+
+## Update — 15:00 UTC
+
+## AI Industry
+
+- [Axios](https://www.axios.com/2026/03/29/claude-mythos-anthropic-cyberattack-ai-agents) US officials and security professionals say new frontier models from Anthropic and OpenAI have crossed a threshold where they can autonomously conduct sophisticated cyberattacks at scale. A Dark Reading survey found 48% of security professionals now rank agentic AI as their top attack vector for 2026, ahead of deepfakes and all other categories.
+
+- [Google Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-deep-think/) Google updated Gemini 3 Deep Think with expanded scientific reasoning — the model now achieves gold-medal-level results on the written sections of the 2025 International Physics and Chemistry Olympiads and identified a logical flaw in a peer-reviewed mathematics paper. The upgraded model is available to Google AI Ultra subscribers and select API researchers.
+
+## AI Tooling
+
+- [GitHub Copilot](https://www.nxcode.io/resources/news/github-copilot-complete-guide-2026-features-pricing-agents) GitHub Copilot agent mode reached general availability on JetBrains in March 2026, extending full agentic coding support to Java, Kotlin, and Python developers for the first time. Agentic code review can now gather full project context and automatically open fix PRs.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/03/29/world/live-news/iran-war-us-israel-trump) Yemen's Houthis carried out their first direct missile attack on Israel on March 29, escalating from prior warnings. Separately, Iran launched two intermediate-range ballistic missiles at Diego Garcia, the joint US-UK base in the Indian Ocean; neither struck the installation.
+
+- [Al Jazeera](https://www.aljazeera.com/news/liveblog/2026/3/29/iran-war-live-houthis-attack-israel-anti-war-protesters-rally-in-tel-aviv) Foreign ministers from Pakistan, Turkey, Egypt, and Saudi Arabia met in Islamabad to coordinate de-escalation. US special envoy Steve Witkoff confirmed Pakistan is serving as the official mediator for US-Iran negotiations.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/whitby-town-hall-incident-security-measures-9.7141804) Whitby Mayor Elizabeth Roy said she will review security at council chambers after Durham Region police opened an investigation into a Rebel News reporter who allegedly approached and harassed a female councillor outside Whitby Town Hall following a late-night council meeting.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898,-78.939) Whitby: 7°C high (updated from morning), 1°C overnight. Mix of sun and cloud this afternoon, clearing this evening. No alerts.
+
+## Just for You
+
+- [GitHub](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.2.8, v3.3.5, and v3.1.13 all patch grpc-go CVE-2026-33186 across three active release branches simultaneously. All Argo CD container images are signed with cosign and meet SLSA Level 3 supply-chain security requirements.
