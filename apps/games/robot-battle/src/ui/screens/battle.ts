@@ -35,101 +35,107 @@ export async function battleScreen(
 ): Promise<void> {
   const player = state.player!;
   const enemyDef = state.registry.enemies.get(enemyName)!;
-  const enemyRobot = state.registry.createEnemyRobot(enemyName);
-  if (!enemyRobot) {
-    terminal.print("Error creating enemy!", "t-red");
-    return;
-  }
 
-  const fightNumber = player.fights + 1;
-  const battle = createBattle(player, enemyRobot, fightNumber);
-
-  // Battle loop
-  while (battle.winner === null) {
-    terminal.clear();
-    terminal.print("");
-    printBattleStatus(terminal, battle);
-    terminal.print("");
-
-    // Player picks action
-    const result = await playerTurn(terminal, battle);
-
-    if (result === "auto") {
-      await autoBattle(terminal, battle);
-      break;
+  // Rematch loop — runs at least once, repeats on Rematch
+  while (true) {
+    const enemyRobot = state.registry.createEnemyRobot(enemyName);
+    if (!enemyRobot) {
+      terminal.print("Error creating enemy!", "t-red");
+      return;
     }
 
-    if (result === "surrendered" || battle.winner) break;
+    const fightNumber = player.fights + 1;
+    const battle = createBattle(player, enemyRobot, fightNumber);
 
-    // Enemy AI picks action
-    const enemyAction = aiPlanAction(battle, false);
-    battle.enemyAction = enemyAction;
-
-    // Resolve turn
-    const rng = createRng();
-    resolveTurn(battle, rng);
-
-    // Clear and show turn results as a fresh screen
-    terminal.clear();
-    terminal.print("");
-    printBattleStatus(terminal, battle);
-    terminal.print("");
-    printTurnLog(terminal, battle);
-
-    if (battle.winner === null) {
-      endTurn(battle);
-    }
-
-    await terminal.promptContinue(0);
-  }
-
-  // Battle ended — fresh screen for results
-  recordTurnSnapshot(battle);
-  terminal.clear();
-  terminal.print("");
-
-  const turns = battle.turnHistory.length;
-  const playerHp = Math.max(0, battle.player.currentHealth);
-  const playerMax = getEffectiveMaxHealth(player);
-
-  if (battle.winner === "player") {
-    terminal.print("*** VICTORY! ***", "t-green t-bold");
-    terminal.print(`Won in ${turns} turns with ${playerHp}/${playerMax} HP remaining`, "t-dim");
-    recordFight(state, true);
-
-    terminal.print("");
-    const leveled = awardExp(state, enemyDef.expReward);
-    const actual = awardMoney(state, enemyDef.reward);
-    terminal.print(`  +${enemyDef.expReward} exp   +$${actual}`, "t-green t-bold");
-
-    if (leveled) {
+    // Battle loop
+    while (battle.winner === null) {
+      terminal.clear();
       terminal.print("");
-      terminal.print(`*** LEVEL UP! Now level ${player.level}! ***`, "t-yellow t-bold");
+      printBattleStatus(terminal, battle);
+      terminal.print("");
+
+      const result = await playerTurn(terminal, battle);
+
+      if (result === "auto") {
+        await autoBattle(terminal, battle);
+        break;
+      }
+
+      if (result === "surrendered" || battle.winner) break;
+
+      const enemyAction = aiPlanAction(battle, false);
+      battle.enemyAction = enemyAction;
+
+      const rng = createRng();
+      resolveTurn(battle, rng);
+
+      terminal.clear();
+      terminal.print("");
+      printBattleStatus(terminal, battle);
+      terminal.print("");
+      printTurnLog(terminal, battle);
+
+      if (battle.winner === null) {
+        endTurn(battle);
+      }
+
+      await terminal.promptContinue(0);
     }
 
+    // Battle ended — results screen
+    recordTurnSnapshot(battle);
+    terminal.clear();
     terminal.print("");
-    terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
-    printNextLevelPreview(terminal, state);
-  } else {
-    if (battle.player.currentHealth > 0) {
-      terminal.print("*** SURRENDERED ***", "t-yellow");
+
+    const turns = battle.turnHistory.length;
+    const playerHp = Math.max(0, battle.player.currentHealth);
+    const playerMax = getEffectiveMaxHealth(player);
+
+    if (battle.winner === "player") {
+      terminal.print("*** VICTORY! ***", "t-green t-bold");
+      terminal.print(`Won in ${turns} turns with ${playerHp}/${playerMax} HP remaining`, "t-dim");
+      recordFight(state, true);
+
+      terminal.print("");
+      const leveled = awardExp(state, enemyDef.expReward);
+      const actual = awardMoney(state, enemyDef.reward);
+      terminal.print(`  +${enemyDef.expReward} exp   +$${actual}`, "t-green t-bold");
+
+      if (leveled) {
+        terminal.print("");
+        terminal.print(`*** LEVEL UP! Now level ${player.level}! ***`, "t-yellow t-bold");
+      }
+
+      terminal.print("");
+      terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
+      printNextLevelPreview(terminal, state);
     } else {
-      terminal.print("*** DEFEAT ***", "t-red t-bold");
-      terminal.print(`Lasted ${turns} turns`, "t-dim");
+      if (battle.player.currentHealth > 0) {
+        terminal.print("*** SURRENDERED ***", "t-yellow");
+      } else {
+        terminal.print("*** DEFEAT ***", "t-red t-bold");
+        terminal.print(`Lasted ${turns} turns`, "t-dim");
+      }
+      recordFight(state, false);
+      player.money += 10;
+      terminal.print(`  +$10 consolation`, "t-green");
+      terminal.print("");
+      terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
+      printNextLevelPreview(terminal, state);
     }
-    recordFight(state, false);
-    player.money += 10;
-    terminal.print(`  +$10 consolation`, "t-green");
-    terminal.print("");
-    terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
-    printNextLevelPreview(terminal, state);
+
+    // Reset health/energy
+    player.health = getEffectiveMaxHealth(player);
+    player.energy = getEffectiveMaxEnergy(player);
+
+    // Rematch or continue
+    const endChoice = await terminal.promptChoice("", [
+      { label: "Rematch", value: "rematch", subtitle: `Fight ${enemyName} again` },
+      { label: "Continue", value: "continue" },
+    ], "row");
+
+    if (endChoice !== "rematch") break;
   }
-
-  // Reset health/energy
-  player.health = getEffectiveMaxHealth(player);
-  player.energy = getEffectiveMaxEnergy(player);
-
-  await terminal.promptContinue();
 }
 
 function printNextLevelPreview(terminal: Terminal, state: GameState): void {
