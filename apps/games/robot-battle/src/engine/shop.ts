@@ -22,8 +22,15 @@ export function countInventorySlots(player: Robot): number {
 }
 
 export function listAvailableItems(state: GameState): Item[] {
-  const player = state.player!;
-  return state.registry.getItemsForLevel(player.level);
+  return state.registry.getAllItems();
+}
+
+function isAmmoGear(item: Item): boolean {
+  if (item.itemType !== "gear") return false;
+  const g = item as Gear;
+  return g.healthBonus === 0 && g.energyBonus === 0 && g.defenceBonus === 0
+    && g.attackBonus === 0 && g.handsBonus === 0 && g.dodgeBonus === 0
+    && g.moneyBonusPercent === 0;
 }
 
 export function canBuy(state: GameState, item: Item): { ok: boolean; reason: string } {
@@ -72,7 +79,7 @@ export function buyItem(state: GameState, item: Item): ShopResult {
 }
 
 export function getSellPrice(item: Item): number {
-  return Math.floor(item.moneyCost / 2);
+  return item.moneyCost;
 }
 
 export function sellItem(state: GameState, item: Item): ShopResult {

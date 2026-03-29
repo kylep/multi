@@ -10,9 +10,12 @@ import {
   getEffectiveMaxHealth,
   getWeapons,
 } from "../../engine/robot";
-import { showRobotStats } from "./inspect";
+import { getXpToLevel } from "../../engine/state";
 import { shopScreen } from "./shop";
+import { upgradesScreen } from "./upgrades";
+import { settingsScreen } from "./settings";
 import { battleScreen } from "./battle";
+import packageJson from "../../../package.json";
 
 export async function mainMenu(
   terminal: Terminal,
@@ -26,23 +29,15 @@ export async function mainMenu(
     const player = state.player!;
 
     // Player stats header panel
-    terminal.printHTML(`
-      <div class="panel-header">
-        <span class="t-blue t-bold">${player.name}</span>
-        &nbsp;&nbsp;
-        <span class="t-yellow">$${player.money}</span>
-        &nbsp;&nbsp;
-        <span class="t-magenta">Lv.${player.level} XP ${player.exp}/10</span>
-        &nbsp;&nbsp;
-        <span class="t-dim">${player.wins}W / ${player.fights}F</span>
-      </div>
-    `);
+    terminal.printHTML(`<div class="panel-header"><span class="t-blue t-bold">${player.name}</span> &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/${getXpToLevel(player.level)}</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span></div>`);
+
 
     const menuChoices: Choice[] = [
       { label: "Fight", value: "fight", subtitle: "Battle enemies" },
       { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
-      { label: "Inspect Robot", value: "inspect", subtitle: "View stats & inventory" },
+      { label: "Upgrades", value: "upgrades", subtitle: "Permanent buffs" },
       { label: "Settings", value: "settings", subtitle: "Sound & options" },
+      { label: "Change Log", value: "changelog", subtitle: "Version history" },
       { label: "Quit", value: "quit", subtitle: "Return to title" },
     ];
 
@@ -56,35 +51,14 @@ export async function mainMenu(
     } else if (choice === "shop") {
       await shopScreen(terminal, state, sound);
       save?.();
-    } else if (choice === "inspect") {
-      await showRobotStats(terminal, state);
-      await terminal.promptContinue(0);
-    } else if (choice === "settings") {
-      await settingsScreen(terminal, sound, settings);
+    } else if (choice === "upgrades") {
+      await upgradesScreen(terminal, state);
       save?.();
-    }
-  }
-}
-
-async function settingsScreen(
-  terminal: Terminal,
-  sound?: SoundPlayer,
-  settings?: GameSettings,
-): Promise<void> {
-  while (true) {
-    terminal.clear();
-    terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">SETTINGS</span></div>`);
-
-    const soundOn = sound?.isEnabled() ?? true;
-    const choice = await terminal.promptChoice("", [
-      { label: `Sound: ${soundOn ? "ON" : "OFF"}`, value: "sound" },
-      { label: "Back", value: "back" },
-    ]);
-
-    if (choice === "back") break;
-    if (choice === "sound" && sound && settings) {
-      sound.setEnabled(!soundOn);
-      settings.soundEnabled = !soundOn;
+    } else if (choice === "settings") {
+      await settingsScreen(terminal, state);
+      save?.();
+    } else if (choice === "changelog") {
+      await changeLogScreen(terminal);
     }
   }
 }
@@ -113,10 +87,14 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
     const choices: Choice[] = [];
     for (const [name, enemy] of enemies) {
       const tag = getDifficulty(player.level, enemy.level);
+      const challengeCleared = player.challengeDefeatedEnemies.includes(name);
+      const normalCleared = player.defeatedEnemies.includes(name);
       choices.push({
         label: `${name} (Lv.${enemy.level})`,
         value: name,
         subtitle: `[${tag}] $${enemy.reward}, ${enemy.expReward} XP`,
+        badge: challengeCleared ? "★" : normalCleared ? "✔" : undefined,
+        badgeClass: challengeCleared ? "badge-challenge" : normalCleared ? "badge-cleared" : undefined,
       });
     }
     choices.push({ label: "Back", value: "back", subtitle: "Return to menu" });
@@ -127,8 +105,11 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
 
     const shouldFight = await enemyDetailScreen(terminal, state, choice);
     if (shouldFight) {
-      await battleScreen(terminal, state, choice, sound);
-      return;
+      let opponent = choice;
+      while (true) {
+        const result = await battleScreen(terminal, state, opponent, sound);
+        if (result !== "fight-again") return;
+      }
     }
   }
 }
@@ -174,4 +155,93 @@ async function enemyDetailScreen(
   ], "row");
 
   return choice === "fight";
+}
+
+function esc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.6.1", date: "2026-03-29", notes: [
+      "Fight Again button after battles (rematch same opponent)",
+      "Defeated badges: white ✔ for cleared, yellow ★ for challenge mode",
+      "Challenge mode first-win bonus: double money payout",
+      "XP to level up now scales: 10 + 2*(level-1)",
+      "Level cap at 50",
+      "Buzzblade payout increased to $75",
+    ],
+  },
+  {
+    version: "0.6.0", date: "2026-03-29", notes: [
+      "Mobile-friendly: responsive battle layout, single-column shop on small screens",
+      "Enter button on name input for mobile",
+      "Shop Back button at top and bottom",
+      "Shop filter toggle — hide items above your level",
+      "Shop scrolls to top when opened",
+      "Change Log screen",
+    ],
+  },
+  {
+    version: "0.5.0", date: "2026-03-28", notes: [
+      "Tabbed shop UI (Buy/Sell/Inventory)",
+      "Upgrades system (permanent inventory expansion)",
+      "Settings screen (Oliver's Challenge, Lucas Mode)",
+      "Stackable ammo gear (Shotgun Shells)",
+      "Battle log replay after fights",
+      "Special TITAN victory screen",
+      "18 weapons, 30+ gear items, 11 consumables",
+      "17 enemies up to level 50",
+    ],
+  },
+  {
+    version: "0.4.0", date: "2026-03-28", notes: [
+      "Visual overhaul: card grid layout, bordered panels",
+      "Modal confirmation dialogs",
+      "Weapon select with toggle checkboxes",
+      "Auto-battle with acceleration",
+      "Yellow Back buttons throughout",
+      "Enemy detail screen with stats preview",
+    ],
+  },
+  {
+    version: "0.3.0", date: "2026-03-28", notes: [
+      "UI overhaul: inline choices with keyboard navigation",
+      "Arrow key and number key shortcuts",
+      "Auto-battle feature",
+      "Player stats on main menu",
+      "Buy confirmation dialogs",
+    ],
+  },
+  {
+    version: "0.2.0", date: "2026-03-28", notes: [
+      "Version display on title screen",
+      "Play link on wiki page",
+    ],
+  },
+  {
+    version: "0.1.0", date: "2026-03-28", notes: [
+      "Initial release",
+      "Turn-based robot combat",
+      "Shop with weapons, gear, and consumables",
+      "Save/load with localStorage",
+      "6 enemies, basic inventory system",
+    ],
+  },
+];
+
+async function changeLogScreen(terminal: Terminal): Promise<void> {
+  terminal.clear();
+  terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">CHANGE LOG</span> &nbsp; <span class="t-dim">v${packageJson.version}</span></div>`);
+
+  const choices: Choice[] = [{ label: "Back", value: "back" }];
+
+  for (const entry of CHANGELOG) {
+    const isCurrent = entry.version === packageJson.version;
+    const label = isCurrent ? `v${entry.version} — ${entry.date} (current)` : `v${entry.version} — ${entry.date}`;
+    const bullets = entry.notes.map((n) => `<div>• ${esc(n)}</div>`).join("");
+    terminal.printHTML(`<div class="panel" style="margin:6px 0"><div class="t-green t-bold">${esc(label)}</div>${bullets}</div>`);
+  }
+
+  await terminal.promptChoice("", choices, "row");
 }

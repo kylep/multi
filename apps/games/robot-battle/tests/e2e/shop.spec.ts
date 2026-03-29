@@ -9,21 +9,23 @@ async function enterGame(page: import("@playwright/test").Page) {
 }
 
 test.describe("Shop", () => {
-  test("can open shop and see buy/sell options", async ({ page }) => {
+  test("can open shop and see tab bar", async ({ page }) => {
     await enterGame(page);
     await page.getByTestId("choice-shop").click();
 
     await expect(page.getByText("SHOP")).toBeVisible();
+    // All tabs visible in the tab bar
     await expect(page.getByTestId("choice-buy")).toBeVisible();
     await expect(page.getByTestId("choice-sell")).toBeVisible();
-    await expect(page.getByTestId("choice-back")).toBeVisible();
+    await expect(page.getByTestId("choice-inventory")).toBeVisible();
+    await expect(page.getByTestId("choice-back").first()).toBeVisible();
   });
 
-  test("Wrench visible in buy menu with stats", async ({ page }) => {
+  test("Wrench visible in buy tab with stats", async ({ page }) => {
     await enterGame(page);
     await page.getByTestId("choice-shop").click();
-    await page.getByTestId("choice-buy").click();
 
+    // Buy tab is active by default — items visible immediately
     await expect(page.getByText("Wrench")).toBeVisible();
     await expect(page.getByText("2 dmg")).toBeVisible();
   });
@@ -31,9 +33,8 @@ test.describe("Shop", () => {
   test("can buy a Stick", async ({ page }) => {
     await enterGame(page);
     await page.getByTestId("choice-shop").click();
-    await page.getByTestId("choice-buy").click();
 
-    // Click the Stick card, confirm in modal
+    // Buy tab is active by default — click the Stick card, confirm in modal
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
 
@@ -41,20 +42,30 @@ test.describe("Shop", () => {
     await expect(page.getByText("$50", { exact: true })).toBeVisible();
   });
 
+  test("bottom Back card returns to main menu", async ({ page }) => {
+    await enterGame(page);
+    await page.getByTestId("choice-shop").click();
+
+    // Click the bottom Back card (not the tab)
+    const bottomBack = page.locator(".card.card-back");
+    await expect(bottomBack).toBeVisible();
+    await bottomBack.click();
+
+    await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
+  });
+
   test("can sell an item after buying", async ({ page }) => {
     await enterGame(page);
     await page.getByTestId("choice-shop").click();
 
-    // Buy a Stick first
-    await page.getByTestId("choice-buy").click();
+    // Buy a Stick first (buy tab is active by default)
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
 
-    // Go back to shop menu
-    await page.getByTestId("choice-back").click();
+    // Switch to Sell tab
+    await page.getByTestId("choice-sell").click();
 
     // Sell one of the Sticks
-    await page.getByTestId("choice-sell").click();
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
 

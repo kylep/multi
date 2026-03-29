@@ -1,7 +1,7 @@
 /** Enemy AI logic. */
 
 import type { BattleRobot, BattleState, PlannedAction, Weapon } from "./types";
-import { getConsumables, getEffectiveHands, getWeapons, hasItem } from "./robot";
+import { getConsumables, getEffectiveHands, getWeaponEnergyCost, getWeapons, hasItem } from "./robot";
 
 export function aiSelectWeapons(fighter: BattleRobot): Weapon[] {
   const weapons = getWeapons(fighter.robot);
@@ -12,7 +12,7 @@ export function aiSelectWeapons(fighter: BattleRobot): Weapon[] {
 
   const usable = weapons.filter(
     (w) =>
-      w.energyCost <= availableEnergy &&
+      getWeaponEnergyCost(w, fighter.robot) <= availableEnergy &&
       w.requirements.every((req) => hasItem(fighter.robot, req)),
   );
 
@@ -24,11 +24,12 @@ export function aiSelectWeapons(fighter: BattleRobot): Weapon[] {
 
   for (const weapon of sorted) {
     if (usedIds.has(weapon)) continue;
-    if (weapon.hands <= availableHands && weapon.energyCost <= availableEnergy) {
+    const eCost = getWeaponEnergyCost(weapon, fighter.robot);
+    if (weapon.hands <= availableHands && eCost <= availableEnergy) {
       selected.push(weapon);
       usedIds.add(weapon);
       availableHands -= weapon.hands;
-      availableEnergy -= weapon.energyCost;
+      availableEnergy -= eCost;
     }
   }
 
@@ -38,10 +39,12 @@ export function aiSelectWeapons(fighter: BattleRobot): Weapon[] {
 export function aiPlanAction(battle: BattleState, isPlayer: boolean): PlannedAction {
   const fighter = isPlayer ? battle.player : battle.enemy;
 
-  // Use consumables first
-  for (const consumable of getConsumables(fighter.robot)) {
-    if (!fighter.consumablesUsed.includes(consumable.name)) {
-      return { actionType: "consumable", weapons: [], consumable };
+  // Use consumables first (enemies only — auto-battle shouldn't waste player items)
+  if (!isPlayer) {
+    for (const consumable of getConsumables(fighter.robot)) {
+      if (!fighter.consumablesUsed.includes(consumable.name)) {
+        return { actionType: "consumable", weapons: [], consumable };
+      }
     }
   }
 

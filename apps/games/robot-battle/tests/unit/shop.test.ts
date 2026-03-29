@@ -11,11 +11,12 @@ function setup() {
 }
 
 describe("listAvailableItems", () => {
-  it("returns items at or below player level", () => {
+  it("returns all items (including above player level)", () => {
     const state = setup();
     const items = listAvailableItems(state);
     expect(items.length).toBeGreaterThan(0);
-    expect(items.every((i) => i.level <= state.player!.level)).toBe(true);
+    // Should include items above player level (shown greyed out in shop)
+    expect(items.some((i) => i.level > state.player!.level)).toBe(true);
   });
 });
 
@@ -81,14 +82,14 @@ describe("buyItem", () => {
 });
 
 describe("sellItem", () => {
-  it("returns half price and removes from inventory", () => {
+  it("returns full price and removes from inventory", () => {
     const state = setup();
     // Sell the starter Stick
     const invItem = state.player!.inventory[0];
     expect(invItem.name).toBe("Stick");
     const result = sellItem(state, invItem);
     expect(result.success).toBe(true);
-    expect(result.moneyGained).toBe(25);
+    expect(result.moneyGained).toBe(50);
     expect(state.player!.inventory.length).toBe(0);
   });
 });
@@ -158,7 +159,7 @@ describe("stackable gear buying", () => {
 });
 
 describe("getSellPrice", () => {
-  it("returns half of buy price", () => {
-    expect(getSellPrice({ name: "x", itemType: "weapon", level: 0, moneyCost: 100, description: "", requirements: [], damage: 1, energyCost: 1, accuracy: 100, hands: 1 })).toBe(50);
+  it("returns full buy price", () => {
+    expect(getSellPrice({ name: "x", itemType: "weapon", level: 0, moneyCost: 100, description: "", requirements: [], damage: 1, energyCost: 1, accuracy: 100, hands: 1 })).toBe(100);
   });
 });

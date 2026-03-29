@@ -1,6 +1,7 @@
 /** Save/load game state to/from storage with 3 save slots. */
 
 import type { Robot } from "./types";
+import { applyAllUpgrades } from "./upgrades";
 
 const SAVE_KEY_PREFIX = "robot-battle-save-";
 const LEGACY_SAVE_KEY = "robot-battle-save";
@@ -36,6 +37,13 @@ function parseSave(raw: string | null): SaveData | null {
     if (!data.player || typeof data.player.name !== "string") return null;
     // Accept both v1 and v2
     if (data.version !== 1 && data.version !== SAVE_VERSION) return null;
+    // Soft migration for new fields
+    if (!data.player.upgrades) data.player.upgrades = [];
+    if (!data.player.settings) data.player.settings = { mode: "oliver", oliverChallenge: false };
+    if (data.player.settings.oliverChallenge === undefined) data.player.settings.oliverChallenge = false;
+    if (!data.player.defeatedEnemies) data.player.defeatedEnemies = [];
+    if (!data.player.challengeDefeatedEnemies) data.player.challengeDefeatedEnemies = [];
+    applyAllUpgrades(data.player);
     return data;
   } catch {
     return null;

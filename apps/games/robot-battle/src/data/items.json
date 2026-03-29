@@ -22,29 +22,10 @@
       "level": 2,
       "damage": 5,
       "moneyCost": 150,
-      "energyCost": 5,
+      "energyCost": 4,
       "accuracy": 100,
       "hands": 2,
       "description": "Metal single-edged longsword with a sharp blade."
-    },
-    "Sawed-off Shotgun": {
-      "level": 5,
-      "damage": 15,
-      "moneyCost": 300,
-      "energyCost": 0,
-      "accuracy": 150,
-      "hands": 1,
-      "requirements": ["Shotgun Shell"],
-      "description": "A small gauge shotgun. Loud!"
-    },
-    "Flame Thrower": {
-      "level": 5,
-      "damage": 10,
-      "moneyCost": 150,
-      "energyCost": 0,
-      "accuracy": 90,
-      "hands": 2,
-      "description": "Fire hot"
     },
     "Shock Rod": {
       "level": 3,
@@ -55,14 +36,133 @@
       "hands": 1,
       "description": "An electrified rod that delivers a shocking blow. Zap!"
     },
+    "Flame Thrower": {
+      "level": 5,
+      "damage": 10,
+      "moneyCost": 300,
+      "energyCost": 4,
+      "accuracy": 85,
+      "hands": 2,
+      "description": "Shoots fire. Everything is better with fire."
+    },
+    "Sawed-off Shotgun": {
+      "level": 5,
+      "damage": 15,
+      "moneyCost": 350,
+      "energyCost": 0,
+      "accuracy": 150,
+      "hands": 1,
+      "requirements": ["Shotgun Shell"],
+      "description": "A small gauge shotgun. BOOM!"
+    },
+    "Laser Gun": {
+      "level": 8,
+      "damage": 20,
+      "moneyCost": 600,
+      "energyCost": 8,
+      "accuracy": 95,
+      "hands": 1,
+      "description": "Pew pew pew! A focused beam of pure energy."
+    },
     "Lightsabre": {
       "level": 10,
       "damage": 30,
       "moneyCost": 1000,
-      "energyCost": 20,
+      "energyCost": 15,
       "accuracy": 90,
       "hands": 2,
       "description": "A laser sword. Very expensive! Bzzzzt."
+    },
+    "Rocket Launcher": {
+      "level": 12,
+      "damage": 50,
+      "moneyCost": 2000,
+      "energyCost": 12,
+      "accuracy": 80,
+      "hands": 2,
+      "description": "Fires explosive rockets. KABOOM! Not very accurate but who cares?"
+    },
+    "Chainsaw": {
+      "level": 15,
+      "damage": 35,
+      "moneyCost": 3000,
+      "energyCost": 8,
+      "accuracy": 95,
+      "hands": 1,
+      "description": "VRRRRRR! A spinning chain of sharp teeth. One-handed destruction."
+    },
+    "Plasma Cannon": {
+      "level": 20,
+      "damage": 80,
+      "moneyCost": 5000,
+      "energyCost": 20,
+      "accuracy": 90,
+      "hands": 2,
+      "description": "Fires superheated plasma. Melts through anything."
+    },
+    "Thunder Hammer": {
+      "level": 25,
+      "damage": 60,
+      "moneyCost": 8000,
+      "energyCost": 12,
+      "accuracy": 95,
+      "hands": 1,
+      "description": "A massive hammer crackling with electricity. One hand. Maximum bonk."
+    },
+    "Missile Launcher": {
+      "level": 30,
+      "damage": 150,
+      "moneyCost": 12000,
+      "energyCost": 25,
+      "accuracy": 85,
+      "hands": 2,
+      "description": "Locks on and fires guided missiles. Explosions guaranteed."
+    },
+    "Death Ray": {
+      "level": 35,
+      "damage": 100,
+      "moneyCost": 20000,
+      "energyCost": 15,
+      "accuracy": 100,
+      "hands": 1,
+      "description": "A beam of pure destruction. Never misses. Ever."
+    },
+    "Nuke Launcher": {
+      "level": 40,
+      "damage": 300,
+      "moneyCost": 40000,
+      "energyCost": 40,
+      "accuracy": 80,
+      "hands": 2,
+      "description": "Launches a miniature nuclear warhead. Everything goes BOOM."
+    },
+    "Antimatter Blade": {
+      "level": 45,
+      "damage": 200,
+      "moneyCost": 60000,
+      "energyCost": 25,
+      "accuracy": 95,
+      "hands": 1,
+      "description": "A sword made of antimatter. Annihilates anything it touches."
+    },
+    "Antimatter Missile Launcher": {
+      "level": 45,
+      "damage": 800,
+      "moneyCost": 80000,
+      "energyCost": 50,
+      "accuracy": 90,
+      "hands": 2,
+      "requirements": ["Antimatter Missile"],
+      "description": "Fires antimatter missiles that erase things from existence. Each missile costs a fortune. Worth it."
+    },
+    "Galaxy Destroyer": {
+      "level": 50,
+      "damage": 500,
+      "moneyCost": 100000,
+      "energyCost": 60,
+      "accuracy": 85,
+      "hands": 2,
+      "description": "The ultimate weapon. Capable of destroying entire galaxies. Probably overkill for a robot fight."
     }
   },
   "gear": {
@@ -72,30 +172,78 @@
       "stackable": true,
       "description": "Allows you to fire a Shotgun weapon once. Consumed when fired."
     },
+    "Antimatter Missile": {
+      "level": 45,
+      "moneyCost": 55000,
+      "description": "A missile made of antimatter. Consumed when launched. Erases anything it hits."
+    },
     "Cardboard Armor": {
       "level": 0,
       "moneyCost": 100,
       "healthBonus": 5,
       "description": "Cheapest possible armor for a robot. Even a stick could break it."
     },
-    "Wooden Armor": {
+    "Tin Armor": {
       "level": 2,
-      "moneyCost": 100,
-      "healthBonus": 25,
-      "description": "This armor was a tree once. The lorax disapproves."
+      "moneyCost": 250,
+      "healthBonus": 10,
+      "defenceBonus": 1,
+      "description": "Shiny tin plates bolted together. Better than cardboard!"
+    },
+    "Iron Armor": {
+      "level": 5,
+      "moneyCost": 500,
+      "healthBonus": 20,
+      "defenceBonus": 2,
+      "description": "Solid iron plating. Now we're talking."
+    },
+    "Steel Armor": {
+      "level": 8,
+      "moneyCost": 1000,
+      "healthBonus": 40,
+      "defenceBonus": 4,
+      "description": "Industrial-grade steel. Tanks wish they had this."
+    },
+    "Titanium Armor": {
+      "level": 12,
+      "moneyCost": 2500,
+      "healthBonus": 60,
+      "defenceBonus": 8,
+      "description": "Lightweight but incredibly strong. Space-age protection."
+    },
+    "Diamond Armor": {
+      "level": 20,
+      "moneyCost": 6000,
+      "healthBonus": 100,
+      "defenceBonus": 12,
+      "description": "Coated in synthetic diamond. Sparkly AND tough."
+    },
+    "Plasma Shield": {
+      "level": 30,
+      "moneyCost": 15000,
+      "healthBonus": 200,
+      "defenceBonus": 20,
+      "description": "A force field made of plasma. Sci-fi stuff. Very cool."
+    },
+    "Cosmic Armor": {
+      "level": 45,
+      "moneyCost": 50000,
+      "healthBonus": 400,
+      "defenceBonus": 35,
+      "description": "Forged from the heart of a dying star. The ultimate protection."
     },
     "Third Arm": {
       "level": 2,
       "moneyCost": 150,
       "handsBonus": 1,
-      "description": "More hands, more weapons"
+      "description": "More hands, more weapons!"
     },
     "Fourth Arm": {
       "level": 5,
       "moneyCost": 250,
       "handsBonus": 1,
       "requirements": ["Third Arm"],
-      "description": "Even more arms, even more weapons"
+      "description": "Even more arms, even more weapons!"
     },
     "Fifth Arm": {
       "level": 5,
@@ -103,6 +251,13 @@
       "handsBonus": 1,
       "requirements": ["Fourth Arm"],
       "description": "This is just silly. Who needs 5 arms?"
+    },
+    "Sixth Arm": {
+      "level": 20,
+      "moneyCost": 1000,
+      "handsBonus": 1,
+      "requirements": ["Fifth Arm"],
+      "description": "SIX ARMS. You look like a spider now."
     },
     "Gold Computer Chip": {
       "level": 3,
@@ -122,6 +277,36 @@
       "attackBonus": 10,
       "description": "A computer chip that boosts attack power. Your attacks deal 10% more damage!"
     },
+    "Advanced Chip": {
+      "level": 12,
+      "moneyCost": 600,
+      "dodgeBonus": 25,
+      "description": "Advanced dodge programming. Matrix-style bullet dodging."
+    },
+    "Ultra Power Chip": {
+      "level": 15,
+      "moneyCost": 1200,
+      "attackBonus": 25,
+      "description": "Overclocked attack algorithms. Hits 25% harder!"
+    },
+    "Mega Chip": {
+      "level": 20,
+      "moneyCost": 2000,
+      "defenceBonus": 5,
+      "description": "Advanced defense protocols. Takes 5 less damage per hit."
+    },
+    "Quantum Chip": {
+      "level": 30,
+      "moneyCost": 5000,
+      "dodgeBonus": 50,
+      "description": "Quantum probability dodging. The robot exists in multiple places at once."
+    },
+    "Hyperdrive": {
+      "level": 35,
+      "moneyCost": 10000,
+      "attackBonus": 40,
+      "description": "Hypercharged attack systems. Hits 40% harder!"
+    },
     "Money Maker": {
       "level": 0,
       "moneyCost": 100,
@@ -133,6 +318,12 @@
       "moneyCost": 50,
       "dodgeBonus": 10,
       "description": "A spinning propeller that helps the robot dodge attacks."
+    },
+    "Jet Booster": {
+      "level": 8,
+      "moneyCost": 300,
+      "dodgeBonus": 20,
+      "description": "Jet-powered dodging. WHOOOOSH!"
     },
     "Small Battery": {
       "level": 1,
@@ -151,6 +342,30 @@
       "moneyCost": 350,
       "energyBonus": 25,
       "description": "A big battery that increases energy capacity."
+    },
+    "Mega Battery": {
+      "level": 15,
+      "moneyCost": 1000,
+      "energyBonus": 50,
+      "description": "A huge battery. Powers the big guns."
+    },
+    "Nuclear Battery": {
+      "level": 25,
+      "moneyCost": 3000,
+      "energyBonus": 80,
+      "description": "Powered by nuclear fission. Don't drop it."
+    },
+    "Fusion Battery": {
+      "level": 35,
+      "moneyCost": 8000,
+      "energyBonus": 120,
+      "description": "Powered by nuclear fusion. Clean energy! (Mostly.)"
+    },
+    "Dark Matter Core": {
+      "level": 40,
+      "moneyCost": 20000,
+      "energyBonus": 200,
+      "description": "Harvested from the void between galaxies. Infinite-ish energy."
     }
   },
   "consumables": {
@@ -158,19 +373,67 @@
       "level": 2,
       "moneyCost": 30,
       "healthRestore": 10,
-      "description": "Repairs the robot. Can even leave it stronger than it started (for one battle)."
-    },
-    "Grenade": {
-      "level": 8,
-      "moneyCost": 100,
-      "damage": 30,
-      "description": "A small bomb you can launch at the enemy."
+      "description": "Repairs the robot. Duct tape and hope."
     },
     "Throwing Net": {
       "level": 4,
       "moneyCost": 100,
       "enemyDodgeReduction": 30,
       "description": "It's a net. You throw it. Destroys the net."
+    },
+    "Shield Boost": {
+      "level": 6,
+      "moneyCost": 80,
+      "tempDefence": 5,
+      "description": "Temporarily hardens your armor. +5 defence for the battle."
+    },
+    "Grenade": {
+      "level": 8,
+      "moneyCost": 100,
+      "damage": 30,
+      "description": "A small bomb you can launch at the enemy. BOOM!"
+    },
+    "EMP Bomb": {
+      "level": 10,
+      "moneyCost": 200,
+      "enemyDodgeReduction": 50,
+      "description": "Electromagnetic pulse. Scrambles their dodge circuits."
+    },
+    "Mega Repair Kit": {
+      "level": 15,
+      "moneyCost": 250,
+      "healthRestore": 50,
+      "description": "Industrial-grade repair tools. Welds, hammers, and lots of duct tape."
+    },
+    "Mega Grenade": {
+      "level": 20,
+      "moneyCost": 400,
+      "damage": 100,
+      "description": "A BIGGER bomb. Shakes the whole arena."
+    },
+    "Force Field": {
+      "level": 25,
+      "moneyCost": 600,
+      "tempDefence": 15,
+      "description": "Projects a temporary force field. +15 defence for the battle."
+    },
+    "Ultra Repair Kit": {
+      "level": 30,
+      "moneyCost": 800,
+      "healthRestore": 150,
+      "description": "Nanotechnology repair swarm. Fixes everything instantly."
+    },
+    "Plasma Grenade": {
+      "level": 30,
+      "moneyCost": 1000,
+      "damage": 250,
+      "description": "Plasma-coated explosive. Melts and explodes at the same time!"
+    },
+    "Nuke": {
+      "level": 40,
+      "moneyCost": 3000,
+      "damage": 500,
+      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed."
     }
   }
 }

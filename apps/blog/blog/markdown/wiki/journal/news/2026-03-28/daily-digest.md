@@ -53,3 +53,21 @@ last_verified: 2026-03-28
 ## Just for You
 
 - [AWS Dev Blog](https://dev.to/devops_descent/march-2026-aws-highlights-4jmb) March AWS highlights: Lambda Managed Instances adds Rust support, bringing native-performance serverless to the runtime. Amazon MSK adds Graviton3 support for Kafka in the Africa (Cape Town) region, expanding low-cost streaming to emerging-region deployments.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/03/28/anthropics-claude-popularity-with-paying-consumers-is-skyrocketing/) Analysis of anonymized credit card transactions from 28 million US consumers shows Claude gaining paid subscribers at a record rate in March 2026. Claude reached 9 million daily active users; ChatGPT still leads at 440 million DAU and is also still adding subscribers.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/03/28/big-ip-apm-vulnerability-cve-2025-53521-exploited/) CVE-2025-53521 in F5 BIG-IP Access Policy Manager was re-classified from denial-of-service to unauthenticated RCE (CVSS 9.8) after new exploitation evidence emerged in March 2026. Active exploitation confirmed; CISA ordered federal agencies to assess and mitigate by March 30. The October 2025 patch resolves the issue.
+
+- [Socket Security](https://socket.dev/blog/malicious-telnyx-packages-supply-chain-attack) The Telnyx Python SDK was compromised on PyPI on March 27 by threat actor TeamPCP: versions 4.87.1 and 4.87.2 contain credential-harvesting code concealed inside a bundled WAV file. Downgrade to 4.87.0 immediately; the PyPI project is currently quarantined.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/03/28/world/live-news/iran-war-us-israel-trump) Iran launched a missile strike on a commercial street in Tel Aviv on March 28, killing at least one person and wounding several others. Yemen's Houthis warned they will enter the conflict if attacks on Iran continue. Israel expanded ground operations in Lebanon toward the Litani River; an Israeli airstrike killed three journalists in southern Lebanon.

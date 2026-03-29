@@ -41,7 +41,7 @@ test.describe("Combat", () => {
     await page.getByTestId("choice-surrender").click();
     await page.getByTestId("confirm-true").click();
 
-    await expect(page.getByText("SURRENDERED")).toBeVisible();
+    await expect(page.getByText("SURRENDERED", { exact: true })).toBeVisible();
   });
 
   test("can rest during battle", async ({ page }) => {
@@ -104,8 +104,8 @@ test.describe("Combat", () => {
     await enterGameWithWeapon(page);
     await page.getByTestId("choice-fight").click();
 
-    await expect(page.getByText("[Fair]")).toBeVisible();
-    await expect(page.getByText("[Hard]")).toBeVisible();
+    await expect(page.getByText("[Fair]").first()).toBeVisible();
+    await expect(page.getByText("[Hard]").first()).toBeVisible();
   });
 
   test("enemy detail screen shows stats and weapons", async ({ page }) => {

@@ -19,8 +19,10 @@ import {
   getEffectiveHands,
   getEffectiveMaxEnergy,
   getEffectiveMaxHealth,
+  getRestEnergyBonus,
   hasItem,
   isAlive,
+  getWeaponEnergyCost,
 } from "./robot";
 import { createRng } from "./rng";
 
@@ -58,6 +60,7 @@ export function createBattle(
     playerAction: null,
     enemyAction: null,
     turnHistory: [],
+    turnLogs: [],
   };
 }
 
@@ -94,7 +97,7 @@ export function executeAttack(
     return fail(`Not enough hands (need ${totalHands}, have ${getEffectiveHands(attacker.robot)})`);
   }
 
-  const totalEnergy = weapons.reduce((s, w) => s + w.energyCost, 0);
+  const totalEnergy = weapons.reduce((s, w) => s + getWeaponEnergyCost(w, attacker.robot), 0);
   if (totalEnergy > attacker.currentEnergy) {
     return fail(`Not enough energy (need ${totalEnergy}, have ${attacker.currentEnergy})`);
   }
@@ -157,7 +160,8 @@ export function executeRest(
   fighter: BattleRobot,
 ): ActionResult {
   const maxEnergy = getEffectiveMaxEnergy(fighter.robot);
-  const restored = Math.min(5, maxEnergy - fighter.currentEnergy);
+  const baseRest = 5 + getRestEnergyBonus(fighter.robot);
+  const restored = Math.min(baseRest, maxEnergy - fighter.currentEnergy);
   fighter.currentEnergy += restored;
   log(battle, `${fighter.robot.name} rests and recovers ${restored} energy`);
   return ok(`Recovered ${restored} energy`);
@@ -250,6 +254,7 @@ export function recordTurnSnapshot(battle: BattleState): void {
 
 export function endTurn(battle: BattleState): void {
   recordTurnSnapshot(battle);
+  battle.turnLogs.push([...battle.currentTurnLog]);
   battle.lastTurnLog = [...battle.currentTurnLog];
   battle.currentTurnLog = [];
   battle.playerAction = null;
@@ -272,7 +277,7 @@ export function planAttack(
     return fail(`Not enough hands (need ${totalHands}, have ${getEffectiveHands(fighter.robot)})`);
   }
 
-  const totalEnergy = weapons.reduce((s, w) => s + w.energyCost, 0);
+  const totalEnergy = weapons.reduce((s, w) => s + getWeaponEnergyCost(w, fighter.robot), 0);
   if (totalEnergy > fighter.currentEnergy) {
     return fail(`Not enough energy (need ${totalEnergy}, have ${fighter.currentEnergy})`);
   }

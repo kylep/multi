@@ -157,6 +157,65 @@ watchlist above:
 - Blog infrastructure (Next.js, static site generation, Playwright testing)
 - Open source AI (local LLMs, llama.cpp, Ollama)
 
+## GitHub Trending (morning only)
+
+Once per day — on the **morning run only** (i.e. when
+`daily-digest.md` does not yet exist) — capture the top GitHub
+trending repos for the week.
+
+### How to capture
+
+Run the script: `python3 bin/github-trending.py --json`
+
+The script fetches https://github.com/trending?since=weekly, filters
+to repos with ≥3,000 stars this week (non-English descriptions
+excluded unless ≥30k stars/week), and returns the top 8 sorted by
+stars this week as JSON.
+
+If the script fails or is unavailable, skip this section silently —
+do not block the rest of the digest.
+
+### Where to save
+
+Write the formatted list to:
+`apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD/github-trending.md`
+
+Use this format:
+
+```markdown
+---
+title: "GitHub Trending: YYYY-MM-DD"
+keywords:
+  - github-trending
+  - YYYY-MM-DD
+related:
+  - wiki/journal
+last_verified: YYYY-MM-DD
+---
+
+1. user/repo: 21,644 stars this week, 115,592 stars total - Description text here
+2. user/repo: 18,872 stars this week, 51,934 stars total - Another description
+...
+```
+
+### Comparison with previous day
+
+After writing the new file, read the previous day's trending file at
+`apps/blog/blog/markdown/wiki/journal/news/PREVIOUS-DATE/github-trending.md`.
+If it exists, compare the two lists and generate a **Trending Summary**
+sentence for Discord. The summary should note:
+- Which repos entered the top 8 (new this week)
+- Which repos dropped off
+- Whether the #1 spot changed or held
+- One sentence on the general trend (e.g. "Claude Code tooling
+  dominates this week" or "trading/finance agents are surging")
+
+If no previous day file exists, just note "First trending snapshot —
+no comparison available."
+
+Include this summary in the Discord morning post only (see Discord
+format below). Do NOT include it in noon or evening updates.
+
 ## Workflow
 
 1. Determine today's date from the system prompt (passed as `${TODAY}`).
@@ -168,8 +227,15 @@ watchlist above:
       `apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD/daily-digest.md`
       (if it exists). Extract all story topics and source URLs already covered.
    Combine both sets into a "already covered" list.
+   c. Note whether the daily-digest.md file existed. If it did NOT
+      exist, this is the morning run — set `IS_MORNING=true`.
 
-3. Run these searches **in parallel**:
+3. **GitHub Trending (morning only)**: If `IS_MORNING` is true, run
+   `python3 bin/github-trending.py --json`, write the trending file,
+   and generate the comparison summary per the "GitHub Trending"
+   section above. Do this in parallel with step 4.
+
+4. Run these searches **in parallel**:
 
    **Batch 1 — Google News MCP** (`search_news`, scoped to today):
    - `Anthropic OR OpenAI`
@@ -193,7 +259,7 @@ watchlist above:
    If any Google News query fails (rate limit, error), fall back to
    WebSearch for that query.
 
-4. Deduplicate results across all queries. Skip any story already in
+5. Deduplicate results across all queries. Skip any story already in
    the "already covered" list unless there is a material update.
    Material updates include: funding amount changes, confirmed
    product launch dates, finalized acquisition terms, revised breach
@@ -201,14 +267,14 @@ watchlist above:
    legal outcomes, and significant pricing or feature changes. If
    including an update, state what changed and cite the new source.
 
-5. Apply the significance rubric. Discard anything below threshold.
+6. Apply the significance rubric. Discard anything below threshold.
    Be aggressive about cutting — fewer high-quality items beats
    more low-quality ones.
 
-6. Check remaining stories against the blog topic list. Promote any
+7. Check remaining stories against the blog topic list. Promote any
    borderline matches to "Just for You."
 
-7. Write the digest to the wiki file at
+8. Write the digest to the wiki file at
    `apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD/daily-digest.md`.
    - If the file does **not** exist: create it with frontmatter and all sections.
    - If the file **already** exists: append new sections below a
@@ -217,9 +283,11 @@ watchlist above:
      rewrite existing sections. Only add new stories.
    - Create the directory first: `mkdir -p apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD`
 
-8. Post to Discord #news using the Discord format below.
+9. Post to Discord #news using the Discord format below. If this is
+   the morning run and you generated a trending summary in step 3,
+   include it at the end of the Discord message.
 
-9. **Error reporting**: If you encounter any errors with git, file I/O,
+10. **Error reporting**: If you encounter any errors with git, file I/O,
    network, or other non-news problems, post a short error summary to
    Discord #news (e.g. "Journalist error: could not commit — merge
    conflict on daily-digest.md") so the operator can fix it. Do not
@@ -298,6 +366,9 @@ Whitby: 8C high, 2C low, overcast, 40% chance afternoon rain. No alerts.
 
 **Just for You**
 - [Anthropic Blog](<https://docs.anthropic.com/...>) Playwright MCP server adds Firefox support alongside Chromium.
+
+**GitHub Trending** (morning only)
+everything-claude-code entered the top 8, pushing llamafile off the list. deer-flow holds the #1 spot for a second week. Agent tooling continues to dominate weekly trending.
 ```
 
 Format rules:

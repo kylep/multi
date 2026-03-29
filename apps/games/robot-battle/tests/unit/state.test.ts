@@ -20,6 +20,13 @@ describe("createPlayer", () => {
     expect(p.level).toBe(1);
   });
 
+  it("initializes upgrades and settings with defaults", () => {
+    const state = setup();
+    const p = state.player!;
+    expect(p.upgrades).toEqual([]);
+    expect(p.settings).toEqual({ mode: "oliver", oliverChallenge: false });
+  });
+
   it("gives player a free Stick", () => {
     const state = setup();
     const p = state.player!;
@@ -77,9 +84,10 @@ describe("awardExp", () => {
   });
 
   it("handles multiple level ups", () => {
+    // Level 1 needs 10 XP, level 2 needs 12 XP; 25 - 10 - 12 = 3 remaining
     const state = setup();
     awardExp(state, 25);
     expect(state.player!.level).toBe(3);
-    expect(state.player!.exp).toBe(5);
+    expect(state.player!.exp).toBe(3);
   });
 });

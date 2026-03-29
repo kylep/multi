@@ -20,10 +20,12 @@ describe("loadAssets", () => {
     expect(wrench.moneyCost).toBe(75);
   });
 
-  it("loads gear including Wooden Armor (not nested under Cardboard)", () => {
+  it("loads armor gear tiers", () => {
     expect(registry.gear.has("Cardboard Armor")).toBe(true);
-    expect(registry.gear.has("Wooden Armor")).toBe(true);
-    expect(registry.gear.get("Wooden Armor")!.healthBonus).toBe(25);
+    expect(registry.gear.has("Tin Armor")).toBe(true);
+    expect(registry.gear.has("Iron Armor")).toBe(true);
+    expect(registry.gear.get("Tin Armor")!.healthBonus).toBe(10);
+    expect(registry.gear.get("Tin Armor")!.defenceBonus).toBe(1);
   });
 
   it("loads consumables", () => {
@@ -32,13 +34,10 @@ describe("loadAssets", () => {
   });
 
   it("loads enemies", () => {
-    expect(registry.enemies.size).toBe(6);
+    expect(registry.enemies.size).toBe(17);
     expect(registry.enemies.has("MiniBot")).toBe(true);
-    expect(registry.enemies.has("Sparky")).toBe(true);
-    expect(registry.enemies.has("Rustclaw")).toBe(true);
-    expect(registry.enemies.has("Firebot")).toBe(true);
-    expect(registry.enemies.has("Voltank")).toBe(true);
-    expect(registry.enemies.has("Omega")).toBe(true);
+    expect(registry.enemies.has("TITAN")).toBe(true);
+    expect(registry.enemies.has("Apocalypse")).toBe(true);
   });
 
   it("loads config defaults", () => {

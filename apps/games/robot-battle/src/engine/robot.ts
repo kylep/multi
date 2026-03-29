@@ -4,6 +4,11 @@ import type { BattleRobot, Gear, Item, Robot, Weapon, Consumable } from "./types
 
 // ── Robot helpers ──
 
+export function getWeaponEnergyCost(weapon: Weapon, player: Robot): number {
+  if (player.settings?.mode === "lucas") return 0;
+  return weapon.energyCost;
+}
+
 export function getWeapons(robot: Robot): Weapon[] {
   return robot.inventory.filter((i): i is Weapon => i.itemType === "weapon");
 }
@@ -29,7 +34,7 @@ export function getEffectiveDefence(robot: Robot): number {
 }
 
 export function getEffectiveMaxHealth(robot: Robot): number {
-  return robot.maxHealth + getGear(robot).reduce((s, g) => s + g.healthBonus, 0);
+  return robot.maxHealth + robot.level * 2 + getGear(robot).reduce((s, g) => s + g.healthBonus, 0);
 }
 
 export function getEffectiveMaxEnergy(robot: Robot): number {
@@ -38,6 +43,10 @@ export function getEffectiveMaxEnergy(robot: Robot): number {
 
 export function getEffectiveAttack(robot: Robot): number {
   return robot.attack + getGear(robot).reduce((s, g) => s + g.attackBonus, 0);
+}
+
+export function getRestEnergyBonus(robot: Robot): number {
+  return getGear(robot).reduce((s, g) => s + Math.ceil(0.5 * g.energyBonus), 0);
 }
 
 export function getMoneyBonusPercent(robot: Robot): number {

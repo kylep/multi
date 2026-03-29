@@ -1,76 +1,114 @@
-/** Shop screen. */
+/** Shop screen — tabbed single-page UI. */
 
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
-import type { Gear, Consumable, Item, Weapon } from "../../engine/types";
+import type { Gear, Consumable, Item, Robot, Weapon } from "../../engine/types";
 import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, sellItem } from "../../engine/shop";
-import { getEffectiveMaxEnergy, getEffectiveMaxHealth } from "../../engine/robot";
-import { showRobotStats } from "./inspect";
+import {
+  getEffectiveMaxEnergy,
+  getEffectiveMaxHealth,
+  getEffectiveAttack,
+  getEffectiveDefence,
+  getEffectiveDodge,
+  getEffectiveHands,
+  getWeapons,
+  getGear,
+  getConsumables,
+  getWeaponEnergyCost,
+} from "../../engine/robot";
 import type { SoundPlayer } from "../sound";
 
-function shopHeader(terminal: Terminal, state: GameState, activeTab: string): void {
+function esc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function renderShopHeader(terminal: Terminal, state: GameState): void {
   const player = state.player!;
   const slots = countInventorySlots(player);
   const invFull = slots >= player.inventorySize;
   const invClass = invFull ? "t-red t-bold" : "";
+
   terminal.printHTML(
-    `<div class="panel-header" style="margin-bottom:0"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${slots}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
+    `<div class="panel-header" style="margin-bottom:4px"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${slots}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
   );
-  // Only show static tab bar on sub-screens (buy/sell)
-  if (activeTab) {
-    const tabs = ["Buy", "Sell", "Back"];
-    const tabHtml = tabs.map((t) => {
-      const val = t.toLowerCase();
-      const isActive = val === activeTab;
-      const isBack = val === "back";
-      let cls = "btn";
-      if (isActive) cls += " btn-primary";
-      else if (isBack) cls += " btn-secondary";
-      return `<span class="${cls}" style="display:inline-block;padding:4px 16px;margin:0 4px 0 0;cursor:default;font-size:14px">${t}</span>`;
-    }).join("");
-    terminal.printHTML(`<div style="margin:2px 0 8px 0">${tabHtml}</div>`);
+}
+
+/** Tab bar choices — all tabs always shown, active tab highlighted */
+function shopTabChoices(activeTab: string, filterOn?: boolean): Choice[] {
+  const tabs = ["Buy", "Sell", "Inventory"];
+  const choices: Choice[] = tabs.map((t) => ({
+    label: t,
+    value: t.toLowerCase(),
+    group: "tab",
+    active: t.toLowerCase() === activeTab,
+  }));
+  if (filterOn !== undefined) {
+    choices.push({
+      label: filterOn ? "Filter: On" : "Filter: Off",
+      value: "toggle-filter",
+      group: "tab",
+      active: filterOn,
+    });
   }
+  choices.push({ label: "Back", value: "back", group: "tab", active: false });
+  return choices;
 }
 
 export async function shopScreen(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
   const player = state.player!;
+  let currentTab = "buy";
+  let filterOn = true;
 
   while (true) {
     player.health = getEffectiveMaxHealth(player);
     player.energy = getEffectiveMaxEnergy(player);
 
     terminal.clear();
-    shopHeader(terminal, state, "");
-    // Main shop: tabs are the interactive choices (no static tab bar)
-    const choice = await terminal.promptChoice("", [
-      { label: "Buy", value: "buy" },
-      { label: "Sell", value: "sell" },
-      { label: "Inventory", value: "inventory" },
-      { label: "Back", value: "back" },
-    ], "row");
+    renderShopHeader(terminal, state);
 
-    if (choice === "back") break;
-    if (choice === "buy") await buyMenu(terminal, state, sound);
-    else if (choice === "sell") await sellMenu(terminal, state);
-    else if (choice === "inventory") {
-      await showRobotStats(terminal, state);
-      await terminal.promptContinue(0);
+    if (currentTab === "buy") {
+      const result = await renderBuyTab(terminal, state, filterOn, sound);
+      if (result === "back") break;
+      if (result === "toggle-filter") { filterOn = !filterOn; continue; }
+      if (result === "sell" || result === "inventory") { currentTab = result; continue; }
+    } else if (currentTab === "sell") {
+      const result = await renderSellTab(terminal, state);
+      if (result === "back") break;
+      if (result === "buy" || result === "inventory") { currentTab = result; continue; }
+    } else if (currentTab === "inventory") {
+      const result = await renderInventoryTab(terminal, state);
+      if (result === "back") break;
+      if (result === "buy" || result === "sell") { currentTab = result; continue; }
     }
   }
 }
 
-async function buyMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
+async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: boolean, sound?: SoundPlayer): Promise<string> {
+  const allItems = listAvailableItems(state);
   const player = state.player!;
+  const available = filterOn
+    ? allItems.filter((i) => i.level <= player.level)
+    : allItems;
 
-  while (true) {
-    terminal.clear();
-    shopHeader(terminal, state, "buy");
+  // Group by type with section headers
+  const weapons = available.filter((i) => i.itemType === "weapon");
+  const gear = available.filter((i) => i.itemType === "gear");
+  const consumables = available.filter((i) => i.itemType === "consumable");
 
-    const available = listAvailableItems(state);
+  const choices: Choice[] = [...shopTabChoices("buy", filterOn)];
 
-    const choices: Choice[] = [];
-    for (let i = 0; i < available.length; i++) {
-      const item = available[i];
+  const sections: { label: string; items: typeof available }[] = [
+    { label: "--- Weapons ---", items: weapons },
+    { label: "--- Gear ---", items: gear },
+    { label: "--- Consumables ---", items: consumables },
+  ];
+
+  for (const section of sections) {
+    if (section.items.length === 0) continue;
+    // Section header as a full-width disabled card
+    choices.push({ label: section.label, value: `header-${section.label}`, disabled: true, group: "header" });
+    for (const item of section.items) {
+      const i = available.indexOf(item);
       const check = canBuy(state, item);
       const owned = item.itemType === "gear" && (item as Gear).stackable
         ? player.inventory.filter((inv) => inv.name === item.name).length
@@ -78,18 +116,21 @@ async function buyMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer
       const ownedTag = owned > 0 ? ` (have ${owned})` : "";
       choices.push({
         label: `${item.name}${ownedTag} — $${item.moneyCost}`,
-        value: String(i),
-        subtitle: itemSummary(item) + (check.ok ? "" : ` [${check.reason}]`),
+        value: `buy-${i}`,
+        subtitle: itemSummary(item, state.player!) + (check.ok ? "" : ` [${check.reason}]`),
         disabled: !check.ok,
       });
     }
-    choices.push({ label: "Back", value: "back" });
+  }
 
-    const choice = await terminal.promptChoice("", choices, "grid");
+  choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
 
-    if (choice === "back") break;
+  const choice = await terminal.promptChoice("", choices, "grid");
 
-    const idx = parseInt(choice, 10);
+  if (choice === "back" || choice === "sell" || choice === "inventory" || choice === "toggle-filter") return choice;
+
+  if (choice.startsWith("buy-")) {
+    const idx = parseInt(choice.slice(4), 10);
     if (idx >= 0 && idx < available.length) {
       const item = available[idx];
       const confirmed = await terminal.promptConfirm(
@@ -103,49 +144,35 @@ async function buyMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer
       }
     }
   }
+
+  return "buy"; // stay on buy tab
 }
 
-async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
+async function renderSellTab(terminal: Terminal, state: GameState): Promise<string> {
   const player = state.player!;
 
-  while (true) {
-    terminal.clear();
-    shopHeader(terminal, state, "sell");
+  if (player.inventory.length === 0) {
+    terminal.print("(No items to sell)", "t-dim");
+  }
 
-    if (player.inventory.length === 0) {
-      terminal.print("(No items to sell)", "t-dim");
-      await terminal.promptContinue(0);
-      break;
-    }
+  const choices: Choice[] = [...shopTabChoices("sell")];
+  for (let i = 0; i < player.inventory.length; i++) {
+    const item = player.inventory[i];
+    choices.push({
+      label: `${item.name} — $${getSellPrice(item)}`,
+      value: `sell-${i}`,
+      subtitle: itemSummary(item, state.player!),
+    });
+  }
 
-    const choices: Choice[] = [];
-    const seen = new Set<string>();
-    for (let i = 0; i < player.inventory.length; i++) {
-      const item = player.inventory[i];
-      if (item.itemType === "gear" && (item as Gear).stackable) {
-        if (seen.has(item.name)) continue;
-        seen.add(item.name);
-        const count = player.inventory.filter((inv) => inv.name === item.name).length;
-        choices.push({
-          label: `${item.name} x${count} — $${getSellPrice(item)}`,
-          value: String(i),
-          subtitle: itemSummary(item),
-        });
-      } else {
-        choices.push({
-          label: `${item.name} — $${getSellPrice(item)}`,
-          value: String(i),
-          subtitle: itemSummary(item),
-        });
-      }
-    }
-    choices.push({ label: "Back", value: "back" });
+  choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
 
-    const choice = await terminal.promptChoice("", choices, "grid");
+  const choice = await terminal.promptChoice("", choices, "grid");
 
-    if (choice === "back") break;
+  if (choice === "back" || choice === "buy" || choice === "inventory") return choice;
 
-    const idx = parseInt(choice, 10);
+  if (choice.startsWith("sell-")) {
+    const idx = parseInt(choice.slice(5), 10);
     if (idx >= 0 && idx < player.inventory.length) {
       const item = player.inventory[idx];
       const confirmed = await terminal.promptConfirm(
@@ -153,23 +180,75 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
         "Sell",
         "Cancel",
       );
-      if (confirmed) {
-        sellItem(state, item);
-      }
+      if (confirmed) sellItem(state, item);
     }
   }
+
+  return "sell"; // stay on sell tab
 }
 
-function itemSummary(item: Item): string {
+async function renderInventoryTab(terminal: Terminal, state: GameState): Promise<string> {
+  const player = state.player!;
+
+  // Build inventory content HTML
+  const statsHtml = `<div class="panel" style="padding:6px 10px"><span class="t-cyan">HP: ${player.health}/${getEffectiveMaxHealth(player)}</span> &nbsp; <span class="t-cyan">EN: ${player.energy}/${getEffectiveMaxEnergy(player)}</span> &nbsp; Atk: ${getEffectiveAttack(player)}% &nbsp; Def: ${getEffectiveDefence(player)} &nbsp; Dodge: ${getEffectiveDodge(player)} &nbsp; Hands: ${getEffectiveHands(player)}</div>`;
+
+  const weapons = getWeapons(player);
+  const gear = getGear(player);
+  const consumables = getConsumables(player);
+
+  const weaponHtml = weapons.length === 0
+    ? `<div class="t-dim">(none)</div>`
+    : weapons.map((w) => `<div class="t-green">${esc(w.name)} — ${w.damage}dmg, ${w.accuracy}%acc</div>`).join("");
+
+  const gearCounts = new Map<string, { gear: typeof gear[0]; count: number }>();
+  for (const g of gear) {
+    const existing = gearCounts.get(g.name);
+    if (existing) existing.count++;
+    else gearCounts.set(g.name, { gear: g, count: 1 });
+  }
+
+  const gearHtml = gear.length === 0
+    ? `<div class="t-dim">(none)</div>`
+    : [...gearCounts.values()].map(({ gear: g, count }) => {
+      const fx: string[] = [];
+      if (g.healthBonus) fx.push(`+${g.healthBonus}HP`);
+      if (g.energyBonus) fx.push(`+${g.energyBonus}EN`);
+      if (g.defenceBonus) fx.push(`+${g.defenceBonus}Def`);
+      if (g.attackBonus) fx.push(`+${g.attackBonus}%Atk`);
+      if (g.handsBonus) fx.push(`+${g.handsBonus}H`);
+      if (g.dodgeBonus) fx.push(`+${g.dodgeBonus}Dodge`);
+      if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}%$`);
+      const countStr = count > 1 ? ` x${count}` : "";
+      const fxStr = fx.length > 0 ? ` — ${fx.join(", ")}` : "";
+      return `<div class="t-cyan">${esc(g.name)}${countStr}${fxStr}</div>`;
+    }).join("");
+
+  let contentHTML = statsHtml;
+  contentHTML += `<div class="battle-layout"><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Weapons</div>${weaponHtml}</div><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Gear</div>${gearHtml}</div></div>`;
+
+  if (consumables.length > 0) {
+    const conHtml = consumables.map((c) => `<div class="t-green">${esc(c.name)}</div>`).join("");
+    contentHTML += `<div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Items</div>${conHtml}</div>`;
+  }
+
+  // Tab bar with inventory content below it
+  const choices: Choice[] = [...shopTabChoices("inventory")];
+  choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
+  const choice = await terminal.promptChoice("", choices, "grid", contentHTML);
+  return choice;
+}
+
+function itemSummary(item: Item, player: Robot): string {
   if (item.itemType === "weapon") {
     const w = item as Weapon;
-    return `${w.damage} dmg, ${w.accuracy}% acc, ${w.energyCost} energy, ${w.hands}h`;
+    return `${w.damage} dmg, ${w.accuracy}% acc, ${getWeaponEnergyCost(w, player)} en, ${w.hands}h`;
   }
   if (item.itemType === "gear") {
     const g = item as Gear;
     const parts: string[] = [];
     if (g.healthBonus) parts.push(`+${g.healthBonus} HP`);
-    if (g.energyBonus) parts.push(`+${g.energyBonus} Energy`);
+    if (g.energyBonus) parts.push(`+${g.energyBonus} EN`);
     if (g.defenceBonus) parts.push(`+${g.defenceBonus} Def`);
     if (g.attackBonus) parts.push(`+${g.attackBonus}% Atk`);
     if (g.handsBonus) parts.push(`+${g.handsBonus} Hands`);
@@ -181,7 +260,7 @@ function itemSummary(item: Item): string {
     const c = item as Consumable;
     const parts: string[] = [];
     if (c.healthRestore) parts.push(`+${c.healthRestore} HP`);
-    if (c.energyRestore) parts.push(`+${c.energyRestore} Energy`);
+    if (c.energyRestore) parts.push(`+${c.energyRestore} EN`);
     if (c.tempDefence) parts.push(`+${c.tempDefence} Temp Def`);
     if (c.tempAttack) parts.push(`+${c.tempAttack}% Temp Atk`);
     if (c.damage) parts.push(`${c.damage} Dmg`);

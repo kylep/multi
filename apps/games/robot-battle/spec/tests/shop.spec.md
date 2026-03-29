@@ -43,3 +43,20 @@
 ### Sell After Buying
 - Buy a Stick, go back, click Sell, click Stick
 - Verify: "Sold Stick for $25" message
+
+### Bottom Back card returns to main menu
+- Open shop, scroll to bottom of buy tab
+- Click the bottom Back card (.card.card-back)
+- Verify: returns to main menu (Fight button visible)
+
+### Shop scrolls to top when opened
+- Open shop
+- Verify: tab bar (Buy/Sell/Inventory/Back) is visible at top of viewport
+
+### Filter toggle hides level-restricted items
+- Open shop (Buy tab, filter defaults to On)
+- Verify: only items at or below player level are shown
+- Click "Filter: On" to toggle off
+- Verify: all items shown including level-restricted ones with "[Requires level X]"
+- Click "Filter: Off" to toggle back on
+- Verify: level-restricted items hidden again
