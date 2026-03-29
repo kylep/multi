@@ -8,8 +8,9 @@ import {
   getEffectiveMaxHealth,
   getWeapons,
 } from "../../engine/robot";
-import { showRobotStats } from "./inspect";
 import { shopScreen } from "./shop";
+import { upgradesScreen } from "./upgrades";
+import { settingsScreen } from "./settings";
 import { battleScreen } from "./battle";
 
 export async function mainMenu(
@@ -37,7 +38,8 @@ export async function mainMenu(
     const choice = await terminal.promptChoice("", [
       { label: "Fight", value: "fight", subtitle: "Battle enemies" },
       { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
-      { label: "Inspect Robot", value: "inspect", subtitle: "View stats & inventory" },
+      { label: "Upgrades", value: "upgrades", subtitle: "Permanent buffs" },
+      { label: "Settings", value: "settings", subtitle: "Game options" },
       { label: "Quit", value: "quit", subtitle: "Return to title" },
     ], "grid");
 
@@ -49,9 +51,12 @@ export async function mainMenu(
     } else if (choice === "shop") {
       await shopScreen(terminal, state);
       save?.();
-    } else if (choice === "inspect") {
-      await showRobotStats(terminal, state);
-      await terminal.promptContinue(0);
+    } else if (choice === "upgrades") {
+      await upgradesScreen(terminal, state);
+      save?.();
+    } else if (choice === "settings") {
+      await settingsScreen(terminal, state);
+      save?.();
     }
   }
 }

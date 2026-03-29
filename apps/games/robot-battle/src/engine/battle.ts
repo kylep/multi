@@ -21,6 +21,7 @@ import {
   getEffectiveMaxHealth,
   hasItem,
   isAlive,
+  getWeaponEnergyCost,
 } from "./robot";
 import { createRng } from "./rng";
 
@@ -58,6 +59,7 @@ export function createBattle(
     playerAction: null,
     enemyAction: null,
     turnHistory: [],
+    turnLogs: [],
   };
 }
 
@@ -94,7 +96,7 @@ export function executeAttack(
     return fail(`Not enough hands (need ${totalHands}, have ${getEffectiveHands(attacker.robot)})`);
   }
 
-  const totalEnergy = weapons.reduce((s, w) => s + w.energyCost, 0);
+  const totalEnergy = weapons.reduce((s, w) => s + getWeaponEnergyCost(w, attacker.robot), 0);
   if (totalEnergy > attacker.currentEnergy) {
     return fail(`Not enough energy (need ${totalEnergy}, have ${attacker.currentEnergy})`);
   }
@@ -250,6 +252,7 @@ export function recordTurnSnapshot(battle: BattleState): void {
 
 export function endTurn(battle: BattleState): void {
   recordTurnSnapshot(battle);
+  battle.turnLogs.push([...battle.currentTurnLog]);
   battle.lastTurnLog = [...battle.currentTurnLog];
   battle.currentTurnLog = [];
   battle.playerAction = null;
@@ -272,7 +275,7 @@ export function planAttack(
     return fail(`Not enough hands (need ${totalHands}, have ${getEffectiveHands(fighter.robot)})`);
   }
 
-  const totalEnergy = weapons.reduce((s, w) => s + w.energyCost, 0);
+  const totalEnergy = weapons.reduce((s, w) => s + getWeaponEnergyCost(w, fighter.robot), 0);
   if (totalEnergy > fighter.currentEnergy) {
     return fail(`Not enough energy (need ${totalEnergy}, have ${fighter.currentEnergy})`);
   }

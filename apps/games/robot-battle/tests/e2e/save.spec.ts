@@ -35,12 +35,10 @@ test.describe("Save & Load", () => {
   test("Continue loads saved game with inventory", async ({ page }) => {
     await newGame(page, "InvBot");
 
-    // Buy a Stick
+    // Buy a Stick (buy tab is active by default)
     await page.getByTestId("choice-shop").click();
-    await page.getByTestId("choice-buy").click();
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
-    await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 
     // Reload and continue
@@ -55,12 +53,10 @@ test.describe("Save & Load", () => {
   test("save persists after fight (surrender)", async ({ page }) => {
     await newGame(page, "FightSaveBot");
 
-    // Buy a Stick
+    // Buy a Stick (buy tab is active by default)
     await page.getByTestId("choice-shop").click();
-    await page.getByTestId("choice-buy").click();
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
-    await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 
     // Fight and surrender
@@ -76,20 +72,17 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-continue").click();
     await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
 
-    // Check fights count in inspect
-    await page.getByTestId("choice-inspect").click();
+    // Check fights count in main menu header
     await expect(page.getByText("0W / 1F").first()).toBeVisible();
   });
 
   test("save persists after shop session", async ({ page }) => {
     await newGame(page, "ShopSaveBot");
 
-    // Buy a Stick
+    // Buy a Stick (buy tab is active by default)
     await page.getByTestId("choice-shop").click();
-    await page.getByTestId("choice-buy").click();
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
-    await page.getByTestId("choice-back").click();
     await page.getByTestId("choice-back").click();
 
     // Reload and continue

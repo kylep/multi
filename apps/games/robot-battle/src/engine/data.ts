@@ -1,6 +1,7 @@
 /** Asset loading from JSON data files. */
 
 import type { Consumable, Enemy, Gear, Item, Robot, Weapon } from "./types";
+import { applyAllUpgrades } from "./upgrades";
 
 import configJson from "../data/config.json";
 import itemsJson from "../data/items.json";
@@ -65,6 +66,7 @@ function loadEnemy(name: string, d: Record<string, unknown>): Enemy {
     weapons: (d.weapons as string[]) ?? [],
     gear: (d.gear as string[]) ?? [],
     consumables: (d.consumables as string[]) ?? [],
+    upgrades: (d.upgrades as string[]) ?? [],
     reward: (d.reward as number) ?? 0,
     expReward: (d.expReward as number) ?? 1,
     description: (d.description as string) ?? "",
@@ -174,6 +176,8 @@ export function loadAssets(): AssetRegistry {
         fights: 0,
         inventorySize: 99,
         inventory: [],
+        upgrades: [],
+        settings: { mode: "oliver", oliverChallenge: false },
       };
 
       for (const wName of enemy.weapons) {
@@ -187,6 +191,12 @@ export function loadAssets(): AssetRegistry {
       for (const cName of enemy.consumables) {
         const c = consumables.get(cName);
         if (c) robot.inventory.push({ ...c });
+      }
+
+      // Apply enemy upgrades
+      if (enemy.upgrades.length > 0) {
+        robot.upgrades = [...enemy.upgrades];
+        applyAllUpgrades(robot);
       }
 
       return robot;

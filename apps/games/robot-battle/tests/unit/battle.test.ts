@@ -35,6 +35,8 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     fights: 0,
     inventorySize: 4,
     inventory: [],
+    upgrades: [],
+    settings: { mode: "oliver", oliverChallenge: false },
     ...overrides,
   };
 }
@@ -122,7 +124,7 @@ describe("executeAttack", () => {
     const result = executeAttack(battle, battle.player, battle.enemy, [weapon], rng);
     expect(result.success).toBe(true);
     expect(result.damageDealt).toBe(3);
-    expect(battle.enemy.currentHealth).toBe(7);
+    expect(battle.enemy.currentHealth).toBe(9); // 12 HP (10 base + 2 from lv1) - 3 dmg
   });
 
   it("fails with insufficient energy", () => {
@@ -186,7 +188,7 @@ describe("useConsumable", () => {
     const battle = createBattle(player, makeRobot());
 
     useConsumable(battle, battle.player, battle.enemy, grenade);
-    expect(battle.enemy.currentHealth).toBe(5);
+    expect(battle.enemy.currentHealth).toBe(7); // 12 HP - 5 dmg
   });
 
   it("cannot use same consumable twice", () => {

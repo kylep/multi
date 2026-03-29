@@ -19,6 +19,7 @@ import {
   getEffectiveHands,
   getEffectiveMaxEnergy,
   getEffectiveMaxHealth,
+  getWeaponEnergyCost,
   getWeapons,
 } from "../../engine/robot";
 import { awardExp, awardMoney, recordFight } from "../../engine/state";
@@ -39,6 +40,11 @@ export async function battleScreen(
   if (!enemyRobot) {
     terminal.print("Error creating enemy!", "t-red");
     return;
+  }
+
+  // Oliver's EXTRA CHALLENGE: enemies get 3x HP per level
+  if (player.settings.oliverChallenge) {
+    enemyRobot.maxHealth += enemyRobot.level * 4;
   }
 
   const fightNumber = player.fights + 1;
@@ -83,67 +89,128 @@ export async function battleScreen(
     await terminal.promptContinue(0);
   }
 
-  // Battle ended — fresh screen for results
+  // Battle ended — capture final turn log and snapshot
   recordTurnSnapshot(battle);
-  terminal.clear();
-  terminal.print("");
+  if (battle.currentTurnLog.length > 0) {
+    battle.turnLogs.push([...battle.currentTurnLog]);
+  }
 
   const turns = battle.turnHistory.length;
   const playerHp = Math.max(0, battle.player.currentHealth);
   const playerMax = getEffectiveMaxHealth(player);
 
   if (battle.winner === "player") {
-    terminal.print("*** VICTORY! ***", "t-green t-bold");
-    terminal.print(`Won in ${turns} turns with ${playerHp}/${playerMax} HP remaining`, "t-dim");
     recordFight(state, true);
-
-    terminal.print("");
     const leveled = awardExp(state, enemyDef.expReward);
     const actual = awardMoney(state, enemyDef.reward);
-    terminal.print(`  +${enemyDef.expReward} exp   +$${actual}`, "t-green t-bold");
 
-    if (leveled) {
-      terminal.print("");
-      terminal.print(`*** LEVEL UP! Now level ${player.level}! ***`, "t-yellow t-bold");
+    // Show victory screen in a loop (re-render after viewing battle log)
+    while (true) {
+      terminal.clear();
+      if (enemyName === "TITAN") {
+        const hardMode = player.settings.oliverChallenge;
+        const msg = hardMode ? "YOU WON THE GAME... ON HARD MODE!" : "YOU WON THE GAME!";
+        terminal.printHTML(`<div class="title-center" style="min-height:0;margin:24px 0"><div class="t-yellow t-bold">╔═══════════════════════════════════════╗</div><div class="t-yellow t-bold" style="font-size:26px">${msg}</div><div class="t-yellow t-bold">╚═══════════════════════════════════════╝</div></div>`);
+      } else {
+        terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-green t-bold">╔═══════════════════════════════╗</div><div class="t-green t-bold" style="font-size:22px">VICTORY!</div><div class="t-green t-bold">╚═══════════════════════════════╝</div></div>`);
+      }
+
+      let rewardsHtml = `<div>Defeated <span class="t-yellow t-bold">${enemyName}</span> in <span class="t-cyan">${turns}</span> turns</div>`;
+      rewardsHtml += `<div>HP remaining: <span class="t-cyan">${playerHp}/${playerMax}</span></div>`;
+      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span> &nbsp; <span class="t-magenta t-bold">+ ${enemyDef.expReward} XP</span></div>`;
+      if (leveled) {
+        rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
+      }
+      rewardsHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/10 &nbsp; ${player.wins}W / ${player.fights}F</div>`;
+      const nextPreview = getNextLevelPreview(state);
+      if (nextPreview) rewardsHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
+      terminal.printHTML(`<div class="panel" style="padding:12px 16px">${rewardsHtml}</div>`);
+
+      const choice = await terminal.promptChoice("", [
+        { label: "Continue", value: "continue" },
+        { label: "Battle Log", value: "log" },
+      ], "row");
+      if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
+      break;
     }
-
-    terminal.print("");
-    terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
-    printNextLevelPreview(terminal, state);
   } else {
-    if (battle.player.currentHealth > 0) {
-      terminal.print("*** SURRENDERED ***", "t-yellow");
-    } else {
-      terminal.print("*** DEFEAT ***", "t-red t-bold");
-      terminal.print(`Lasted ${turns} turns`, "t-dim");
-    }
     recordFight(state, false);
-    player.money += 10;
-    terminal.print(`  +$10 consolation`, "t-green");
-    terminal.print("");
-    terminal.print(`$${player.money} | Lv.${player.level} (${player.exp}/10 exp) | ${player.wins}W/${player.fights}F`, "t-cyan");
-    printNextLevelPreview(terminal, state);
+    const surrendered = battle.player.currentHealth > 0;
+    if (!surrendered) player.money += 10;
+
+    while (true) {
+      terminal.clear();
+      if (surrendered) {
+        terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-yellow t-bold">╔═══════════════════════════════╗</div><div class="t-yellow t-bold" style="font-size:22px">SURRENDERED</div><div class="t-yellow t-bold">╚═══════════════════════════════╝</div></div>`);
+      } else {
+        terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-red t-bold">╔═══════════════════════════════╗</div><div class="t-red t-bold" style="font-size:22px">DEFEATED</div><div class="t-red t-bold">╚═══════════════════════════════╝</div></div>`);
+      }
+
+      let infoHtml = surrendered
+        ? `<div>Surrendered to <span class="t-yellow t-bold">${enemyName}</span></div>`
+        : `<div>Destroyed by <span class="t-yellow t-bold">${enemyName}</span> after <span class="t-cyan">${turns}</span> turns</div>`;
+      if (!surrendered) infoHtml += `<div style="margin-top:4px"><span class="t-green">+$10 consolation</span></div>`;
+      infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/10 &nbsp; ${player.wins}W / ${player.fights}F</div>`;
+      const nextPreview = getNextLevelPreview(state);
+      if (nextPreview) infoHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
+      terminal.printHTML(`<div class="panel" style="padding:12px 16px">${infoHtml}</div>`);
+
+      const choice = await terminal.promptChoice("", [
+        { label: "Continue", value: "continue" },
+        { label: "Battle Log", value: "log" },
+      ], "row");
+      if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
+      break;
+    }
   }
 
   // Reset health/energy
   player.health = getEffectiveMaxHealth(player);
   player.energy = getEffectiveMaxEnergy(player);
-
-  await terminal.promptContinue();
 }
 
-function printNextLevelPreview(terminal: Terminal, state: GameState): void {
+function getNextLevelPreview(state: GameState): string | null {
   const player = state.player!;
   const nextLevelItems = state.registry.getAllItems().filter(
     (i) => i.level === player.level + 1,
   );
-  if (nextLevelItems.length > 0) {
-    terminal.print("");
-    terminal.print(
-      `Next level unlocks: ${nextLevelItems.map((i) => i.name).join(", ")}`,
-      "t-cyan",
-    );
+  if (nextLevelItems.length === 0) return null;
+  return nextLevelItems.map((i) => i.name).join(", ");
+}
+
+async function showBattleLog(
+  terminal: Terminal,
+  battle: BattleState,
+  playerName: string,
+  enemyName: string,
+): Promise<void> {
+  terminal.clear();
+
+  terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">BATTLE LOG</span> &nbsp; <span class="t-dim">${playerName} vs ${enemyName}</span></div>`);
+
+  // Continue at top
+  const topChoices: Choice[] = [{ label: "Continue", value: "continue" }];
+  // We can't have two interactive prompts, so render top as static text and bottom as interactive
+
+  for (let t = 0; t < battle.turnLogs.length; t++) {
+    const logs = battle.turnLogs[t];
+    const snapshot = battle.turnHistory[t];
+
+    let turnHtml = `<div class="t-yellow t-bold" style="margin-bottom:4px">Turn ${t + 1}</div>`;
+    for (const line of logs) {
+      const isHit = line.includes("hits for") || line.includes("destroyed");
+      const isMiss = line.includes("misses!");
+      const cls = isHit ? "t-red" : isMiss ? "t-dim" : "";
+      turnHtml += `<div class="${cls}">${line.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>`;
+    }
+    if (snapshot) {
+      turnHtml += `<div style="margin-top:4px" class="t-dim">${playerName}: ${Math.max(0, snapshot.playerHp)}/${snapshot.playerMaxHp} HP &nbsp; ${enemyName}: ${Math.max(0, snapshot.enemyHp)}/${snapshot.enemyMaxHp} HP</div>`;
+    }
+    terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin:4px 0">${turnHtml}</div>`);
   }
+
+  // Continue at bottom
+  await terminal.promptChoice("", topChoices, "row");
 }
 
 // ── Auto-Battle ──
@@ -246,14 +313,20 @@ async function playerTurn(
   }
 
   while (true) {
-    const hasWeapons = getWeapons(player.robot).length > 0;
+    const weapons = getWeapons(player.robot);
+    const hasWeapons = weapons.length > 0;
+    const canAffordAny = hasWeapons && weapons.some((w) => getWeaponEnergyCost(w, player.robot) <= player.currentEnergy);
     const hasConsumables = getConsumables(player.robot).some(
       (c) => !player.consumablesUsed.includes(c.name),
     );
 
+    let attackLabel = "Attack";
+    if (!hasWeapons) attackLabel = "Attack (none)";
+    else if (!canAffordAny) attackLabel = "Attack (no energy!)";
+
     const choices: Choice[] = [];
     choices.push({ label: "Auto", value: "auto" });
-    choices.push({ label: hasWeapons ? "Attack" : "Attack (none)", value: "attack" });
+    choices.push({ label: attackLabel, value: "attack" });
     choices.push({ label: hasConsumables ? "Item" : "Item (none)", value: "item" });
     choices.push({ label: "Rest", value: "rest" });
     choices.push({ label: "Surrender", value: "surrender" });
@@ -276,6 +349,11 @@ async function playerTurn(
       if (!hasWeapons) {
         redrawBattle();
         terminal.print("You have no weapons!", "t-red");
+        continue;
+      }
+      if (!canAffordAny) {
+        redrawBattle();
+        terminal.print("Not enough energy! Rest to recover.", "t-red");
         continue;
       }
       const planned = await playerPlanAttack(terminal, battle, suggested);
@@ -340,7 +418,7 @@ async function playerPlanAttack(
     terminal.print("");
 
     const usedHands = [...selected].reduce((s, i) => s + weapons[i].hands, 0);
-    const usedEnergy = [...selected].reduce((s, i) => s + weapons[i].energyCost, 0);
+    const usedEnergy = [...selected].reduce((s, i) => s + getWeaponEnergyCost(weapons[i], player.robot), 0);
 
     // Weapon toggles as grid cards
     const weaponChoices: Choice[] = [];
@@ -350,7 +428,7 @@ async function playerPlanAttack(
       weaponChoices.push({
         label: `${check} ${w.name}`,
         value: `toggle-${i}`,
-        subtitle: `${w.damage} dmg, ${w.hands}h, ${w.energyCost} en`,
+        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${w.requirements.length > 0 ? ` (${player.robot.inventory.filter((it) => w.requirements.includes(it.name)).length} ${w.requirements[0]})` : ""}`,
       });
     }
     // Attack and Back as extra cards in the grid

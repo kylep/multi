@@ -104,8 +104,8 @@ test.describe("Combat", () => {
     await enterGameWithWeapon(page);
     await page.getByTestId("choice-fight").click();
 
-    await expect(page.getByText("[Fair]")).toBeVisible();
-    await expect(page.getByText("[Hard]")).toBeVisible();
+    await expect(page.getByText("[Fair]").first()).toBeVisible();
+    await expect(page.getByText("[Hard]").first()).toBeVisible();
   });
 
   test("enemy detail screen shows stats and weapons", async ({ page }) => {

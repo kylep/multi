@@ -5,8 +5,15 @@ import type { GameState } from "./state";
 import { getGear, hasItem } from "./robot";
 
 export function listAvailableItems(state: GameState): Item[] {
-  const player = state.player!;
-  return state.registry.getItemsForLevel(player.level);
+  return state.registry.getAllItems();
+}
+
+function isAmmoGear(item: Item): boolean {
+  if (item.itemType !== "gear") return false;
+  const g = item as Gear;
+  return g.healthBonus === 0 && g.energyBonus === 0 && g.defenceBonus === 0
+    && g.attackBonus === 0 && g.handsBonus === 0 && g.dodgeBonus === 0
+    && g.moneyBonusPercent === 0;
 }
 
 export function canBuy(state: GameState, item: Item): { ok: boolean; reason: string } {
@@ -15,13 +22,22 @@ export function canBuy(state: GameState, item: Item): { ok: boolean; reason: str
   if (item.level > player.level) return { ok: false, reason: `Requires level ${item.level}` };
   if (player.money < item.moneyCost)
     return { ok: false, reason: `Not enough money (need ${item.moneyCost}, have ${player.money})` };
-  if (player.inventory.length >= player.inventorySize) return { ok: false, reason: "Inventory is full" };
+
+  // Ammo gear (no stat bonuses, e.g. Shotgun Shell) is stackable —
+  // skip inventory full check if player already owns one
+  const ammo = isAmmoGear(item);
+  const alreadyOwns = player.inventory.some((i) => i.name === item.name);
+
+  if (player.inventory.length >= player.inventorySize && !(ammo && alreadyOwns)) {
+    return { ok: false, reason: "Inventory is full" };
+  }
 
   for (const req of item.requirements) {
     if (!hasItem(player, req)) return { ok: false, reason: `Requires ${req}` };
   }
 
-  if (item.itemType === "gear") {
+  // Non-ammo gear doesn't stack
+  if (item.itemType === "gear" && !ammo) {
     if (getGear(player).some((g) => g.name === item.name)) {
       return { ok: false, reason: "You already have this gear equipped" };
     }

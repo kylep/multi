@@ -20,6 +20,13 @@ describe("createPlayer", () => {
     expect(p.level).toBe(1);
   });
 
+  it("initializes upgrades and settings with defaults", () => {
+    const state = setup();
+    const p = state.player!;
+    expect(p.upgrades).toEqual([]);
+    expect(p.settings).toEqual({ mode: "oliver", oliverChallenge: false });
+  });
+
   it("gives player a free Stick", () => {
     const state = setup();
     const p = state.player!;

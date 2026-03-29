@@ -1,6 +1,7 @@
 /** Save/load game state to/from storage. */
 
 import type { Robot } from "./types";
+import { applyAllUpgrades } from "./upgrades";
 
 export const SAVE_KEY = "robot-battle-save";
 const SAVE_VERSION = 1;
@@ -29,6 +30,11 @@ export function loadGame(storage: SaveStorage): Robot | null {
     const data = JSON.parse(raw) as SaveData;
     if (data.version !== SAVE_VERSION) return null;
     if (!data.player || typeof data.player.name !== "string") return null;
+    // Soft migration for new fields
+    if (!data.player.upgrades) data.player.upgrades = [];
+    if (!data.player.settings) data.player.settings = { mode: "oliver", oliverChallenge: false };
+    if (data.player.settings.oliverChallenge === undefined) data.player.settings.oliverChallenge = false;
+    applyAllUpgrades(data.player);
     return data.player;
   } catch {
     return null;
