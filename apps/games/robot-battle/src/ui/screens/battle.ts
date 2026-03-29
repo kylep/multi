@@ -71,7 +71,8 @@ export async function battleScreen(
 
       terminal.clear();
       terminal.print("");
-      printBattleStatus(terminal, battle);
+      const anims = animsFromLog(battle);
+      printBattleStatus(terminal, battle, anims);
       terminal.print("");
       printTurnLog(terminal, battle);
 
@@ -193,7 +194,34 @@ function printTurnLog(terminal: Terminal, battle: BattleState): void {
   terminal.printHTML(`<div class="panel" style="margin-top:8px"><div class="t-yellow t-bold">Turn Resolution</div>${logLines}</div>`);
 }
 
-function printBattleStatus(terminal: Terminal, battle: BattleState): void {
+interface BattleAnims {
+  playerPanel?: string;
+  enemyPanel?: string;
+}
+
+function animsFromLog(battle: BattleState): BattleAnims {
+  const log = battle.currentTurnLog;
+  const pName = battle.player.robot.name;
+  const eName = battle.enemy.robot.name;
+  let playerPanel = "";
+  let enemyPanel = "";
+  for (const line of log) {
+    if (line.includes("hits for")) {
+      // The target of the hit gets the shake
+      if (line.startsWith(eName)) playerPanel = "anim-shake";
+      else if (line.startsWith(pName)) enemyPanel = "anim-shake";
+    }
+    if (line.includes("misses")) {
+      if (line.startsWith(eName)) enemyPanel ||= "anim-flash";
+      else if (line.startsWith(pName)) playerPanel ||= "anim-flash";
+    }
+  }
+  if (battle.winner === "player") { enemyPanel = "anim-fadeout"; playerPanel = "anim-pulse"; }
+  else if (battle.winner === "enemy") { playerPanel = "anim-fadeout"; enemyPanel = "anim-pulse"; }
+  return { playerPanel, enemyPanel };
+}
+
+function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: BattleAnims): void {
   const p = battle.player;
   const e = battle.enemy;
   const pMaxHp = getEffectiveMaxHealth(p.robot);
@@ -203,18 +231,21 @@ function printBattleStatus(terminal: Terminal, battle: BattleState): void {
 
   terminal.printHTML(`<div class="t-yellow t-bold">FIGHT #${battle.fightNumber}: vs ${esc(e.robot.name)} &mdash; Turn ${battle.turnNumber}</div>`);
 
+  const pAnim = anims?.playerPanel ?? "";
+  const eAnim = anims?.enemyPanel ?? "";
+
   const lastTurnHtml = battle.lastTurnLog.length > 0
     ? `<div class="t-dim" style="margin-top:6px;font-size:13px">${battle.lastTurnLog.map((m) => esc(m)).join("<br>")}</div>`
     : "";
 
   terminal.printHTML(`
     <div class="battle-layout">
-      <div class="panel">
+      <div class="panel ${pAnim}">
         <div class="t-magenta t-bold">${esc(p.robot.name)} (You)</div>
         <div class="t-cyan">HP: ${hpBar(p.currentHealth, pMaxHp)} ${p.currentHealth}/${pMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(p.currentEnergy, pMaxEn)} ${p.currentEnergy}/${pMaxEn}</div>
       </div>
-      <div class="panel">
+      <div class="panel ${eAnim}">
         <div class="t-magenta t-bold">${esc(e.robot.name)} (Enemy)</div>
         <div class="t-cyan">HP: ${hpBar(e.currentHealth, eMaxHp)} ${e.currentHealth}/${eMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(e.currentEnergy, eMaxEn)} ${e.currentEnergy}/${eMaxEn}</div>
