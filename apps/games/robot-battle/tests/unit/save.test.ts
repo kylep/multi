@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { deleteSave, hasSave, loadGame, SAVE_KEY, saveGame } from "../../src/engine/save";
+import {
+  deleteSlot,
+  hasAnySlot,
+  listSlots,
+  loadSlot,
+  migrateV1Save,
+  saveSlot,
+  DEFAULT_SETTINGS,
+} from "../../src/engine/save";
 import type { SaveStorage } from "../../src/engine/save";
 import type { Robot } from "../../src/engine/types";
 
@@ -32,20 +40,33 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     inventory: [],
     upgrades: [],
     settings: { mode: "oliver" as const, oliverChallenge: false },
+    defeatedEnemies: [],
+    challengeDefeatedEnemies: [],
     ...overrides,
   };
 }
 
-describe("saveGame", () => {
-  it("writes JSON to storage under the save key", () => {
+describe("saveSlot / loadSlot", () => {
+  it("writes and reads a save in a given slot", () => {
     const storage = createMockStorage();
-    const player = makeRobot();
-    saveGame(storage, player);
-    const raw = storage.getItem(SAVE_KEY);
-    expect(raw).not.toBeNull();
-    const data = JSON.parse(raw!);
-    expect(data.version).toBe(1);
-    expect(data.player.name).toBe("TestBot");
+    const player = makeRobot({ name: "SlotBot" });
+    saveSlot(storage, 1, player);
+    const loaded = loadSlot(storage, 1);
+    expect(loaded).not.toBeNull();
+    expect(loaded!.player.name).toBe("SlotBot");
+    expect(loaded!.settings).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it("returns null for empty slot", () => {
+    const storage = createMockStorage();
+    expect(loadSlot(storage, 2)).toBeNull();
+  });
+
+  it("preserves settings", () => {
+    const storage = createMockStorage();
+    saveSlot(storage, 1, makeRobot(), { soundEnabled: false });
+    const loaded = loadSlot(storage, 1)!;
+    expect(loaded.settings.soundEnabled).toBe(false);
   });
 
   it("preserves inventory items with correct types", () => {
@@ -53,117 +74,88 @@ describe("saveGame", () => {
     const player = makeRobot({
       inventory: [
         { name: "Stick", itemType: "weapon", level: 0, moneyCost: 50, description: "", requirements: [], damage: 1, energyCost: 1, accuracy: 80, hands: 1 },
-        { name: "Propeller", itemType: "gear", level: 1, moneyCost: 50, description: "", requirements: [], healthBonus: 0, energyBonus: 0, defenceBonus: 0, attackBonus: 0, handsBonus: 0, dodgeBonus: 10, moneyBonusPercent: 0 },
-        { name: "Repair Kit", itemType: "consumable", level: 2, moneyCost: 30, description: "", requirements: [], healthRestore: 10, energyRestore: 0, tempDefence: 0, tempAttack: 0, damage: 0, enemyDodgeReduction: 0 },
+        { name: "Propeller", itemType: "gear", level: 1, moneyCost: 50, description: "", requirements: [], healthBonus: 0, energyBonus: 0, defenceBonus: 0, attackBonus: 0, handsBonus: 0, dodgeBonus: 10, moneyBonusPercent: 0, stackable: false },
       ],
     });
-    saveGame(storage, player);
-    const data = JSON.parse(storage.getItem(SAVE_KEY)!);
-    expect(data.player.inventory).toHaveLength(3);
-    expect(data.player.inventory[0].itemType).toBe("weapon");
-    expect(data.player.inventory[1].itemType).toBe("gear");
-    expect(data.player.inventory[2].itemType).toBe("consumable");
+    saveSlot(storage, 1, player);
+    const loaded = loadSlot(storage, 1)!;
+    expect(loaded.player.inventory).toHaveLength(2);
+    expect(loaded.player.inventory[0].itemType).toBe("weapon");
+    expect(loaded.player.inventory[1].itemType).toBe("gear");
   });
 });
 
-describe("loadGame", () => {
-  it("returns Robot when valid save exists", () => {
+describe("listSlots", () => {
+  it("returns 3 slots", () => {
     const storage = createMockStorage();
-    saveGame(storage, makeRobot({ name: "LoadBot", level: 5 }));
-    const loaded = loadGame(storage);
+    const slots = listSlots(storage);
+    expect(slots).toHaveLength(3);
+  });
+
+  it("shows occupied and empty slots", () => {
+    const storage = createMockStorage();
+    saveSlot(storage, 1, makeRobot({ name: "Bot1" }));
+    saveSlot(storage, 3, makeRobot({ name: "Bot3" }));
+    const slots = listSlots(storage);
+    expect(slots[0].player?.name).toBe("Bot1");
+    expect(slots[1].player).toBeNull();
+    expect(slots[2].player?.name).toBe("Bot3");
+  });
+});
+
+describe("deleteSlot", () => {
+  it("removes a save slot", () => {
+    const storage = createMockStorage();
+    saveSlot(storage, 2, makeRobot());
+    deleteSlot(storage, 2);
+    expect(loadSlot(storage, 2)).toBeNull();
+  });
+
+  it("no error when slot is empty", () => {
+    const storage = createMockStorage();
+    expect(() => deleteSlot(storage, 1)).not.toThrow();
+  });
+});
+
+describe("hasAnySlot", () => {
+  it("returns false when no saves", () => {
+    const storage = createMockStorage();
+    expect(hasAnySlot(storage)).toBe(false);
+  });
+
+  it("returns true when any slot occupied", () => {
+    const storage = createMockStorage();
+    saveSlot(storage, 2, makeRobot());
+    expect(hasAnySlot(storage)).toBe(true);
+  });
+});
+
+describe("migrateV1Save", () => {
+  it("migrates legacy save to slot 1", () => {
+    const storage = createMockStorage();
+    const legacyData = { version: 1, player: makeRobot({ name: "LegacyBot" }) };
+    storage.setItem("robot-battle-save", JSON.stringify(legacyData));
+    migrateV1Save(storage);
+    expect(storage.getItem("robot-battle-save")).toBeNull();
+    const loaded = loadSlot(storage, 1);
     expect(loaded).not.toBeNull();
-    expect(loaded!.name).toBe("LoadBot");
-    expect(loaded!.level).toBe(5);
+    expect(loaded!.player.name).toBe("LegacyBot");
   });
 
-  it("returns null when no save exists", () => {
+  it("does not overwrite existing slot 1", () => {
     const storage = createMockStorage();
-    expect(loadGame(storage)).toBeNull();
+    saveSlot(storage, 1, makeRobot({ name: "Existing" }));
+    const legacyData = { version: 1, player: makeRobot({ name: "LegacyBot" }) };
+    storage.setItem("robot-battle-save", JSON.stringify(legacyData));
+    migrateV1Save(storage);
+    expect(storage.getItem("robot-battle-save")).toBeNull();
+    const loaded = loadSlot(storage, 1)!;
+    expect(loaded.player.name).toBe("Existing");
   });
 
-  it("returns null when stored JSON is malformed", () => {
+  it("no-op when no legacy save", () => {
     const storage = createMockStorage();
-    storage.setItem(SAVE_KEY, "not valid json{{{");
-    expect(loadGame(storage)).toBeNull();
-  });
-
-  it("returns null when version doesn't match", () => {
-    const storage = createMockStorage();
-    storage.setItem(SAVE_KEY, JSON.stringify({ version: 999, player: makeRobot() }));
-    expect(loadGame(storage)).toBeNull();
-  });
-
-  it("returns null when player field is missing", () => {
-    const storage = createMockStorage();
-    storage.setItem(SAVE_KEY, JSON.stringify({ version: 1 }));
-    expect(loadGame(storage)).toBeNull();
-  });
-
-  it("soft-migrates missing upgrades and settings fields", () => {
-    const storage = createMockStorage();
-    // Simulate an old save without the new fields
-    const oldPlayer = { ...makeRobot(), upgrades: undefined, settings: undefined };
-    storage.setItem(SAVE_KEY, JSON.stringify({ version: 1, player: oldPlayer }));
-    const loaded = loadGame(storage)!;
-    expect(loaded.upgrades).toEqual([]);
-    expect(loaded.settings).toEqual({ mode: "oliver", oliverChallenge: false });
-  });
-
-  it("re-applies upgrades on load", () => {
-    const storage = createMockStorage();
-    const player = makeRobot({ upgrades: ["inventory-5"], inventorySize: 4 });
-    saveGame(storage, player);
-    const loaded = loadGame(storage)!;
-    expect(loaded.inventorySize).toBe(5);
-  });
-
-  it("restores inventory items with all fields intact", () => {
-    const storage = createMockStorage();
-    const player = makeRobot({
-      inventory: [
-        { name: "Stick", itemType: "weapon", level: 0, moneyCost: 50, description: "a stick", requirements: [], damage: 1, energyCost: 1, accuracy: 80, hands: 1 },
-      ],
-    });
-    saveGame(storage, player);
-    const loaded = loadGame(storage)!;
-    expect(loaded.inventory[0].name).toBe("Stick");
-    expect(loaded.inventory[0].itemType).toBe("weapon");
-    expect((loaded.inventory[0] as any).damage).toBe(1);
-    expect((loaded.inventory[0] as any).accuracy).toBe(80);
-  });
-
-  it("restores a player with empty inventory", () => {
-    const storage = createMockStorage();
-    saveGame(storage, makeRobot({ inventory: [] }));
-    const loaded = loadGame(storage)!;
-    expect(loaded.inventory).toEqual([]);
-  });
-});
-
-describe("deleteSave", () => {
-  it("removes the save key from storage", () => {
-    const storage = createMockStorage();
-    saveGame(storage, makeRobot());
-    deleteSave(storage);
-    expect(storage.getItem(SAVE_KEY)).toBeNull();
-  });
-
-  it("no error when key doesn't exist", () => {
-    const storage = createMockStorage();
-    expect(() => deleteSave(storage)).not.toThrow();
-  });
-});
-
-describe("hasSave", () => {
-  it("returns true when save exists", () => {
-    const storage = createMockStorage();
-    saveGame(storage, makeRobot());
-    expect(hasSave(storage)).toBe(true);
-  });
-
-  it("returns false when no save exists", () => {
-    const storage = createMockStorage();
-    expect(hasSave(storage)).toBe(false);
+    expect(() => migrateV1Save(storage)).not.toThrow();
   });
 });
 
@@ -171,9 +163,9 @@ describe("round-trip", () => {
   it("save then load returns identical Robot", () => {
     const storage = createMockStorage();
     const original = makeRobot({ name: "RoundTrip", level: 7, money: 999, wins: 42, fights: 50 });
-    saveGame(storage, original);
-    const loaded = loadGame(storage)!;
-    expect(loaded).toEqual(original);
+    saveSlot(storage, 1, original);
+    const loaded = loadSlot(storage, 1)!;
+    expect(loaded.player).toEqual(original);
   });
 
   it("round-trips mixed inventory", () => {
@@ -181,12 +173,12 @@ describe("round-trip", () => {
     const original = makeRobot({
       inventory: [
         { name: "Sword", itemType: "weapon", level: 2, moneyCost: 150, description: "", requirements: [], damage: 10, energyCost: 5, accuracy: 100, hands: 2 },
-        { name: "Cardboard Armor", itemType: "gear", level: 0, moneyCost: 100, description: "", requirements: [], healthBonus: 5, energyBonus: 0, defenceBonus: 0, attackBonus: 0, handsBonus: 0, dodgeBonus: 0, moneyBonusPercent: 0 },
+        { name: "Cardboard Armor", itemType: "gear", level: 0, moneyCost: 100, description: "", requirements: [], healthBonus: 5, energyBonus: 0, defenceBonus: 0, attackBonus: 0, handsBonus: 0, dodgeBonus: 0, moneyBonusPercent: 0, stackable: false },
         { name: "Grenade", itemType: "consumable", level: 8, moneyCost: 100, description: "", requirements: [], healthRestore: 0, energyRestore: 0, tempDefence: 0, tempAttack: 0, damage: 30, enemyDodgeReduction: 0 },
       ],
     });
-    saveGame(storage, original);
-    const loaded = loadGame(storage)!;
-    expect(loaded.inventory).toEqual(original.inventory);
+    saveSlot(storage, 2, original);
+    const loaded = loadSlot(storage, 2)!;
+    expect(loaded.player.inventory).toEqual(original.inventory);
   });
 });

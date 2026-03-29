@@ -3,7 +3,7 @@
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
 import type { Gear, Consumable, Item, Robot, Weapon } from "../../engine/types";
-import { buyItem, canBuy, getSellPrice, listAvailableItems, sellItem } from "../../engine/shop";
+import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, sellItem } from "../../engine/shop";
 import {
   getEffectiveMaxEnergy,
   getEffectiveMaxHealth,
@@ -16,6 +16,7 @@ import {
   getConsumables,
   getWeaponEnergyCost,
 } from "../../engine/robot";
+import type { SoundPlayer } from "../sound";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -23,11 +24,12 @@ function esc(s: string): string {
 
 function renderShopHeader(terminal: Terminal, state: GameState): void {
   const player = state.player!;
-  const invFull = player.inventory.length >= player.inventorySize;
+  const slots = countInventorySlots(player);
+  const invFull = slots >= player.inventorySize;
   const invClass = invFull ? "t-red t-bold" : "";
 
   terminal.printHTML(
-    `<div class="panel-header" style="margin-bottom:4px"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${player.inventory.length}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
+    `<div class="panel-header" style="margin-bottom:4px"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${slots}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
   );
 }
 
@@ -52,7 +54,7 @@ function shopTabChoices(activeTab: string, filterOn?: boolean): Choice[] {
   return choices;
 }
 
-export async function shopScreen(terminal: Terminal, state: GameState): Promise<void> {
+export async function shopScreen(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
   const player = state.player!;
   let currentTab = "buy";
   let filterOn = true;
@@ -65,7 +67,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
     renderShopHeader(terminal, state);
 
     if (currentTab === "buy") {
-      const result = await renderBuyTab(terminal, state, filterOn);
+      const result = await renderBuyTab(terminal, state, filterOn, sound);
       if (result === "back") break;
       if (result === "toggle-filter") { filterOn = !filterOn; continue; }
       if (result === "sell" || result === "inventory") { currentTab = result; continue; }
@@ -81,7 +83,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
   }
 }
 
-async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: boolean): Promise<string> {
+async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: boolean, sound?: SoundPlayer): Promise<string> {
   const allItems = listAvailableItems(state);
   const player = state.player!;
   const available = filterOn
@@ -108,8 +110,12 @@ async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: bool
     for (const item of section.items) {
       const i = available.indexOf(item);
       const check = canBuy(state, item);
+      const owned = item.itemType === "gear" && (item as Gear).stackable
+        ? player.inventory.filter((inv) => inv.name === item.name).length
+        : 0;
+      const ownedTag = owned > 0 ? ` (have ${owned})` : "";
       choices.push({
-        label: `${item.name} — $${item.moneyCost}`,
+        label: `${item.name}${ownedTag} — $${item.moneyCost}`,
         value: `buy-${i}`,
         subtitle: itemSummary(item, state.player!) + (check.ok ? "" : ` [${check.reason}]`),
         disabled: !check.ok,
@@ -132,7 +138,10 @@ async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: bool
         "Buy",
         "Cancel",
       );
-      if (confirmed) buyItem(state, item);
+      if (confirmed) {
+        buyItem(state, item);
+        sound?.buy();
+      }
     }
   }
 

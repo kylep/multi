@@ -4,6 +4,23 @@ import type { Gear, Item, Robot, ShopResult } from "./types";
 import type { GameState } from "./state";
 import { getGear, hasItem } from "./robot";
 
+/** Count inventory slots used, treating stackable gear groups as 1 slot. */
+export function countInventorySlots(player: Robot): number {
+  const stacked = new Set<string>();
+  let count = 0;
+  for (const item of player.inventory) {
+    if (item.itemType === "gear" && (item as Gear).stackable) {
+      if (!stacked.has(item.name)) {
+        stacked.add(item.name);
+        count++;
+      }
+    } else {
+      count++;
+    }
+  }
+  return count;
+}
+
 export function listAvailableItems(state: GameState): Item[] {
   return state.registry.getAllItems();
 }
@@ -23,25 +40,23 @@ export function canBuy(state: GameState, item: Item): { ok: boolean; reason: str
   if (player.money < item.moneyCost)
     return { ok: false, reason: `Not enough money (need ${item.moneyCost}, have ${player.money})` };
 
-  // Ammo gear (no stat bonuses, e.g. Shotgun Shell) is stackable —
-  // skip inventory full check if player already owns one
-  const ammo = isAmmoGear(item);
-  const alreadyOwns = player.inventory.some((i) => i.name === item.name);
-
-  if (player.inventory.length >= player.inventorySize && !(ammo && alreadyOwns)) {
-    return { ok: false, reason: "Inventory is full" };
-  }
-
   for (const req of item.requirements) {
     if (!hasItem(player, req)) return { ok: false, reason: `Requires ${req}` };
   }
 
-  // Non-ammo gear doesn't stack
-  if (item.itemType === "gear" && !ammo) {
-    if (getGear(player).some((g) => g.name === item.name)) {
+  if (item.itemType === "gear") {
+    const gear = item as Gear;
+    if (!gear.stackable && getGear(player).some((g) => g.name === item.name)) {
       return { ok: false, reason: "You already have this gear equipped" };
     }
   }
+
+  // Stackable items don't need a free slot if you already have one
+  if (item.itemType === "gear" && (item as Gear).stackable && hasItem(player, item.name)) {
+    return { ok: true, reason: "" };
+  }
+
+  if (countInventorySlots(player) >= player.inventorySize) return { ok: false, reason: "Inventory is full" };
 
   return { ok: true, reason: "" };
 }
@@ -64,7 +79,7 @@ export function buyItem(state: GameState, item: Item): ShopResult {
 }
 
 export function getSellPrice(item: Item): number {
-  return Math.floor(item.moneyCost / 2);
+  return item.moneyCost;
 }
 
 export function sellItem(state: GameState, item: Item): ShopResult {

@@ -1,13 +1,16 @@
 /** Main menu screen. */
 
 import type { Terminal, Choice } from "../terminal";
+import type { SoundPlayer } from "../sound";
 import type { GameState } from "../../engine/state";
+import type { GameSettings } from "../../engine/save";
 import {
   getEffectiveDefence,
   getEffectiveDodge,
   getEffectiveMaxHealth,
   getWeapons,
 } from "../../engine/robot";
+import { getXpToLevel } from "../../engine/state";
 import { shopScreen } from "./shop";
 import { upgradesScreen } from "./upgrades";
 import { settingsScreen } from "./settings";
@@ -18,30 +21,35 @@ export async function mainMenu(
   terminal: Terminal,
   state: GameState,
   save?: () => void,
+  sound?: SoundPlayer,
+  settings?: GameSettings,
 ): Promise<void> {
   while (true) {
     terminal.clear();
     const player = state.player!;
 
     // Player stats header panel
-    terminal.printHTML(`<div class="panel-header"><span class="t-blue t-bold">${player.name}</span> &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/10</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span></div>`);
+    terminal.printHTML(`<div class="panel-header"><span class="t-blue t-bold">${player.name}</span> &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/${getXpToLevel(player.level)}</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span></div>`);
 
-    const choice = await terminal.promptChoice("", [
+
+    const menuChoices: Choice[] = [
       { label: "Fight", value: "fight", subtitle: "Battle enemies" },
       { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
       { label: "Upgrades", value: "upgrades", subtitle: "Permanent buffs" },
-      { label: "Settings", value: "settings", subtitle: "Game options" },
+      { label: "Settings", value: "settings", subtitle: "Sound & options" },
       { label: "Change Log", value: "changelog", subtitle: "Version history" },
       { label: "Quit", value: "quit", subtitle: "Return to title" },
-    ], "grid");
+    ];
+
+    const choice = await terminal.promptChoice("", menuChoices, "grid");
 
     if (choice === "quit") break;
 
     if (choice === "fight") {
-      await fightMenu(terminal, state);
+      await fightMenu(terminal, state, sound);
       save?.();
     } else if (choice === "shop") {
-      await shopScreen(terminal, state);
+      await shopScreen(terminal, state, sound);
       save?.();
     } else if (choice === "upgrades") {
       await upgradesScreen(terminal, state);
@@ -63,7 +71,7 @@ function getDifficulty(playerLevel: number, enemyLevel: number): string {
   return "Deadly";
 }
 
-async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
+async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
   const player = state.player!;
   const enemies = Array.from(state.registry.enemies.entries());
 
@@ -79,10 +87,14 @@ async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
     const choices: Choice[] = [];
     for (const [name, enemy] of enemies) {
       const tag = getDifficulty(player.level, enemy.level);
+      const challengeCleared = player.challengeDefeatedEnemies.includes(name);
+      const normalCleared = player.defeatedEnemies.includes(name);
       choices.push({
         label: `${name} (Lv.${enemy.level})`,
         value: name,
         subtitle: `[${tag}] $${enemy.reward}, ${enemy.expReward} XP`,
+        badge: challengeCleared ? "★" : normalCleared ? "✔" : undefined,
+        badgeClass: challengeCleared ? "badge-challenge" : normalCleared ? "badge-cleared" : undefined,
       });
     }
     choices.push({ label: "Back", value: "back", subtitle: "Return to menu" });
@@ -93,8 +105,11 @@ async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
 
     const shouldFight = await enemyDetailScreen(terminal, state, choice);
     if (shouldFight) {
-      await battleScreen(terminal, state, choice);
-      return;
+      let opponent = choice;
+      while (true) {
+        const result = await battleScreen(terminal, state, opponent, sound);
+        if (result !== "fight-again") return;
+      }
     }
   }
 }
@@ -147,6 +162,16 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.6.1", date: "2026-03-29", notes: [
+      "Fight Again button after battles (rematch same opponent)",
+      "Defeated badges: white ✔ for cleared, yellow ★ for challenge mode",
+      "Challenge mode first-win bonus: double money payout",
+      "XP to level up now scales: 10 + 2*(level-1)",
+      "Level cap at 50",
+      "Buzzblade payout increased to $75",
+    ],
+  },
   {
     version: "0.6.0", date: "2026-03-29", notes: [
       "Mobile-friendly: responsive battle layout, single-column shop on small screens",

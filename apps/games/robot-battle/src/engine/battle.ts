@@ -19,6 +19,7 @@ import {
   getEffectiveHands,
   getEffectiveMaxEnergy,
   getEffectiveMaxHealth,
+  getRestEnergyBonus,
   hasItem,
   isAlive,
   getWeaponEnergyCost,
@@ -159,7 +160,8 @@ export function executeRest(
   fighter: BattleRobot,
 ): ActionResult {
   const maxEnergy = getEffectiveMaxEnergy(fighter.robot);
-  const restored = Math.min(5, maxEnergy - fighter.currentEnergy);
+  const baseRest = 5 + getRestEnergyBonus(fighter.robot);
+  const restored = Math.min(baseRest, maxEnergy - fighter.currentEnergy);
   fighter.currentEnergy += restored;
   log(battle, `${fighter.robot.name} rests and recovers ${restored} energy`);
   return ok(`Recovered ${restored} energy`);

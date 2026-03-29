@@ -22,7 +22,8 @@ import {
   getWeaponEnergyCost,
   getWeapons,
 } from "../../engine/robot";
-import { awardExp, awardMoney, recordFight } from "../../engine/state";
+import { awardExp, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
+import type { SoundPlayer } from "../sound";
 
 
 function delay(ms: number): Promise<void> {
@@ -33,13 +34,14 @@ export async function battleScreen(
   terminal: Terminal,
   state: GameState,
   enemyName: string,
-): Promise<void> {
+  sound?: SoundPlayer,
+): Promise<"continue" | "fight-again"> {
   const player = state.player!;
   const enemyDef = state.registry.enemies.get(enemyName)!;
   const enemyRobot = state.registry.createEnemyRobot(enemyName);
   if (!enemyRobot) {
     terminal.print("Error creating enemy!", "t-red");
-    return;
+    return "continue";
   }
 
   // Oliver's EXTRA CHALLENGE: enemies get 3x HP per level
@@ -57,7 +59,6 @@ export async function battleScreen(
     printBattleStatus(terminal, battle);
     terminal.print("");
 
-    // Player picks action
     const result = await playerTurn(terminal, battle);
 
     if (result === "auto") {
@@ -67,20 +68,25 @@ export async function battleScreen(
 
     if (result === "surrendered" || battle.winner) break;
 
-    // Enemy AI picks action
     const enemyAction = aiPlanAction(battle, false);
     battle.enemyAction = enemyAction;
 
-    // Resolve turn
     const rng = createRng();
     resolveTurn(battle, rng);
 
-    // Clear and show turn results as a fresh screen
     terminal.clear();
     terminal.print("");
-    printBattleStatus(terminal, battle);
+    const anims = animsFromLog(battle);
+    printBattleStatus(terminal, battle, anims);
     terminal.print("");
     printTurnLog(terminal, battle);
+
+    // Play sound for hits/misses
+    if (sound) {
+      const log = battle.currentTurnLog;
+      if (log.some((l) => l.includes("hits for"))) sound.hit();
+      else if (log.some((l) => l.includes("misses"))) sound.miss();
+    }
 
     if (battle.winner === null) {
       endTurn(battle);
@@ -101,12 +107,29 @@ export async function battleScreen(
 
   if (battle.winner === "player") {
     recordFight(state, true);
+    sound?.victory();
     // Easy enemies (below player level) give 50% gold and 0 XP
     const isEasy = enemyDef.level < player.level;
     const xpReward = isEasy ? 0 : enemyDef.expReward;
-    const goldReward = isEasy ? Math.floor(enemyDef.reward / 2) : enemyDef.reward;
+    let goldReward = isEasy ? Math.floor(enemyDef.reward / 2) : enemyDef.reward;
+
+    // First challenge mode win against this enemy: double money
+    const isChallenge = player.settings.oliverChallenge;
+    const firstChallengeWin = isChallenge && !player.challengeDefeatedEnemies.includes(enemyName);
+    if (firstChallengeWin) goldReward *= 2;
+
     const leveled = awardExp(state, xpReward);
     const actual = awardMoney(state, goldReward);
+
+    // Track defeated enemies
+    if (!player.defeatedEnemies.includes(enemyName)) {
+      player.defeatedEnemies.push(enemyName);
+    }
+    if (isChallenge && !player.challengeDefeatedEnemies.includes(enemyName)) {
+      player.challengeDefeatedEnemies.push(enemyName);
+    }
+
+    if (leveled) sound?.levelUp();
 
     // Show victory screen in a loop (re-render after viewing battle log)
     while (true) {
@@ -119,28 +142,34 @@ export async function battleScreen(
         terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-green t-bold">╔═══════════════════════════════╗</div><div class="t-green t-bold" style="font-size:22px">VICTORY!</div><div class="t-green t-bold">╚═══════════════════════════════╝</div></div>`);
       }
 
-      let rewardsHtml = `<div>Defeated <span class="t-yellow t-bold">${enemyName}</span> in <span class="t-cyan">${turns}</span> turns</div>`;
+      let rewardsHtml = `<div>Defeated <span class="t-yellow t-bold">${enemyName}</span> in <span class="t-cyan">${turns}</span> ${turns === 1 ? "turn" : "turns"}</div>`;
       rewardsHtml += `<div>HP remaining: <span class="t-cyan">${playerHp}/${playerMax}</span></div>`;
-      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span> &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
+      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span>${firstChallengeWin ? ` <span class="t-yellow">(2x challenge bonus!)</span>` : ""} &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
       if (leveled) {
         rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
       }
-      rewardsHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/10 &nbsp; ${player.wins}W / ${player.fights}F</div>`;
+      rewardsHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
       const nextPreview = getNextLevelPreview(state);
       if (nextPreview) rewardsHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${rewardsHtml}</div>`);
 
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
+        { label: "Fight Again", value: "fight-again" },
         { label: "Battle Log", value: "log" },
       ], "row");
       if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
-      break;
+      player.health = getEffectiveMaxHealth(player);
+      player.energy = getEffectiveMaxEnergy(player);
+      return choice as "continue" | "fight-again";
     }
   } else {
     recordFight(state, false);
     const surrendered = battle.player.currentHealth > 0;
-    if (!surrendered) player.money += 10;
+    if (!surrendered) {
+      player.money += 10;
+      sound?.defeat();
+    }
 
     while (true) {
       terminal.clear();
@@ -152,25 +181,30 @@ export async function battleScreen(
 
       let infoHtml = surrendered
         ? `<div>Surrendered to <span class="t-yellow t-bold">${enemyName}</span></div>`
-        : `<div>Destroyed by <span class="t-yellow t-bold">${enemyName}</span> after <span class="t-cyan">${turns}</span> turns</div>`;
+        : `<div>Destroyed by <span class="t-yellow t-bold">${enemyName}</span> after <span class="t-cyan">${turns}</span> ${turns === 1 ? "turn" : "turns"}</div>`;
       if (!surrendered) infoHtml += `<div style="margin-top:4px"><span class="t-green">+$10 consolation</span></div>`;
-      infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/10 &nbsp; ${player.wins}W / ${player.fights}F</div>`;
+      infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
       const nextPreview = getNextLevelPreview(state);
       if (nextPreview) infoHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${infoHtml}</div>`);
 
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
+        { label: "Fight Again", value: "fight-again" },
         { label: "Battle Log", value: "log" },
       ], "row");
       if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
-      break;
+      // Reset health/energy before returning
+      player.health = getEffectiveMaxHealth(player);
+      player.energy = getEffectiveMaxEnergy(player);
+      return choice as "continue" | "fight-again";
     }
   }
 
-  // Reset health/energy
+  // Reset health/energy (fallback, should not reach here)
   player.health = getEffectiveMaxHealth(player);
   player.energy = getEffectiveMaxEnergy(player);
+  return "continue";
 }
 
 function getNextLevelPreview(state: GameState): string | null {
@@ -258,7 +292,34 @@ function printTurnLog(terminal: Terminal, battle: BattleState): void {
   terminal.printHTML(`<div class="panel" style="margin-top:8px"><div class="t-yellow t-bold">Turn Resolution</div>${logLines}</div>`);
 }
 
-function printBattleStatus(terminal: Terminal, battle: BattleState): void {
+interface BattleAnims {
+  playerPanel?: string;
+  enemyPanel?: string;
+}
+
+function animsFromLog(battle: BattleState): BattleAnims {
+  const log = battle.currentTurnLog;
+  const pName = battle.player.robot.name;
+  const eName = battle.enemy.robot.name;
+  let playerPanel = "";
+  let enemyPanel = "";
+  for (const line of log) {
+    if (line.includes("hits for")) {
+      // The target of the hit gets the shake
+      if (line.startsWith(eName)) playerPanel = "anim-shake";
+      else if (line.startsWith(pName)) enemyPanel = "anim-shake";
+    }
+    if (line.includes("misses")) {
+      if (line.startsWith(eName)) enemyPanel ||= "anim-flash";
+      else if (line.startsWith(pName)) playerPanel ||= "anim-flash";
+    }
+  }
+  if (battle.winner === "player") { enemyPanel = "anim-fadeout"; playerPanel = "anim-pulse"; }
+  else if (battle.winner === "enemy") { playerPanel = "anim-fadeout"; enemyPanel = "anim-pulse"; }
+  return { playerPanel, enemyPanel };
+}
+
+function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: BattleAnims): void {
   const p = battle.player;
   const e = battle.enemy;
   const pMaxHp = getEffectiveMaxHealth(p.robot);
@@ -269,18 +330,21 @@ function printBattleStatus(terminal: Terminal, battle: BattleState): void {
 
   terminal.printHTML(`<div class="t-yellow t-bold">FIGHT #${battle.fightNumber}: vs ${esc(e.robot.name)} &mdash; Turn ${battle.turnNumber}</div>`);
 
+  const pAnim = anims?.playerPanel ?? "";
+  const eAnim = anims?.enemyPanel ?? "";
+
   const lastTurnHtml = battle.lastTurnLog.length > 0
     ? `<div class="t-dim" style="margin-top:6px;font-size:13px">${battle.lastTurnLog.map((m) => esc(m)).join("<br>")}</div>`
     : "";
 
   terminal.printHTML(`
     <div class="battle-layout">
-      <div class="panel">
+      <div class="panel ${pAnim}">
         <div class="t-magenta t-bold">${esc(p.robot.name)} (You)</div>
         <div class="t-cyan">HP: ${hpBar(p.currentHealth, pMaxHp, barWidth)} ${p.currentHealth}/${pMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(p.currentEnergy, pMaxEn, barWidth)} ${p.currentEnergy}/${pMaxEn}</div>
       </div>
-      <div class="panel">
+      <div class="panel ${eAnim}">
         <div class="t-magenta t-bold">${esc(e.robot.name)} (Enemy)</div>
         <div class="t-cyan">HP: ${hpBar(e.currentHealth, eMaxHp, barWidth)} ${e.currentHealth}/${eMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(e.currentEnergy, eMaxEn, barWidth)} ${e.currentEnergy}/${eMaxEn}</div>

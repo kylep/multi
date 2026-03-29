@@ -7,6 +7,8 @@ export interface Choice {
   disabled?: boolean;
   group?: string;
   active?: boolean;
+  badge?: string;
+  badgeClass?: string;
 }
 
 export interface Span {
@@ -202,6 +204,14 @@ export function createDomTerminal(root: HTMLElement): Terminal {
                 sub.className = "card-subtitle";
                 sub.textContent = choices[i].subtitle!;
                 card.appendChild(sub);
+              }
+
+              if (choices[i].badge) {
+                const badgeEl = document.createElement("div");
+                badgeEl.className = `card-badge ${choices[i].badgeClass || ""}`;
+                badgeEl.textContent = choices[i].badge!;
+                card.appendChild(badgeEl);
+                card.style.position = "relative";
               }
 
               if (!choices[i].disabled) {

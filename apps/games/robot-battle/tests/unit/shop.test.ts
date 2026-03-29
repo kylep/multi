@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buyItem, canBuy, getSellPrice, listAvailableItems, sellItem } from "../../src/engine/shop";
+import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, sellItem } from "../../src/engine/shop";
 import { createGameState, createPlayer } from "../../src/engine/state";
 import { loadAssets } from "../../src/engine/data";
 
@@ -82,20 +82,84 @@ describe("buyItem", () => {
 });
 
 describe("sellItem", () => {
-  it("returns half price and removes from inventory", () => {
+  it("returns full price and removes from inventory", () => {
     const state = setup();
     // Sell the starter Stick
     const invItem = state.player!.inventory[0];
     expect(invItem.name).toBe("Stick");
     const result = sellItem(state, invItem);
     expect(result.success).toBe(true);
-    expect(result.moneyGained).toBe(25);
+    expect(result.moneyGained).toBe(50);
     expect(state.player!.inventory.length).toBe(0);
   });
 });
 
+describe("countInventorySlots", () => {
+  it("counts non-stackable items normally", () => {
+    const state = setup();
+    // Player starts with 1 Stick
+    expect(countInventorySlots(state.player!)).toBe(1);
+  });
+
+  it("counts stackable gear group as 1 slot", () => {
+    const state = setup();
+    state.player!.level = 5;
+    const shell = state.registry.getItem("Shotgun Shell")!;
+    state.player!.inventory.push({ ...shell }, { ...shell }, { ...shell });
+    // 1 Stick + 3 Shotgun Shells (counted as 1 slot) = 2 slots
+    expect(countInventorySlots(state.player!)).toBe(2);
+  });
+});
+
+describe("stackable gear buying", () => {
+  it("allows buying multiple stackable gear items", () => {
+    const state = setup();
+    state.player!.level = 5;
+    state.player!.money = 10000;
+    const shell = state.registry.getItem("Shotgun Shell")!;
+    // Buy first shell
+    const r1 = buyItem(state, shell);
+    expect(r1.success).toBe(true);
+    // Buy second shell — should not be rejected as duplicate
+    const r2 = canBuy(state, shell);
+    expect(r2.ok).toBe(true);
+    const r3 = buyItem(state, shell);
+    expect(r3.success).toBe(true);
+    // Should have 3 items in array but only 2 inventory slots
+    expect(state.player!.inventory.filter((i) => i.name === "Shotgun Shell").length).toBe(2);
+    expect(countInventorySlots(state.player!)).toBe(2); // Stick + 1 shell slot
+  });
+
+  it("allows buying stackable gear even when inventory slots are full", () => {
+    const state = setup();
+    state.player!.level = 5;
+    state.player!.money = 10000;
+    // Fill all 4 slots: Stick + 3 gear
+    state.player!.inventory.push(
+      { ...state.registry.getItem("Propeller")! },
+      { ...state.registry.getItem("Small Battery")! },
+      { ...state.registry.getItem("Shotgun Shell")! },
+    );
+    expect(countInventorySlots(state.player!)).toBe(4);
+    // Buying another Shotgun Shell should work (stacks into existing slot)
+    const shell = state.registry.getItem("Shotgun Shell")!;
+    const result = canBuy(state, shell);
+    expect(result.ok).toBe(true);
+  });
+
+  it("sells one stackable item at a time", () => {
+    const state = setup();
+    state.player!.level = 5;
+    const shell = state.registry.getItem("Shotgun Shell")!;
+    state.player!.inventory.push({ ...shell }, { ...shell });
+    const shellInv = state.player!.inventory.find((i) => i.name === "Shotgun Shell")!;
+    sellItem(state, shellInv);
+    expect(state.player!.inventory.filter((i) => i.name === "Shotgun Shell").length).toBe(1);
+  });
+});
+
 describe("getSellPrice", () => {
-  it("returns half of buy price", () => {
-    expect(getSellPrice({ name: "x", itemType: "weapon", level: 0, moneyCost: 100, description: "", requirements: [], damage: 1, energyCost: 1, accuracy: 100, hands: 1 })).toBe(50);
+  it("returns full buy price", () => {
+    expect(getSellPrice({ name: "x", itemType: "weapon", level: 0, moneyCost: 100, description: "", requirements: [], damage: 1, energyCost: 1, accuracy: 100, hands: 1 })).toBe(100);
   });
 });

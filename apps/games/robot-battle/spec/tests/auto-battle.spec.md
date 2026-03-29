@@ -9,14 +9,14 @@ tested via the AI and battle test suites. The feature is purely UI-layer.
 
 ### Auto-Battle button visible
 - Enter battle with MiniBot
-- Verify: "5. Auto-Battle" button is visible alongside other actions
+- Verify: "Auto" button is visible alongside other actions
 
 ### Auto-Battle runs to completion
 - Enter battle with a weapon equipped
 - Click Auto-Battle
 - Wait for battle to end (victory or defeat text appears)
-- Verify: either "VICTORY" or "DEFEAT" is visible (no timeout — the
-  battle should resolve within a few seconds with 1s pauses)
+- Verify: either "VICTORY" or "DEFEAT" is visible (resolves within
+  seconds — turns accelerate from 250ms to 150ms)
 
 ### Auto-Battle shows turn resolution
 - Enter battle, click Auto-Battle

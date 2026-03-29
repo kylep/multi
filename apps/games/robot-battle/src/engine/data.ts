@@ -39,6 +39,7 @@ function loadGear(name: string, d: Record<string, unknown>): Gear {
     handsBonus: (d.handsBonus as number) ?? 0,
     dodgeBonus: (d.dodgeBonus as number) ?? 0,
     moneyBonusPercent: (d.moneyBonusPercent as number) ?? 0,
+    stackable: (d.stackable as boolean) ?? false,
   };
 }
 
@@ -178,6 +179,8 @@ export function loadAssets(): AssetRegistry {
         inventory: [],
         upgrades: [],
         settings: { mode: "oliver", oliverChallenge: false },
+        defeatedEnemies: [],
+        challengeDefeatedEnemies: [],
       };
 
       for (const wName of enemy.weapons) {

@@ -45,6 +45,10 @@ export function getEffectiveAttack(robot: Robot): number {
   return robot.attack + getGear(robot).reduce((s, g) => s + g.attackBonus, 0);
 }
 
+export function getRestEnergyBonus(robot: Robot): number {
+  return getGear(robot).reduce((s, g) => s + Math.ceil(0.5 * g.energyBonus), 0);
+}
+
 export function getMoneyBonusPercent(robot: Robot): number {
   return getGear(robot).reduce((s, g) => s + g.moneyBonusPercent, 0);
 }

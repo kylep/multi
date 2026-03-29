@@ -142,6 +142,7 @@ body {
   padding: 10px 14px;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
+  position: relative;
 }
 
 .card-header {
@@ -195,6 +196,23 @@ body {
   opacity: 0.6;
   font-size: 14px;
   margin-top: 2px;
+}
+
+.card-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.card-badge.badge-cleared {
+  color: #ffffff;
+}
+
+.card-badge.badge-challenge {
+  color: #ffff33;
 }
 
 /* === Button row — horizontal action buttons === */
@@ -383,6 +401,35 @@ body {
   color: #0a0a0a;
 }
 
+/* === Combat animations === */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+@keyframes flash {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0.3; }
+}
+
+@keyframes pulse {
+  0%, 100% { border-color: #33ff33; }
+  50% { border-color: #88ffaa; box-shadow: 0 0 8px #33ff3366; }
+}
+
+.anim-shake { animation: shake 0.2s ease-in-out; }
+.anim-flash { animation: flash 0.15s ease-out; }
+.anim-fadeout { animation: fadeOut 0.5s ease-out forwards; }
+.anim-pulse { animation: pulse 0.5s ease-in-out 2; }
+
 /* === Tooltips — CSS-only via data-tooltip === */
 [data-tooltip] {
   position: relative;
@@ -405,6 +452,7 @@ body {
   color: #33ff33;
   margin-bottom: 4px;
 }
+
 
 /* === Title centering === */
 .title-center {

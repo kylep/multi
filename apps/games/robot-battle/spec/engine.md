@@ -64,7 +64,7 @@ Consumables are removed from inventory when used.
 
 ## Save System
 
-The save module (`src/engine/save.ts`) provides three pure functions
+The save module (`src/engine/save.ts`) provides four pure functions
 plus a storage interface for testability:
 
 ```typescript
