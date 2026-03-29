@@ -56,6 +56,7 @@ function loadConsumable(name: string, d: Record<string, unknown>): Consumable {
     tempDefence: (d.tempDefence as number) ?? 0,
     tempAttack: (d.tempAttack as number) ?? 0,
     damage: (d.damage as number) ?? 0,
+    damageBlock: (d.damageBlock as number) ?? 0,
     enemyDodgeReduction: (d.enemyDodgeReduction as number) ?? 0,
   };
 }

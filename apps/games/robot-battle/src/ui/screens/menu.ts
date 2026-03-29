@@ -108,6 +108,10 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
       let opponent = choice;
       while (true) {
         const result = await battleScreen(terminal, state, opponent, sound);
+        if (result === "shop") {
+          await shopScreen(terminal, state, sound);
+          return;
+        }
         if (result !== "fight-again") return;
       }
     }
@@ -119,42 +123,56 @@ async function enemyDetailScreen(
   state: GameState,
   enemyName: string,
 ): Promise<boolean> {
-  const enemyDef = state.registry.enemies.get(enemyName)!;
-  const bot = state.registry.createEnemyRobot(enemyName);
-  if (!bot) return false;
-
   const player = state.player!;
-  const tag = getDifficulty(player.level, enemyDef.level);
-  const hp = getEffectiveMaxHealth(bot);
-  const dodge = getEffectiveDodge(bot);
-  const def = getEffectiveDefence(bot);
-  const weapons = getWeapons(bot);
-  const weaponStr = weapons.length > 0
-    ? weapons.map((w) => `${w.name} (${w.damage} dmg)`).join(", ")
-    : "None";
+  const enemyDef = state.registry.enemies.get(enemyName)!;
 
-  terminal.clear();
-  terminal.printHTML(`
-    <div class="panel">
-      <div class="t-yellow t-bold" style="font-size:18px">${enemyName}</div>
-      <div class="t-dim">Level ${enemyDef.level} &bull; [${tag}]</div>
-      <div style="margin-top:8px">${enemyDef.description}</div>
-      <div style="margin-top:8px">
-        <span class="t-cyan">HP: ${hp}</span> &nbsp;
-        <span>Dodge: ${dodge}</span> &nbsp;
-        <span>Defence: ${def}</span>
+  while (true) {
+    const bot = state.registry.createEnemyRobot(enemyName);
+    if (!bot) return false;
+
+    if (player.settings.oliverChallenge) {
+      bot.maxHealth += bot.level * 4;
+    }
+
+    const tag = getDifficulty(player.level, enemyDef.level);
+    const hp = getEffectiveMaxHealth(bot);
+    const dodge = getEffectiveDodge(bot);
+    const def = getEffectiveDefence(bot);
+    const weapons = getWeapons(bot);
+    const weaponStr = weapons.length > 0
+      ? weapons.map((w) => `${w.name} (${w.damage} dmg)`).join(", ")
+      : "None";
+
+    const challengeLabel = player.settings.oliverChallenge ? "Challenge: ON" : "Challenge: OFF";
+
+    terminal.clear();
+    terminal.printHTML(`
+      <div class="panel">
+        <div class="t-yellow t-bold" style="font-size:18px">${enemyName}</div>
+        <div class="t-dim">Level ${enemyDef.level} &bull; [${tag}]</div>
+        <div style="margin-top:8px">${enemyDef.description}</div>
+        <div style="margin-top:8px">
+          <span class="t-cyan">HP: ${hp}</span> &nbsp;
+          <span>Dodge: ${dodge}</span> &nbsp;
+          <span>Defence: ${def}</span>
+        </div>
+        <div>Weapons: ${weaponStr}</div>
+        <div class="t-magenta" style="margin-top:4px">Reward: $${enemyDef.reward} &nbsp; XP: ${enemyDef.expReward}</div>
       </div>
-      <div>Weapons: ${weaponStr}</div>
-      <div class="t-magenta" style="margin-top:4px">Reward: $${enemyDef.reward} &nbsp; XP: ${enemyDef.expReward}</div>
-    </div>
-  `);
+    `);
 
-  const choice = await terminal.promptChoice("", [
-    { label: "Fight!", value: "fight" },
-    { label: "Back", value: "back" },
-  ], "row");
+    const choice = await terminal.promptChoice("", [
+      { label: "Fight!", value: "fight" },
+      { label: "Back", value: "back" },
+      { label: challengeLabel, value: "challenge" },
+    ], "row");
 
-  return choice === "fight";
+    if (choice === "challenge") {
+      player.settings.oliverChallenge = !player.settings.oliverChallenge;
+      continue;
+    }
+    return choice === "fight";
+  }
 }
 
 function esc(s: string): string {
@@ -163,7 +181,7 @@ function esc(s: string): string {
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
-    version: "0.6.1", date: "2026-03-29", notes: [
+    version: "0.7.0", date: "2026-03-29", notes: [
       "Fight Again button after battles (rematch same opponent)",
       "Defeated badges: white ✔ for cleared, yellow ★ for challenge mode",
       "Challenge mode first-win bonus: double money payout",

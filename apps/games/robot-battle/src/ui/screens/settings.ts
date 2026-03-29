@@ -12,7 +12,16 @@ export async function settingsScreen(terminal: Terminal, state: GameState): Prom
       `<div class="panel-header"><span class="t-yellow t-bold">SETTINGS</span></div>`
     );
 
+    const isSandbox = player.settings.mode === "sandbox";
     const isOliver = player.settings.mode === "oliver";
+
+    if (isSandbox) {
+      terminal.printHTML(`<div class="panel" style="padding:6px 10px"><span class="t-yellow t-bold">Sandbox mode</span> <span class="t-dim">— everything free, no level cap, no badges</span></div>`);
+      const choice = await terminal.promptChoice("", [{ label: "Back", value: "back" }], "row");
+      if (choice === "back") return;
+      continue;
+    }
+
     const desc = isOliver
       ? "Oliver mode: normal gameplay — energy costs apply"
       : "Lucas mode: all weapon energy costs are 0";

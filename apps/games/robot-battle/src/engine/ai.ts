@@ -1,7 +1,7 @@
 /** Enemy AI logic. */
 
-import type { BattleRobot, BattleState, PlannedAction, Weapon } from "./types";
-import { getConsumables, getEffectiveHands, getWeaponEnergyCost, getWeapons, hasItem } from "./robot";
+import type { BattleRobot, BattleState, Consumable, PlannedAction, Weapon } from "./types";
+import { getConsumables, getEffectiveHands, getEffectiveMaxHealth, getWeaponEnergyCost, getWeapons, hasItem } from "./robot";
 
 export function aiSelectWeapons(fighter: BattleRobot): Weapon[] {
   const weapons = getWeapons(fighter.robot);
@@ -36,14 +36,27 @@ export function aiSelectWeapons(fighter: BattleRobot): Weapon[] {
   return selected;
 }
 
+function shouldUseConsumable(fighter: BattleRobot, consumable: Consumable): boolean {
+  // Healing items: wait until damaged enough to get full (or near-full) value
+  if (consumable.healthRestore > 0) {
+    const maxHp = getEffectiveMaxHealth(fighter.robot);
+    const missing = maxHp - fighter.currentHealth;
+    return missing >= consumable.healthRestore * 0.75;
+  }
+  // Non-healing consumables (grenades, shields, etc.): use immediately
+  return true;
+}
+
 export function aiPlanAction(battle: BattleState, isPlayer: boolean): PlannedAction {
   const fighter = isPlayer ? battle.player : battle.enemy;
 
-  // Use consumables first (enemies only — auto-battle shouldn't waste player items)
+  // Use consumables (enemies only — auto-battle shouldn't waste player items)
   if (!isPlayer) {
     for (const consumable of getConsumables(fighter.robot)) {
       if (!fighter.consumablesUsed.includes(consumable.name)) {
-        return { actionType: "consumable", weapons: [], consumable };
+        if (shouldUseConsumable(fighter, consumable)) {
+          return { actionType: "consumable", weapons: [], consumable };
+        }
       }
     }
   }

@@ -34,7 +34,7 @@ describe("loadAssets", () => {
   });
 
   it("loads enemies", () => {
-    expect(registry.enemies.size).toBe(17);
+    expect(registry.enemies.size).toBe(18);
     expect(registry.enemies.has("MiniBot")).toBe(true);
     expect(registry.enemies.has("TITAN")).toBe(true);
     expect(registry.enemies.has("Apocalypse")).toBe(true);

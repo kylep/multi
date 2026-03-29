@@ -135,7 +135,12 @@ export function executeAttack(
     const roll = rng.random();
 
     if (roll < hitChance) {
-      const damage = calculateDamage(weapon, attacker, defender);
+      let damage = calculateDamage(weapon, attacker, defender);
+      if (defender.damageBlock > 0) {
+        const blocked = Math.min(damage, defender.damageBlock);
+        defender.damageBlock -= blocked;
+        damage -= blocked;
+      }
       totalDamage += damage;
       defender.currentHealth -= damage;
       const msg = `  ${weapon.name} ${i + 1} hits for ${damage} damage`;
@@ -208,9 +213,19 @@ export function useConsumable(
     attacker.tempAttack += consumable.tempAttack;
     effects.push(`+${consumable.tempAttack} temp attack`);
   }
+  if (consumable.damageBlock > 0) {
+    attacker.damageBlock += consumable.damageBlock;
+    effects.push(`blocks ${consumable.damageBlock} damage this turn`);
+  }
   if (consumable.damage > 0) {
-    defender.currentHealth -= consumable.damage;
-    effects.push(`${consumable.damage} damage to enemy`);
+    let dmg = consumable.damage;
+    if (defender.damageBlock > 0) {
+      const blocked = Math.min(dmg, defender.damageBlock);
+      defender.damageBlock -= blocked;
+      dmg -= blocked;
+    }
+    defender.currentHealth -= dmg;
+    effects.push(`${dmg} damage to enemy`);
   }
   if (consumable.enemyDodgeReduction > 0) {
     defender.tempDodgeReduction += consumable.enemyDodgeReduction;
@@ -259,6 +274,8 @@ export function endTurn(battle: BattleState): void {
   battle.currentTurnLog = [];
   battle.playerAction = null;
   battle.enemyAction = null;
+  battle.player.damageBlock = 0;
+  battle.enemy.damageBlock = 0;
   battle.turnNumber += 1;
 }
 

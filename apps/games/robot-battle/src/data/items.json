@@ -59,7 +59,7 @@
       "level": 8,
       "damage": 20,
       "moneyCost": 600,
-      "energyCost": 8,
+      "energyCost": 10,
       "accuracy": 95,
       "hands": 1,
       "description": "Pew pew pew! A focused beam of pure energy."
@@ -68,7 +68,7 @@
       "level": 10,
       "damage": 30,
       "moneyCost": 1000,
-      "energyCost": 15,
+      "energyCost": 10,
       "accuracy": 90,
       "hands": 2,
       "description": "A laser sword. Very expensive! Bzzzzt."
@@ -387,6 +387,12 @@
       "tempDefence": 5,
       "description": "Temporarily hardens your armor. +5 defence for the battle."
     },
+    "Blast Shield": {
+      "level": 6,
+      "moneyCost": 80,
+      "damageBlock": 35,
+      "description": "A throwaway shield that absorbs one big hit. Blocks 35 damage this turn."
+    },
     "Grenade": {
       "level": 8,
       "moneyCost": 100,
@@ -404,6 +410,12 @@
       "moneyCost": 250,
       "healthRestore": 50,
       "description": "Industrial-grade repair tools. Welds, hammers, and lots of duct tape."
+    },
+    "Mega Blast Shield": {
+      "level": 18,
+      "moneyCost": 350,
+      "damageBlock": 120,
+      "description": "Heavy duty blast shield. Blocks 120 damage this turn. Built like a tank door."
     },
     "Mega Grenade": {
       "level": 20,
@@ -423,11 +435,23 @@
       "healthRestore": 150,
       "description": "Nanotechnology repair swarm. Fixes everything instantly."
     },
+    "Plasma Blast Shield": {
+      "level": 28,
+      "moneyCost": 800,
+      "damageBlock": 300,
+      "description": "Plasma-reinforced blast shield. Blocks 300 damage this turn. Almost indestructible."
+    },
     "Plasma Grenade": {
       "level": 30,
       "moneyCost": 1000,
       "damage": 250,
       "description": "Plasma-coated explosive. Melts and explodes at the same time!"
+    },
+    "Antimatter Shield": {
+      "level": 38,
+      "moneyCost": 2500,
+      "damageBlock": 600,
+      "description": "Antimatter containment shield. Blocks 600 damage this turn. Laughs at nukes."
     },
     "Nuke": {
       "level": 40,

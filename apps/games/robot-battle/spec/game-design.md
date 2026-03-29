@@ -64,6 +64,22 @@ The choice appears mid-battle because that's when tedium strikes. A
 kid starts a fight, does a few turns manually, gets bored, hits
 Auto-Battle, and watches the rest play out. No settings screen needed.
 
+## Game Modes
+
+When starting a new game, the player chooses Normal or Sandbox mode.
+Mode is permanent per save slot and cannot be changed.
+
+### Normal Mode
+Standard gameplay. Earn money from fights, buy items and upgrades with
+money, level up to unlock higher-tier items. Defeated badges (check marks
+and stars) are awarded for beating enemies.
+
+### Sandbox Mode
+Everything is free — items and upgrades cost $0, no level requirements
+in the shop. No level cap (can level past 50). However, defeated badges
+are not awarded (no check marks or stars). For kids who want to
+experiment with every weapon and fight every enemy without grinding.
+
 ## Progression
 
 - XP to level up: `10 + 2*(level-1)` — starts at 10, grows by 2 per level

@@ -67,6 +67,7 @@ export function createBattleRobot(robot: Robot): BattleRobot {
     tempDefence: 0,
     tempAttack: 0,
     tempDodgeReduction: 0,
+    damageBlock: 0,
     consumablesUsed: [],
   };
 }

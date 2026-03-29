@@ -106,9 +106,18 @@ export async function startGame(
       }
     } else if (choice.startsWith("new-")) {
       activeSlot = parseInt(choice.slice(4), 10);
+      terminal.clear();
+      terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">NEW GAME</span></div>`);
       const name = await terminal.promptText("Name your robot:");
       const playerName = name.trim() || "RoboPlayer";
+      const gameMode = await terminal.promptChoice("Choose mode:", [
+        { label: "Normal", value: "normal", subtitle: "Earn money, level up, unlock items" },
+        { label: "Sandbox", value: "sandbox", subtitle: "Everything free, no badges" },
+      ], "row");
       createPlayer(state, playerName);
+      if (gameMode === "sandbox") {
+        state.player!.settings.mode = "sandbox";
+      }
       saveSlot(storage, activeSlot, state.player!, settings);
     }
 

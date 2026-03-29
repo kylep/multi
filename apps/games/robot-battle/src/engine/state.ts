@@ -69,15 +69,16 @@ const MAX_LEVEL = 50;
 
 export function awardExp(state: GameState, amount: number): boolean {
   const player = state.player!;
-  if (player.level >= MAX_LEVEL) return false;
+  const capped = player.settings.mode !== "sandbox";
+  if (capped && player.level >= MAX_LEVEL) return false;
   player.exp += amount;
   let leveledUp = false;
-  while (player.exp >= getXpToLevel(player.level) && player.level < MAX_LEVEL) {
+  while (player.exp >= getXpToLevel(player.level) && (!capped || player.level < MAX_LEVEL)) {
     player.exp -= getXpToLevel(player.level);
     player.level += 1;
     leveledUp = true;
   }
-  if (player.level >= MAX_LEVEL) {
+  if (capped && player.level >= MAX_LEVEL) {
     player.exp = 0;
   }
   return leveledUp;

@@ -274,9 +274,14 @@ body {
 /* === Text input (name entry) === */
 .terminal-input-line {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin: 12px 0;
+}
+
+.terminal-input-line .terminal-prompt {
+  width: 100%;
 }
 
 .terminal-prompt {
