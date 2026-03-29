@@ -115,7 +115,7 @@ spec:
                   claude --agent journalist \
                     -p "Run a news update. Today is ${TODAY}. Write to the wiki at apps/blog/blog/markdown/wiki/journal/news/${TODAY}/daily-digest.md — create the file if it does not exist, or append new sections if it does. Check both Discord #news (last 15 messages) and the existing wiki file for stories already covered so you do not post duplicates. Collect the news, write to the wiki, commit, then post to Discord #news. If you encounter any errors with git, file I/O, or other non-news problems, post a short error summary to Discord #news so the operator can fix it. Commit message: 'journal: AI news digest for ${TODAY}'." \
                     --mcp-config /tmp/mcp.json \
-                    --allowedTools "WebSearch,WebFetch,Read,Glob,Grep,Write,Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/news/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git config user.name *),Bash(git config user.email *),Bash(git commit --no-verify *),Bash(date *),mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \
+                    --allowedTools "WebSearch,WebFetch,Read,Glob,Grep,Write,Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/news/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git config user.name *),Bash(git config user.email *),Bash(git commit --no-verify *),Bash(date *),Bash(python3 bin/github-trending.py *),mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \
                     --verbose \
                     --output-format stream-json
                   STATUS=$?
