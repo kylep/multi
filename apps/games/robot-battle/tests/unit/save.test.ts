@@ -30,6 +30,8 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     fights: 0,
     inventorySize: 4,
     inventory: [],
+    upgrades: [],
+    settings: { mode: "oliver" as const, oliverChallenge: false },
     ...overrides,
   };
 }
@@ -95,6 +97,24 @@ describe("loadGame", () => {
     const storage = createMockStorage();
     storage.setItem(SAVE_KEY, JSON.stringify({ version: 1 }));
     expect(loadGame(storage)).toBeNull();
+  });
+
+  it("soft-migrates missing upgrades and settings fields", () => {
+    const storage = createMockStorage();
+    // Simulate an old save without the new fields
+    const oldPlayer = { ...makeRobot(), upgrades: undefined, settings: undefined };
+    storage.setItem(SAVE_KEY, JSON.stringify({ version: 1, player: oldPlayer }));
+    const loaded = loadGame(storage)!;
+    expect(loaded.upgrades).toEqual([]);
+    expect(loaded.settings).toEqual({ mode: "oliver", oliverChallenge: false });
+  });
+
+  it("re-applies upgrades on load", () => {
+    const storage = createMockStorage();
+    const player = makeRobot({ upgrades: ["inventory-5"], inventorySize: 4 });
+    saveGame(storage, player);
+    const loaded = loadGame(storage)!;
+    expect(loaded.inventorySize).toBe(5);
   });
 
   it("restores inventory items with all fields intact", () => {

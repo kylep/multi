@@ -19,6 +19,7 @@ import {
   getEffectiveHands,
   getEffectiveMaxEnergy,
   getEffectiveMaxHealth,
+  getWeaponEnergyCost,
   getWeapons,
 } from "../../engine/robot";
 import { awardExp, awardMoney, recordFight } from "../../engine/state";
@@ -39,6 +40,11 @@ export async function battleScreen(
   if (!enemyRobot) {
     terminal.print("Error creating enemy!", "t-red");
     return;
+  }
+
+  // Oliver's EXTRA CHALLENGE: enemies get 3x HP per level
+  if (player.settings.oliverChallenge) {
+    enemyRobot.maxHealth += enemyRobot.level * 4;
   }
 
   const fightNumber = player.fights + 1;
@@ -248,7 +254,7 @@ async function playerTurn(
   while (true) {
     const weapons = getWeapons(player.robot);
     const hasWeapons = weapons.length > 0;
-    const canAffordAny = hasWeapons && weapons.some((w) => w.energyCost <= player.currentEnergy);
+    const canAffordAny = hasWeapons && weapons.some((w) => getWeaponEnergyCost(w, player.robot) <= player.currentEnergy);
     const hasConsumables = getConsumables(player.robot).some(
       (c) => !player.consumablesUsed.includes(c.name),
     );
@@ -351,7 +357,7 @@ async function playerPlanAttack(
     terminal.print("");
 
     const usedHands = [...selected].reduce((s, i) => s + weapons[i].hands, 0);
-    const usedEnergy = [...selected].reduce((s, i) => s + weapons[i].energyCost, 0);
+    const usedEnergy = [...selected].reduce((s, i) => s + getWeaponEnergyCost(weapons[i], player.robot), 0);
 
     // Weapon toggles as grid cards
     const weaponChoices: Choice[] = [];
@@ -361,7 +367,7 @@ async function playerPlanAttack(
       weaponChoices.push({
         label: `${check} ${w.name}`,
         value: `toggle-${i}`,
-        subtitle: `${w.damage} dmg, ${w.hands}h, ${w.energyCost} en`,
+        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${w.requirements.length > 0 ? ` (${player.robot.inventory.filter((it) => w.requirements.includes(it.name)).length} ${w.requirements[0]})` : ""}`,
       });
     }
     // Attack and Back as extra cards in the grid

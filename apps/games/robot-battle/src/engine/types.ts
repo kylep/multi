@@ -59,6 +59,8 @@ export interface Robot {
   fights: number;
   inventorySize: number;
   inventory: Item[];
+  upgrades: string[];
+  settings: { mode: "oliver" | "lucas"; oliverChallenge: boolean };
 }
 
 export interface Enemy {
@@ -67,6 +69,7 @@ export interface Enemy {
   weapons: string[];
   gear: string[];
   consumables: string[];
+  upgrades: string[];
   reward: number;
   expReward: number;
   description: string;

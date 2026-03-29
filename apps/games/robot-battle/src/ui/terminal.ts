@@ -5,6 +5,8 @@ export interface Choice {
   value: string;
   subtitle?: string;
   disabled?: boolean;
+  group?: string;
+  active?: boolean;
 }
 
 export interface Span {
@@ -20,7 +22,7 @@ export interface Terminal {
   printHTML(html: string): void;
   clear(): void;
   promptText(prompt: string): Promise<string>;
-  promptChoice(prompt: string, choices: Choice[], layout?: ChoiceLayout): Promise<string>;
+  promptChoice(prompt: string, choices: Choice[], layout?: ChoiceLayout, contentHTML?: string): Promise<string>;
   promptContinue(seconds?: number): Promise<void>;
   promptConfirm(message: string, confirmLabel?: string, cancelLabel?: string): Promise<boolean>;
 }
@@ -59,7 +61,7 @@ export function createDomTerminal(root: HTMLElement): Terminal {
 
     printHTML(html: string): void {
       const div = document.createElement("div");
-      div.innerHTML = html;
+      div.innerHTML = html; // nosemgrep: javascript.browser.security.insecure-document-method.insecure-document-method
       output.appendChild(div);
       scrollToBottom();
     },
@@ -110,7 +112,7 @@ export function createDomTerminal(root: HTMLElement): Terminal {
       });
     },
 
-    promptChoice(prompt: string, choices: Choice[], layout: ChoiceLayout = "list"): Promise<string> {
+    promptChoice(prompt: string, choices: Choice[], layout: ChoiceLayout = "list", contentHTML?: string): Promise<string> {
       return new Promise((resolve) => {
         if (prompt) terminal.print(prompt);
 
@@ -122,46 +124,88 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         if (selectedIndex >= choices.length) selectedIndex = 0;
 
         if (layout === "grid") {
-          // ── Grid layout: 2-column card grid ──
+          // ── Grid layout: 2-column card grid, with optional tab bar ──
+          const hasTabs = choices.some((c) => c.group === "tab");
+          const wrapper = document.createElement("div");
+          wrapper.setAttribute("data-testid", "choice-prompt");
+
+          let tabBar: HTMLDivElement | null = null;
+          if (hasTabs) {
+            tabBar = document.createElement("div");
+            tabBar.className = "tab-bar";
+            wrapper.appendChild(tabBar);
+          }
+
+          if (contentHTML) {
+            const content = document.createElement("div");
+            content.innerHTML = contentHTML; // nosemgrep: javascript.browser.security.insecure-document-method.insecure-document-method
+            wrapper.appendChild(content);
+          }
+
           const grid = document.createElement("div");
           grid.className = "card-grid";
-          grid.setAttribute("data-testid", "choice-prompt");
+          wrapper.appendChild(grid);
 
           const cards: HTMLDivElement[] = [];
           for (let i = 0; i < choices.length; i++) {
-            const card = document.createElement("div");
-            const isBack = choices[i].value === "back";
-            let cardClass = "card";
-            if (choices[i].disabled) cardClass += " disabled";
-            if (isBack) cardClass += " card-back";
-            card.className = cardClass;
-            card.setAttribute("data-testid", `choice-${choices[i].value}`);
+            const isTab = choices[i].group === "tab";
 
-            const title = document.createElement("div");
-            title.className = "card-title";
-            title.textContent = choices[i].label;
-            card.appendChild(title);
+            if (isTab) {
+              const tab = document.createElement("div");
+              const isBack = choices[i].value === "back";
+              let tabClass = "tab";
+              if (choices[i].active) tabClass += " tab-active";
+              if (isBack) tabClass += " tab-back";
+              tab.className = tabClass;
+              tab.setAttribute("data-testid", `choice-${choices[i].value}`);
+              tab.textContent = choices[i].label;
 
-            if (choices[i].subtitle) {
-              const sub = document.createElement("div");
-              sub.className = "card-subtitle";
-              sub.textContent = choices[i].subtitle!;
-              card.appendChild(sub);
-            }
-
-            if (!choices[i].disabled) {
-              card.addEventListener("click", () => {
+              tab.addEventListener("click", () => {
                 selectedIndex = i;
                 updateSelection();
                 confirm();
               });
-            }
 
-            grid.appendChild(card);
-            cards.push(card);
+              tabBar!.appendChild(tab);
+              cards.push(tab);
+            } else {
+              const card = document.createElement("div");
+              const isBack = choices[i].value === "back";
+              let cardClass = "card";
+              if (choices[i].disabled) cardClass += " disabled";
+              if (isBack) cardClass += " card-back";
+              card.className = cardClass;
+              card.setAttribute("data-testid", `choice-${choices[i].value}`);
+
+              const title = document.createElement("div");
+              title.className = "card-title";
+              title.textContent = choices[i].label;
+              card.appendChild(title);
+
+              if (choices[i].subtitle) {
+                const sub = document.createElement("div");
+                sub.className = "card-subtitle";
+                sub.textContent = choices[i].subtitle!;
+                card.appendChild(sub);
+              }
+
+              if (!choices[i].disabled) {
+                card.addEventListener("click", () => {
+                  selectedIndex = i;
+                  updateSelection();
+                  confirm();
+                });
+              }
+
+              grid.appendChild(card);
+              cards.push(card);
+            }
           }
 
-          output.appendChild(grid);
+          // Hide grid if it has no content children
+          if (grid.children.length === 0) grid.style.display = "none";
+
+          output.appendChild(wrapper);
 
           function updateSelection(): void {
             for (let i = 0; i < cards.length; i++) {

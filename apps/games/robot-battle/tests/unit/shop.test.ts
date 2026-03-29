@@ -11,11 +11,12 @@ function setup() {
 }
 
 describe("listAvailableItems", () => {
-  it("returns items at or below player level", () => {
+  it("returns all items (including above player level)", () => {
     const state = setup();
     const items = listAvailableItems(state);
     expect(items.length).toBeGreaterThan(0);
-    expect(items.every((i) => i.level <= state.player!.level)).toBe(true);
+    // Should include items above player level (shown greyed out in shop)
+    expect(items.some((i) => i.level > state.player!.level)).toBe(true);
   });
 });
 

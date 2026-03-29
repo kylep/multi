@@ -1,4 +1,4 @@
-/* === Robot Battle v0.4.0 — Retro Point-and-Click UI === */
+/* === Robot Battle v0.5.0 — Retro Point-and-Click UI === */
 
 * {
   margin: 0;
@@ -55,6 +55,54 @@ body {
   margin: 4px 0;
   background: #0d1a0d;
   white-space: normal;
+}
+
+/* === Tab bar — horizontal navigation tabs === */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  margin: 8px 0 0 0;
+}
+
+.tab {
+  padding: 8px 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: #33ff33;
+  border: 1px solid #1a5a1a;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  opacity: 0.6;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.tab:hover {
+  opacity: 1;
+  background: #0d1a0d;
+}
+
+.tab.selected {
+  opacity: 1;
+  background: #1a3a1a;
+}
+
+.tab-active {
+  opacity: 1;
+  background: #1a3a1a;
+  border-color: #33ff33;
+  font-weight: bold;
+}
+
+.tab-back {
+  margin-left: auto;
+  color: #ffff33;
+  border-color: #ffff3366;
+}
+
+.tab-back:hover {
+  background: #3a3a0d;
 }
 
 /* === Cards — clickable bordered items === */
@@ -300,6 +348,29 @@ body {
 .terminal-modal-btn:hover {
   background: #33ff33;
   color: #0a0a0a;
+}
+
+/* === Tooltips — CSS-only via data-tooltip === */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0a0a0a;
+  border: 1px solid #33ff33;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
+  white-space: nowrap;
+  z-index: 50;
+  pointer-events: none;
+  color: #33ff33;
+  margin-bottom: 4px;
 }
 
 /* === Title centering === */

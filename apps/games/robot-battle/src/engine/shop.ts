@@ -5,8 +5,7 @@ import type { GameState } from "./state";
 import { getGear, hasItem } from "./robot";
 
 export function listAvailableItems(state: GameState): Item[] {
-  const player = state.player!;
-  return state.registry.getItemsForLevel(player.level);
+  return state.registry.getAllItems();
 }
 
 function isAmmoGear(item: Item): boolean {
