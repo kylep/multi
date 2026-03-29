@@ -59,14 +59,24 @@ export function recordFight(state: GameState, won: boolean): void {
   if (won) player.wins += 1;
 }
 
+export function getXpToLevel(level: number): number {
+  return 10 + 2 * (level - 1);
+}
+
+const MAX_LEVEL = 50;
+
 export function awardExp(state: GameState, amount: number): boolean {
   const player = state.player!;
+  if (player.level >= MAX_LEVEL) return false;
   player.exp += amount;
   let leveledUp = false;
-  while (player.exp >= 10) {
-    player.exp -= 10;
+  while (player.exp >= getXpToLevel(player.level) && player.level < MAX_LEVEL) {
+    player.exp -= getXpToLevel(player.level);
     player.level += 1;
     leveledUp = true;
+  }
+  if (player.level >= MAX_LEVEL) {
+    player.exp = 0;
   }
   return leveledUp;
 }

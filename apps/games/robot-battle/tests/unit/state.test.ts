@@ -84,9 +84,10 @@ describe("awardExp", () => {
   });
 
   it("handles multiple level ups", () => {
+    // Level 1 needs 10 XP, level 2 needs 12 XP; 25 - 10 - 12 = 3 remaining
     const state = setup();
     awardExp(state, 25);
     expect(state.player!.level).toBe(3);
-    expect(state.player!.exp).toBe(5);
+    expect(state.player!.exp).toBe(3);
   });
 });

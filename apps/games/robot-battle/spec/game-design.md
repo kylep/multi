@@ -30,6 +30,9 @@ fun descriptions, clear feedback.
 - **Defeat**: robot is "destroyed" but auto-rebuilt; earns $10 consolation
 - **Surrender**: forfeit mid-battle; earns $10 consolation (same as defeat)
 - **Auto-Battle**: AI plays for you with a 250ms pause between turns
+- **Fight Again**: after any battle result, a "Fight Again" button
+  re-enters battle against the same opponent immediately (skipping
+  the menu → fight → select → detail flow)
 
 ## Auto-Battle
 
@@ -59,7 +62,8 @@ Auto-Battle, and watches the rest play out. No settings screen needed.
 
 ## Progression
 
-- XP: level up every 10 XP
+- XP to level up: `10 + 2*(level-1)` — starts at 10, grows by 2 per level
+- Level cap: 50 (XP stops accumulating once reached)
 - Higher levels unlock better items in the shop and tougher enemies
 - Money earned from wins; bonus from "Money Maker" gear
 - Losses and surrenders earn $10 consolation money (you always make progress)
@@ -105,6 +109,7 @@ is added during `createPlayer`, not as a shop purchase.
 | Name | Level | Gear | Reward | XP |
 |------|-------|------|--------|----|
 | MiniBot | 1 | Cardboard Armor | $50 | 2 |
+| Buzzblade | 2 | Cardboard Armor, Propeller | $75 | 2 |
 | Sparky | 3 | Small Battery, Small Computer Chip | $80 | 3 |
 | Firebot | 5 | Gold Computer Chip | $150 | 5 |
 

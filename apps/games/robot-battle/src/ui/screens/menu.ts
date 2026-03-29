@@ -8,6 +8,7 @@ import {
   getEffectiveMaxHealth,
   getWeapons,
 } from "../../engine/robot";
+import { getXpToLevel } from "../../engine/state";
 import { shopScreen } from "./shop";
 import { upgradesScreen } from "./upgrades";
 import { settingsScreen } from "./settings";
@@ -24,7 +25,8 @@ export async function mainMenu(
     const player = state.player!;
 
     // Player stats header panel
-    terminal.printHTML(`<div class="panel-header"><span class="t-blue t-bold">${player.name}</span> &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/10</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span></div>`);
+    terminal.printHTML(`<div class="panel-header"><span class="t-blue t-bold">${player.name}</span> &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/${getXpToLevel(player.level)}</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span></div>`);
+
 
     const choice = await terminal.promptChoice("", [
       { label: "Fight", value: "fight", subtitle: "Battle enemies" },
@@ -93,8 +95,11 @@ async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
 
     const shouldFight = await enemyDetailScreen(terminal, state, choice);
     if (shouldFight) {
-      await battleScreen(terminal, state, choice);
-      return;
+      let opponent = choice;
+      while (true) {
+        const result = await battleScreen(terminal, state, opponent);
+        if (result !== "fight-again") return;
+      }
     }
   }
 }
@@ -147,6 +152,14 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.6.1", date: "2026-03-29", notes: [
+      "Fight Again button after battles (rematch same opponent)",
+      "XP to level up now scales: 10 + 2*(level-1)",
+      "Level cap at 50",
+      "Buzzblade payout increased to $75",
+    ],
+  },
   {
     version: "0.6.0", date: "2026-03-29", notes: [
       "Mobile-friendly: responsive battle layout, single-column shop on small screens",

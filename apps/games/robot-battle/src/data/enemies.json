@@ -14,7 +14,7 @@
       "weapons": ["Wrench"],
       "gear": ["Cardboard Armor", "Propeller"],
       "consumables": [],
-      "reward": 60,
+      "reward": 75,
       "expReward": 2,
       "description": "A rusty bot with spinning blades. Watch your fingers!"
     },

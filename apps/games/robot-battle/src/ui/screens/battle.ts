@@ -22,7 +22,7 @@ import {
   getWeaponEnergyCost,
   getWeapons,
 } from "../../engine/robot";
-import { awardExp, awardMoney, recordFight } from "../../engine/state";
+import { awardExp, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
 
 
 function delay(ms: number): Promise<void> {
@@ -33,13 +33,13 @@ export async function battleScreen(
   terminal: Terminal,
   state: GameState,
   enemyName: string,
-): Promise<void> {
+): Promise<"continue" | "fight-again"> {
   const player = state.player!;
   const enemyDef = state.registry.enemies.get(enemyName)!;
   const enemyRobot = state.registry.createEnemyRobot(enemyName);
   if (!enemyRobot) {
     terminal.print("Error creating enemy!", "t-red");
-    return;
+    return "continue";
   }
 
   // Oliver's EXTRA CHALLENGE: enemies get 3x HP per level
@@ -125,17 +125,20 @@ export async function battleScreen(
       if (leveled) {
         rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
       }
-      rewardsHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/10 &nbsp; ${player.wins}W / ${player.fights}F</div>`;
+      rewardsHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
       const nextPreview = getNextLevelPreview(state);
       if (nextPreview) rewardsHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${rewardsHtml}</div>`);
 
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
+        { label: "Fight Again", value: "fight-again" },
         { label: "Battle Log", value: "log" },
       ], "row");
       if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
-      break;
+      player.health = getEffectiveMaxHealth(player);
+      player.energy = getEffectiveMaxEnergy(player);
+      return choice as "continue" | "fight-again";
     }
   } else {
     recordFight(state, false);
@@ -154,23 +157,28 @@ export async function battleScreen(
         ? `<div>Surrendered to <span class="t-yellow t-bold">${enemyName}</span></div>`
         : `<div>Destroyed by <span class="t-yellow t-bold">${enemyName}</span> after <span class="t-cyan">${turns}</span> turns</div>`;
       if (!surrendered) infoHtml += `<div style="margin-top:4px"><span class="t-green">+$10 consolation</span></div>`;
-      infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/10 &nbsp; ${player.wins}W / ${player.fights}F</div>`;
+      infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
       const nextPreview = getNextLevelPreview(state);
       if (nextPreview) infoHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${infoHtml}</div>`);
 
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
+        { label: "Fight Again", value: "fight-again" },
         { label: "Battle Log", value: "log" },
       ], "row");
       if (choice === "log") { await showBattleLog(terminal, battle, player.name, enemyName); continue; }
-      break;
+      // Reset health/energy before returning
+      player.health = getEffectiveMaxHealth(player);
+      player.energy = getEffectiveMaxEnergy(player);
+      return choice as "continue" | "fight-again";
     }
   }
 
-  // Reset health/energy
+  // Reset health/energy (fallback, should not reach here)
   player.health = getEffectiveMaxHealth(player);
   player.energy = getEffectiveMaxEnergy(player);
+  return "continue";
 }
 
 function getNextLevelPreview(state: GameState): string | null {
