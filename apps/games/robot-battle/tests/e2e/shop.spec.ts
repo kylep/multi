@@ -18,7 +18,7 @@ test.describe("Shop", () => {
     await expect(page.getByTestId("choice-buy")).toBeVisible();
     await expect(page.getByTestId("choice-sell")).toBeVisible();
     await expect(page.getByTestId("choice-inventory")).toBeVisible();
-    await expect(page.getByTestId("choice-back")).toBeVisible();
+    await expect(page.getByTestId("choice-back").first()).toBeVisible();
   });
 
   test("Wrench visible in buy tab with stats", async ({ page }) => {
@@ -40,6 +40,18 @@ test.describe("Shop", () => {
 
     // Buy menu re-renders — verify money decreased
     await expect(page.getByText("$50", { exact: true })).toBeVisible();
+  });
+
+  test("bottom Back card returns to main menu", async ({ page }) => {
+    await enterGame(page);
+    await page.getByTestId("choice-shop").click();
+
+    // Click the bottom Back card (not the tab)
+    const bottomBack = page.locator(".card.card-back");
+    await expect(bottomBack).toBeVisible();
+    await bottomBack.click();
+
+    await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
   });
 
   test("can sell an item after buying", async ({ page }) => {

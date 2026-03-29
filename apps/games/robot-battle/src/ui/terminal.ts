@@ -87,6 +87,12 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         input.setAttribute("data-testid", "text-input");
         wrapper.appendChild(input);
 
+        const submitBtn = document.createElement("div");
+        submitBtn.className = "btn";
+        submitBtn.setAttribute("data-testid", "text-submit");
+        submitBtn.textContent = "Enter";
+        wrapper.appendChild(submitBtn);
+
         output.appendChild(wrapper);
         input.focus();
 
@@ -97,16 +103,22 @@ export function createDomTerminal(root: HTMLElement): Terminal {
         };
         document.addEventListener("keydown", refocus);
 
+        function submit(): void {
+          document.removeEventListener("keydown", refocus);
+          const value = input.value;
+          wrapper.remove();
+          terminal.print(`${prompt}${value}`);
+          resolve(value);
+        }
+
         input.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            document.removeEventListener("keydown", refocus);
-            const value = input.value;
-            wrapper.remove();
-            terminal.print(`${prompt}${value}`);
-            resolve(value);
+            submit();
           }
         });
+
+        submitBtn.addEventListener("click", submit);
 
         scrollToBottom();
       });
@@ -153,9 +165,11 @@ export function createDomTerminal(root: HTMLElement): Terminal {
             if (isTab) {
               const tab = document.createElement("div");
               const isBack = choices[i].value === "back";
+              const isFilter = choices[i].value === "toggle-filter";
               let tabClass = "tab";
               if (choices[i].active) tabClass += " tab-active";
               if (isBack) tabClass += " tab-back";
+              if (isFilter) tabClass += " tab-filter";
               tab.className = tabClass;
               tab.setAttribute("data-testid", `choice-${choices[i].value}`);
               tab.textContent = choices[i].label;
@@ -170,9 +184,10 @@ export function createDomTerminal(root: HTMLElement): Terminal {
               cards.push(tab);
             } else {
               const card = document.createElement("div");
-              const isBack = choices[i].value === "back";
-              let cardClass = "card";
-              if (choices[i].disabled) cardClass += " disabled";
+              const isBack = choices[i].value === "back" || choices[i].value === "quit";
+              const isHeader = choices[i].group === "header";
+              let cardClass = isHeader ? "card card-header" : "card";
+              if (choices[i].disabled && !isHeader) cardClass += " disabled";
               if (isBack) cardClass += " card-back";
               card.className = cardClass;
               card.setAttribute("data-testid", `choice-${choices[i].value}`);
@@ -261,7 +276,7 @@ export function createDomTerminal(root: HTMLElement): Terminal {
             document.addEventListener("keydown", onKey);
           });
 
-          scrollToBottom();
+          wrapper.scrollIntoView({ block: "start", behavior: "instant" });
 
         } else if (layout === "row") {
           // ── Row layout: horizontal buttons ──

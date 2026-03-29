@@ -39,7 +39,7 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
-    await page.getByTestId("choice-back").click();
+    await page.getByTestId("choice-back").first().click();
 
     // Reload and continue
     await page.reload();
@@ -57,7 +57,7 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
-    await page.getByTestId("choice-back").click();
+    await page.getByTestId("choice-back").first().click();
 
     // Fight and surrender
     await page.getByTestId("choice-fight").click();
@@ -83,7 +83,7 @@ test.describe("Save & Load", () => {
     await page.getByTestId("choice-shop").click();
     await page.getByText("Stick", { exact: false }).first().click();
     await page.getByTestId("confirm-true").click();
-    await page.getByTestId("choice-back").click();
+    await page.getByTestId("choice-back").first().click();
 
     // Reload and continue
     await page.reload();
