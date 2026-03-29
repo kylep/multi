@@ -107,7 +107,13 @@ export async function battleScreen(
     // Show victory screen in a loop (re-render after viewing battle log)
     while (true) {
       terminal.clear();
-      terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-green t-bold">╔═══════════════════════════════╗</div><div class="t-green t-bold" style="font-size:22px">VICTORY!</div><div class="t-green t-bold">╚═══════════════════════════════╝</div></div>`);
+      if (enemyName === "TITAN") {
+        const hardMode = player.settings.oliverChallenge;
+        const msg = hardMode ? "YOU WON THE GAME... ON HARD MODE!" : "YOU WON THE GAME!";
+        terminal.printHTML(`<div class="title-center" style="min-height:0;margin:24px 0"><div class="t-yellow t-bold">╔═══════════════════════════════════════╗</div><div class="t-yellow t-bold" style="font-size:26px">${msg}</div><div class="t-yellow t-bold">╚═══════════════════════════════════════╝</div></div>`);
+      } else {
+        terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-green t-bold">╔═══════════════════════════════╗</div><div class="t-green t-bold" style="font-size:22px">VICTORY!</div><div class="t-green t-bold">╚═══════════════════════════════╝</div></div>`);
+      }
 
       let rewardsHtml = `<div>Defeated <span class="t-yellow t-bold">${enemyName}</span> in <span class="t-cyan">${turns}</span> turns</div>`;
       rewardsHtml += `<div>HP remaining: <span class="t-cyan">${playerHp}/${playerMax}</span></div>`;
