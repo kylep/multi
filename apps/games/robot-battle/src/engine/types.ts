@@ -111,6 +111,7 @@ export interface BattleState {
   playerAction: PlannedAction | null;
   enemyAction: PlannedAction | null;
   turnHistory: TurnSnapshot[];
+  turnLogs: string[][];
 }
 
 export interface ActionResult {

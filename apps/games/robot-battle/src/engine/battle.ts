@@ -59,6 +59,7 @@ export function createBattle(
     playerAction: null,
     enemyAction: null,
     turnHistory: [],
+    turnLogs: [],
   };
 }
 
@@ -251,6 +252,7 @@ export function recordTurnSnapshot(battle: BattleState): void {
 
 export function endTurn(battle: BattleState): void {
   recordTurnSnapshot(battle);
+  battle.turnLogs.push([...battle.currentTurnLog]);
   battle.lastTurnLog = [...battle.currentTurnLog];
   battle.currentTurnLog = [];
   battle.playerAction = null;
