@@ -104,9 +104,23 @@ export async function battleScreen(
     // Easy enemies (below player level) give 50% gold and 0 XP
     const isEasy = enemyDef.level < player.level;
     const xpReward = isEasy ? 0 : enemyDef.expReward;
-    const goldReward = isEasy ? Math.floor(enemyDef.reward / 2) : enemyDef.reward;
+    let goldReward = isEasy ? Math.floor(enemyDef.reward / 2) : enemyDef.reward;
+
+    // First challenge mode win against this enemy: double money
+    const isChallenge = player.settings.oliverChallenge;
+    const firstChallengeWin = isChallenge && !player.challengeDefeatedEnemies.includes(enemyName);
+    if (firstChallengeWin) goldReward *= 2;
+
     const leveled = awardExp(state, xpReward);
     const actual = awardMoney(state, goldReward);
+
+    // Track defeated enemies
+    if (!player.defeatedEnemies.includes(enemyName)) {
+      player.defeatedEnemies.push(enemyName);
+    }
+    if (isChallenge && !player.challengeDefeatedEnemies.includes(enemyName)) {
+      player.challengeDefeatedEnemies.push(enemyName);
+    }
 
     // Show victory screen in a loop (re-render after viewing battle log)
     while (true) {
@@ -121,7 +135,7 @@ export async function battleScreen(
 
       let rewardsHtml = `<div>Defeated <span class="t-yellow t-bold">${enemyName}</span> in <span class="t-cyan">${turns}</span> turns</div>`;
       rewardsHtml += `<div>HP remaining: <span class="t-cyan">${playerHp}/${playerMax}</span></div>`;
-      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span> &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
+      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span>${firstChallengeWin ? ` <span class="t-yellow">(2x challenge bonus!)</span>` : ""} &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
       if (leveled) {
         rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
       }

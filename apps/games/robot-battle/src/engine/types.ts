@@ -61,6 +61,8 @@ export interface Robot {
   inventory: Item[];
   upgrades: string[];
   settings: { mode: "oliver" | "lucas"; oliverChallenge: boolean };
+  defeatedEnemies: string[];
+  challengeDefeatedEnemies: string[];
 }
 
 export interface Enemy {

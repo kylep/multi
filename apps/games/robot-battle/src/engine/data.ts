@@ -178,6 +178,8 @@ export function loadAssets(): AssetRegistry {
         inventory: [],
         upgrades: [],
         settings: { mode: "oliver", oliverChallenge: false },
+        defeatedEnemies: [],
+        challengeDefeatedEnemies: [],
       };
 
       for (const wName of enemy.weapons) {

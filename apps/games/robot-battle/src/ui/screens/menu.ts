@@ -81,10 +81,14 @@ async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
     const choices: Choice[] = [];
     for (const [name, enemy] of enemies) {
       const tag = getDifficulty(player.level, enemy.level);
+      const challengeCleared = player.challengeDefeatedEnemies.includes(name);
+      const normalCleared = player.defeatedEnemies.includes(name);
       choices.push({
         label: `${name} (Lv.${enemy.level})`,
         value: name,
         subtitle: `[${tag}] $${enemy.reward}, ${enemy.expReward} XP`,
+        badge: challengeCleared ? "★" : normalCleared ? "✔" : undefined,
+        badgeClass: challengeCleared ? "badge-challenge" : normalCleared ? "badge-cleared" : undefined,
       });
     }
     choices.push({ label: "Back", value: "back", subtitle: "Return to menu" });
@@ -155,6 +159,8 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
     version: "0.6.1", date: "2026-03-29", notes: [
       "Fight Again button after battles (rematch same opponent)",
+      "Defeated badges: white ✔ for cleared, yellow ★ for challenge mode",
+      "Challenge mode first-win bonus: double money payout",
       "XP to level up now scales: 10 + 2*(level-1)",
       "Level cap at 50",
       "Buzzblade payout increased to $75",

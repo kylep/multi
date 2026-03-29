@@ -32,6 +32,8 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     inventory: [],
     upgrades: [],
     settings: { mode: "oliver" as const, oliverChallenge: false },
+    defeatedEnemies: [],
+    challengeDefeatedEnemies: [],
     ...overrides,
   };
 }

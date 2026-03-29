@@ -34,6 +34,8 @@ export function createPlayer(state: GameState, name: string): Robot {
     inventory: [],
     upgrades: [],
     settings: { mode: "oliver", oliverChallenge: false },
+    defeatedEnemies: [],
+    challengeDefeatedEnemies: [],
   };
   // Give player a free starter Stick
   const stick = state.registry.getItem("Stick");

@@ -34,6 +34,8 @@ export function loadGame(storage: SaveStorage): Robot | null {
     if (!data.player.upgrades) data.player.upgrades = [];
     if (!data.player.settings) data.player.settings = { mode: "oliver", oliverChallenge: false };
     if (data.player.settings.oliverChallenge === undefined) data.player.settings.oliverChallenge = false;
+    if (!data.player.defeatedEnemies) data.player.defeatedEnemies = [];
+    if (!data.player.challengeDefeatedEnemies) data.player.challengeDefeatedEnemies = [];
     applyAllUpgrades(data.player);
     return data.player;
   } catch {

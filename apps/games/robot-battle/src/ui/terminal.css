@@ -197,6 +197,23 @@ body {
   margin-top: 2px;
 }
 
+.card-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.card-badge.badge-cleared {
+  color: #ffffff;
+}
+
+.card-badge.badge-challenge {
+  color: #ffff33;
+}
+
 /* === Button row — horizontal action buttons === */
 .button-row {
   display: flex;

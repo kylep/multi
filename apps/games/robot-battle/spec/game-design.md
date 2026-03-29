@@ -33,6 +33,10 @@ fun descriptions, clear feedback.
 - **Fight Again**: after any battle result, a "Fight Again" button
   re-enters battle against the same opponent immediately (skipping
   the menu → fight → select → detail flow)
+- **Defeated badges**: the fight menu shows a white ✔ on enemies
+  you've beaten, and a yellow ★ if beaten on challenge mode
+- **Challenge mode bonus**: first-time challenge mode win against
+  an enemy pays double money (same XP)
 
 ## Auto-Battle
 
