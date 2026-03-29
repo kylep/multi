@@ -101,8 +101,12 @@ export async function battleScreen(
 
   if (battle.winner === "player") {
     recordFight(state, true);
-    const leveled = awardExp(state, enemyDef.expReward);
-    const actual = awardMoney(state, enemyDef.reward);
+    // Easy enemies (below player level) give 50% gold and 0 XP
+    const isEasy = enemyDef.level < player.level;
+    const xpReward = isEasy ? 0 : enemyDef.expReward;
+    const goldReward = isEasy ? Math.floor(enemyDef.reward / 2) : enemyDef.reward;
+    const leveled = awardExp(state, xpReward);
+    const actual = awardMoney(state, goldReward);
 
     // Show victory screen in a loop (re-render after viewing battle log)
     while (true) {
@@ -117,7 +121,7 @@ export async function battleScreen(
 
       let rewardsHtml = `<div>Defeated <span class="t-yellow t-bold">${enemyName}</span> in <span class="t-cyan">${turns}</span> turns</div>`;
       rewardsHtml += `<div>HP remaining: <span class="t-cyan">${playerHp}/${playerMax}</span></div>`;
-      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span> &nbsp; <span class="t-magenta t-bold">+ ${enemyDef.expReward} XP</span></div>`;
+      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span> &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
       if (leveled) {
         rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
       }
@@ -261,6 +265,7 @@ function printBattleStatus(terminal: Terminal, battle: BattleState): void {
   const eMaxHp = getEffectiveMaxHealth(e.robot);
   const pMaxEn = getEffectiveMaxEnergy(p.robot);
   const eMaxEn = getEffectiveMaxEnergy(e.robot);
+  const barWidth = window.innerWidth < 500 ? 10 : 20;
 
   terminal.printHTML(`<div class="t-yellow t-bold">FIGHT #${battle.fightNumber}: vs ${esc(e.robot.name)} &mdash; Turn ${battle.turnNumber}</div>`);
 
@@ -272,13 +277,13 @@ function printBattleStatus(terminal: Terminal, battle: BattleState): void {
     <div class="battle-layout">
       <div class="panel">
         <div class="t-magenta t-bold">${esc(p.robot.name)} (You)</div>
-        <div class="t-cyan">HP: ${hpBar(p.currentHealth, pMaxHp)} ${p.currentHealth}/${pMaxHp}</div>
-        <div class="t-yellow">EN: ${hpBar(p.currentEnergy, pMaxEn)} ${p.currentEnergy}/${pMaxEn}</div>
+        <div class="t-cyan">HP: ${hpBar(p.currentHealth, pMaxHp, barWidth)} ${p.currentHealth}/${pMaxHp}</div>
+        <div class="t-yellow">EN: ${hpBar(p.currentEnergy, pMaxEn, barWidth)} ${p.currentEnergy}/${pMaxEn}</div>
       </div>
       <div class="panel">
         <div class="t-magenta t-bold">${esc(e.robot.name)} (Enemy)</div>
-        <div class="t-cyan">HP: ${hpBar(e.currentHealth, eMaxHp)} ${e.currentHealth}/${eMaxHp}</div>
-        <div class="t-yellow">EN: ${hpBar(e.currentEnergy, eMaxEn)} ${e.currentEnergy}/${eMaxEn}</div>
+        <div class="t-cyan">HP: ${hpBar(e.currentHealth, eMaxHp, barWidth)} ${e.currentHealth}/${eMaxHp}</div>
+        <div class="t-yellow">EN: ${hpBar(e.currentEnergy, eMaxEn, barWidth)} ${e.currentEnergy}/${eMaxEn}</div>
       </div>
     </div>
     ${lastTurnHtml}

@@ -32,19 +32,30 @@ function renderShopHeader(terminal: Terminal, state: GameState): void {
 }
 
 /** Tab bar choices — all tabs always shown, active tab highlighted */
-function shopTabChoices(activeTab: string): Choice[] {
-  const tabs = ["Buy", "Sell", "Inventory", "Back"];
-  return tabs.map((t) => ({
+function shopTabChoices(activeTab: string, filterOn?: boolean): Choice[] {
+  const tabs = ["Buy", "Sell", "Inventory"];
+  const choices: Choice[] = tabs.map((t) => ({
     label: t,
     value: t.toLowerCase(),
     group: "tab",
     active: t.toLowerCase() === activeTab,
   }));
+  if (filterOn !== undefined) {
+    choices.push({
+      label: filterOn ? "Filter: On" : "Filter: Off",
+      value: "toggle-filter",
+      group: "tab",
+      active: filterOn,
+    });
+  }
+  choices.push({ label: "Back", value: "back", group: "tab", active: false });
+  return choices;
 }
 
 export async function shopScreen(terminal: Terminal, state: GameState): Promise<void> {
   const player = state.player!;
   let currentTab = "buy";
+  let filterOn = true;
 
   while (true) {
     player.health = getEffectiveMaxHealth(player);
@@ -54,10 +65,10 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
     renderShopHeader(terminal, state);
 
     if (currentTab === "buy") {
-      const result = await renderBuyTab(terminal, state);
+      const result = await renderBuyTab(terminal, state, filterOn);
       if (result === "back") break;
+      if (result === "toggle-filter") { filterOn = !filterOn; continue; }
       if (result === "sell" || result === "inventory") { currentTab = result; continue; }
-      // Otherwise stayed on buy (bought something), loop to re-render
     } else if (currentTab === "sell") {
       const result = await renderSellTab(terminal, state);
       if (result === "back") break;
@@ -70,24 +81,47 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
   }
 }
 
-async function renderBuyTab(terminal: Terminal, state: GameState): Promise<string> {
-  const available = listAvailableItems(state);
+async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: boolean): Promise<string> {
+  const allItems = listAvailableItems(state);
+  const player = state.player!;
+  const available = filterOn
+    ? allItems.filter((i) => i.level <= player.level)
+    : allItems;
 
-  const choices: Choice[] = [...shopTabChoices("buy")];
-  for (let i = 0; i < available.length; i++) {
-    const item = available[i];
-    const check = canBuy(state, item);
-    choices.push({
-      label: `${item.name} — $${item.moneyCost}`,
-      value: `buy-${i}`,
-      subtitle: itemSummary(item, state.player!) + (check.ok ? "" : ` [${check.reason}]`),
-      disabled: !check.ok,
-    });
+  // Group by type with section headers
+  const weapons = available.filter((i) => i.itemType === "weapon");
+  const gear = available.filter((i) => i.itemType === "gear");
+  const consumables = available.filter((i) => i.itemType === "consumable");
+
+  const choices: Choice[] = [...shopTabChoices("buy", filterOn)];
+
+  const sections: { label: string; items: typeof available }[] = [
+    { label: "--- Weapons ---", items: weapons },
+    { label: "--- Gear ---", items: gear },
+    { label: "--- Consumables ---", items: consumables },
+  ];
+
+  for (const section of sections) {
+    if (section.items.length === 0) continue;
+    // Section header as a full-width disabled card
+    choices.push({ label: section.label, value: `header-${section.label}`, disabled: true, group: "header" });
+    for (const item of section.items) {
+      const i = available.indexOf(item);
+      const check = canBuy(state, item);
+      choices.push({
+        label: `${item.name} — $${item.moneyCost}`,
+        value: `buy-${i}`,
+        subtitle: itemSummary(item, state.player!) + (check.ok ? "" : ` [${check.reason}]`),
+        disabled: !check.ok,
+      });
+    }
   }
+
+  choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
 
   const choice = await terminal.promptChoice("", choices, "grid");
 
-  if (choice === "back" || choice === "sell" || choice === "inventory") return choice;
+  if (choice === "back" || choice === "sell" || choice === "inventory" || choice === "toggle-filter") return choice;
 
   if (choice.startsWith("buy-")) {
     const idx = parseInt(choice.slice(4), 10);
@@ -121,6 +155,8 @@ async function renderSellTab(terminal: Terminal, state: GameState): Promise<stri
       subtitle: itemSummary(item, state.player!),
     });
   }
+
+  choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
 
   const choice = await terminal.promptChoice("", choices, "grid");
 
@@ -189,6 +225,7 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
 
   // Tab bar with inventory content below it
   const choices: Choice[] = [...shopTabChoices("inventory")];
+  choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
   const choice = await terminal.promptChoice("", choices, "grid", contentHTML);
   return choice;
 }

@@ -78,3 +78,8 @@
 ### Level-up unlock preview
 - Win enough fights to approach level 2
 - Verify: after a win, "Next level:" text shows upcoming item unlocks
+
+### Mobile: battle renders without horizontal scroll
+- HP bars use responsive width (10 chars on viewports < 500px, 20 chars on desktop)
+- Battle panels stack vertically on mobile via CSS media query
+- Action buttons wrap naturally with smaller padding on mobile

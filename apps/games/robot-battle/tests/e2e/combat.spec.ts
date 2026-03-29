@@ -41,7 +41,7 @@ test.describe("Combat", () => {
     await page.getByTestId("choice-surrender").click();
     await page.getByTestId("confirm-true").click();
 
-    await expect(page.getByText("SURRENDERED")).toBeVisible();
+    await expect(page.getByText("SURRENDERED", { exact: true })).toBeVisible();
   });
 
   test("can rest during battle", async ({ page }) => {

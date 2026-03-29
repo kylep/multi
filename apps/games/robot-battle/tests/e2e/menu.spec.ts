@@ -66,4 +66,15 @@ test.describe("Main Menu", () => {
     await expect(page.getByText("ROBOT BATTLE")).toBeVisible();
     await expect(page.getByText("Continue")).toBeVisible();
   });
+
+  test("Enter button submits robot name", async ({ page }) => {
+    await freshStart(page);
+    const input = page.getByTestId("text-input");
+    await expect(input).toBeVisible();
+    await input.fill("BtnBot");
+
+    await page.getByTestId("text-submit").click();
+
+    await expect(page.getByTestId("choice-fight")).toBeVisible({ timeout: 10000 });
+  });
 });
