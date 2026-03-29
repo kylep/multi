@@ -11,7 +11,7 @@ related:
   - wiki/agent-team
   - wiki/history
 scope: "Index of Deep Research reports. Each report includes the provider, prompt, and date generated."
-last_verified: 2026-03-15
+last_verified: 2026-03-29
 ---
 
 Deep Research reports from ChatGPT, Gemini, and Claude, stored
@@ -41,3 +41,7 @@ used and links to the individual provider reports.
   Three reports on design doc templates, PRD-to-design handoff,
   trade-off documentation, implementation phasing, and structuring
   design docs as inputs to AI coding agents. March 2026.
+- [Autolearn v1: Autonomous PoC Learning System](/wiki/research/autolearn-v1.html) —
+  Three reports on architecting an autonomous AI-native SDLC
+  pipeline for continuous PoC learning on Kubernetes (structured
+  planning, agent sandboxing, orchestration frameworks). March 2026.
