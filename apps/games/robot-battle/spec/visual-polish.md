@@ -190,81 +190,71 @@ construct HTML structures using the panel/card classes.
 
 ## New enemies + balance pass
 
-### Enemy roster (6 enemies, smooth progression)
+### Enemy roster (17 enemies, levels 1–50)
 
-| # | Name | Level | HP | Weapons | Key Gear | Reward | XP |
-|---|------|-------|----|---------|----------|--------|----|
-| 1 | MiniBot | 1 | 15 | Stick (1 dmg) | Cardboard Armor | $50 | 2 |
-| 2 | Sparky | 3 | 15 | Shock Rod (5 dmg) | Cardboard Armor, Small Battery, Small Computer Chip | $80 | 3 |
-| 3 | Rustclaw | 4 | 15 | Wrench (2 dmg) x2 | Cardboard Armor, Third Arm, Propeller | $120 | 4 |
-| 4 | Firebot | 5 | 35 | Flame Thrower (10 dmg) | Wooden Armor, Gold Computer Chip | $150 | 5 |
-| 5 | Voltank | 7 | 35 | Sawed-off Shotgun (15 dmg), Shock Rod (5 dmg) | Wooden Armor, Medium Battery, Fourth Arm, Small Computer Chip, Shotgun Shell | $250 | 7 |
-| 6 | Omega | 10 | 10 | Lightsabre (30 dmg) | Big Battery, Gold Computer Chip, Power Chip | $500 | 10 |
+> **Note:** This table was updated post-content-expansion to match
+> `enemies.json`. Effective HP = 10 + level*2 + gear HP bonuses.
 
-**Rustclaw** (new, level 4): A scrappy dual-wielding bot. Has two Wrenches
+| # | Name | Level | Eff. HP | Def | Weapons | Key Gear | Reward | XP |
+|---|------|-------|---------|-----|---------|----------|--------|----|
+| 1 | MiniBot | 1 | 17 | 0 | Stick (1) | Cardboard Armor | $50 | 2 |
+| 2 | Buzzblade | 2 | 19 | 0 | Wrench (2) | Cardboard Armor, Propeller | $75 | 2 |
+| 3 | Sparky | 3 | 26 | 1 | Shock Rod (5) | Tin Armor, Small Battery, Small Computer Chip | $100 | 3 |
+| 4 | Rustclaw | 4 | 28 | 1 | Wrench (2) x2 | Tin Armor, Third Arm, Propeller | $150 | 4 |
+| 5 | Firebot | 5 | 40 | 3 | Flame Thrower (10) | Iron Armor, Gold Computer Chip | $200 | 5 |
+| 6 | Smashbot | 6 | 42 | 2 | Sword (5), Wrench (2) | Iron Armor, Third Arm, Small Battery | $250 | 6 |
+| 7 | Voltank | 7 | 44 | 3 | Shotgun (15), Shock Rod (5) | Iron Armor, Medium Battery, Fourth Arm, Gold Computer Chip, Shotgun Shell | $350 | 7 |
+| 8 | Boombox | 9 | 68 | 4 | Flame Thrower (10) | Steel Armor, Medium Battery, Jet Booster | $500 | 8 |
+| 9 | Omega | 10 | 70 | 4 | Lightsabre (30) | Steel Armor, Big Battery, Power Chip | $600 | 10 |
+| 10 | Ironclad | 13 | 96 | 12 | Laser Gun (20), Shock Rod (5) | Titanium Armor, Big Battery, Fourth Arm, Gold Computer Chip + armor-plating | $1500 | 10 |
+| 11 | Laserface | 16 | 102 | 8 | Laser Gun (20) x2 | Titanium Armor, Mega Battery, Fourth Arm, Advanced Chip | $2500 | 10 |
+| 12 | Thunderbot | 20 | 150 | 15 | Plasma Cannon (80) | Diamond Armor, Mega Battery, Ultra Power Chip + armor-plating | $4000 | 12 |
+| 13 | Megacrusher | 25 | 160 | 15 | Thunder Hammer (60), Chainsaw (35) | Diamond Armor, Nuclear Battery, Fifth Arm, Quantum Chip + armor-plating | $8000 | 12 |
+| 14 | Doombot | 30 | 270 | 23 | Missile Launcher (150) | Plasma Shield, Nuclear Battery, Ultra Power Chip, Hyperdrive + armor-plating | $12000 | 15 |
+| 15 | Nightmare | 35 | 280 | 23 | Death Ray (100), Thunder Hammer (60) | Plasma Shield, Fusion Battery, Sixth Arm, Quantum Chip, Hyperdrive + armor-plating | $18000 | 15 |
+| 16 | Apocalypse | 40 | 490 | 38 | Nuke Launcher (300) | Cosmic Armor, Dark Matter Core, Hyperdrive + armor-plating | $30000 | 18 |
+| 17 | TITAN | 50 | 510 | 38 | Galaxy Destroyer (500) | Cosmic Armor, Dark Matter Core, Hyperdrive, Quantum Chip + armor-plating | $50000 | 20 |
+
+**Buzzblade** (level 2): Rusty bot with spinning blades. Wrench + Propeller
+gives it dodge. Bridge between MiniBot and Sparky.
+
+**Rustclaw** (level 4): A scrappy dual-wielding bot. Has two Wrenches
 and a Third Arm (3 hands total). Hits twice per turn for 2 dmg each.
 Propeller gives 10 dodge. Bridge between Sparky and Firebot.
 
-**Voltank** (new, level 7): A heavy armored bot with a shotgun and shock
+**Voltank** (level 7): A heavy armored bot with a shotgun and shock
 rod. High HP, high damage output, but needs Shotgun Shells (which it
 starts with). Burns through ammo then falls back to Shock Rod.
 
-**Omega** (new, level 10): The final boss. Lightsabre deals 30 dmg but
-costs 20 energy — it can only fire twice before resting. Big Battery
-gives +25 energy to sustain it longer. Power Chip boosts damage further.
+**Omega** (level 10): Lightsabre deals 30 dmg but costs 15 energy —
+it can only fire a few times before resting. Steel Armor gives solid
+bulk (70 HP). Big Battery + Power Chip sustain and boost damage.
 
 ### Progression design
 
-- **Lv.1 player vs MiniBot**: Even fight (both have Stick + Cardboard Armor).
+- **Lv.1 vs MiniBot**: Even fight (both have Stick + Cardboard Armor).
   Win rate ~50%. Need 1 win ($50 reward + $100 start = $150) to afford Sword.
-- **Lv.2 with Sword vs Sparky**: Sword (5 dmg) vs Sparky's 15 HP + 10 dodge.
-  Challenging but winnable. Need several wins to afford gear upgrades.
-- **Lv.3-4 with gear vs Rustclaw**: Need good gear (armor + dodge) to
-  survive dual Wrench attacks. Rewards fund Flame Thrower / advanced gear.
-- **Lv.5+ vs Firebot**: Flame Thrower does 10 dmg at 90% acc. Need Wooden
-  Armor (35 HP effective) to survive. Reward is enough for high-end gear.
+- **Lv.2 vs Buzzblade**: Wrench + Propeller dodge makes it slightly trickier
+  than MiniBot. Winnable with Sword or upgraded gear.
+- **Lv.3 vs Sparky**: Shock Rod (5 dmg) with Tin Armor (26 HP). Challenging
+  but winnable with good gear. Rewards fund further upgrades.
+- **Lv.4 vs Rustclaw**: Need good gear (armor + dodge) to survive dual
+  Wrench attacks. Rewards fund Flame Thrower / advanced gear.
+- **Lv.5+ vs Firebot**: Flame Thrower does 10 dmg. Need Iron Armor
+  (40 HP effective) to survive. Reward funds high-end gear.
 - **Lv.7+ vs Voltank**: Shotgun does 15 dmg on first turns, then Shock Rod.
   Need full build (armor + dodge + battery) to survive.
-- **Lv.10 vs Omega**: Lightsabre one-shots anything under 30 HP. Need
-  max gear and consumables. The final challenge.
-
-### New items needed
-
-No new items needed beyond what's already defined — the existing item
-set covers the full progression.
-
-### Enemies JSON additions
-
-Add to `enemies.json`:
-```json
-"Rustclaw": {
-  "level": 4,
-  "weapons": ["Wrench", "Wrench"],
-  "gear": ["Cardboard Armor", "Third Arm", "Propeller"],
-  "consumables": [],
-  "reward": 120,
-  "expReward": 4,
-  "description": "A scrappy junkyard bot with two wrenches and a propeller. Double trouble!"
-},
-"Voltank": {
-  "level": 7,
-  "weapons": ["Sawed-off Shotgun", "Shock Rod"],
-  "gear": ["Wooden Armor", "Medium Battery", "Fourth Arm", "Small Computer Chip", "Shotgun Shell"],
-  "consumables": [],
-  "reward": 250,
-  "expReward": 7,
-  "description": "A heavily armored tank with a shotgun. Watch out for the blast!"
-},
-"Omega": {
-  "level": 10,
-  "weapons": ["Lightsabre"],
-  "gear": ["Big Battery", "Gold Computer Chip", "Power Chip"],
-  "consumables": ["Grenade"],
-  "reward": 500,
-  "expReward": 10,
-  "description": "The ultimate fighting machine. Bzzzzt."
-}
-```
+- **Lv.9+ vs Boombox**: Flame Thrower + Grenade. Steel Armor makes it tanky.
+  Jet Booster dodge makes it hard to hit.
+- **Lv.10 vs Omega**: Lightsabre hits for 30 dmg. Need Steel Armor or better
+  and consumables. First real wall.
+- **Lv.13+ vs Ironclad**: First enemy with armor-plating upgrade (+3 def).
+  96 HP and 12 defence — need strong weapons to punch through.
+- **Lv.20+ vs Thunderbot**: Plasma Cannon at 80 dmg. 150 HP and 15 def.
+  Diamond Armor tier needed to survive.
+- **Lv.30+ vs Doombot**: Missile Launcher at 150 dmg. 270 HP wall.
+- **Lv.40+ vs Apocalypse**: Nuke Launcher at 300 dmg. 490 HP. Near endgame.
+- **Lv.50 vs TITAN**: Galaxy Destroyer at 500 dmg. 510 HP. The final boss.
 
 ## Version
 

@@ -129,6 +129,8 @@ export async function battleScreen(
       player.challengeDefeatedEnemies.push(enemyName);
     }
 
+    if (leveled) sound?.levelUp();
+
     // Show victory screen in a loop (re-render after viewing battle log)
     while (true) {
       terminal.clear();
@@ -145,7 +147,6 @@ export async function battleScreen(
       rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span>${firstChallengeWin ? ` <span class="t-yellow">(2x challenge bonus!)</span>` : ""} &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
       if (leveled) {
         rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
-        sound?.levelUp();
       }
       rewardsHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
       const nextPreview = getNextLevelPreview(state);

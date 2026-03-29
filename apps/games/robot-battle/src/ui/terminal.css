@@ -142,6 +142,7 @@ body {
   padding: 10px 14px;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
+  position: relative;
 }
 
 .card-header {
