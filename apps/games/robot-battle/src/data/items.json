@@ -69,6 +69,7 @@
     "Shotgun Shell": {
       "level": 5,
       "moneyCost": 30,
+      "stackable": true,
       "description": "Allows you to fire a Shotgun weapon once. Consumed when fired."
     },
     "Cardboard Armor": {

@@ -4,6 +4,23 @@ import type { Gear, Item, Robot, ShopResult } from "./types";
 import type { GameState } from "./state";
 import { getGear, hasItem } from "./robot";
 
+/** Count inventory slots used, treating stackable gear groups as 1 slot. */
+export function countInventorySlots(player: Robot): number {
+  const stacked = new Set<string>();
+  let count = 0;
+  for (const item of player.inventory) {
+    if (item.itemType === "gear" && (item as Gear).stackable) {
+      if (!stacked.has(item.name)) {
+        stacked.add(item.name);
+        count++;
+      }
+    } else {
+      count++;
+    }
+  }
+  return count;
+}
+
 export function listAvailableItems(state: GameState): Item[] {
   const player = state.player!;
   return state.registry.getItemsForLevel(player.level);
@@ -15,17 +32,24 @@ export function canBuy(state: GameState, item: Item): { ok: boolean; reason: str
   if (item.level > player.level) return { ok: false, reason: `Requires level ${item.level}` };
   if (player.money < item.moneyCost)
     return { ok: false, reason: `Not enough money (need ${item.moneyCost}, have ${player.money})` };
-  if (player.inventory.length >= player.inventorySize) return { ok: false, reason: "Inventory is full" };
 
   for (const req of item.requirements) {
     if (!hasItem(player, req)) return { ok: false, reason: `Requires ${req}` };
   }
 
   if (item.itemType === "gear") {
-    if (getGear(player).some((g) => g.name === item.name)) {
+    const gear = item as Gear;
+    if (!gear.stackable && getGear(player).some((g) => g.name === item.name)) {
       return { ok: false, reason: "You already have this gear equipped" };
     }
   }
+
+  // Stackable items don't need a free slot if you already have one
+  if (item.itemType === "gear" && (item as Gear).stackable && hasItem(player, item.name)) {
+    return { ok: true, reason: "" };
+  }
+
+  if (countInventorySlots(player) >= player.inventorySize) return { ok: false, reason: "Inventory is full" };
 
   return { ok: true, reason: "" };
 }

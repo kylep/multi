@@ -3,16 +3,17 @@
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
 import type { Gear, Consumable, Item, Weapon } from "../../engine/types";
-import { buyItem, canBuy, getSellPrice, listAvailableItems, sellItem } from "../../engine/shop";
+import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, sellItem } from "../../engine/shop";
 import { getEffectiveMaxEnergy, getEffectiveMaxHealth } from "../../engine/robot";
 import { showRobotStats } from "./inspect";
 
 function shopHeader(terminal: Terminal, state: GameState, activeTab: string): void {
   const player = state.player!;
-  const invFull = player.inventory.length >= player.inventorySize;
+  const slots = countInventorySlots(player);
+  const invFull = slots >= player.inventorySize;
   const invClass = invFull ? "t-red t-bold" : "";
   terminal.printHTML(
-    `<div class="panel-header" style="margin-bottom:0"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${player.inventory.length}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
+    `<div class="panel-header" style="margin-bottom:0"><span class="t-yellow t-bold">SHOP</span> &nbsp; <span class="t-yellow">$${player.money}</span> &nbsp; <span class="${invClass}">Inv: ${slots}/${player.inventorySize}</span> &nbsp; <span class="t-dim">Lv.${player.level}</span></div>`
   );
   // Only show static tab bar on sub-screens (buy/sell)
   if (activeTab) {
@@ -70,8 +71,12 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
     for (let i = 0; i < available.length; i++) {
       const item = available[i];
       const check = canBuy(state, item);
+      const owned = item.itemType === "gear" && (item as Gear).stackable
+        ? player.inventory.filter((inv) => inv.name === item.name).length
+        : 0;
+      const ownedTag = owned > 0 ? ` (have ${owned})` : "";
       choices.push({
-        label: `${item.name} — $${item.moneyCost}`,
+        label: `${item.name}${ownedTag} — $${item.moneyCost}`,
         value: String(i),
         subtitle: itemSummary(item) + (check.ok ? "" : ` [${check.reason}]`),
         disabled: !check.ok,
@@ -112,13 +117,25 @@ async function sellMenu(terminal: Terminal, state: GameState): Promise<void> {
     }
 
     const choices: Choice[] = [];
+    const seen = new Set<string>();
     for (let i = 0; i < player.inventory.length; i++) {
       const item = player.inventory[i];
-      choices.push({
-        label: `${item.name} — $${getSellPrice(item)}`,
-        value: String(i),
-        subtitle: itemSummary(item),
-      });
+      if (item.itemType === "gear" && (item as Gear).stackable) {
+        if (seen.has(item.name)) continue;
+        seen.add(item.name);
+        const count = player.inventory.filter((inv) => inv.name === item.name).length;
+        choices.push({
+          label: `${item.name} x${count} — $${getSellPrice(item)}`,
+          value: String(i),
+          subtitle: itemSummary(item),
+        });
+      } else {
+        choices.push({
+          label: `${item.name} — $${getSellPrice(item)}`,
+          value: String(i),
+          subtitle: itemSummary(item),
+        });
+      }
     }
     choices.push({ label: "Back", value: "back" });
 

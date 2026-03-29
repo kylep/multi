@@ -28,6 +28,7 @@ export interface Gear extends ItemBase {
   handsBonus: number;
   dodgeBonus: number;
   moneyBonusPercent: number;
+  stackable: boolean;
 }
 
 export interface Consumable extends ItemBase {

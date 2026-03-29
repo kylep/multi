@@ -13,6 +13,7 @@ import {
   getGear,
   getConsumables,
 } from "../../engine/robot";
+import { countInventorySlots } from "../../engine/shop";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -57,17 +58,32 @@ export async function showRobotStats(terminal: Terminal, state: GameState): Prom
 
   const gearHtml = gear.length === 0
     ? `<div class="t-dim">(none)</div>`
-    : gear.map((g) => {
-      const fx: string[] = [];
-      if (g.healthBonus) fx.push(`+${g.healthBonus} HP`);
-      if (g.energyBonus) fx.push(`+${g.energyBonus} Energy`);
-      if (g.defenceBonus) fx.push(`+${g.defenceBonus} Def`);
-      if (g.attackBonus) fx.push(`+${g.attackBonus}% Atk`);
-      if (g.handsBonus) fx.push(`+${g.handsBonus} Hands`);
-      if (g.dodgeBonus) fx.push(`+${g.dodgeBonus} Dodge`);
-      if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}% Money`);
-      return `<div class="t-cyan">${esc(g.name)} &mdash; ${fx.join(", ")}</div>`;
-    }).join("");
+    : (() => {
+      // Count stackable gear and deduplicate
+      const counts = new Map<string, number>();
+      for (const g of gear) {
+        if (g.stackable) counts.set(g.name, (counts.get(g.name) ?? 0) + 1);
+      }
+      const seen = new Set<string>();
+      return gear.map((g) => {
+        if (g.stackable) {
+          if (seen.has(g.name)) return "";
+          seen.add(g.name);
+        }
+        const fx: string[] = [];
+        if (g.healthBonus) fx.push(`+${g.healthBonus} HP`);
+        if (g.energyBonus) fx.push(`+${g.energyBonus} Energy`);
+        if (g.defenceBonus) fx.push(`+${g.defenceBonus} Def`);
+        if (g.attackBonus) fx.push(`+${g.attackBonus}% Atk`);
+        if (g.handsBonus) fx.push(`+${g.handsBonus} Hands`);
+        if (g.dodgeBonus) fx.push(`+${g.dodgeBonus} Dodge`);
+        if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}% Money`);
+        const count = counts.get(g.name);
+        const nameStr = count ? `${esc(g.name)} x${count}` : esc(g.name);
+        const fxStr = fx.length ? fx.join(", ") : esc(g.description);
+        return `<div class="t-cyan">${nameStr} &mdash; ${fxStr}</div>`;
+      }).filter(Boolean).join("");
+    })();
 
   terminal.printHTML(`
     <div class="battle-layout">
@@ -89,5 +105,5 @@ export async function showRobotStats(terminal: Terminal, state: GameState): Prom
     terminal.printHTML(`<div class="panel"><div class="t-yellow t-bold">Items</div>${conHtml}</div>`);
   }
 
-  terminal.print(`Inventory: ${player.inventory.length}/${player.inventorySize}`, "t-dim");
+  terminal.print(`Inventory: ${countInventorySlots(player)}/${player.inventorySize}`, "t-dim");
 }
