@@ -16,11 +16,13 @@ import {
 } from "../../engine/save";
 import { getEffectiveMaxEnergy, getEffectiveMaxHealth } from "../../engine/robot";
 import { mainMenu } from "./menu";
+import type { SoundPlayer } from "../sound";
 import packageJson from "../../../package.json";
 
 export async function startGame(
   terminal: Terminal,
   storage: SaveStorage = localStorage,
+  sound?: SoundPlayer,
 ): Promise<void> {
   const registry = loadAssets();
 
@@ -110,10 +112,13 @@ export async function startGame(
       saveSlot(storage, activeSlot, state.player!, settings);
     }
 
+    // Apply sound settings
+    if (sound) sound.setEnabled(settings.soundEnabled);
+
     terminal.print("");
     terminal.print(`Welcome, ${state.player!.name}!`, "t-magenta");
 
     const save = () => saveSlot(storage, activeSlot, state.player!, settings);
-    await mainMenu(terminal, state, save);
+    await mainMenu(terminal, state, save, sound, settings);
   }
 }

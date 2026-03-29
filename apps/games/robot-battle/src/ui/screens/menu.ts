@@ -1,7 +1,9 @@
 /** Main menu screen. */
 
 import type { Terminal, Choice } from "../terminal";
+import type { SoundPlayer } from "../sound";
 import type { GameState } from "../../engine/state";
+import type { GameSettings } from "../../engine/save";
 import {
   getEffectiveDefence,
   getEffectiveDodge,
@@ -16,6 +18,8 @@ export async function mainMenu(
   terminal: Terminal,
   state: GameState,
   save?: () => void,
+  sound?: SoundPlayer,
+  settings?: GameSettings,
 ): Promise<void> {
   while (true) {
     terminal.clear();
@@ -34,24 +38,53 @@ export async function mainMenu(
       </div>
     `);
 
-    const choice = await terminal.promptChoice("", [
+    const menuChoices: Choice[] = [
       { label: "Fight", value: "fight", subtitle: "Battle enemies" },
       { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
       { label: "Inspect Robot", value: "inspect", subtitle: "View stats & inventory" },
+      { label: "Settings", value: "settings", subtitle: "Sound & options" },
       { label: "Quit", value: "quit", subtitle: "Return to title" },
-    ], "grid");
+    ];
+
+    const choice = await terminal.promptChoice("", menuChoices, "grid");
 
     if (choice === "quit") break;
 
     if (choice === "fight") {
-      await fightMenu(terminal, state);
+      await fightMenu(terminal, state, sound);
       save?.();
     } else if (choice === "shop") {
-      await shopScreen(terminal, state);
+      await shopScreen(terminal, state, sound);
       save?.();
     } else if (choice === "inspect") {
       await showRobotStats(terminal, state);
       await terminal.promptContinue(0);
+    } else if (choice === "settings") {
+      await settingsScreen(terminal, sound, settings);
+      save?.();
+    }
+  }
+}
+
+async function settingsScreen(
+  terminal: Terminal,
+  sound?: SoundPlayer,
+  settings?: GameSettings,
+): Promise<void> {
+  while (true) {
+    terminal.clear();
+    terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">SETTINGS</span></div>`);
+
+    const soundOn = sound?.isEnabled() ?? true;
+    const choice = await terminal.promptChoice("", [
+      { label: `Sound: ${soundOn ? "ON" : "OFF"}`, value: "sound" },
+      { label: "Back", value: "back" },
+    ]);
+
+    if (choice === "back") break;
+    if (choice === "sound" && sound && settings) {
+      sound.setEnabled(!soundOn);
+      settings.soundEnabled = !soundOn;
     }
   }
 }
@@ -64,7 +97,7 @@ function getDifficulty(playerLevel: number, enemyLevel: number): string {
   return "Deadly";
 }
 
-async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
+async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
   const player = state.player!;
   const enemies = Array.from(state.registry.enemies.entries());
 
@@ -94,7 +127,7 @@ async function fightMenu(terminal: Terminal, state: GameState): Promise<void> {
 
     const shouldFight = await enemyDetailScreen(terminal, state, choice);
     if (shouldFight) {
-      await battleScreen(terminal, state, choice);
+      await battleScreen(terminal, state, choice, sound);
       return;
     }
   }

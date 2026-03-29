@@ -6,6 +6,7 @@ import type { Gear, Consumable, Item, Weapon } from "../../engine/types";
 import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, sellItem } from "../../engine/shop";
 import { getEffectiveMaxEnergy, getEffectiveMaxHealth } from "../../engine/robot";
 import { showRobotStats } from "./inspect";
+import type { SoundPlayer } from "../sound";
 
 function shopHeader(terminal: Terminal, state: GameState, activeTab: string): void {
   const player = state.player!;
@@ -31,7 +32,7 @@ function shopHeader(terminal: Terminal, state: GameState, activeTab: string): vo
   }
 }
 
-export async function shopScreen(terminal: Terminal, state: GameState): Promise<void> {
+export async function shopScreen(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
   const player = state.player!;
 
   while (true) {
@@ -49,7 +50,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
     ], "row");
 
     if (choice === "back") break;
-    if (choice === "buy") await buyMenu(terminal, state);
+    if (choice === "buy") await buyMenu(terminal, state, sound);
     else if (choice === "sell") await sellMenu(terminal, state);
     else if (choice === "inventory") {
       await showRobotStats(terminal, state);
@@ -58,7 +59,7 @@ export async function shopScreen(terminal: Terminal, state: GameState): Promise<
   }
 }
 
-async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
+async function buyMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
   const player = state.player!;
 
   while (true) {
@@ -98,6 +99,7 @@ async function buyMenu(terminal: Terminal, state: GameState): Promise<void> {
       );
       if (confirmed) {
         buyItem(state, item);
+        sound?.buy();
       }
     }
   }

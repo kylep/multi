@@ -22,6 +22,7 @@ import {
   getWeapons,
 } from "../../engine/robot";
 import { awardExp, awardMoney, recordFight } from "../../engine/state";
+import type { SoundPlayer } from "../sound";
 
 
 function delay(ms: number): Promise<void> {
@@ -32,6 +33,7 @@ export async function battleScreen(
   terminal: Terminal,
   state: GameState,
   enemyName: string,
+  sound?: SoundPlayer,
 ): Promise<void> {
   const player = state.player!;
   const enemyDef = state.registry.enemies.get(enemyName)!;
@@ -76,6 +78,13 @@ export async function battleScreen(
       terminal.print("");
       printTurnLog(terminal, battle);
 
+      // Play sound for hits/misses
+      if (sound) {
+        const log = battle.currentTurnLog;
+        if (log.some((l) => l.includes("hits for"))) sound.hit();
+        else if (log.some((l) => l.includes("misses"))) sound.miss();
+      }
+
       if (battle.winner === null) {
         endTurn(battle);
       }
@@ -95,6 +104,7 @@ export async function battleScreen(
     if (battle.winner === "player") {
       terminal.print("*** VICTORY! ***", "t-green t-bold");
       terminal.print(`Won in ${turns} turns with ${playerHp}/${playerMax} HP remaining`, "t-dim");
+      sound?.victory();
       recordFight(state, true);
 
       terminal.print("");
@@ -105,6 +115,7 @@ export async function battleScreen(
       if (leveled) {
         terminal.print("");
         terminal.print(`*** LEVEL UP! Now level ${player.level}! ***`, "t-yellow t-bold");
+        sound?.levelUp();
       }
 
       terminal.print("");
@@ -116,6 +127,7 @@ export async function battleScreen(
       } else {
         terminal.print("*** DEFEAT ***", "t-red t-bold");
         terminal.print(`Lasted ${turns} turns`, "t-dim");
+        sound?.defeat();
       }
       recordFight(state, false);
       player.money += 10;
