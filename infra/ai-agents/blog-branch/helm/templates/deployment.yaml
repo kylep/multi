@@ -50,11 +50,11 @@ spec:
               mountPath: /output
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 1000m
+              cpu: 500m
               memory: 1Gi
+            limits:
+              cpu: 2
+              memory: 3Gi
       containers:
         - name: nginx
           image: nginx:alpine
