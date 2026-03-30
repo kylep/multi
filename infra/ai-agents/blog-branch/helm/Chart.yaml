@@ -1,0 +1,4 @@
+apiVersion: v2
+name: blog-branch
+description: Feature branch deployment of blog for header-based routing
+version: 0.1.0

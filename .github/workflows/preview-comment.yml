@@ -1,0 +1,31 @@
+name: Preview deployment comment
+on:
+  pull_request:
+    types: [labeled]
+jobs:
+  comment:
+    if: github.event.label.name == 'preview'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post header instructions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SLUG=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//' | cut -c1-63)
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "$(cat <<EOF
+          ## Preview Deployment
+
+          Branch preview is deploying. Once ready, set this header to view it:
+
+          \`\`\`
+          X-Branch: ${SLUG}
+          \`\`\`
+
+          **curl**: \`curl -H 'X-Branch: ${SLUG}' https://pai.pericak.com\`
+          **ModHeader**: Add header \`X-Branch\` = \`${SLUG}\`
+
+          The preview will be removed automatically when this PR is closed/merged or the \`preview\` label is removed.
+          EOF
+          )"
