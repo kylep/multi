@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Branch Header",
+  "version": "1.0.0",
+  "description": "Injects X-Branch header for Traefik branch preview routing",
+  "permissions": ["declarativeNetRequest", "storage"],
+  "host_permissions": [
+    "*://*.pericak.com/*",
+    "*://localhost/*",
+    "*://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
