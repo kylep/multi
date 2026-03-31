@@ -1,0 +1,43 @@
+# Deploys feature branch previews of the blog for header-based routing.
+# Add the "preview" label to a PR to trigger a branch deployment.
+# Set the X-Branch header to the branch slug to route to it.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: blog-branches
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - pullRequest:
+        github:
+          owner: kylep
+          repo: multi
+          labels:
+            - preview
+        requeueAfterSeconds: 30
+  template:
+    metadata:
+      name: "blog-branch-{{.branch_slug}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kylep/multi
+        targetRevision: "{{.head_sha}}"
+        path: infra/ai-agents/blog-branch/helm
+        helm:
+          parameters:
+            - name: blog.branch
+              value: "{{.branch}}"
+            - name: blog.branchSlug
+              value: "{{.branch_slug}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: blog-staging
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

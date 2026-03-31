@@ -25,3 +25,4 @@ configuration management.
 - [Bootstrap & Recovery](/wiki/devops/bootstrap.html) — Single-command bootstrap, Vault secrets, post-reboot recovery
 - [Mac Setup Learnings](/wiki/devops/mac-setup-learnings.html) — Gotchas and patterns from the Ansible-managed Mac setup
 - [Mac Setup Run Log](/wiki/devops/mac-setup-run-log.html) — Per-run decision log from bootstrap execution
+- [Preview Environments](/wiki/devops/preview-environments.html) — Header-based branch routing with Traefik and ArgoCD

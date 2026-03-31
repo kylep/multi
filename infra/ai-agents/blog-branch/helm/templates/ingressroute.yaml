@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: blog-branch-{{ .Values.blog.branchSlug }}
+  namespace: blog-staging
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`{{ .Values.hostname }}`) && Headers(`X-Branch`, `{{ .Values.blog.branchSlug }}`)
+      kind: Rule
+      priority: 10
+      services:
+        - name: blog-{{ .Values.blog.branchSlug }}
+          port: 80
