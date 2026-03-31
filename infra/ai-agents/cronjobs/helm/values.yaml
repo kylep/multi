@@ -15,7 +15,7 @@ cronjobs:
     schedule: "0 13 * * *"   # 9:00 AM EDT / 13:00 UTC
   paiMorning:
     enabled: false
-    schedule: "30 12 * * *"
+    schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC)
   tweetRss:
     enabled: false
     schedule: "*/15 * * * *"  # every 15 min
