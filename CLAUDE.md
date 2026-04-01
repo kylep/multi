@@ -45,7 +45,7 @@ kill the process if stuck.
 
 # Agent Team
 
-This repo has 10 Claude Code agents defined in `.claude/agents/`.
+This repo has 11 Claude Code agents defined in `.claude/agents/`.
 Use them instead of doing everything yourself.
 
 ## When to use which agent
@@ -58,6 +58,7 @@ Use them instead of doing everything yourself.
 | Synthesizer | Comparing/contrasting multiple Deep Research reports | `claude --agent synthesizer` |
 | PRD Writer | Scoping a product idea into a well-defined PRD | `claude --agent prd-writer` |
 | Design Doc Writer | Taking an approved PRD and producing a technical design doc | `claude --agent design-doc-writer` |
+| Interviewee | Answering interview questions from repo context (auto-interview mode) | Subagent (auto-delegated) |
 | Researcher | Gathering sourced facts for blog posts or validating claims | Subagent (auto-delegated) |
 | Reviewer | Checking style, substance, frontmatter, sourcing | Subagent (auto-delegated) |
 | QA | Verifying a blog post is production-ready | Subagent (auto-delegated) |
@@ -71,7 +72,7 @@ matches an agent's description, delegate to it as a subagent rather than
 doing the work yourself.
 
 Pai, Publisher, Analyst, Synthesizer, PRD Writer, and Design Doc Writer are top-level agents
-(run via `claude --agent <name>`). Researcher, Reviewer, QA, and Security Auditor
+(run via `claude --agent <name>`). Interviewee, Researcher, Reviewer, QA, and Security Auditor
 are subagents that Publisher calls during its pipeline.
 
 
