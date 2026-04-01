@@ -45,3 +45,35 @@ last_verified: 2026-04-01
 ## Just for You
 
 - [GitHub Blog](https://github.blog/open-source/maintainers/from-mcp-to-multi-agents-the-top-10-open-source-ai-projects-on-github-right-now-and-why-they-matter/) n8n is cited among the top open-source AI projects gaining traction in early 2026 for its self-hosted, fair-code workflow automation with native AI and 400+ integrations. Trending alongside agent frameworks as teams build internal automation pipelines.
+
+---
+
+## Update — 16:30 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-01/openai-demand-sinks-on-secondary-market-as-anthropic-runs-hot) OpenAI secondary market shares have stalled — roughly $600 million in sell orders placed with Next Round Capital found no buyers. Competing marketplaces report record demand for Anthropic shares. Epoch AI projects Anthropic will surpass OpenAI in annualized revenue by mid-2026; Claude Code alone is credited with $2.5 billion in annualized revenue and 4% of all public GitHub commits.
+
+- [Investing.com / The Information](https://www.investing.com/news/stock-market-news/anthropic-considers-ipo-as-soon-as-q4-2026-the-information-4584016) Anthropic is targeting an IPO as early as October 2026, with bankers projecting a raise exceeding $60 billion. The company's annualized revenue has roughly doubled since early March to around $20 billion.
+
+## AI Tooling
+
+- [Claude Code Changelog](https://code.claude.com/docs/en/changelog) Claude Code v2.1.88 adds a `defer` decision to PreToolUse hooks so headless sessions can pause at a tool call and resume with `--resume` for re-evaluation. A new `PermissionDenied` hook fires after auto mode classifier denials, allowing `{retry: true}` to signal the model to retry. Named subagents now appear in `@`-mention typeahead suggestions.
+
+- [Anthropic Platform Docs](https://platform.claude.com/docs/en/release-notes/overview) Anthropic API updates: sandboxed code execution is now free when paired with web search or web fetch; max_tokens cap raised to 300k on the Message Batches API for Opus 4.6 and Sonnet 4.6; data residency controls added via an `inference_geo` parameter for US-only inference. Claude Haiku 3 is deprecated with retirement on April 19.
+
+- [Google Blog](https://www.vanguardngr.com/2026/04/google-expands-search-live-globally-introduces-new-ai-voice-model/) Google expanded Search Live to more than 200 countries and territories, powered by Gemini 3.1 Flash Live — a new multilingual voice and audio model. Developers can access Gemini Live API in AI Studio preview; enterprises can use it through Gemini Enterprise for Customer Experience.
+
+## Security
+
+- [CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) CVE-2026-21385: an Android component vulnerability is under limited, targeted exploitation and has been added to CISA's Known Exploited Vulnerabilities catalog. Apply Google's March 2026 Android Security Bulletin patches.
+
+- [Microsoft Security](https://msrc.microsoft.com/update-guide/) CVE-2026-20963: deserialization of untrusted data in SharePoint Server allows an unauthenticated remote attacker to execute code over a network. Apply vendor patches or discontinue exposure.
+
+## Geopolitics
+
+- [CBC News](https://www.cbc.ca/news/canada/calgary/alberta-ottawa-mou-missed-deadlines-9.7149141) Canada and Alberta missed the April 1 deadline on two of four commitments in their energy MOU — carbon pricing equivalency and the trilateral agreement with Oil Sands Alliance companies. Both Carney and Smith confirmed the miss publicly; Smith said she hopes the carbon price deal is done within days and the Alliance agreement before the end of April.
+
+## Local
+
+- [UrbanToronto](https://urbantoronto.ca/news/2026/04/news-roundup-april-1-2026.60694) Ontario's minimum wage is set to increase to $17.95 per hour on October 1, 2026. An adviser also publicly warned the province to look more closely at Therme's finances before signing a lease for the Ontario Place redevelopment site.
