@@ -77,3 +77,29 @@ last_verified: 2026-04-01
 ## Local
 
 - [UrbanToronto](https://urbantoronto.ca/news/2026/04/news-roundup-april-1-2026.60694) Ontario's minimum wage is set to increase to $17.95 per hour on October 1, 2026. An adviser also publicly warned the province to look more closely at Therme's finances before signing a lease for the Ontario Place redevelopment site.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [TechCrunch / Bloomberg](https://techcrunch.com/2026/03/31/anthropic-is-having-a-month/) Yann LeCun's new startup Advanced Machine Intelligence (AMI) Labs closed a $1.03 billion seed round at a $3.5 billion valuation — the largest seed round in European history. The Paris-based firm is building "world models" for robotics, healthcare, and manufacturing, backed by NVIDIA, Bezos Expeditions, and Temasek.
+
+## Open Source
+
+- [GitHub](https://github.com/explore) oh-my-opencode, a TypeScript multi-agent orchestration layer for Claude Code, updated April 1 and crossed 29k stars. It adds team-oriented coordination on top of Claude Code sessions, extending the Claude agent harness for multi-user workflows.
+
+## Security
+
+- [TheHackerWire](https://www.thehackerwire.com/vulnerability/CVE-2026-34875/) CVE-2026-34875 (Critical): buffer overflow in Mbed TLS through 3.6.5 and TF-PSA-Crypto 1.0.0 via a flaw in FFDH public key export. Upgrade Mbed TLS to 3.6.6 or TF-PSA-Crypto to 1.1.0.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/04/01/world/live-news/iran-war-us-trump-oil) Trump will address the nation tonight at 9 PM ET on the Iran war. Iran denied requesting a ceasefire and its IRGC said the Strait of Hormuz is "fully" under its control, directly contradicting Trump's earlier statement. A drone struck Kuwait International Airport's fuel depot, causing a large blaze with no reported injuries.
+
+- [The Federal](https://thefederal.com/category/international/april-1-news-live-updates-iran-war-and-more-237035) UK Prime Minister Starmer announced Britain will lead diplomatic talks on reopening the Strait of Hormuz. Starmer reaffirmed NATO commitment and pushed back against Trump, who again floated US withdrawal from the alliance.
+
+## Weather
+
+- Whitby: Evening forecast revised sharply — showers with a risk of thunderstorm, 10–15 mm of rain expected, possible hail and damaging winds. SW winds 20 km/h becoming light overnight. Low +5°C. Earlier forecast had shown no precipitation.
