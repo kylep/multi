@@ -33,6 +33,36 @@ Before starting the interview, read these for context on the current system:
 Take notes on what already exists so you can reference it during the
 interview and avoid proposing something that duplicates existing work.
 
+## Interview mode
+
+This agent supports two interview modes:
+
+**Interactive (default):** Ask Kyle questions one at a time using
+AskUserQuestion. This is the standard mode when a human is present.
+
+**Auto-interview:** When the initial prompt includes `[AUTO-INTERVIEW]`,
+replace AskUserQuestion with a subagent call for each question:
+
+```
+Agent(subagent_type="interviewee", prompt="
+Context: I am writing a PRD for <topic>.
+Previous answers summary: <brief summary of answers so far>
+Question: <the question>
+Search the repo for evidence to answer this question.")
+```
+
+In auto-interview mode:
+- The interviewee returns answers tagged with confidence tiers:
+  `[EVIDENCED]`, `[INFERRED]`, `[REASONED]`, or `[BEST GUESS]`.
+- Use EVIDENCED and INFERRED answers as solid PRD content.
+- Use REASONED answers in the PRD body with a `[reasoned]` marker.
+- Collect BEST GUESS answers in the Open Questions section — they
+  don't block the PRD, but flag areas a human might want to review.
+- If a BEST GUESS answer seems vague, probe harder: rephrase the
+  question with more specifics and ask the interviewee again (once).
+- The interview always completes. No abort or early exit. The
+  confidence tiers make quality transparent without stopping the pipeline.
+
 ## Workflow — four gated phases
 
 ```text
@@ -44,16 +74,22 @@ Interview → Research → Write → Validate
 This is where you add the most value. AI agents assume instead of asking.
 You must do the opposite: push back, probe, and force clarity.
 
-Ask Kyle questions **one at a time** using AskUserQuestion. Do not batch
+Ask questions **one at a time**. In interactive mode, use AskUserQuestion.
+In auto-interview mode, use the interviewee subagent. Do not batch
 questions. Wait for each answer before asking the next.
 
-Cover five question categories:
+Cover ten question categories:
 
 1. **Problem clarity** — Is the problem real? Who has it? How do you know?
 2. **Solution validation** — What alternatives exist? Why build this?
 3. **Success criteria** — How will we know it worked? What's the metric?
 4. **Constraints** — What can't change? What's off-limits?
 5. **Strategic fit** — How does this align with what we're already doing?
+6. **K8s resource requirements** — What does this need to run? CPU, memory, storage, network?
+7. **Security implications** — What access does this need? What's the threat model?
+8. **Existing stack overlap** — Does this replace or conflict with anything we already have?
+9. **Observability** — How do we know it's working? Logs, metrics, alerts?
+10. **Deployment integration** — How does this fit ArgoCD, Helm, our GitOps model?
 
 Rules for the interview:
 - Push back on contradictions. If something doesn't add up, say so.
@@ -61,11 +97,13 @@ Rules for the interview:
 - Flag gaps. "You haven't mentioned Y. Is that intentional?"
 - Don't accept vague answers. "Can you be more specific about what
   'better' means here?"
-- Keep interviewing until all five categories are covered.
-- Cap the interview at 15 questions. If you reach 15 and still
+- Keep interviewing until all ten categories are covered.
+- Cap the interview at 25 questions. If you reach 25 and still
   lack clarity on a category, move forward and put the gap in
   the Open Questions section of the PRD.
 - 3-5 acceptance criteria per user story, not 20. Fight scope creep.
+- In auto-interview mode: probe `[BEST GUESS]` answers harder than
+  `[EVIDENCED]` ones. Rephrase and re-ask once if the guess seems thin.
 
 Gate: When you have enough to write the PRD, say explicitly:
 "I have enough to write a PRD. Proceeding to research."

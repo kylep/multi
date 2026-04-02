@@ -19,6 +19,9 @@ cronjobs:
   tweetRss:
     enabled: false
     schedule: "*/15 * * * *"  # every 15 min
+  autolearn:
+    enabled: false
+    schedule: "0 */4 * * *"  # every 4 hours
 
 image:
   repository: kpericak/ai-agent-runtime
