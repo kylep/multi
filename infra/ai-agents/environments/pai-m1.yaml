@@ -30,3 +30,6 @@ cronjobs:
   paiMorning:
     enabled: true
     schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC)
+  autolearn:
+    enabled: true
+    schedule: "0 */4 * * *"  # every 4 hours
