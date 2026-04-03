@@ -27,4 +27,6 @@ terminal output.
 
 ## Evaluations
 
-_None yet. Evaluations will appear here as the autolearn pipeline runs._
+| Tool | Verdict | Score | Date | Summary |
+|------|---------|-------|------|---------|
+| [Microsoft VibeVoice](/wiki/evaluations/vibevoice.html) | skip | 2.4 / 5.0 | 2026-04-03 | Excellent voice AI but requires GPU hardware not in our stack |
