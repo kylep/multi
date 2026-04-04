@@ -6,6 +6,7 @@ import type { GameState } from "../../engine/state";
 import type { Enemy, Robot } from "../../engine/types";
 import type { SaveStorage } from "../../engine/save";
 import type { GameSettings } from "../../engine/save";
+import { loadLeaderboard } from "../../engine/save";
 import { createRng } from "../../engine/rng";
 import {
   getConsumables,
@@ -49,6 +50,7 @@ export async function mainMenu(
       { label: "Upgrades", value: "upgrades", subtitle: "Permanent buffs" },
       { label: "Bank", value: "bank", subtitle: "Deposit & earn interest" },
       { label: "Cheat Codes", value: "cheats", subtitle: "Enter a secret code" },
+      { label: "Leaderboard", value: "leaderboard", subtitle: "100% challenge records" },
       { label: "Settings", value: "settings", subtitle: "Sound & options" },
       { label: "Change Log", value: "changelog", subtitle: "Version history" },
       { label: "Quit", value: "quit", subtitle: "Return to title" },
@@ -76,10 +78,39 @@ export async function mainMenu(
     } else if (choice === "cheats") {
       await cheatCodeScreen(terminal, state, sound, storage);
       save?.();
+    } else if (choice === "leaderboard") {
+      await leaderboardScreen(terminal, storage);
     } else if (choice === "changelog") {
       await changeLogScreen(terminal);
     }
   }
+}
+
+async function leaderboardScreen(terminal: Terminal, storage?: SaveStorage): Promise<void> {
+  terminal.clear();
+  terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">LEADERBOARD</span> <span class="t-dim">— 100% Challenge Completions</span></div>`);
+
+  if (!storage) {
+    terminal.print("No leaderboard data available.", "t-dim");
+    await terminal.promptChoice("", [{ label: "Back", value: "back" }], "row");
+    return;
+  }
+
+  const board = loadLeaderboard(storage);
+  if (board.length === 0) {
+    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="t-dim">No entries yet. Defeat all enemies on Challenge mode to earn a spot!</div></div>`);
+  } else {
+    let html = "";
+    for (let i = 0; i < board.length; i++) {
+      const e = board[i];
+      const ngp = e.newGamePlusLevel > 0 ? ` <span class="t-yellow">[+${e.newGamePlusLevel}]</span>` : "";
+      const rank = i === 0 ? "t-yellow t-bold" : i === 1 ? "t-cyan" : i === 2 ? "t-green" : "t-dim";
+      html += `<div class="${rank}">${i + 1}. ${esc(e.name)}${ngp} — ${e.fights} fights (${e.date})</div>`;
+    }
+    terminal.printHTML(`<div class="panel" style="padding:12px 16px">${html}</div>`);
+  }
+
+  await terminal.promptChoice("", [{ label: "Back", value: "back" }], "row");
 }
 
 async function cheatCodeScreen(

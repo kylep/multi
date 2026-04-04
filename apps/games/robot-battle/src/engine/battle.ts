@@ -232,22 +232,26 @@ export function useConsumable(
     effects.push(`blocks ${consumable.damageBlock} damage this turn`);
   }
   if (consumable.damage > 0) {
-    // 50% dodge chance against consumable damage
-    const dodge = battleDodge(defender);
-    const dodgeChance = Math.max(0, Math.min(1, dodge / 200)); // half effectiveness
-    if (r.random() < dodgeChance) {
-      effects.push(`enemy dodged ${consumable.name}!`);
+    if (defender.robot.godMode) {
+      effects.push(`0 damage... BECAUSE YOU ARE A GOD`);
     } else {
-      // Defence reduces consumable damage
-      const defence = battleDefence(defender);
-      let dmg = Math.max(0, consumable.damage - defence);
-      if (defender.damageBlock > 0) {
-        const blocked = Math.min(dmg, defender.damageBlock);
-        defender.damageBlock -= blocked;
-        dmg -= blocked;
+      // 50% dodge chance against consumable damage
+      const dodge = battleDodge(defender);
+      const dodgeChance = Math.max(0, Math.min(1, dodge / 200)); // half effectiveness
+      if (r.random() < dodgeChance) {
+        effects.push(`enemy dodged ${consumable.name}!`);
+      } else {
+        // Defence reduces consumable damage
+        const defence = battleDefence(defender);
+        let dmg = Math.max(0, consumable.damage - defence);
+        if (defender.damageBlock > 0) {
+          const blocked = Math.min(dmg, defender.damageBlock);
+          defender.damageBlock -= blocked;
+          dmg -= blocked;
+        }
+        defender.currentHealth -= dmg;
+        effects.push(`${dmg} damage to enemy`);
       }
-      defender.currentHealth -= dmg;
-      effects.push(`${dmg} damage to enemy`);
     }
   }
   if (consumable.enemyDodgeReduction > 0) {
