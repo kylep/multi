@@ -104,8 +104,9 @@ async function leaderboardScreen(terminal: Terminal, storage?: SaveStorage): Pro
     for (let i = 0; i < board.length; i++) {
       const e = board[i];
       const ngp = e.newGamePlusLevel > 0 ? ` <span class="t-yellow">[+${e.newGamePlusLevel}]</span>` : "";
+      const cheat = e.cheatsUsed ? ` <span class="t-red">✘</span>` : "";
       const rank = i === 0 ? "t-yellow t-bold" : i === 1 ? "t-cyan" : i === 2 ? "t-green" : "t-dim";
-      html += `<div class="${rank}">${i + 1}. ${esc(e.name)}${ngp} — ${e.fights} fights (${e.date})</div>`;
+      html += `<div class="${rank}">${i + 1}. ${esc(e.name)}${ngp}${cheat} — ${e.fights} fights (${e.date})</div>`;
     }
     terminal.printHTML(`<div class="panel" style="padding:12px 16px">${html}</div>`);
   }
