@@ -3,6 +3,7 @@
 import type { Terminal, Choice } from "../terminal";
 import type { SoundPlayer } from "../sound";
 import type { GameState } from "../../engine/state";
+import type { Enemy, Robot } from "../../engine/types";
 import type { SaveStorage } from "../../engine/save";
 import type { GameSettings } from "../../engine/save";
 import { createRng } from "../../engine/rng";
@@ -175,6 +176,41 @@ async function cheatCodeScreen(
   }
 }
 
+function buildRewardBreakdown(enemyDef: Enemy, player: Robot, enemyName: string, isChallenge: boolean): string {
+  const base = enemyDef.reward;
+  const isEasy = enemyDef.level < player.level;
+  const firstChallengeWin = isChallenge && !player.challengeDefeatedEnemies.includes(enemyName);
+
+  let lines = `<div style="margin-top:4px"><span class="t-magenta">$${base.toLocaleString()}</span>`;
+
+  let total = base;
+
+  if (isChallenge && firstChallengeWin) {
+    const doubleBonus = base;
+    total += doubleBonus;
+    lines += `<br><span class="t-purple">+ $${doubleBonus.toLocaleString()} (2x first challenge win)</span>`;
+  }
+
+  if (isChallenge) {
+    const challengeBonus = Math.floor(total * 0.2);
+    total += challengeBonus;
+    lines += `<br><span class="t-purple">+ $${challengeBonus.toLocaleString()} (20% challenge bonus)</span>`;
+  }
+
+  if (isEasy) {
+    const reduction = Math.floor(total / 2);
+    total = total - reduction;
+    lines += `<br><span class="t-red">- $${reduction.toLocaleString()} ([Easy] enemy)</span>`;
+  }
+
+  if (isChallenge || isEasy) {
+    lines += `<br><span class="t-green t-bold">= $${total.toLocaleString()}</span>`;
+  }
+
+  lines += ` &nbsp; XP: ${isEasy ? Math.floor(enemyDef.expReward / 2) : enemyDef.expReward}</div>`;
+  return lines;
+}
+
 function getDifficulty(playerLevel: number, enemyLevel: number): string {
   const diff = enemyLevel - playerLevel;
   if (diff < 0) return "Easy";
@@ -204,13 +240,14 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
       const normalCleared = player.defeatedEnemies.includes(name);
       const displayName = challengeOn && enemy.challengeName ? enemy.challengeName : name;
       const isEasy = enemy.level < player.level;
-      const displayReward = isEasy ? Math.floor(enemy.reward / 2) : enemy.reward;
+      let displayReward = enemy.reward;
+      if (challengeOn) displayReward = Math.floor(displayReward * 1.2);
+      if (isEasy) displayReward = Math.floor(displayReward / 2);
       const displayXp = isEasy ? Math.floor(enemy.expReward / 2) : enemy.expReward;
-      const easyTag = isEasy ? " (halved)" : "";
       choices.push({
         label: `${displayName} (Lv.${enemy.level})`,
         value: name,
-        subtitle: `[${tag}] $${displayReward}${easyTag}, ${displayXp} XP`,
+        subtitle: `[${tag}] $${displayReward}, ${displayXp} XP`,
         badge: challengeCleared ? "★" : normalCleared ? "✔" : undefined,
         badgeClass: challengeCleared ? "badge-challenge" : normalCleared ? "badge-cleared" : undefined,
         labelClass: challengeOn && enemy.challengeName ? "t-purple" : undefined,
@@ -291,7 +328,7 @@ async function enemyDetailScreen(
         <div>Weapons: ${weaponStr}</div>
         <div>Gear: ${gearStr}</div>
         <div>Items: ${conStr}</div>
-        <div class="t-magenta" style="margin-top:4px">Reward: $${isChallenge ? Math.floor(enemyDef.reward * (player.challengeDefeatedEnemies.includes(enemyName) ? 1.2 : 2.4)) : enemyDef.reward}${isChallenge ? ` <span class="t-purple">(challenge)</span>` : ""} &nbsp; XP: ${enemyDef.expReward}</div>
+        ${buildRewardBreakdown(enemyDef, player, enemyName, isChallenge)}
       </div>
     `);
 
