@@ -100,8 +100,14 @@ async function cheatCodeScreen(
       terminal.printHTML(`<div class="t-red t-bold" style="margin:4px 0">GOD MODE IS ON</div>`);
     }
 
+    const action = await terminal.promptChoice("", [
+      { label: "Enter Code", value: "enter" },
+      { label: "Back", value: "back" },
+    ], "row");
+    if (action === "back") return;
+
     const code = await terminal.promptText("Enter cheat code:");
-    if (!code || code.trim() === "") return;
+    if (!code || code.trim() === "") continue;
 
     const trimmed = code.trim().toLowerCase();
 
