@@ -194,6 +194,10 @@ export function loadAssets(): AssetRegistry {
         settings: { mode: "oliver", oliverChallenge: false },
         defeatedEnemies: [],
         challengeDefeatedEnemies: [],
+        cheatsUsed: false,
+        godMode: false,
+        newGamePlusLevel: 0,
+        titanDefeated: false,
       };
 
       for (const wName of enemy.weapons) {

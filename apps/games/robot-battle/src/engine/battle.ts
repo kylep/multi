@@ -138,16 +138,23 @@ export function executeAttack(
 
     if (roll < hitChance) {
       let damage = calculateDamage(weapon, attacker, defender);
-      if (defender.damageBlock > 0) {
-        const blocked = Math.min(damage, defender.damageBlock);
-        defender.damageBlock -= blocked;
-        damage -= blocked;
+      // God mode: defender takes 0 damage
+      if (defender.robot.godMode) {
+        const msg = `  ${weapon.name} ${i + 1} hits for 0 damage... BECAUSE YOU ARE A GOD`;
+        messages.push(msg);
+        log(battle, msg);
+      } else {
+        if (defender.damageBlock > 0) {
+          const blocked = Math.min(damage, defender.damageBlock);
+          defender.damageBlock -= blocked;
+          damage -= blocked;
+        }
+        totalDamage += damage;
+        defender.currentHealth -= damage;
+        const msg = `  ${weapon.name} ${i + 1} hits for ${damage} damage`;
+        messages.push(msg);
+        log(battle, msg);
       }
-      totalDamage += damage;
-      defender.currentHealth -= damage;
-      const msg = `  ${weapon.name} ${i + 1} hits for ${damage} damage`;
-      messages.push(msg);
-      log(battle, msg);
     } else {
       const msg = `  ${weapon.name} ${i + 1} misses!`;
       messages.push(msg);

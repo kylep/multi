@@ -74,6 +74,10 @@ export interface Robot {
   settings: { mode: "oliver" | "lucas" | "sandbox"; oliverChallenge: boolean };
   defeatedEnemies: string[];
   challengeDefeatedEnemies: string[];
+  cheatsUsed: boolean;
+  godMode: boolean;
+  newGamePlusLevel: number;
+  titanDefeated: boolean;
 }
 
 export interface Enemy {

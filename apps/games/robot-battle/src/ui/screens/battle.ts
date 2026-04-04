@@ -26,6 +26,8 @@ import {
 import { awardExp, awardInterest, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
 import { shouldShowLootBox } from "../../engine/battle";
 import type { SoundPlayer } from "../sound";
+import type { SaveStorage } from "../../engine/save";
+import { addLeaderboardEntry, loadLeaderboard } from "../../engine/save";
 
 
 function delay(ms: number): Promise<void> {
@@ -37,6 +39,7 @@ export async function battleScreen(
   state: GameState,
   enemyName: string,
   sound?: SoundPlayer,
+  storage?: SaveStorage,
 ): Promise<"continue" | "fight-again" | "shop"> {
   const player = state.player!;
   const enemyDef = state.registry.enemies.get(enemyName)!;
@@ -145,9 +148,21 @@ export async function battleScreen(
 
     if (leveled) sound?.levelUp();
 
-    // 100% Game Complete check
+    // 100% Game Complete check — only show once per achievement
     const totalEnemies = state.registry.enemies.size;
-    if (player.settings.mode !== "sandbox" && player.challengeDefeatedEnemies.length >= totalEnemies) {
+    const justCompleted100 = player.settings.mode !== "sandbox"
+      && isChallenge && firstChallengeWin
+      && player.challengeDefeatedEnemies.length >= totalEnemies;
+    if (justCompleted100) {
+      // Record to leaderboard
+      if (storage) {
+        addLeaderboardEntry(storage, {
+          name: player.name,
+          fights: player.fights,
+          newGamePlusLevel: player.newGamePlusLevel,
+          date: new Date().toISOString().slice(0, 10),
+        });
+      }
       terminal.clear();
       terminal.printHTML(`
         <div class="title-center" style="min-height:0;margin:24px 0">
@@ -156,9 +171,22 @@ export async function battleScreen(
           <div class="t-yellow t-bold">╚═════════════════════════════════════════════╝</div>
           <div class="t-green" style="margin-top:12px">You have defeated every enemy on Challenge Mode!</div>
           <div class="t-cyan" style="margin-top:8px">You are the ultimate Robot Battle champion.</div>
-          <div class="t-dim" style="margin-top:8px">Thank you for playing!</div>
+          <div class="t-dim" style="margin-top:8px">Try New Game + from the title screen for an even bigger challenge!</div>
         </div>
       `);
+      // Show leaderboard
+      if (storage) {
+        const board = loadLeaderboard(storage);
+        if (board.length > 0) {
+          let lbHtml = `<div class="t-yellow t-bold" style="margin-top:12px">LEADERBOARD</div>`;
+          for (let i = 0; i < board.length; i++) {
+            const e = board[i];
+            const ngp = e.newGamePlusLevel > 0 ? ` [+${e.newGamePlusLevel}]` : "";
+            lbHtml += `<div class="t-dim">${i + 1}. ${e.name}${ngp} — ${e.fights} fights (${e.date})</div>`;
+          }
+          terminal.printHTML(`<div class="panel" style="padding:8px 12px">${lbHtml}</div>`);
+        }
+      }
       await terminal.promptContinue(0);
     }
 
@@ -172,10 +200,12 @@ export async function battleScreen(
     // Show victory screen in a loop (re-render after viewing battle log)
     while (true) {
       terminal.clear();
-      if (enemyName === "TITAN") {
+      if (enemyName === "TITAN" && !player.titanDefeated) {
+        player.titanDefeated = true;
         const hardMode = player.settings.oliverChallenge;
         const msg = hardMode ? "YOU WON THE GAME... ON HARD MODE!" : "YOU WON THE GAME!";
         terminal.printHTML(`<div class="title-center" style="min-height:0;margin:24px 0"><div class="t-yellow t-bold">╔═══════════════════════════════════════╗</div><div class="t-yellow t-bold" style="font-size:26px">${msg}</div><div class="t-yellow t-bold">╚═══════════════════════════════════════╝</div></div>`);
+        terminal.printHTML(`<div class="t-dim" style="margin:0 0 8px 0">Try New Game + from the title screen!</div>`);
       } else {
         terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-green t-bold">╔═══════════════════════════════╗</div><div class="t-green t-bold" style="font-size:22px">VICTORY!</div><div class="t-green t-bold">╚═══════════════════════════════╝</div></div>`);
       }

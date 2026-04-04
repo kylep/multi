@@ -2,7 +2,7 @@
 
 import type { Terminal } from "../terminal";
 import type { GameState } from "../../engine/state";
-import { depositMoney, withdrawMoney, calculateInterest } from "../../engine/state";
+import { depositMoney, withdrawMoney, calculateInterest, getInterestRate } from "../../engine/state";
 
 export async function bankScreen(terminal: Terminal, state: GameState): Promise<void> {
   const player = state.player!;
@@ -18,7 +18,7 @@ export async function bankScreen(terminal: Terminal, state: GameState): Promise<
       <div class="panel" style="padding:12px 16px">
         <div><span class="t-yellow">Cash on hand:</span> <span class="t-green t-bold">$${player.money.toLocaleString()}</span></div>
         <div><span class="t-yellow">Bank balance:</span> <span class="t-cyan t-bold">$${player.bank.toLocaleString()}</span></div>
-        <div style="margin-top:8px" class="t-dim">Interest rate: 1% per fight = <span class="t-green">$${interest.toLocaleString()}</span>/fight</div>
+        <div style="margin-top:8px" class="t-dim">Interest rate: ${getInterestRate(player)}% per fight = <span class="t-green">$${interest.toLocaleString()}</span>/fight</div>
       </div>
     `);
 

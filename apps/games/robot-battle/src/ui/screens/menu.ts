@@ -3,7 +3,9 @@
 import type { Terminal, Choice } from "../terminal";
 import type { SoundPlayer } from "../sound";
 import type { GameState } from "../../engine/state";
+import type { SaveStorage } from "../../engine/save";
 import type { GameSettings } from "../../engine/save";
+import { createRng } from "../../engine/rng";
 import {
   getConsumables,
   getEffectiveDefence,
@@ -26,13 +28,18 @@ export async function mainMenu(
   save?: () => void,
   sound?: SoundPlayer,
   settings?: GameSettings,
+  storage?: SaveStorage,
 ): Promise<void> {
   while (true) {
     terminal.clear();
     const player = state.player!;
 
     // Player stats header panel
-    terminal.printHTML(`<div class="panel-header"><span class="t-blue t-bold">${player.name}</span> &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/${getXpToLevel(player.level)}</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span></div>`);
+    const ngpTag = player.newGamePlusLevel > 0 ? ` <span class="t-yellow">[+${player.newGamePlusLevel}]</span>` : "";
+    const cheatTag = player.cheatsUsed ? ` <span class="t-red">✘</span>` : "";
+    const borderClass = player.godMode ? "t-red" : "";
+    const panelStyle = player.godMode ? "border-color:#ff4444" : "";
+    terminal.printHTML(`<div class="panel-header" style="${panelStyle}"><span class="t-blue t-bold">${player.name}</span>${ngpTag} &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/${getXpToLevel(player.level)}</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span>${cheatTag}</div>`);
 
 
     const menuChoices: Choice[] = [
@@ -40,6 +47,7 @@ export async function mainMenu(
       { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
       { label: "Upgrades", value: "upgrades", subtitle: "Permanent buffs" },
       { label: "Bank", value: "bank", subtitle: "Deposit & earn interest" },
+      { label: "Cheat Codes", value: "cheats", subtitle: "Enter a secret code" },
       { label: "Settings", value: "settings", subtitle: "Sound & options" },
       { label: "Change Log", value: "changelog", subtitle: "Version history" },
       { label: "Quit", value: "quit", subtitle: "Return to title" },
@@ -50,7 +58,7 @@ export async function mainMenu(
     if (choice === "quit") break;
 
     if (choice === "fight") {
-      await fightMenu(terminal, state, sound);
+      await fightMenu(terminal, state, sound, storage);
       save?.();
     } else if (choice === "shop") {
       await shopScreen(terminal, state, sound);
@@ -64,8 +72,105 @@ export async function mainMenu(
     } else if (choice === "settings") {
       await settingsScreen(terminal, state);
       save?.();
+    } else if (choice === "cheats") {
+      await cheatCodeScreen(terminal, state, sound, storage);
+      save?.();
     } else if (choice === "changelog") {
       await changeLogScreen(terminal);
+    }
+  }
+}
+
+async function cheatCodeScreen(
+  terminal: Terminal,
+  state: GameState,
+  sound?: SoundPlayer,
+  storage?: SaveStorage,
+): Promise<void> {
+  const player = state.player!;
+
+  while (true) {
+    terminal.clear();
+    terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">CHEAT CODES</span></div>`);
+    if (player.cheatsUsed) {
+      terminal.printHTML(`<div class="t-dim" style="margin:4px 0">This save has used cheat codes <span class="t-red">✘</span></div>`);
+    }
+    if (player.godMode) {
+      terminal.printHTML(`<div class="t-red t-bold" style="margin:4px 0">GOD MODE IS ON</div>`);
+    }
+
+    const code = await terminal.promptText("Enter cheat code:");
+    if (!code || code.trim() === "") return;
+
+    const trimmed = code.trim().toLowerCase();
+
+    if (trimmed === "omnomnom") {
+      player.cheatsUsed = true;
+      // Find strongest defeated enemy for scaling
+      const enemies = Array.from(state.registry.enemies.values());
+      const defeated = enemies.filter((e) => player.defeatedEnemies.includes(e.name));
+      const strongest = defeated.length > 0
+        ? defeated.reduce((a, b) => a.level > b.level ? a : b)
+        : enemies[0];
+      sound?.lootBox();
+      // Inline loot box
+      const rng = createRng();
+      const tiers: Array<"diamond" | "gold" | "silver"> = ["diamond", "gold", "silver"];
+      for (let i = tiers.length - 1; i > 0; i--) {
+        const j = Math.floor(rng.random() * (i + 1));
+        [tiers[i], tiers[j]] = [tiers[j], tiers[i]];
+      }
+      terminal.clear();
+      terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-yellow t-bold" style="font-size:22px">★ LOOT BOX! ★</div><div class="t-dim">Choose a box!</div></div>`);
+      const boxChoice = await terminal.promptChoice("", [
+        { label: "Box 1", value: "0" },
+        { label: "Box 2", value: "1" },
+        { label: "Box 3", value: "2" },
+      ], "row");
+      const tier = tiers[parseInt(boxChoice, 10)];
+      const eligibleConsumables = state.registry.getAllItems()
+        .filter((i) => i.itemType === "consumable" && i.level <= strongest.level);
+      terminal.clear();
+      const tierLabels: Record<string, string> = { diamond: "Diamond", gold: "Gold", silver: "Silver" };
+      const tierColors: Record<string, string> = { diamond: "t-cyan", gold: "t-yellow", silver: "t-dim" };
+      const revealHtml = tiers.map((t, i) => {
+        const picked = i === parseInt(boxChoice, 10);
+        const cls = picked ? `${tierColors[t]} t-bold` : "t-dim";
+        return `<span class="${cls}">[Box ${i + 1}: ${tierLabels[t]}${picked ? " ◄" : ""}]</span>`;
+      }).join(" &nbsp; ");
+      terminal.printHTML(`<div style="margin:8px 0">${revealHtml}</div>`);
+      if (tier === "diamond") {
+        const money = strongest.reward;
+        player.money += money;
+        terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="t-cyan t-bold" style="font-size:18px">Diamond!</div><div class="t-green t-bold" style="margin-top:8px">You found $${money.toLocaleString()}!</div></div>`);
+      } else {
+        const count = tier === "gold" ? 3 : 1;
+        const label = tier === "gold" ? "Gold!" : "Silver!";
+        const color = tier === "gold" ? "t-yellow" : "t-dim";
+        const items: string[] = [];
+        for (let i = 0; i < count; i++) {
+          if (eligibleConsumables.length > 0) {
+            const item = rng.choice(eligibleConsumables);
+            player.inventory.push({ ...item });
+            items.push(item.name);
+          }
+        }
+        terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="${color} t-bold" style="font-size:18px">${label}</div>${items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("")}</div>`);
+      }
+      await terminal.promptContinue(0);
+    } else if (trimmed === "the quick brown fox jumps over the lazy dog") {
+      player.cheatsUsed = true;
+      player.godMode = !player.godMode;
+      terminal.clear();
+      if (player.godMode) {
+        terminal.printHTML(`<div class="t-red t-bold" style="font-size:20px;margin:16px 0">GOD MODE ON</div>`);
+      } else {
+        terminal.printHTML(`<div class="t-green t-bold" style="font-size:20px;margin:16px 0">GOD MODE OFF</div>`);
+      }
+      await terminal.promptContinue(0);
+    } else {
+      terminal.print("Invalid cheat code!", "t-red");
+      await terminal.promptContinue(0);
     }
   }
 }
@@ -78,7 +183,7 @@ function getDifficulty(playerLevel: number, enemyLevel: number): string {
   return "Deadly";
 }
 
-async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer): Promise<void> {
+async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlayer, storage?: SaveStorage): Promise<void> {
   const player = state.player!;
   const enemies = Array.from(state.registry.enemies.entries());
 
@@ -117,7 +222,7 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
     if (shouldFight) {
       let opponent = choice;
       while (true) {
-        const result = await battleScreen(terminal, state, opponent, sound);
+        const result = await battleScreen(terminal, state, opponent, sound, storage);
         if (result === "shop") {
           await shopScreen(terminal, state, sound);
           return;
@@ -205,6 +310,17 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.10.0", date: "2026-04-04", notes: [
+      "Cheat Codes: 'omnomnom' for free loot box, pangram for god mode",
+      "Cheat indicator: red ✘ on saves that used cheats",
+      "God Mode: red border, enemy attacks deal 0 damage",
+      "New Game +: restart with higher bank interest after beating all enemies",
+      "Yellow [+N] tag shows New Game + level next to name",
+      "Leaderboard: records fastest 100% challenge completions across saves",
+      "TITAN/100% win screens only show on first achievement (not every time)",
+    ],
+  },
   {
     version: "0.9.3", date: "2026-04-04", notes: [
       "Fix: Using one consumable no longer blocks all copies of that item",
