@@ -165,6 +165,7 @@ export async function battleScreen(
     // Loot box check (victory only)
     const lootRng = createRng();
     if (shouldShowLootBox(turns, lootRng)) {
+      sound?.lootBox();
       await showLootBox(terminal, state, enemyDef, lootRng);
     }
 
