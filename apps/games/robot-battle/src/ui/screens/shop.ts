@@ -182,12 +182,24 @@ async function renderSellTab(terminal: Terminal, state: GameState): Promise<stri
     terminal.print("(No items to sell)", "t-dim");
   }
 
-  const choices: Choice[] = [...shopTabChoices("sell")];
+  // Group items by name for display
+  const itemGroups = new Map<string, { item: typeof player.inventory[0]; count: number; firstIndex: number }>();
   for (let i = 0; i < player.inventory.length; i++) {
     const item = player.inventory[i];
+    const existing = itemGroups.get(item.name);
+    if (existing) {
+      existing.count++;
+    } else {
+      itemGroups.set(item.name, { item, count: 1, firstIndex: i });
+    }
+  }
+
+  const choices: Choice[] = [...shopTabChoices("sell")];
+  for (const [name, { item, count, firstIndex }] of itemGroups) {
+    const countStr = count > 1 ? ` (${count})` : "";
     choices.push({
-      label: `${item.name} — $${getSellPrice(item)}`,
-      value: `sell-${i}`,
+      label: `${name}${countStr} — $${getSellPrice(item)}`,
+      value: `sell-${firstIndex}`,
       subtitle: itemSummary(item, state.player!),
     });
   }
