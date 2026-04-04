@@ -400,113 +400,129 @@
       "level": 2,
       "moneyCost": 30,
       "healthRestore": 10,
+      "maxStack": 10,
       "useText": "You deploy a Repair Kit, patching up damage with duct tape and hope!",
-      "description": "Repairs the robot. Duct tape and hope."
+      "description": "Repairs the robot. Duct tape and hope. Max 10."
     },
     "Throwing Net": {
       "level": 4,
       "moneyCost": 100,
       "enemyDodgeReduction": 30,
+      "maxStack": 5,
       "useText": "You hurl a Throwing Net, tangling the enemy's legs!",
-      "description": "It's a net. You throw it. Destroys the net."
+      "description": "It's a net. You throw it. Destroys the net. Max 5."
     },
     "Shield Boost": {
       "level": 6,
       "moneyCost": 80,
       "tempDefence": 5,
+      "maxStack": 5,
       "useText": "You activate a Shield Boost, hardening your armor plating!",
-      "description": "Temporarily hardens your armor. +5 defence for the battle."
+      "description": "Temporarily hardens your armor. +5 defence for the battle. Max 5."
     },
     "Blast Shield": {
       "level": 6,
       "moneyCost": 80,
       "damageBlock": 35,
+      "maxStack": 5,
       "useText": "You raise a Blast Shield, bracing for impact!",
-      "description": "A throwaway shield that absorbs one big hit. Blocks 35 damage this turn."
+      "description": "A throwaway shield that absorbs one big hit. Blocks 35 damage this turn. Max 5."
     },
     "Grenade": {
       "level": 8,
       "moneyCost": 100,
       "damage": 30,
+      "maxStack": 10,
       "useText": "You throw a Grenade! BOOM!",
-      "description": "A small bomb you can launch at the enemy. BOOM!"
+      "description": "A small bomb you can launch at the enemy. BOOM! Max 10."
     },
     "Targeting Lock": {
       "level": 10,
       "moneyCost": 150,
       "accuracyBonus": 30,
+      "maxStack": 3,
       "useText": "You activate the Targeting Lock, locking onto the enemy!",
-      "description": "Locks onto the enemy for improved aim. +30 temp accuracy for the battle."
+      "description": "Locks onto the enemy for improved aim. +30 temp accuracy for the battle. Max 3."
     },
     "EMP Bomb": {
       "level": 10,
       "moneyCost": 200,
       "enemyDodgeReduction": 50,
+      "maxStack": 3,
       "useText": "You detonate an EMP Bomb, scrambling the enemy's circuits!",
-      "description": "Electromagnetic pulse. Scrambles their dodge circuits."
+      "description": "Electromagnetic pulse. Scrambles their dodge circuits. Max 3."
     },
     "Mega Repair Kit": {
       "level": 15,
       "moneyCost": 250,
       "healthRestore": 50,
+      "maxStack": 7,
       "useText": "You deploy a Mega Repair Kit. Industrial welders whir to life!",
-      "description": "Industrial-grade repair tools. Welds, hammers, and lots of duct tape."
+      "description": "Industrial-grade repair tools. Welds, hammers, and lots of duct tape. Max 7."
     },
     "Mega Blast Shield": {
       "level": 18,
       "moneyCost": 350,
       "damageBlock": 120,
+      "maxStack": 3,
       "useText": "You slam down a Mega Blast Shield. Nothing's getting through!",
-      "description": "Heavy duty blast shield. Blocks 120 damage this turn. Built like a tank door."
+      "description": "Heavy duty blast shield. Blocks 120 damage this turn. Built like a tank door. Max 3."
     },
     "Mega Grenade": {
       "level": 20,
       "moneyCost": 400,
       "damage": 100,
+      "maxStack": 7,
       "useText": "You lob a Mega Grenade. The whole arena shakes! KABOOM!",
-      "description": "A BIGGER bomb. Shakes the whole arena."
+      "description": "A BIGGER bomb. Shakes the whole arena. Max 7."
     },
     "Force Field": {
       "level": 25,
       "moneyCost": 600,
       "tempDefence": 15,
+      "maxStack": 3,
       "useText": "You activate a Force Field. A shimmering barrier surrounds you!",
-      "description": "Projects a temporary force field. +15 defence for the battle."
+      "description": "Projects a temporary force field. +15 defence for the battle. Max 3."
     },
     "Ultra Repair Kit": {
       "level": 30,
       "moneyCost": 800,
       "healthRestore": 150,
+      "maxStack": 5,
       "useText": "You release a Nano Repair Swarm. Thousands of tiny bots fix everything!",
-      "description": "Nanotechnology repair swarm. Fixes everything instantly."
+      "description": "Nanotechnology repair swarm. Fixes everything instantly. Max 5."
     },
     "Plasma Blast Shield": {
       "level": 28,
       "moneyCost": 800,
       "damageBlock": 300,
+      "maxStack": 2,
       "useText": "You deploy a Plasma Blast Shield. Pure energy absorbs incoming fire!",
-      "description": "Plasma-reinforced blast shield. Blocks 300 damage this turn. Almost indestructible."
+      "description": "Plasma-reinforced blast shield. Blocks 300 damage this turn. Almost indestructible. Max 2."
     },
     "Plasma Grenade": {
       "level": 30,
       "moneyCost": 1000,
       "damage": 250,
+      "maxStack": 5,
       "useText": "You launch a Plasma Grenade. It melts AND explodes!",
-      "description": "Plasma-coated explosive. Melts and explodes at the same time!"
+      "description": "Plasma-coated explosive. Melts and explodes at the same time! Max 5."
     },
     "Antimatter Shield": {
       "level": 38,
       "moneyCost": 2500,
       "damageBlock": 600,
+      "maxStack": 1,
       "useText": "You activate an Antimatter Shield. Reality itself bends around you!",
-      "description": "Antimatter containment shield. Blocks 600 damage this turn. Laughs at nukes."
+      "description": "Antimatter containment shield. Blocks 600 damage this turn. Laughs at nukes. Max 1."
     },
     "Nuke": {
       "level": 40,
       "moneyCost": 3000,
       "damage": 500,
+      "maxStack": 1,
       "useText": "You launch a Nuke. NUCLEAR EXPLOSION! Everything goes white!",
-      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed."
+      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 1."
     }
   }
 }

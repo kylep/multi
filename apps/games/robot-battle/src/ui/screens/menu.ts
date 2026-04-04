@@ -206,6 +206,14 @@ function esc(s: string): string {
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
+    version: "0.9.3", date: "2026-04-04", notes: [
+      "Fix: Using one consumable no longer blocks all copies of that item",
+      "Consumable stack limits (Grenades max 10, Nukes max 1, etc.)",
+      "Battle item menu groups duplicate consumables with count",
+      "Shop enforces consumable max stack on purchase",
+    ],
+  },
+  {
     version: "0.9.2", date: "2026-04-04", notes: [
       "Fix: Loading old saves no longer breaks accuracy (all attacks missed)",
       "Fix: Loot boxes are now blind picks — rewards randomly assigned to 3 mystery boxes",

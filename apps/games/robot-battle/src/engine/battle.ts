@@ -184,9 +184,6 @@ export function useConsumable(
   rng?: Rng,
 ): ActionResult {
   const r = rng ?? createRng();
-  if (attacker.consumablesUsed.includes(consumable.name)) {
-    return fail("Already used this consumable");
-  }
   if (!hasItem(attacker.robot, consumable.name)) {
     return fail("Don't have this consumable");
   }

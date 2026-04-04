@@ -194,15 +194,35 @@ async function renderSellTab(terminal: Terminal, state: GameState): Promise<stri
     }
   }
 
-  const choices: Choice[] = [...shopTabChoices("sell")];
-  for (const [name, { item, count, firstIndex }] of itemGroups) {
-    const countStr = count > 1 ? ` (${count})` : "";
-    choices.push({
-      label: `${name}${countStr} — $${getSellPrice(item)}`,
-      value: `sell-${firstIndex}`,
-      subtitle: itemSummary(item, state.player!),
-    });
+  // Split into sections: equipment (uses slots), ammo, consumables (free)
+  const equipment: typeof itemGroups extends Map<string, infer V> ? [string, V][] : never = [];
+  const ammo: typeof equipment = [];
+  const consumableItems: typeof equipment = [];
+  for (const entry of itemGroups) {
+    const item = entry[1].item;
+    if (item.itemType === "consumable") consumableItems.push(entry);
+    else if (item.itemType === "gear" && (item as Gear).category === "Ammo") ammo.push(entry);
+    else equipment.push(entry);
   }
+
+  const choices: Choice[] = [...shopTabChoices("sell")];
+
+  function addSellSection(label: string, entries: typeof equipment): void {
+    if (entries.length === 0) return;
+    choices.push({ label, value: `header-${label}`, disabled: true, group: "header" });
+    for (const [name, { item, count, firstIndex }] of entries) {
+      const countStr = count > 1 ? ` (${count})` : "";
+      choices.push({
+        label: `${name}${countStr} — $${getSellPrice(item)}`,
+        value: `sell-${firstIndex}`,
+        subtitle: itemSummary(item, state.player!),
+      });
+    }
+  }
+
+  addSellSection("--- Equipment ---", equipment);
+  addSellSection("--- Ammo ---", ammo);
+  addSellSection("--- Consumables ---", consumableItems);
 
   choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
 
