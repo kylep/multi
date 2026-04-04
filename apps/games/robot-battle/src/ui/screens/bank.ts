@@ -91,6 +91,7 @@ async function amountPrompt(
   }
 
   execute(amount);
-  terminal.print(`${action}ed $${amount.toLocaleString()}!`, "t-green");
+  terminal.clear();
+  terminal.print(`${action === "Withdraw" ? "Withdrew" : "Deposited"} $${amount.toLocaleString()}!`, "t-green");
   await terminal.promptContinue(0);
 }

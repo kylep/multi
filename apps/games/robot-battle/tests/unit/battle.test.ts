@@ -14,7 +14,8 @@ import {
   shouldShowLootBox,
   useConsumable,
 } from "../../src/engine/battle";
-import { createBattleRobot } from "../../src/engine/robot";
+import { createBattleRobot, getEffectiveAccuracy } from "../../src/engine/robot";
+import { loadAssets } from "../../src/engine/data";
 import { createRng } from "../../src/engine/rng";
 import type { Consumable, Robot, Weapon } from "../../src/engine/types";
 
@@ -271,6 +272,66 @@ describe("planAttack + resolveTurn", () => {
     const results = resolveTurn(battle, rng);
     expect(results.length).toBe(2);
     expect(results.every((r) => r.result.success)).toBe(true);
+  });
+});
+
+describe("basic weapon accuracy regression", () => {
+  it("80% accuracy weapon hits most of the time against 0 dodge", () => {
+    const weapon = makeWeapon({ name: "Rocket Launcher", damage: 50, accuracy: 80, energyCost: 12, hands: 2 });
+    let hitCount = 0;
+    for (let seed = 0; seed < 100; seed++) {
+      const player = makeRobot({ energy: 20, maxEnergy: 20, inventory: [{ ...weapon }] });
+      const enemy = makeRobot({ name: "MiniBot", dodge: 0, maxHealth: 10, health: 10 });
+      const b = createBattle(player, enemy);
+      const rng = createRng(seed);
+      const result = executeAttack(b, b.player, b.enemy, [weapon], rng);
+      if (result.damageDealt > 0) hitCount++;
+    }
+    // 80% accuracy should hit ~80 out of 100
+    expect(hitCount).toBeGreaterThan(60);
+  });
+
+  it("100% accuracy weapon never misses against 0 dodge", () => {
+    const weapon = makeWeapon({ damage: 5, accuracy: 100 });
+    for (let seed = 0; seed < 50; seed++) {
+      const player = makeRobot({ inventory: [{ ...weapon }] });
+      const enemy = makeRobot({ name: "Target", dodge: 0 });
+      const b = createBattle(player, enemy);
+      const rng = createRng(seed);
+      const result = executeAttack(b, b.player, b.enemy, [weapon], rng);
+      expect(result.damageDealt).toBeGreaterThan(0);
+    }
+  });
+
+  it("getEffectiveAccuracy does not return NaN with gear lacking accuracyBonus", () => {
+    // Simulate gear that might not have accuracyBonus set
+    const gear = { name: "Iron Armor", itemType: "gear" as const, level: 5, moneyCost: 500, description: "", requirements: [], healthBonus: 20, energyBonus: 0, defenceBonus: 2, attackBonus: 0, handsBonus: 0, dodgeBonus: 0, accuracyBonus: 0, moneyBonusPercent: 0, stackable: false, maxStack: 0, category: "Armor" };
+    const player = makeRobot({ inventory: [gear] });
+    const acc = getEffectiveAccuracy(player);
+    expect(Number.isNaN(acc)).toBe(false);
+    expect(acc).toBe(0);
+  });
+});
+
+describe("real game data accuracy", () => {
+  it("player with real Rocket Launcher hits real MiniBot", () => {
+    const registry = loadAssets();
+    const rocketLauncher = registry.weapons.get("Rocket Launcher")!;
+    const minibot = registry.createEnemyRobot("MiniBot")!;
+
+    let hitCount = 0;
+    for (let seed = 0; seed < 100; seed++) {
+      const player = makeRobot({
+        level: 12,
+        inventory: [{ ...rocketLauncher }],
+      });
+      const b = createBattle(player, minibot);
+      const rng = createRng(seed);
+      const result = executeAttack(b, b.player, b.enemy, [rocketLauncher], rng);
+      if (result.damageDealt > 0) hitCount++;
+    }
+    // 80% accuracy vs 0 dodge: expect ~80 hits
+    expect(hitCount).toBeGreaterThan(60);
   });
 });
 

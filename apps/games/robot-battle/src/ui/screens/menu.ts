@@ -104,6 +104,7 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
         subtitle: `[${tag}] $${enemy.reward}, ${enemy.expReward} XP`,
         badge: challengeCleared ? "★" : normalCleared ? "✔" : undefined,
         badgeClass: challengeCleared ? "badge-challenge" : normalCleared ? "badge-cleared" : undefined,
+        labelClass: challengeOn && enemy.challengeName ? "t-purple" : undefined,
       });
     }
     choices.push({ label: "Back", value: "back", subtitle: "Return to menu" });
@@ -181,7 +182,7 @@ async function enemyDetailScreen(
         <div>Weapons: ${weaponStr}</div>
         <div>Gear: ${gearStr}</div>
         <div>Items: ${conStr}</div>
-        <div class="t-magenta" style="margin-top:4px">Reward: $${enemyDef.reward} &nbsp; XP: ${enemyDef.expReward}</div>
+        <div class="t-magenta" style="margin-top:4px">Reward: $${isChallenge ? Math.floor(enemyDef.reward * (player.challengeDefeatedEnemies.includes(enemyName) ? 1.2 : 2.4)) : enemyDef.reward}${isChallenge ? ` <span class="t-purple">(challenge)</span>` : ""} &nbsp; XP: ${enemyDef.expReward}</div>
       </div>
     `);
 
@@ -204,6 +205,16 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.9.1", date: "2026-04-04", notes: [
+      "Fix: Challenge mode names now show in purple on fight selection grid",
+      "Fix: Enemy reward display updates when toggling challenge mode",
+      "Fix: Auto-battle cancels after 50 turns to prevent stalemate loops",
+      "Fix: Bank withdraw/deposit clears screen before showing confirmation",
+      "Fix: Bank withdraw message grammar (Withdrew instead of Withdrawed)",
+      "Balance: Arm upgrade prices scaled up (Third $1k, Fourth $5k, Fifth $25k, Sixth $100k)",
+    ],
+  },
   {
     version: "0.9.0", date: "2026-04-04", notes: [
       "Bank: deposit money and earn 1% interest per fight",
