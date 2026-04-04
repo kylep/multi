@@ -454,9 +454,13 @@ async function playerTurn(
     const weapons = getWeapons(player.robot);
     const hasWeapons = weapons.length > 0;
     const canAffordAny = hasWeapons && weapons.some((w) => getWeaponEnergyCost(w, player.robot) <= player.currentEnergy);
-    const hasConsumables = getConsumables(player.robot).some(
-      (c) => !player.consumablesUsed.includes(c.name),
-    );
+    const usedCounts = new Map<string, number>();
+    for (const n of player.consumablesUsed) usedCounts.set(n, (usedCounts.get(n) ?? 0) + 1);
+    const hasConsumables = getConsumables(player.robot).some((c) => {
+      const owned = player.robot.inventory.filter((i) => i.name === c.name).length;
+      const used = usedCounts.get(c.name) ?? 0;
+      return used < owned;
+    });
 
     let attackLabel = "Attack";
     if (!hasWeapons) attackLabel = "Attack (none)";
@@ -609,20 +613,35 @@ async function playerPlanAttack(
 
 async function playerUseItem(terminal: Terminal, battle: BattleState): Promise<void> {
   const player = battle.player;
-  const consumables = getConsumables(player.robot).filter(
-    (c) => !player.consumablesUsed.includes(c.name),
-  );
+  const allConsumables = getConsumables(player.robot);
 
-  if (consumables.length === 0) {
+  // Group by name, count remaining (owned - used)
+  const groups = new Map<string, { consumable: typeof allConsumables[0]; remaining: number }>();
+  for (const c of allConsumables) {
+    const existing = groups.get(c.name);
+    if (existing) existing.remaining++;
+    else groups.set(c.name, { consumable: c, remaining: 1 });
+  }
+  // Subtract used counts
+  for (const name of player.consumablesUsed) {
+    const g = groups.get(name);
+    if (g) g.remaining--;
+  }
+  // Filter to usable
+  const usable = [...groups.values()].filter((g) => g.remaining > 0);
+
+  if (usable.length === 0) {
     terminal.print("You have no usable consumables!", "t-red");
     return;
   }
 
   terminal.print("");
   const choices: Choice[] = [{ label: "Back", value: "back" }];
-  for (let i = 0; i < consumables.length; i++) {
+  for (let i = 0; i < usable.length; i++) {
+    const { consumable, remaining } = usable[i];
+    const countStr = remaining > 1 ? ` (${remaining})` : "";
     choices.push({
-      label: `${i + 1}. ${consumables[i].name} - ${consumables[i].description}`,
+      label: `${i + 1}. ${consumable.name}${countStr} - ${consumable.description}`,
       value: String(i),
     });
   }
@@ -631,8 +650,8 @@ async function playerUseItem(terminal: Terminal, battle: BattleState): Promise<v
   if (choice === "back") return;
 
   const idx = parseInt(choice, 10);
-  if (idx >= 0 && idx < consumables.length) {
-    const result = useConsumable(battle, battle.player, battle.enemy, consumables[idx], createRng());
+  if (idx >= 0 && idx < usable.length) {
+    const result = useConsumable(battle, battle.player, battle.enemy, usable[idx].consumable, createRng());
     if (result.success) {
       terminal.print(result.message, "t-green");
     } else {

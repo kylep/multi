@@ -1,6 +1,6 @@
 /** Shop engine — pure functions. */
 
-import type { Gear, Item, Robot, ShopResult } from "./types";
+import type { Consumable, Gear, Item, Robot, ShopResult } from "./types";
 import type { GameState } from "./state";
 import { getGear, hasItem } from "./robot";
 
@@ -54,8 +54,15 @@ export function canBuy(state: GameState, item: Item): { ok: boolean; reason: str
     }
   }
 
-  // Consumables don't take inventory space
-  if (item.itemType === "consumable") return { ok: true, reason: "" };
+  // Consumables don't take inventory space but have max stack
+  if (item.itemType === "consumable") {
+    const c = item as Consumable;
+    if (c.maxStack > 0) {
+      const owned = player.inventory.filter((inv) => inv.name === item.name).length;
+      if (owned >= c.maxStack) return { ok: false, reason: `Max ${c.maxStack} allowed` };
+    }
+    return { ok: true, reason: "" };
+  }
 
   // Ammo doesn't take inventory space but has a max stack
   if (item.itemType === "gear" && (item as Gear).category === "Ammo") {

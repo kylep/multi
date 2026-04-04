@@ -45,6 +45,7 @@ export interface Consumable extends ItemBase {
   enemyDodgeReduction: number;
   useText: string;
   accuracyBonus: number;
+  maxStack: number;
 }
 
 export type Item = Weapon | Gear | Consumable;

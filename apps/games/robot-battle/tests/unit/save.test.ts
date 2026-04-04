@@ -177,7 +177,7 @@ describe("round-trip", () => {
       inventory: [
         { name: "Sword", itemType: "weapon", level: 2, moneyCost: 150, description: "", requirements: [], damage: 10, energyCost: 5, accuracy: 100, hands: 2 },
         { name: "Cardboard Armor", itemType: "gear", level: 0, moneyCost: 100, description: "", requirements: [], healthBonus: 5, energyBonus: 0, defenceBonus: 0, attackBonus: 0, handsBonus: 0, dodgeBonus: 0, moneyBonusPercent: 0, stackable: false, maxStack: 0, accuracyBonus: 0, category: "" },
-        { name: "Grenade", itemType: "consumable", level: 8, moneyCost: 100, description: "", requirements: [], healthRestore: 0, energyRestore: 0, tempDefence: 0, tempAttack: 0, damage: 30, damageBlock: 0, enemyDodgeReduction: 0, useText: "", accuracyBonus: 0 },
+        { name: "Grenade", itemType: "consumable", level: 8, moneyCost: 100, description: "", requirements: [], healthRestore: 0, energyRestore: 0, tempDefence: 0, tempAttack: 0, damage: 30, damageBlock: 0, enemyDodgeReduction: 0, useText: "", accuracyBonus: 0, maxStack: 10 },
       ],
     });
     saveSlot(storage, 2, original);

@@ -63,6 +63,7 @@ function loadConsumable(name: string, d: Record<string, unknown>): Consumable {
     enemyDodgeReduction: (d.enemyDodgeReduction as number) ?? 0,
     useText: (d.useText as string) ?? "",
     accuracyBonus: (d.accuracyBonus as number) ?? 0,
+    maxStack: (d.maxStack as number) ?? 0,
   };
 }
 

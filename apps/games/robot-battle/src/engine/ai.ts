@@ -52,11 +52,13 @@ export function aiPlanAction(battle: BattleState, isPlayer: boolean): PlannedAct
 
   // Use consumables (enemies only — auto-battle shouldn't waste player items)
   if (!isPlayer) {
+    const usedCounts = new Map<string, number>();
+    for (const n of fighter.consumablesUsed) usedCounts.set(n, (usedCounts.get(n) ?? 0) + 1);
     for (const consumable of getConsumables(fighter.robot)) {
-      if (!fighter.consumablesUsed.includes(consumable.name)) {
-        if (shouldUseConsumable(fighter, consumable)) {
-          return { actionType: "consumable", weapons: [], consumable };
-        }
+      const owned = fighter.robot.inventory.filter((i) => i.name === consumable.name).length;
+      const used = usedCounts.get(consumable.name) ?? 0;
+      if (used < owned && shouldUseConsumable(fighter, consumable)) {
+        return { actionType: "consumable", weapons: [], consumable };
       }
     }
   }

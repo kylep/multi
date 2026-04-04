@@ -81,6 +81,7 @@ function makeConsumable(overrides?: Partial<Consumable>): Consumable {
     enemyDodgeReduction: 0,
     useText: "",
     accuracyBonus: 0,
+    maxStack: 0,
     ...overrides,
   };
 }
@@ -201,14 +202,42 @@ describe("useConsumable", () => {
     expect(battle.enemy.currentHealth).toBe(7); // 12 HP - 5 dmg
   });
 
-  it("cannot use same consumable twice", () => {
+  it("cannot use consumable not in inventory", () => {
     const kit = makeConsumable();
-    const player = makeRobot({ inventory: [kit] });
+    const player = makeRobot({ inventory: [] });
     const battle = createBattle(player, makeRobot());
-    battle.player.consumablesUsed.push("Test Kit");
 
     const result = useConsumable(battle, battle.player, battle.enemy, kit);
     expect(result.success).toBe(false);
+  });
+
+  it("can use multiple copies of same consumable", () => {
+    const kit1 = makeConsumable({ healthRestore: 5 });
+    const kit2 = makeConsumable({ healthRestore: 5 });
+    const kit3 = makeConsumable({ healthRestore: 5 });
+    const player = makeRobot({ inventory: [kit1, kit2, kit3] });
+    const enemy = makeRobot();
+    const battle = createBattle(player, enemy);
+    // Damage the player so heals are useful
+    battle.player.currentHealth = 1;
+
+    // Use first kit
+    const r1 = useConsumable(battle, battle.player, battle.enemy, kit1);
+    expect(r1.success).toBe(true);
+
+    // Use second kit (same name, should work)
+    battle.player.currentHealth = 1;
+    const r2 = useConsumable(battle, battle.player, battle.enemy, kit2);
+    expect(r2.success).toBe(true);
+
+    // Use third kit
+    battle.player.currentHealth = 1;
+    const r3 = useConsumable(battle, battle.player, battle.enemy, kit3);
+    expect(r3.success).toBe(true);
+
+    // Fourth attempt should fail (only had 3)
+    const r4 = useConsumable(battle, battle.player, battle.enemy, makeConsumable({ healthRestore: 5 }));
+    expect(r4.success).toBe(false);
   });
 });
 

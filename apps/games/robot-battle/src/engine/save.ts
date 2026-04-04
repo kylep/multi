@@ -73,6 +73,7 @@ function parseSave(raw: string | null): SaveData | null {
       if (item.itemType === "consumable") {
         if (raw.useText === undefined) raw.useText = "";
         if (raw.accuracyBonus === undefined) raw.accuracyBonus = 0;
+        if (raw.maxStack === undefined) raw.maxStack = 0;
       }
     }
     applyAllUpgrades(data.player);
