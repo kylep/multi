@@ -37,6 +37,10 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     settings: { mode: "oliver", oliverChallenge: false },
     defeatedEnemies: [],
     challengeDefeatedEnemies: [],
+    cheatsUsed: false,
+    godMode: false,
+    newGamePlusLevel: 0,
+    titanDefeated: false,
     ...overrides,
   };
 }

@@ -89,6 +89,7 @@ export function createBattleRobot(robot: Robot): BattleRobot {
     tempDodgeReduction: 0,
     damageBlock: 0,
     consumablesUsed: [],
+    consumableUsedThisTurn: false,
   };
 }
 

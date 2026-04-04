@@ -39,6 +39,10 @@ export function createPlayer(state: GameState, name: string): Robot {
     settings: { mode: "oliver", oliverChallenge: false },
     defeatedEnemies: [],
     challengeDefeatedEnemies: [],
+    cheatsUsed: false,
+    godMode: false,
+    newGamePlusLevel: 0,
+    titanDefeated: false,
   };
   // Give player a free starter Stick
   const stick = state.registry.getItem("Stick");
@@ -73,7 +77,12 @@ export function withdrawMoney(player: Robot, amount: number): boolean {
 }
 
 export function calculateInterest(player: Robot): number {
-  return Math.floor(player.bank * 0.01);
+  const rate = 0.01 + player.newGamePlusLevel * 0.01;
+  return Math.floor(player.bank * rate);
+}
+
+export function getInterestRate(player: Robot): number {
+  return 1 + player.newGamePlusLevel;
 }
 
 export function awardInterest(player: Robot): number {
@@ -92,7 +101,7 @@ export function getXpToLevel(level: number): number {
   return 10 + 2 * (level - 1);
 }
 
-const MAX_LEVEL = 50;
+const MAX_LEVEL = 100;
 
 export function awardExp(state: GameState, amount: number): boolean {
   const player = state.player!;

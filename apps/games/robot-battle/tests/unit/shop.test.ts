@@ -198,13 +198,15 @@ describe("ammo maxStack", () => {
     state.player!.level = 45;
     state.player!.money = 1000000;
     const missile = state.registry.getItem("Antimatter Missile")!;
-    // Buy one (max is 1)
-    const r1 = buyItem(state, missile);
-    expect(r1.success).toBe(true);
-    // Second should fail
+    // Buy up to max (3)
+    for (let i = 0; i < 3; i++) {
+      const r = buyItem(state, missile);
+      expect(r.success).toBe(true);
+    }
+    // Next should fail
     const check = canBuy(state, missile);
     expect(check.ok).toBe(false);
-    expect(check.reason).toContain("Max 1");
+    expect(check.reason).toContain("Max 3");
   });
 
   it("ammo does not take inventory slots", () => {

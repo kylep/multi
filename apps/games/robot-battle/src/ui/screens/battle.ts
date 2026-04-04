@@ -26,6 +26,8 @@ import {
 import { awardExp, awardInterest, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
 import { shouldShowLootBox } from "../../engine/battle";
 import type { SoundPlayer } from "../sound";
+import type { SaveStorage } from "../../engine/save";
+import { addLeaderboardEntry, loadLeaderboard } from "../../engine/save";
 
 
 function delay(ms: number): Promise<void> {
@@ -37,6 +39,7 @@ export async function battleScreen(
   state: GameState,
   enemyName: string,
   sound?: SoundPlayer,
+  storage?: SaveStorage,
 ): Promise<"continue" | "fight-again" | "shop"> {
   const player = state.player!;
   const enemyDef = state.registry.enemies.get(enemyName)!;
@@ -145,9 +148,21 @@ export async function battleScreen(
 
     if (leveled) sound?.levelUp();
 
-    // 100% Game Complete check
+    // 100% Game Complete check — only show once per achievement
     const totalEnemies = state.registry.enemies.size;
-    if (player.settings.mode !== "sandbox" && player.challengeDefeatedEnemies.length >= totalEnemies) {
+    const justCompleted100 = player.settings.mode !== "sandbox"
+      && isChallenge && firstChallengeWin
+      && player.challengeDefeatedEnemies.length >= totalEnemies;
+    if (justCompleted100) {
+      // Record to leaderboard
+      if (storage) {
+        addLeaderboardEntry(storage, {
+          name: player.name,
+          fights: player.fights,
+          newGamePlusLevel: player.newGamePlusLevel,
+          date: new Date().toISOString().slice(0, 10),
+        });
+      }
       terminal.clear();
       terminal.printHTML(`
         <div class="title-center" style="min-height:0;margin:24px 0">
@@ -156,9 +171,22 @@ export async function battleScreen(
           <div class="t-yellow t-bold">╚═════════════════════════════════════════════╝</div>
           <div class="t-green" style="margin-top:12px">You have defeated every enemy on Challenge Mode!</div>
           <div class="t-cyan" style="margin-top:8px">You are the ultimate Robot Battle champion.</div>
-          <div class="t-dim" style="margin-top:8px">Thank you for playing!</div>
+          <div class="t-dim" style="margin-top:8px">Try New Game + from the title screen for an even bigger challenge!</div>
         </div>
       `);
+      // Show leaderboard
+      if (storage) {
+        const board = loadLeaderboard(storage);
+        if (board.length > 0) {
+          let lbHtml = `<div class="t-yellow t-bold" style="margin-top:12px">LEADERBOARD</div>`;
+          for (let i = 0; i < board.length; i++) {
+            const e = board[i];
+            const ngp = e.newGamePlusLevel > 0 ? ` [+${e.newGamePlusLevel}]` : "";
+            lbHtml += `<div class="t-dim">${i + 1}. ${e.name}${ngp} — ${e.fights} fights (${e.date})</div>`;
+          }
+          terminal.printHTML(`<div class="panel" style="padding:8px 12px">${lbHtml}</div>`);
+        }
+      }
       await terminal.promptContinue(0);
     }
 
@@ -172,10 +200,12 @@ export async function battleScreen(
     // Show victory screen in a loop (re-render after viewing battle log)
     while (true) {
       terminal.clear();
-      if (enemyName === "TITAN") {
+      if (enemyName === "TITAN" && !player.titanDefeated) {
+        player.titanDefeated = true;
         const hardMode = player.settings.oliverChallenge;
         const msg = hardMode ? "YOU WON THE GAME... ON HARD MODE!" : "YOU WON THE GAME!";
         terminal.printHTML(`<div class="title-center" style="min-height:0;margin:24px 0"><div class="t-yellow t-bold">╔═══════════════════════════════════════╗</div><div class="t-yellow t-bold" style="font-size:26px">${msg}</div><div class="t-yellow t-bold">╚═══════════════════════════════════════╝</div></div>`);
+        terminal.printHTML(`<div class="t-dim" style="margin:0 0 8px 0">Try New Game + from the title screen!</div>`);
       } else {
         terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-green t-bold">╔═══════════════════════════════╗</div><div class="t-green t-bold" style="font-size:22px">VICTORY!</div><div class="t-green t-bold">╚═══════════════════════════════╝</div></div>`);
       }
@@ -457,7 +487,7 @@ async function playerTurn(
     const canAffordAny = hasWeapons && weapons.some((w) => getWeaponEnergyCost(w, player.robot) <= player.currentEnergy);
     const usedCounts = new Map<string, number>();
     for (const n of player.consumablesUsed) usedCounts.set(n, (usedCounts.get(n) ?? 0) + 1);
-    const hasConsumables = getConsumables(player.robot).some((c) => {
+    const hasConsumables = !player.consumableUsedThisTurn && getConsumables(player.robot).some((c) => {
       const owned = player.robot.inventory.filter((i) => i.name === c.name).length;
       const used = usedCounts.get(c.name) ?? 0;
       return used < owned;
@@ -470,7 +500,8 @@ async function playerTurn(
     const choices: Choice[] = [];
     choices.push({ label: "Auto", value: "auto" });
     choices.push({ label: attackLabel, value: "attack" });
-    choices.push({ label: hasConsumables ? "Item" : "Item (none)", value: "item" });
+    const itemLabel = player.consumableUsedThisTurn ? "Item (used)" : hasConsumables ? "Item" : "Item (none)";
+    choices.push({ label: itemLabel, value: "item" });
     choices.push({ label: "Rest", value: "rest" });
     choices.push({ label: "Surrender", value: "surrender" });
 
@@ -694,9 +725,9 @@ async function showLootBox(
   ];
 
   const choice = await terminal.promptChoice("", [
-    { label: "Box 1", value: "0", subtitle: boxArt[0] },
-    { label: "Box 2", value: "1", subtitle: boxArt[1] },
-    { label: "Box 3", value: "2", subtitle: boxArt[2] },
+    { label: "Box 1", value: "0", subtitle: boxArt[0], btnClass: "" },
+    { label: "Box 2", value: "1", subtitle: boxArt[1], btnClass: "" },
+    { label: "Box 3", value: "2", subtitle: boxArt[2], btnClass: "" },
   ], "row");
 
   const tier = tiers[parseInt(choice, 10)];
@@ -717,6 +748,21 @@ async function showLootBox(
   }).join(" &nbsp; ");
   terminal.printHTML(`<div style="margin:8px 0">${revealHtml}</div>`);
 
+  function grantConsumable(): string | null {
+    // Try to find a consumable that isn't at max stack
+    const shuffled = [...eligibleConsumables].sort(() => rng.random() - 0.5);
+    for (const item of shuffled) {
+      const c = item as import("../../engine/types").Consumable;
+      if (c.maxStack > 0) {
+        const owned = player.inventory.filter((inv) => inv.name === c.name).length;
+        if (owned >= c.maxStack) continue;
+      }
+      player.inventory.push({ ...item });
+      return item.name;
+    }
+    return null; // all consumables at max
+  }
+
   if (tier === "diamond") {
     const money = enemyDef.reward;
     player.money += money;
@@ -726,16 +772,24 @@ async function showLootBox(
     const label = tier === "gold" ? "Gold!" : "Silver!";
     const color = tier === "gold" ? "t-yellow" : "t-dim";
     const items: string[] = [];
+    let fallbackMoney = 0;
 
     for (let i = 0; i < count; i++) {
-      if (eligibleConsumables.length > 0) {
-        const item = rng.choice(eligibleConsumables);
-        player.inventory.push({ ...item });
-        items.push(item.name);
+      const granted = grantConsumable();
+      if (granted) {
+        items.push(granted);
+      } else {
+        // All full — give money instead
+        fallbackMoney += enemyDef.reward;
       }
     }
 
-    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="${color} t-bold" style="font-size:18px">${label}</div>${items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("")}</div>`);
+    if (fallbackMoney > 0) player.money += fallbackMoney;
+
+    let rewardHtml = items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("");
+    if (fallbackMoney > 0) rewardHtml += `<div class="t-green t-bold" style="margin-top:4px">+ $${fallbackMoney.toLocaleString()} (inventory full)</div>`;
+
+    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="${color} t-bold" style="font-size:18px">${label}</div>${rewardHtml}</div>`);
   }
 
   await terminal.promptContinue(0);

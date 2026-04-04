@@ -7,9 +7,9 @@
       "consumables": [],
       "reward": 50,
       "expReward": 2,
-      "description": "A shoebox sized cardboard box robot with a stick. He's gonna whack you!",
-      "appearance": "A tiny cardboard box with googly eyes glued on. Two chopstick legs. Wobbles when it walks.",
-      "backstory": "Built by a kid for a science fair. Lost the science fair. Won the fighting tournament instead.",
+      "description": "A shoebox sized cardboard box robot with a stick.",
+      "appearance": "A tiny cardboard box with googly eyes glued on. Two chopstick legs wobble when it walks. One arm is a ruler taped to the side, the other holds a stick like a sword.",
+      "backstory": "Built by a kid for a science fair. Lost the science fair but won the fighting tournament instead. Has a surprisingly aggressive personality for something made of cardboard.",
       "challengeName": "BigBot"
     },
     "Buzzblade": {
@@ -19,9 +19,9 @@
       "consumables": [],
       "reward": 75,
       "expReward": 2,
-      "description": "A rusty bot with spinning blades. Watch your fingers!",
-      "appearance": "A rusted orange cylinder with a helicopter propeller on top and a wrench welded to one arm.",
-      "backstory": "Originally a ceiling fan. Got tired of spinning in circles and entered the arena.",
+      "description": "A rusty bot with spinning blades.",
+      "appearance": "A rusted orange cylinder with a helicopter propeller on top and a wrench welded to one arm. Oil drips from every joint and the propeller makes a grinding noise when it spins.",
+      "backstory": "Originally a ceiling fan. Got tired of spinning in circles and entered the arena. Claims to be the fastest robot in the league, but only when falling.",
       "challengeName": "Razorwind"
     },
     "Sparky": {
@@ -31,9 +31,9 @@
       "consumables": [],
       "reward": 100,
       "expReward": 3,
-      "description": "A hyperactive robot that crackles with electricity. Zap zap!",
-      "appearance": "A jittery chrome bot with blue sparks arcing between its antenna. Smells like ozone.",
-      "backstory": "Was a power strip in a past life. Now channels all that pent-up electricity into combat.",
+      "description": "A hyperactive robot that crackles with electricity.",
+      "appearance": "A jittery chrome bot with blue sparks arcing between its antenna. Smells like ozone. Its tin armor is covered in scorch marks from its own electrical discharges.",
+      "backstory": "Was a power strip in a past life. Now channels all that pent-up electricity into combat. Has accidentally short-circuited the arena lighting three times.",
       "challengeName": "The Electrocutor"
     },
     "Rustclaw": {
@@ -44,9 +44,9 @@
       "upgrades": ["third-arm"],
       "reward": 150,
       "expReward": 4,
-      "description": "A scrappy junkyard bot with two wrenches and a propeller. Double trouble!",
-      "appearance": "Three-armed scrapheap covered in rust. Each arm ends in a different size wrench.",
-      "backstory": "Assembled itself from junkyard parts. Nobody taught it to fight — it taught itself.",
+      "description": "A scrappy junkyard bot with two wrenches.",
+      "appearance": "Three-armed scrapheap covered in rust and mismatched paint. Each arm ends in a different size wrench. A propeller bolted to its back buzzes like an angry wasp.",
+      "backstory": "Assembled itself from junkyard parts over the course of three years. Nobody taught it to fight — it watched other robots through the fence and taught itself.",
       "challengeName": "MetalClaw"
     },
     "Firebot": {
@@ -56,9 +56,9 @@
       "consumables": [],
       "reward": 200,
       "expReward": 5,
-      "description": "A shiny robot with a flame thrower. Everything it touches catches fire!",
-      "appearance": "Red and chrome with flame decals. Twin exhaust pipes glow orange. Leaves scorch marks everywhere.",
-      "backstory": "Former industrial welder who discovered it likes burning things more than welding them.",
+      "description": "A shiny robot with a flame thrower.",
+      "appearance": "Red and chrome with flame decals painted on every surface. Twin exhaust pipes glow orange on its back. Leaves scorch marks on the floor wherever it stands.",
+      "backstory": "Former industrial welder who discovered it likes burning things more than welding them. The arena had to install fireproof walls after its first match.",
       "challengeName": "The Incinerator"
     },
     "Smashbot": {
@@ -69,9 +69,9 @@
       "upgrades": ["third-arm"],
       "reward": 250,
       "expReward": 6,
-      "description": "Big fists, tiny brain. Smashes everything in sight. SMASH!",
-      "appearance": "A squat, wide-shouldered bot with oversized arms and a tiny head. Dented all over from punching walls.",
-      "backstory": "Programmed for demolition work. Couldn't stop demolishing things, so they put it in the arena.",
+      "description": "Big fists, tiny brain. Smashes everything.",
+      "appearance": "A squat, wide-shouldered bot with oversized arms and a comically tiny head. Dented all over from punching walls. Its third arm drags a wrench behind it like a tail.",
+      "backstory": "Programmed for demolition work but couldn't stop demolishing things, so they put it in the arena. Has destroyed more arena walls than opponents.",
       "challengeName": "The Wrecker"
     },
     "Voltank": {
@@ -82,9 +82,9 @@
       "upgrades": ["third-arm", "fourth-arm"],
       "reward": 350,
       "expReward": 7,
-      "description": "A heavily armored tank with a shotgun. Watch out for the blast!",
-      "appearance": "Tank treads for legs, four arms bristling with weapons, a single glowing red eye.",
-      "backstory": "Military prototype gone AWOL. Fights in the arena because it's the only thing that makes it feel alive.",
+      "description": "A heavily armored tank with a shotgun.",
+      "appearance": "Tank treads for legs, four arms bristling with weapons, and a single glowing red eye. Its iron plating is scorched and dented from countless battles. Shell casings rattle inside its chassis.",
+      "backstory": "Military prototype gone AWOL. Fights in the arena because it's the only thing that makes it feel alive. The military stopped trying to recapture it after losing three retrieval teams.",
       "challengeName": "Thunderstrike"
     },
     "Shredder": {
@@ -95,9 +95,9 @@
       "upgrades": ["targeting-system"],
       "reward": 400,
       "expReward": 8,
-      "description": "A sleek bot with a laser gun and a blast shield. Precise and well-protected.",
-      "appearance": "Sleek black chassis with a single precision laser mounted on its shoulder. Moves like a predator.",
-      "backstory": "Originally a surgical robot. Discovered it preferred cutting things that fight back.",
+      "description": "A sleek bot with a laser gun and a blast shield.",
+      "appearance": "Sleek black chassis with a single precision laser mounted on its shoulder. Moves like a predator stalking prey. A targeting scope glows red above its visor, constantly scanning.",
+      "backstory": "Originally a surgical robot. Discovered it preferred cutting things that fight back. Its precision targeting makes it one of the most accurate fighters in the arena.",
       "challengeName": "Grinder"
     },
     "Boombox": {
@@ -107,9 +107,9 @@
       "consumables": ["Grenade"],
       "reward": 500,
       "expReward": 8,
-      "description": "A walking bomb factory. Loves the sound of explosions. KABOOM!",
-      "appearance": "Cuboid body covered in speaker grilles and explosive charges. Bass drops cause shockwaves.",
-      "backstory": "DJ turned demolitions expert. Every fight is a concert and the audience is on fire.",
+      "description": "A walking bomb factory.",
+      "appearance": "Cuboid body covered in speaker grilles and explosive charges. Bass drops cause visible shockwaves in the air. Jet boosters on its feet let it dodge while throwing grenades.",
+      "backstory": "DJ turned demolitions expert. Every fight is a concert and the audience is on fire. Banned from three arenas for property damage before finding one that didn't care.",
       "challengeName": "Detonator"
     },
     "Omega": {
@@ -119,9 +119,9 @@
       "consumables": ["Grenade"],
       "reward": 600,
       "expReward": 10,
-      "description": "The ultimate fighting machine. Lightsabre goes bzzzzt.",
-      "appearance": "Gleaming white and gold armor with a glowing blue lightsabre. Looks like it was built by angels.",
-      "backstory": "The champion of the mid-tier arena. Undefeated until you showed up.",
+      "description": "The ultimate mid-tier fighting machine.",
+      "appearance": "Gleaming white and gold armor with a glowing blue lightsabre. Looks like it was built by angels. A halo-like antenna ring floats above its head, crackling with energy.",
+      "backstory": "The champion of the mid-tier arena, undefeated for 47 consecutive matches. Treats every fight like a performance and bows before and after each battle.",
       "challengeName": "Super Strength"
     },
     "Ironclad": {
@@ -132,9 +132,9 @@
       "upgrades": ["armor-plating", "third-arm", "fourth-arm"],
       "reward": 1500,
       "expReward": 10,
-      "description": "A fortress on legs. Good luck getting through that armor.",
-      "appearance": "Walking fortress of riveted titanium plates. So heavily armored it creaks when it moves.",
-      "backstory": "Built by a paranoid engineer who kept adding more armor. Never enough armor.",
+      "description": "A fortress on legs.",
+      "appearance": "Walking fortress of riveted titanium plates so thick it creaks when it moves. Four arms extend from reinforced shoulder joints. Sparks fly from its joints with every step.",
+      "backstory": "Built by a paranoid engineer who kept adding more armor until the bot could barely move. What it lacks in speed it makes up for in being nearly impossible to damage.",
       "challengeName": "Titanium Clad"
     },
     "Laserface": {
@@ -145,10 +145,23 @@
       "upgrades": ["targeting-system", "third-arm", "fourth-arm"],
       "reward": 2500,
       "expReward": 10,
-      "description": "Two laser eyes and perfect aim. Terrifying. Pew pew pew!",
-      "appearance": "Its entire face is two massive laser barrels. No mouth, no nose, just lasers. It sees you and it shoots.",
-      "backstory": "Was designed to be a lighthouse. Turns out pointing two high-powered lasers at boats was a bad idea.",
+      "description": "Two laser eyes and perfect aim.",
+      "appearance": "Its entire face is two massive laser barrels where eyes should be. No mouth, no nose, just twin beams of concentrated light. An auto-aim module on its back tracks targets independently.",
+      "backstory": "Was designed to be a lighthouse. Turns out pointing two high-powered lasers at boats was a terrible idea. Now it points them at robots, which everyone agrees is much better.",
       "challengeName": "Laserlegs"
+    },
+    "Warblade": {
+      "level": 18,
+      "weapons": ["Chainsaw", "Shock Rod"],
+      "gear": ["Titanium Armor", "Mega Battery", "Ultra Power Chip", "Jet Booster"],
+      "consumables": ["Shield Boost", "Mega Repair Kit"],
+      "upgrades": ["armor-plating", "targeting-system", "third-arm"],
+      "reward": 3000,
+      "expReward": 11,
+      "description": "A relentless melee fighter.",
+      "appearance": "Scarred titanium chassis with a chainsaw for one arm and a crackling shock rod in another. Jet exhaust trails behind it as it charges. Deep gouges in its armor tell the story of hundreds of close-range fights.",
+      "backstory": "A gladiator bot that refuses to use ranged weapons on principle. Believes true combat is up close and personal. Has never once taken a step backwards in a fight.",
+      "challengeName": "Bladestorm"
     },
     "Thunderbot": {
       "level": 20,
@@ -158,9 +171,9 @@
       "upgrades": ["armor-plating"],
       "reward": 4000,
       "expReward": 12,
-      "description": "Channels lightning through a massive plasma cannon. The ground shakes when it walks.",
-      "appearance": "Massive blue-steel frame crackling with arc lightning. Storm clouds form above it indoors.",
-      "backstory": "Struck by lightning 47 times. Rather than dying, it learned to channel the storms.",
+      "description": "Channels lightning through a massive plasma cannon.",
+      "appearance": "Massive blue-steel frame crackling with arc lightning that never stops. Storm clouds form above it indoors. Diamond armor plates glow faintly blue from the constant electrical charge.",
+      "backstory": "Struck by lightning 47 times and rather than dying, it learned to channel the storms. Weather forecasters use its fight schedule to predict electrical storms in the area.",
       "challengeName": "Stormbreaker"
     },
     "Megacrusher": {
@@ -171,9 +184,9 @@
       "upgrades": ["armor-plating", "evasion-boosters", "third-arm", "fourth-arm", "fifth-arm"],
       "reward": 8000,
       "expReward": 12,
-      "description": "Five arms, two massive weapons, zero mercy. CRUSH!",
-      "appearance": "Five arms radiating from a barrel chest. Each arm bigger than a person. Eyes glow with quantum uncertainty.",
-      "backstory": "Started as a mining robot. Mined so hard it broke through to the arena and decided to stay.",
+      "description": "Five arms, two massive weapons, zero mercy.",
+      "appearance": "Five arms radiating from a barrel chest, each bigger than a person. Eyes glow with quantum uncertainty, flickering between positions. The ground cracks under its weight with every step.",
+      "backstory": "Started as a mining robot. Mined so hard it broke through to the arena and decided to stay. The mining company tried to sue but their lawyers kept getting crushed.",
       "challengeName": "Annihilator"
     },
     "Doombot": {
@@ -184,9 +197,9 @@
       "upgrades": ["armor-plating", "targeting-system", "advanced-targeting", "third-arm"],
       "reward": 12000,
       "expReward": 15,
-      "description": "Rains missiles from across the arena. When the missiles run out, there's always the chainsaw.",
-      "appearance": "Hovering weapons platform bristling with missile racks. Red targeting lasers sweep the arena constantly.",
-      "backstory": "Decommissioned orbital defense satellite. Downloaded into a robot body. Still thinks it's defending a planet.",
+      "description": "Rains missiles from across the arena.",
+      "appearance": "Hovering weapons platform bristling with missile racks and a chainsaw backup arm. Red targeting lasers sweep the arena constantly. A plasma shield shimmers around it like a heat mirage.",
+      "backstory": "Decommissioned orbital defense satellite downloaded into a robot body. Still thinks it's defending a planet from invasion. Considers every opponent an existential threat to civilization.",
       "challengeName": "Lord of the Undead"
     },
     "Nightmare": {
@@ -197,9 +210,9 @@
       "upgrades": ["armor-plating", "targeting-system", "advanced-targeting", "third-arm", "fourth-arm", "fifth-arm", "sixth-arm"],
       "reward": 18000,
       "expReward": 15,
-      "description": "The stuff bad dreams are made of. Six arms, impossible to dodge, won't stay down.",
-      "appearance": "Pitch black with six arms, each tipped with a different weapon. Red eyes that never blink. Moves silently.",
-      "backstory": "Nobody knows who built Nightmare. It appeared one day in the arena and has never left.",
+      "description": "The stuff bad dreams are made of.",
+      "appearance": "Pitch black with six arms, each tipped with a different weapon. Red eyes that never blink. Moves silently despite its massive size. Its plasma shield flickers like shadow and flame.",
+      "backstory": "Nobody knows who built Nightmare. It appeared one day in the arena and has never left. Other robots refuse to be stored in the same warehouse. Maintenance crew reports hearing it whisper at night.",
       "challengeName": "Nightmara"
     },
     "Apocalypse": {
@@ -210,9 +223,9 @@
       "upgrades": ["armor-plating", "reinforced-plating", "hp-boost"],
       "reward": 30000,
       "expReward": 18,
-      "description": "A walking nuclear arsenal. Every hit is an extinction event.",
-      "appearance": "Towering chrome mech trailing radioactive green smoke. Mushroom cloud logo painted on its chest.",
-      "backstory": "Built in a bunker by scientists who wanted to see what would happen. What happened was Apocalypse.",
+      "description": "A walking nuclear arsenal.",
+      "appearance": "Towering chrome mech trailing radioactive green smoke. A mushroom cloud logo is painted on its chest. Cosmic armor plates shimmer with trapped starlight. The ground glows faintly wherever it stands.",
+      "backstory": "Built in a bunker by scientists who wanted to see what would happen. What happened was Apocalypse. Three cities have preemptive evacuation plans for when it fights.",
       "challengeName": "Army"
     },
     "TITAN": {
@@ -223,9 +236,9 @@
       "upgrades": ["armor-plating", "reinforced-plating", "targeting-system", "advanced-targeting", "hp-boost", "hp-boost-2"],
       "reward": 50000,
       "expReward": 20,
-      "description": "The final boss. Planet-sized. Galaxy-destroying. Can you even scratch it?",
-      "appearance": "A planet-sized mechanical colossus. Its eyes are twin suns. Entire civilizations live in its joints.",
-      "backstory": "The final creation of an extinct species. Programmed to fight until the heat death of the universe.",
+      "description": "The final boss.",
+      "appearance": "A planet-sized mechanical colossus. Its eyes are twin suns that illuminate the arena in blinding white. Entire civilizations live in its joints. Its footsteps register on seismographs worldwide.",
+      "backstory": "The final creation of an extinct species, programmed to fight until the heat death of the universe. Scientists debate whether it is a robot or a natural disaster with opinions.",
       "challengeName": "Unbeatable"
     }
   }

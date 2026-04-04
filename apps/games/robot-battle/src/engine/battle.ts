@@ -138,16 +138,25 @@ export function executeAttack(
 
     if (roll < hitChance) {
       let damage = calculateDamage(weapon, attacker, defender);
-      if (defender.damageBlock > 0) {
-        const blocked = Math.min(damage, defender.damageBlock);
-        defender.damageBlock -= blocked;
-        damage -= blocked;
+      // God mode: defender takes 0 damage
+      if (defender.robot.godMode) {
+        const msg = `  ${weapon.name} ${i + 1} hits for 0 damage... BECAUSE YOU ARE A GOD`;
+        messages.push(msg);
+        log(battle, msg);
+      } else {
+        const rawDamage = damage;
+        if (defender.damageBlock > 0) {
+          const blocked = Math.min(damage, defender.damageBlock);
+          defender.damageBlock -= blocked;
+          damage -= blocked;
+          log(battle, `  Shield blocked ${blocked} of ${rawDamage} damage!`);
+        }
+        totalDamage += damage;
+        defender.currentHealth -= damage;
+        const msg = `  ${weapon.name} ${i + 1} hits for ${damage} damage`;
+        messages.push(msg);
+        log(battle, msg);
       }
-      totalDamage += damage;
-      defender.currentHealth -= damage;
-      const msg = `  ${weapon.name} ${i + 1} hits for ${damage} damage`;
-      messages.push(msg);
-      log(battle, msg);
     } else {
       const msg = `  ${weapon.name} ${i + 1} misses!`;
       messages.push(msg);
@@ -187,7 +196,11 @@ export function useConsumable(
   if (!hasItem(attacker.robot, consumable.name)) {
     return fail("Don't have this consumable");
   }
+  if (attacker.consumableUsedThisTurn) {
+    return fail("Already used a consumable this turn");
+  }
 
+  attacker.consumableUsedThisTurn = true;
   attacker.consumablesUsed.push(consumable.name);
   const idx = attacker.robot.inventory.findIndex((i) => i.name === consumable.name);
   if (idx !== -1) attacker.robot.inventory.splice(idx, 1);
@@ -246,7 +259,8 @@ export function useConsumable(
     effects.push(`+${consumable.accuracyBonus} temp accuracy`);
   }
 
-  if (consumable.useText) {
+  const isPlayer = attacker === battle.player;
+  if (consumable.useText && isPlayer) {
     log(battle, `${attacker.robot.name}: ${consumable.useText}`);
   } else {
     log(battle, `${attacker.robot.name} uses ${consumable.name}: ${effects.join(", ")}`);
@@ -294,6 +308,8 @@ export function endTurn(battle: BattleState): void {
   battle.enemyAction = null;
   battle.player.damageBlock = 0;
   battle.enemy.damageBlock = 0;
+  battle.player.consumableUsedThisTurn = false;
+  battle.enemy.consumableUsedThisTurn = false;
   battle.turnNumber += 1;
 }
 

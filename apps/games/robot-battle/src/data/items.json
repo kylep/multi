@@ -171,25 +171,25 @@
       "level": 5,
       "moneyCost": 30,
       "stackable": true,
-      "maxStack": 20,
+      "maxStack": 60,
       "category": "Ammo",
-      "description": "Ammo for the Sawed-off Shotgun. Consumed when fired. Max 20."
+      "description": "Ammo for the Sawed-off Shotgun. Consumed when fired. Max 60."
     },
     "Missile": {
       "level": 30,
       "moneyCost": 500,
       "stackable": true,
-      "maxStack": 10,
+      "maxStack": 30,
       "category": "Ammo",
-      "description": "Ammo for the Missile Launcher. Consumed when fired. Max 10."
+      "description": "Ammo for the Missile Launcher. Consumed when fired. Max 30."
     },
     "Antimatter Missile": {
       "level": 45,
       "moneyCost": 55000,
       "stackable": true,
-      "maxStack": 1,
+      "maxStack": 3,
       "category": "Ammo",
-      "description": "Ammo for the Antimatter Missile Launcher. Consumed when launched. Max 1."
+      "description": "Ammo for the Antimatter Missile Launcher. Consumed when launched. Max 3."
     },
     "Cardboard Armor": {
       "level": 0,
@@ -518,11 +518,11 @@
     },
     "Nuke": {
       "level": 40,
-      "moneyCost": 3000,
+      "moneyCost": 15000,
       "damage": 500,
-      "maxStack": 1,
+      "maxStack": 5,
       "useText": "You launch a Nuke. NUCLEAR EXPLOSION! Everything goes white!",
-      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 1."
+      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 5."
     }
   }
 }

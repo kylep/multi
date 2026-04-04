@@ -47,6 +47,11 @@ function parseSave(raw: string | null): SaveData | null {
     if (data.player.bank === undefined) data.player.bank = 0;
     if (!data.player.repeatableUpgrades) data.player.repeatableUpgrades = {};
     if (data.player.accuracy === undefined) data.player.accuracy = 0;
+    // Soft migration for v3→v4 fields
+    if (data.player.cheatsUsed === undefined) data.player.cheatsUsed = false;
+    if (data.player.godMode === undefined) data.player.godMode = false;
+    if (data.player.newGamePlusLevel === undefined) data.player.newGamePlusLevel = 0;
+    if (data.player.titanDefeated === undefined) data.player.titanDefeated = false;
     // Migrate arm gear items to arm upgrades
     const armGearNames = ["Third Arm", "Fourth Arm", "Fifth Arm", "Sixth Arm"];
     const armUpgradeIds = ["third-arm", "fourth-arm", "fifth-arm", "sixth-arm"];
@@ -140,4 +145,32 @@ export function hasAnySlot(storage: SaveStorage): boolean {
     if (storage.getItem(slotKey(i)) !== null) return true;
   }
   return false;
+}
+
+// ── Leaderboard ──
+
+const LEADERBOARD_KEY = "robot-battle-leaderboard";
+
+export interface LeaderboardEntry {
+  name: string;
+  fights: number;
+  newGamePlusLevel: number;
+  date: string;
+}
+
+export function loadLeaderboard(storage: SaveStorage): LeaderboardEntry[] {
+  const raw = storage.getItem(LEADERBOARD_KEY);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) as LeaderboardEntry[];
+  } catch {
+    return [];
+  }
+}
+
+export function addLeaderboardEntry(storage: SaveStorage, entry: LeaderboardEntry): void {
+  const board = loadLeaderboard(storage);
+  board.push(entry);
+  board.sort((a, b) => a.fights - b.fights);
+  storage.setItem(LEADERBOARD_KEY, JSON.stringify(board.slice(0, 20)));
 }
