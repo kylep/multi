@@ -31,7 +31,7 @@ export async function settingsScreen(terminal: Terminal, state: GameState): Prom
       ? "EXTRA CHALLENGE is ON — enemies have 3x HP per level!"
       : "";
     if (challengeDesc) {
-      terminal.printHTML(`<div class="panel" style="padding:6px 10px"><span class="t-red t-bold">${challengeDesc}</span></div>`);
+      terminal.printHTML(`<div class="panel" style="padding:6px 10px"><span class="t-purple t-bold">${challengeDesc}</span></div>`);
     }
 
     const choices: Choice[] = [

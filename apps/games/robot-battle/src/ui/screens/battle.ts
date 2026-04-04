@@ -651,31 +651,60 @@ async function showLootBox(
 ): Promise<void> {
   const player = state.player!;
 
+  // Randomly assign rewards to 3 boxes
+  const tiers: Array<"diamond" | "gold" | "silver"> = ["diamond", "gold", "silver"];
+  // Fisher-Yates shuffle
+  for (let i = tiers.length - 1; i > 0; i--) {
+    const j = Math.floor(rng.random() * (i + 1));
+    [tiers[i], tiers[j]] = [tiers[j], tiers[i]];
+  }
+
   terminal.clear();
   terminal.printHTML(`
     <div class="title-center" style="min-height:0;margin:16px 0">
       <div class="t-yellow t-bold" style="font-size:22px">★ LOOT BOX! ★</div>
-      <div class="t-dim">Choose a chest!</div>
+      <div class="t-dim">Choose a box!</div>
     </div>
   `);
 
+  const boxArt = [
+    "┌─────┐\n│ ??? │\n│  1  │\n└─────┘",
+    "┌─────┐\n│ ??? │\n│  2  │\n└─────┘",
+    "┌─────┐\n│ ??? │\n│  3  │\n└─────┘",
+  ];
+
   const choice = await terminal.promptChoice("", [
-    { label: "Diamond", value: "diamond", subtitle: "Mystery cash reward" },
-    { label: "Gold", value: "gold", subtitle: "3 random consumables" },
-    { label: "Silver", value: "silver", subtitle: "1 random consumable" },
+    { label: "Box 1", value: "0", subtitle: boxArt[0] },
+    { label: "Box 2", value: "1", subtitle: boxArt[1] },
+    { label: "Box 3", value: "2", subtitle: boxArt[2] },
   ], "row");
+
+  const tier = tiers[parseInt(choice, 10)];
 
   // Get level-appropriate consumables based on enemy level
   const eligibleConsumables = state.registry.getAllItems()
     .filter((i) => i.itemType === "consumable" && i.level <= enemyDef.level);
 
-  if (choice === "diamond") {
+  terminal.clear();
+
+  // Show what all 3 boxes were
+  const tierLabels: Record<string, string> = { diamond: "Diamond", gold: "Gold", silver: "Silver" };
+  const tierColors: Record<string, string> = { diamond: "t-cyan", gold: "t-yellow", silver: "t-dim" };
+  const revealHtml = tiers.map((t, i) => {
+    const picked = i === parseInt(choice, 10);
+    const cls = picked ? `${tierColors[t]} t-bold` : "t-dim";
+    return `<span class="${cls}">[Box ${i + 1}: ${tierLabels[t]}${picked ? " ◄" : ""}]</span>`;
+  }).join(" &nbsp; ");
+  terminal.printHTML(`<div style="margin:8px 0">${revealHtml}</div>`);
+
+  if (tier === "diamond") {
     const money = enemyDef.reward;
     player.money += money;
-    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="t-yellow t-bold" style="font-size:18px">Diamond!</div><div class="t-green t-bold" style="margin-top:8px">You found $${money.toLocaleString()}!</div></div>`);
+    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="t-cyan t-bold" style="font-size:18px">Diamond!</div><div class="t-green t-bold" style="margin-top:8px">You found $${money.toLocaleString()}!</div></div>`);
   } else {
-    const count = choice === "gold" ? 3 : 1;
-    const label = choice === "gold" ? "Gold!" : "Silver!";
+    const count = tier === "gold" ? 3 : 1;
+    const label = tier === "gold" ? "Gold!" : "Silver!";
+    const color = tier === "gold" ? "t-yellow" : "t-dim";
     const items: string[] = [];
 
     for (let i = 0; i < count; i++) {
@@ -686,7 +715,7 @@ async function showLootBox(
       }
     }
 
-    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="t-yellow t-bold" style="font-size:18px">${label}</div>${items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("")}</div>`);
+    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="${color} t-bold" style="font-size:18px">${label}</div>${items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("")}</div>`);
   }
 
   await terminal.promptContinue(0);

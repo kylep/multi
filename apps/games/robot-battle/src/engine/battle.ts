@@ -414,7 +414,7 @@ export function resolveTurn(
 
 export function shouldShowLootBox(turns: number, rng: Rng): boolean {
   for (let i = 0; i < turns; i++) {
-    if (rng.random() < 0.05) return true;
+    if (rng.random() < 0.025) return true;
   }
   return false;
 }

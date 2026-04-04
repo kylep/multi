@@ -62,6 +62,19 @@ function parseSave(raw: string | null): SaveData | null {
         }
       }
     }
+    // Patch inventory items missing v3 fields
+    for (const item of data.player.inventory) {
+      const raw = item as unknown as Record<string, unknown>;
+      if (item.itemType === "gear") {
+        if (raw.accuracyBonus === undefined) raw.accuracyBonus = 0;
+        if (raw.maxStack === undefined) raw.maxStack = 0;
+        if (raw.category === undefined) raw.category = "";
+      }
+      if (item.itemType === "consumable") {
+        if (raw.useText === undefined) raw.useText = "";
+        if (raw.accuracyBonus === undefined) raw.accuracyBonus = 0;
+      }
+    }
     applyAllUpgrades(data.player);
     return data;
   } catch {

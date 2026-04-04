@@ -206,6 +206,16 @@ function esc(s: string): string {
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
+    version: "0.9.2", date: "2026-04-04", notes: [
+      "Fix: Loading old saves no longer breaks accuracy (all attacks missed)",
+      "Fix: Loot boxes are now blind picks — rewards randomly assigned to 3 mystery boxes",
+      "Loot box reveal shows what was in all 3 boxes after picking",
+      "Fix: Inventory groups duplicate consumables and weapons with count",
+      "Fix: Challenge mode text in settings is purple",
+      "Balance: Loot box chance reduced from 5% to 2.5% per turn",
+    ],
+  },
+  {
     version: "0.9.1", date: "2026-04-04", notes: [
       "Fix: Challenge mode names now show in purple on fight selection grid",
       "Fix: Enemy reward display updates when toggling challenge mode",
