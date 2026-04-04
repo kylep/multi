@@ -242,4 +242,58 @@ describe("v2 to v3 migration", () => {
     // Hands should be 4 after applyAllUpgrades
     expect(loaded.player.hands).toBe(4);
   });
+
+  it("patches old gear items missing accuracyBonus (prevents NaN accuracy)", () => {
+    const storage = createMockStorage();
+    const v2Data = {
+      version: 2,
+      player: {
+        name: "OldGearBot",
+        health: 10, maxHealth: 10, energy: 20, maxEnergy: 20,
+        defence: 0, attack: 0, hands: 2, dodge: 0,
+        level: 5, exp: 0, money: 500,
+        wins: 3, fights: 5, inventorySize: 4,
+        inventory: [
+          { name: "Stick", itemType: "weapon", level: 0, moneyCost: 50, description: "", requirements: [], damage: 1, energyCost: 1, accuracy: 80, hands: 1 },
+          { name: "Iron Armor", itemType: "gear", level: 5, moneyCost: 500, description: "", requirements: [], healthBonus: 20, energyBonus: 0, defenceBonus: 2, attackBonus: 0, handsBonus: 0, dodgeBonus: 0, moneyBonusPercent: 0, stackable: false },
+        ],
+        upgrades: [],
+        settings: { mode: "oliver", oliverChallenge: false },
+        defeatedEnemies: [],
+        challengeDefeatedEnemies: [],
+      },
+    };
+    storage.setItem("robot-battle-save-1", JSON.stringify(v2Data));
+    const loaded = loadSlot(storage, 1)!;
+    const gear = loaded.player.inventory.find((i: { name: string }) => i.name === "Iron Armor") as Record<string, unknown>;
+    expect(gear.accuracyBonus).toBe(0);
+    expect(gear.maxStack).toBe(0);
+    expect(gear.category).toBe("");
+  });
+
+  it("patches old consumable items missing useText and accuracyBonus", () => {
+    const storage = createMockStorage();
+    const v2Data = {
+      version: 2,
+      player: {
+        name: "OldConBot",
+        health: 10, maxHealth: 10, energy: 20, maxEnergy: 20,
+        defence: 0, attack: 0, hands: 2, dodge: 0,
+        level: 10, exp: 0, money: 500,
+        wins: 3, fights: 5, inventorySize: 4,
+        inventory: [
+          { name: "Grenade", itemType: "consumable", level: 8, moneyCost: 100, description: "", requirements: [], healthRestore: 0, energyRestore: 0, tempDefence: 0, tempAttack: 0, damage: 30, damageBlock: 0, enemyDodgeReduction: 0 },
+        ],
+        upgrades: [],
+        settings: { mode: "oliver", oliverChallenge: false },
+        defeatedEnemies: [],
+        challengeDefeatedEnemies: [],
+      },
+    };
+    storage.setItem("robot-battle-save-1", JSON.stringify(v2Data));
+    const loaded = loadSlot(storage, 1)!;
+    const grenade = loaded.player.inventory.find((i: { name: string }) => i.name === "Grenade") as Record<string, unknown>;
+    expect(grenade.useText).toBe("");
+    expect(grenade.accuracyBonus).toBe(0);
+  });
 });
