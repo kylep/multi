@@ -259,7 +259,8 @@ export function useConsumable(
     effects.push(`+${consumable.accuracyBonus} temp accuracy`);
   }
 
-  if (consumable.useText) {
+  const isPlayer = attacker === battle.player;
+  if (consumable.useText && isPlayer) {
     log(battle, `${attacker.robot.name}: ${consumable.useText}`);
   } else {
     log(battle, `${attacker.robot.name} uses ${consumable.name}: ${effects.join(", ")}`);
