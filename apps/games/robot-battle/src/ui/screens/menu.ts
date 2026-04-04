@@ -181,6 +181,22 @@ function esc(s: string): string {
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
+    version: "0.8.0", date: "2026-03-29", notes: [
+      "Sandbox mode: everything free, no level cap, no defeated badges",
+      "Blast Shield consumable (blocks all damage for 1 turn)",
+      "Shredder enemy (level 8)",
+      "Dodge Circuits and Energy Core upgrades",
+      "Inventory 7 upgrade",
+      "Shop button on victory/defeat screens",
+      "Extra Challenge toggle on enemy detail screen",
+      "Level-up screen shows unlocked items",
+      "Balance: Laser energy 8→10, Lightsabre energy 15→10",
+      "Easy enemies give 50% XP instead of 0",
+      "Sell price is full buy price (was 50%)",
+      "AI waits to heal until sufficiently hurt",
+    ],
+  },
+  {
     version: "0.7.0", date: "2026-03-29", notes: [
       "Fight Again button after battles (rematch same opponent)",
       "Defeated badges: white ✔ for cleared, yellow ★ for challenge mode",
