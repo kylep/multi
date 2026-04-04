@@ -304,7 +304,15 @@ async function showBattleLog(
 
 async function autoBattle(terminal: Terminal, battle: BattleState, enemyNameClass?: string): Promise<void> {
   let turnDelay = 250;
+  let autoTurns = 0;
   while (battle.winner === null) {
+    autoTurns++;
+    if (autoTurns > 50) {
+      terminal.print("");
+      terminal.print("Auto-battle cancelled after 50 turns — stalemate!", "t-yellow t-bold");
+      await terminal.promptContinue(0);
+      break;
+    }
     const playerAction = aiPlanAction(battle, true);
     battle.playerAction = playerAction;
     const enemyAction = aiPlanAction(battle, false);

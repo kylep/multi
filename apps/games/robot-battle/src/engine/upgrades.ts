@@ -13,10 +13,10 @@ export interface UpgradeDef {
 
 const UPGRADES: UpgradeDef[] = [
   // Arms
-  { id: "third-arm", name: "Third Arm", cost: 150, description: "+1 Hand (permanent)", requires: null, section: "arms" },
-  { id: "fourth-arm", name: "Fourth Arm", cost: 250, description: "+1 Hand (permanent)", requires: "third-arm", section: "arms" },
-  { id: "fifth-arm", name: "Fifth Arm", cost: 350, description: "+1 Hand (permanent)", requires: "fourth-arm", section: "arms" },
-  { id: "sixth-arm", name: "Sixth Arm", cost: 1000, description: "+1 Hand (permanent)", requires: "fifth-arm", section: "arms" },
+  { id: "third-arm", name: "Third Arm", cost: 1000, description: "+1 Hand (permanent)", requires: null, section: "arms" },
+  { id: "fourth-arm", name: "Fourth Arm", cost: 5000, description: "+1 Hand (permanent)", requires: "third-arm", section: "arms" },
+  { id: "fifth-arm", name: "Fifth Arm", cost: 25000, description: "+1 Hand (permanent)", requires: "fourth-arm", section: "arms" },
+  { id: "sixth-arm", name: "Sixth Arm", cost: 100000, description: "+1 Hand (permanent)", requires: "fifth-arm", section: "arms" },
   // Combat
   { id: "armor-plating", name: "Armor Plating", cost: 5000, description: "+3 Defence (permanent)", requires: null, section: "combat" },
   { id: "reinforced-plating", name: "Reinforced Plating", cost: 12000, description: "+5 Defence (permanent)", requires: "armor-plating", section: "combat" },

@@ -10,6 +10,7 @@ export interface Choice {
   badge?: string;
   badgeClass?: string;
   btnClass?: string;
+  labelClass?: string;
 }
 
 export interface Span {
@@ -196,7 +197,7 @@ export function createDomTerminal(root: HTMLElement): Terminal {
               card.setAttribute("data-testid", `choice-${choices[i].value}`);
 
               const title = document.createElement("div");
-              title.className = "card-title";
+              title.className = choices[i].labelClass ? `card-title ${choices[i].labelClass}` : "card-title";
               title.textContent = choices[i].label;
               card.appendChild(title);
 
