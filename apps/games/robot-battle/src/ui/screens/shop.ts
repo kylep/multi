@@ -224,9 +224,18 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
   const gear = getGear(player);
   const consumables = getConsumables(player);
 
+  const weaponCounts = new Map<string, { weapon: typeof weapons[0]; count: number }>();
+  for (const w of weapons) {
+    const existing = weaponCounts.get(w.name);
+    if (existing) existing.count++;
+    else weaponCounts.set(w.name, { weapon: w, count: 1 });
+  }
   const weaponHtml = weapons.length === 0
     ? `<div class="t-dim">(none)</div>`
-    : weapons.map((w) => `<div class="t-green">${esc(w.name)} — ${w.damage}dmg, ${w.accuracy}%acc</div>`).join("");
+    : [...weaponCounts.values()].map(({ weapon: w, count }) => {
+      const countStr = count > 1 ? ` (${count})` : "";
+      return `<div class="t-green">${esc(w.name)}${countStr} — ${w.damage}dmg, ${w.accuracy}%acc</div>`;
+    }).join("");
 
   const gearCounts = new Map<string, { gear: typeof gear[0]; count: number }>();
   for (const g of gear) {
@@ -256,7 +265,14 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
   contentHTML += `<div class="battle-layout"><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Weapons</div>${weaponHtml}</div><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Gear</div>${gearHtml}</div></div>`;
 
   if (consumables.length > 0) {
-    const conHtml = consumables.map((c) => `<div class="t-green">${esc(c.name)}</div>`).join("");
+    const conCounts = new Map<string, number>();
+    for (const c of consumables) {
+      conCounts.set(c.name, (conCounts.get(c.name) ?? 0) + 1);
+    }
+    const conHtml = [...conCounts.entries()].map(([name, count]) => {
+      const countStr = count > 1 ? ` (${count})` : "";
+      return `<div class="t-green">${esc(name)}${countStr}</div>`;
+    }).join("");
     contentHTML += `<div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Items</div>${conHtml}</div>`;
   }
 
