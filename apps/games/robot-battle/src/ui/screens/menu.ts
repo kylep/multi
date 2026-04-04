@@ -5,14 +5,17 @@ import type { SoundPlayer } from "../sound";
 import type { GameState } from "../../engine/state";
 import type { GameSettings } from "../../engine/save";
 import {
+  getConsumables,
   getEffectiveDefence,
   getEffectiveDodge,
   getEffectiveMaxHealth,
+  getGear,
   getWeapons,
 } from "../../engine/robot";
 import { getXpToLevel } from "../../engine/state";
 import { shopScreen } from "./shop";
 import { upgradesScreen } from "./upgrades";
+import { bankScreen } from "./bank";
 import { settingsScreen } from "./settings";
 import { battleScreen } from "./battle";
 import packageJson from "../../../package.json";
@@ -36,6 +39,7 @@ export async function mainMenu(
       { label: "Fight", value: "fight", subtitle: "Battle enemies" },
       { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
       { label: "Upgrades", value: "upgrades", subtitle: "Permanent buffs" },
+      { label: "Bank", value: "bank", subtitle: "Deposit & earn interest" },
       { label: "Settings", value: "settings", subtitle: "Sound & options" },
       { label: "Change Log", value: "changelog", subtitle: "Version history" },
       { label: "Quit", value: "quit", subtitle: "Return to title" },
@@ -53,6 +57,9 @@ export async function mainMenu(
       save?.();
     } else if (choice === "upgrades") {
       await upgradesScreen(terminal, state);
+      save?.();
+    } else if (choice === "bank") {
+      await bankScreen(terminal, state);
       save?.();
     } else if (choice === "settings") {
       await settingsScreen(terminal, state);
@@ -85,12 +92,14 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
     terminal.printHTML(`<div class="panel-header">CHOOSE YOUR OPPONENT</div>`);
 
     const choices: Choice[] = [];
+    const challengeOn = player.settings.oliverChallenge;
     for (const [name, enemy] of enemies) {
       const tag = getDifficulty(player.level, enemy.level);
       const challengeCleared = player.challengeDefeatedEnemies.includes(name);
       const normalCleared = player.defeatedEnemies.includes(name);
+      const displayName = challengeOn && enemy.challengeName ? enemy.challengeName : name;
       choices.push({
-        label: `${name} (Lv.${enemy.level})`,
+        label: `${displayName} (Lv.${enemy.level})`,
         value: name,
         subtitle: `[${tag}] $${enemy.reward}, ${enemy.expReward} XP`,
         badge: challengeCleared ? "★" : normalCleared ? "✔" : undefined,
@@ -142,14 +151,27 @@ async function enemyDetailScreen(
     const weaponStr = weapons.length > 0
       ? weapons.map((w) => `${w.name} (${w.damage} dmg)`).join(", ")
       : "None";
+    const gearItems = getGear(bot);
+    const gearStr = gearItems.length > 0
+      ? gearItems.map((g) => g.name).join(", ")
+      : "None";
+    const consumableItems = getConsumables(bot);
+    const conStr = consumableItems.length > 0
+      ? consumableItems.map((c) => c.name).join(", ")
+      : "None";
 
     const challengeLabel = player.settings.oliverChallenge ? "Challenge: ON" : "Challenge: OFF";
+    const isChallenge = player.settings.oliverChallenge;
+    const displayName = isChallenge && enemyDef.challengeName ? enemyDef.challengeName : enemyName;
+    const nameClass = isChallenge && enemyDef.challengeName ? "t-purple" : "t-yellow";
 
     terminal.clear();
     terminal.printHTML(`
       <div class="panel">
-        <div class="t-yellow t-bold" style="font-size:18px">${enemyName}</div>
+        <div class="${nameClass} t-bold" style="font-size:18px">${esc(displayName)}</div>
         <div class="t-dim">Level ${enemyDef.level} &bull; [${tag}]</div>
+        ${enemyDef.appearance ? `<div style="margin-top:8px" class="t-dim">${esc(enemyDef.appearance)}</div>` : ""}
+        ${enemyDef.backstory ? `<div class="t-dim">${esc(enemyDef.backstory)}</div>` : ""}
         <div style="margin-top:8px">${enemyDef.description}</div>
         <div style="margin-top:8px">
           <span class="t-cyan">HP: ${hp}</span> &nbsp;
@@ -157,6 +179,8 @@ async function enemyDetailScreen(
           <span>Defence: ${def}</span>
         </div>
         <div>Weapons: ${weaponStr}</div>
+        <div>Gear: ${gearStr}</div>
+        <div>Items: ${conStr}</div>
         <div class="t-magenta" style="margin-top:4px">Reward: $${enemyDef.reward} &nbsp; XP: ${enemyDef.expReward}</div>
       </div>
     `);
@@ -164,7 +188,7 @@ async function enemyDetailScreen(
     const choice = await terminal.promptChoice("", [
       { label: "Fight!", value: "fight" },
       { label: "Back", value: "back" },
-      { label: challengeLabel, value: "challenge" },
+      { label: challengeLabel, value: "challenge", btnClass: "btn-challenge" },
     ], "row");
 
     if (choice === "challenge") {
@@ -180,6 +204,31 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.9.0", date: "2026-04-04", notes: [
+      "Bank: deposit money and earn 1% interest per fight",
+      "Arms are now permanent upgrades (no longer take inventory slots)",
+      "Consumables no longer take inventory slots",
+      "New upgrades: Targeting System, Advanced Targeting, Evasion Boosters, Phantom Protocol, Reinforced Plating, HP Boost I & II",
+      "Repeatable upgrades unlock after all normal upgrades (+HP, +Dmg, +Def, +Acc, +Dodge)",
+      "Consumable use-text: descriptive messages when using items in battle",
+      "100% Game Complete screen for defeating all enemies on Challenge mode",
+      "Post-battle loot boxes (5% chance per turn, victory only)",
+      "Enhanced enemy detail: gear, consumables, appearance, backstory",
+      "Shop categories: gear broken into Armor, Battery, Chip, Booster, Ammo",
+      "Accuracy-boosting gear and upgrades",
+      "Evasion-boosting upgrades",
+      "Challenge mode gives +20% money on all wins",
+      "Ammo system: Shotgun Shells (max 20), Missiles (max 10), Antimatter Missiles (max 1)",
+      "Ammo weapons use little or no energy — ammo is the cost",
+      "Missile Launcher now requires Missile ammo",
+      "Ammo shown in battle status panels",
+      "Challenge mode names: enemies have alternate names shown in purple",
+      "Balance: Sword energy 4→2, Death Ray damage 100→75",
+      "New items: Targeting Scope, Auto-Aim Module, Targeting Lock, Missile",
+      "Full enemy rebalance with new upgrades, gear, and ammo",
+    ],
+  },
   {
     version: "0.8.0", date: "2026-03-29", notes: [
       "Sandbox mode: everything free, no level cap, no defeated badges",

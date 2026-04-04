@@ -27,8 +27,11 @@ export interface Gear extends ItemBase {
   attackBonus: number;
   handsBonus: number;
   dodgeBonus: number;
+  accuracyBonus: number;
   moneyBonusPercent: number;
   stackable: boolean;
+  maxStack: number;
+  category: string;
 }
 
 export interface Consumable extends ItemBase {
@@ -40,6 +43,8 @@ export interface Consumable extends ItemBase {
   damage: number;
   damageBlock: number;
   enemyDodgeReduction: number;
+  useText: string;
+  accuracyBonus: number;
 }
 
 export type Item = Weapon | Gear | Consumable;
@@ -54,14 +59,17 @@ export interface Robot {
   attack: number;
   hands: number;
   dodge: number;
+  accuracy: number;
   level: number;
   exp: number;
   money: number;
+  bank: number;
   wins: number;
   fights: number;
   inventorySize: number;
   inventory: Item[];
   upgrades: string[];
+  repeatableUpgrades: Record<string, number>;
   settings: { mode: "oliver" | "lucas" | "sandbox"; oliverChallenge: boolean };
   defeatedEnemies: string[];
   challengeDefeatedEnemies: string[];
@@ -77,6 +85,9 @@ export interface Enemy {
   reward: number;
   expReward: number;
   description: string;
+  appearance: string;
+  backstory: string;
+  challengeName: string;
 }
 
 export interface BattleRobot {
@@ -85,6 +96,7 @@ export interface BattleRobot {
   currentEnergy: number;
   tempDefence: number;
   tempAttack: number;
+  tempAccuracy: number;
   tempDodgeReduction: number;
   damageBlock: number;
   consumablesUsed: string[];

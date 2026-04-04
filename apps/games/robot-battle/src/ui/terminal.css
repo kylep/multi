@@ -36,6 +36,7 @@ body {
 .t-yellow { color: #ffff33; }
 .t-cyan { color: #33ffff; }
 .t-magenta { color: #ff33ff; }
+.t-purple { color: #bb55ff; }
 .t-bold { font-weight: bold; }
 .t-dim { opacity: 0.6; }
 
@@ -151,8 +152,12 @@ body {
   padding: 8px 4px 2px;
   color: #ffff33;
   font-weight: bold;
-  cursor: default;
+  cursor: pointer;
   opacity: 1;
+}
+
+.card-header:hover {
+  opacity: 0.8;
 }
 
 .card:hover {
@@ -261,6 +266,15 @@ body {
 
 .btn-secondary:hover {
   background: #3a3a0d;
+}
+
+.btn-challenge {
+  border-color: #bb55ff;
+  color: #bb55ff;
+}
+
+.btn-challenge:hover {
+  background: #2a1a3a;
 }
 
 /* === Battle layout — two-panel side by side === */

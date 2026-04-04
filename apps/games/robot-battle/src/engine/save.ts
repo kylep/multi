@@ -5,7 +5,7 @@ import { applyAllUpgrades } from "./upgrades";
 
 const SAVE_KEY_PREFIX = "robot-battle-save-";
 const LEGACY_SAVE_KEY = "robot-battle-save";
-const SAVE_VERSION = 2;
+const SAVE_VERSION = 3;
 export const NUM_SLOTS = 3;
 
 export interface SaveStorage {
@@ -35,14 +35,33 @@ function parseSave(raw: string | null): SaveData | null {
   try {
     const data = JSON.parse(raw) as SaveData;
     if (!data.player || typeof data.player.name !== "string") return null;
-    // Accept both v1 and v2
-    if (data.version !== 1 && data.version !== SAVE_VERSION) return null;
-    // Soft migration for new fields
+    // Accept v1, v2, and v3
+    if (data.version !== 1 && data.version !== 2 && data.version !== SAVE_VERSION) return null;
+    // Soft migration for v1→v2 fields
     if (!data.player.upgrades) data.player.upgrades = [];
     if (!data.player.settings) data.player.settings = { mode: "oliver", oliverChallenge: false };
     if (data.player.settings.oliverChallenge === undefined) data.player.settings.oliverChallenge = false;
     if (!data.player.defeatedEnemies) data.player.defeatedEnemies = [];
     if (!data.player.challengeDefeatedEnemies) data.player.challengeDefeatedEnemies = [];
+    // Soft migration for v2→v3 fields
+    if (data.player.bank === undefined) data.player.bank = 0;
+    if (!data.player.repeatableUpgrades) data.player.repeatableUpgrades = {};
+    if (data.player.accuracy === undefined) data.player.accuracy = 0;
+    // Migrate arm gear items to arm upgrades
+    const armGearNames = ["Third Arm", "Fourth Arm", "Fifth Arm", "Sixth Arm"];
+    const armUpgradeIds = ["third-arm", "fourth-arm", "fifth-arm", "sixth-arm"];
+    for (let i = 0; i < armGearNames.length; i++) {
+      const gearIdx = data.player.inventory.findIndex((item: { name: string }) => item.name === armGearNames[i]);
+      if (gearIdx !== -1) {
+        data.player.inventory.splice(gearIdx, 1);
+        // Add this and all prerequisite arm upgrades
+        for (let j = 0; j <= i; j++) {
+          if (!data.player.upgrades.includes(armUpgradeIds[j])) {
+            data.player.upgrades.push(armUpgradeIds[j]);
+          }
+        }
+      }
+    }
     applyAllUpgrades(data.player);
     return data;
   } catch {
