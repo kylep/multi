@@ -196,7 +196,11 @@ export function useConsumable(
   if (!hasItem(attacker.robot, consumable.name)) {
     return fail("Don't have this consumable");
   }
+  if (attacker.consumableUsedThisTurn) {
+    return fail("Already used a consumable this turn");
+  }
 
+  attacker.consumableUsedThisTurn = true;
   attacker.consumablesUsed.push(consumable.name);
   const idx = attacker.robot.inventory.findIndex((i) => i.name === consumable.name);
   if (idx !== -1) attacker.robot.inventory.splice(idx, 1);
@@ -303,6 +307,8 @@ export function endTurn(battle: BattleState): void {
   battle.enemyAction = null;
   battle.player.damageBlock = 0;
   battle.enemy.damageBlock = 0;
+  battle.player.consumableUsedThisTurn = false;
+  battle.enemy.consumableUsedThisTurn = false;
   battle.turnNumber += 1;
 }
 

@@ -150,6 +150,19 @@
       "backstory": "Was designed to be a lighthouse. Turns out pointing two high-powered lasers at boats was a bad idea.",
       "challengeName": "Laserlegs"
     },
+    "Warblade": {
+      "level": 18,
+      "weapons": ["Chainsaw", "Shock Rod"],
+      "gear": ["Titanium Armor", "Mega Battery", "Ultra Power Chip", "Jet Booster"],
+      "consumables": ["Shield Boost", "Mega Repair Kit"],
+      "upgrades": ["armor-plating", "targeting-system", "third-arm"],
+      "reward": 3000,
+      "expReward": 11,
+      "description": "A relentless melee fighter with a chainsaw and shock rod. No explosives — just raw cutting power.",
+      "appearance": "Scarred titanium chassis with a chainsaw arm and crackling shock rod. Moves with predatory speed. Jet exhaust trails behind.",
+      "backstory": "A gladiator bot that refuses to use ranged weapons. Believes true combat is up close and personal.",
+      "challengeName": "Bladestorm"
+    },
     "Thunderbot": {
       "level": 20,
       "weapons": ["Plasma Cannon"],

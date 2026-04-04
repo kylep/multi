@@ -487,7 +487,7 @@ async function playerTurn(
     const canAffordAny = hasWeapons && weapons.some((w) => getWeaponEnergyCost(w, player.robot) <= player.currentEnergy);
     const usedCounts = new Map<string, number>();
     for (const n of player.consumablesUsed) usedCounts.set(n, (usedCounts.get(n) ?? 0) + 1);
-    const hasConsumables = getConsumables(player.robot).some((c) => {
+    const hasConsumables = !player.consumableUsedThisTurn && getConsumables(player.robot).some((c) => {
       const owned = player.robot.inventory.filter((i) => i.name === c.name).length;
       const used = usedCounts.get(c.name) ?? 0;
       return used < owned;
@@ -500,7 +500,8 @@ async function playerTurn(
     const choices: Choice[] = [];
     choices.push({ label: "Auto", value: "auto" });
     choices.push({ label: attackLabel, value: "attack" });
-    choices.push({ label: hasConsumables ? "Item" : "Item (none)", value: "item" });
+    const itemLabel = player.consumableUsedThisTurn ? "Item (used)" : hasConsumables ? "Item" : "Item (none)";
+    choices.push({ label: itemLabel, value: "item" });
     choices.push({ label: "Rest", value: "rest" });
     choices.push({ label: "Surrender", value: "surrender" });
 

@@ -215,31 +215,38 @@ describe("useConsumable", () => {
     expect(result.success).toBe(false);
   });
 
-  it("can use multiple copies of same consumable", () => {
+  it("can use multiple copies of same consumable across turns", () => {
     const kit1 = makeConsumable({ healthRestore: 5 });
     const kit2 = makeConsumable({ healthRestore: 5 });
     const kit3 = makeConsumable({ healthRestore: 5 });
     const player = makeRobot({ inventory: [kit1, kit2, kit3] });
     const enemy = makeRobot();
     const battle = createBattle(player, enemy);
-    // Damage the player so heals are useful
     battle.player.currentHealth = 1;
 
-    // Use first kit
+    // Use first kit (turn 1)
     const r1 = useConsumable(battle, battle.player, battle.enemy, kit1);
     expect(r1.success).toBe(true);
 
-    // Use second kit (same name, should work)
+    // Second use same turn should fail (once per turn)
+    battle.player.currentHealth = 1;
+    const r1b = useConsumable(battle, battle.player, battle.enemy, kit2);
+    expect(r1b.success).toBe(false);
+
+    // Next turn: reset flag
+    endTurn(battle);
     battle.player.currentHealth = 1;
     const r2 = useConsumable(battle, battle.player, battle.enemy, kit2);
     expect(r2.success).toBe(true);
 
-    // Use third kit
+    // Next turn
+    endTurn(battle);
     battle.player.currentHealth = 1;
     const r3 = useConsumable(battle, battle.player, battle.enemy, kit3);
     expect(r3.success).toBe(true);
 
-    // Fourth attempt should fail (only had 3)
+    // No more kits
+    endTurn(battle);
     const r4 = useConsumable(battle, battle.player, battle.enemy, makeConsumable({ healthRestore: 5 }));
     expect(r4.success).toBe(false);
   });

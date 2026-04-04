@@ -203,10 +203,14 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
       const challengeCleared = player.challengeDefeatedEnemies.includes(name);
       const normalCleared = player.defeatedEnemies.includes(name);
       const displayName = challengeOn && enemy.challengeName ? enemy.challengeName : name;
+      const isEasy = enemy.level < player.level;
+      const displayReward = isEasy ? Math.floor(enemy.reward / 2) : enemy.reward;
+      const displayXp = isEasy ? Math.floor(enemy.expReward / 2) : enemy.expReward;
+      const easyTag = isEasy ? " (halved)" : "";
       choices.push({
         label: `${displayName} (Lv.${enemy.level})`,
         value: name,
-        subtitle: `[${tag}] $${enemy.reward}, ${enemy.expReward} XP`,
+        subtitle: `[${tag}] $${displayReward}${easyTag}, ${displayXp} XP`,
         badge: challengeCleared ? "★" : normalCleared ? "✔" : undefined,
         badgeClass: challengeCleared ? "badge-challenge" : normalCleared ? "badge-cleared" : undefined,
         labelClass: challengeOn && enemy.challengeName ? "t-purple" : undefined,
@@ -325,6 +329,9 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
       "Quantity purchase for consumables and ammo in shop",
       "Cannot sell consumables",
       "Balance: Nuke max 5 ($15,000 each)",
+      "New enemy: Warblade (Lv.18) — melee fighter bridging Laserface to Thunderbot",
+      "Consumables limited to one use per turn",
+      "Easy enemies show actual halved payout in fight menu",
     ],
   },
   {

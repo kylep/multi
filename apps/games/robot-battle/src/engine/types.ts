@@ -105,6 +105,7 @@ export interface BattleRobot {
   tempDodgeReduction: number;
   damageBlock: number;
   consumablesUsed: string[];
+  consumableUsedThisTurn: boolean;
 }
 
 export interface PlannedAction {
