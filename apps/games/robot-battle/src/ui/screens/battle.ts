@@ -162,6 +162,7 @@ export async function battleScreen(
           fights: player.fights,
           newGamePlusLevel: player.newGamePlusLevel,
           date: new Date().toISOString().slice(0, 10),
+          cheatsUsed: player.cheatsUsed,
         });
       }
       terminal.clear();
@@ -183,7 +184,8 @@ export async function battleScreen(
           for (let i = 0; i < board.length; i++) {
             const e = board[i];
             const ngp = e.newGamePlusLevel > 0 ? ` [+${e.newGamePlusLevel}]` : "";
-            lbHtml += `<div class="t-dim">${i + 1}. ${e.name}${ngp} — ${e.fights} fights (${e.date})</div>`;
+            const cheat = e.cheatsUsed ? ` <span class="t-red">✘</span>` : "";
+            lbHtml += `<div class="t-dim">${i + 1}. ${e.name}${ngp}${cheat} — ${e.fights} fights (${e.date})</div>`;
           }
           terminal.printHTML(`<div class="panel" style="padding:8px 12px">${lbHtml}</div>`);
         }

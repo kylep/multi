@@ -156,13 +156,19 @@ export interface LeaderboardEntry {
   fights: number;
   newGamePlusLevel: number;
   date: string;
+  cheatsUsed: boolean;
 }
 
 export function loadLeaderboard(storage: SaveStorage): LeaderboardEntry[] {
   const raw = storage.getItem(LEADERBOARD_KEY);
   if (!raw) return [];
   try {
-    return JSON.parse(raw) as LeaderboardEntry[];
+    const entries = JSON.parse(raw) as LeaderboardEntry[];
+    // Patch old entries missing cheatsUsed
+    for (const e of entries) {
+      if (e.cheatsUsed === undefined) e.cheatsUsed = false;
+    }
+    return entries;
   } catch {
     return [];
   }
