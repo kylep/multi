@@ -58,6 +58,7 @@ export async function shopScreen(terminal: Terminal, state: GameState, sound?: S
   const player = state.player!;
   let currentTab = "buy";
   let filterOn = true;
+  const collapsed = new Set<string>();
 
   while (true) {
     player.health = getEffectiveMaxHealth(player);
@@ -67,7 +68,7 @@ export async function shopScreen(terminal: Terminal, state: GameState, sound?: S
     renderShopHeader(terminal, state);
 
     if (currentTab === "buy") {
-      const result = await renderBuyTab(terminal, state, filterOn, sound);
+      const result = await renderBuyTab(terminal, state, filterOn, collapsed, sound);
       if (result === "back") break;
       if (result === "toggle-filter") { filterOn = !filterOn; continue; }
       if (result === "sell" || result === "inventory") { currentTab = result; continue; }
@@ -83,7 +84,7 @@ export async function shopScreen(terminal: Terminal, state: GameState, sound?: S
   }
 }
 
-async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: boolean, sound?: SoundPlayer): Promise<string> {
+async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: boolean, collapsed: Set<string>, sound?: SoundPlayer): Promise<string> {
   const allItems = listAvailableItems(state);
   const player = state.player!;
   const available = filterOn
@@ -95,25 +96,31 @@ async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: bool
   const gear = available.filter((i) => i.itemType === "gear");
   const consumables = available.filter((i) => i.itemType === "consumable");
 
+  // Sub-categorize gear
+  const gearCategoryOrder = ["Armor", "Battery", "Chip", "Booster", "Ammo"];
+  const gearByCategory = new Map<string, typeof gear>();
+  for (const item of gear) {
+    const cat = (item as Gear).category || "Other";
+    if (!gearByCategory.has(cat)) gearByCategory.set(cat, []);
+    gearByCategory.get(cat)!.push(item);
+  }
+
   const choices: Choice[] = [...shopTabChoices("buy", filterOn)];
 
-  const sections: { label: string; items: typeof available }[] = [
-    { label: "--- Weapons ---", items: weapons },
-    { label: "--- Gear ---", items: gear },
-    { label: "--- Consumables ---", items: consumables },
-  ];
-
-  for (const section of sections) {
-    if (section.items.length === 0) continue;
-    // Section header as a full-width disabled card
-    choices.push({ label: section.label, value: `header-${section.label}`, disabled: true, group: "header" });
-    for (const item of section.items) {
+  function addItemSection(label: string, items: typeof available): void {
+    if (items.length === 0) return;
+    const isCollapsed = collapsed.has(label);
+    const arrow = isCollapsed ? "▶" : "▼";
+    choices.push({ label: `${arrow} ${label}`, value: `toggle-section-${label}`, group: "header" });
+    if (isCollapsed) return;
+    for (const item of items) {
       const i = available.indexOf(item);
       const check = canBuy(state, item);
       const owned = item.itemType === "gear" && (item as Gear).stackable
         ? player.inventory.filter((inv) => inv.name === item.name).length
         : 0;
-      const ownedTag = owned > 0 ? ` (have ${owned})` : "";
+      const maxStack = item.itemType === "gear" ? (item as Gear).maxStack : 0;
+      const ownedTag = owned > 0 ? ` (${owned}${maxStack > 0 ? `/${maxStack}` : ""})` : "";
       choices.push({
         label: `${item.name}${ownedTag} — $${item.moneyCost}`,
         value: `buy-${i}`,
@@ -123,11 +130,31 @@ async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: bool
     }
   }
 
+  addItemSection("--- Weapons ---", weapons);
+  for (const cat of gearCategoryOrder) {
+    const items = gearByCategory.get(cat);
+    if (items && items.length > 0) addItemSection(`--- ${cat} ---`, items);
+  }
+  // Any uncategorized gear
+  for (const [cat, items] of gearByCategory) {
+    if (!gearCategoryOrder.includes(cat) && items.length > 0) {
+      addItemSection(`--- ${cat} ---`, items);
+    }
+  }
+  addItemSection("--- Consumables ---", consumables);
+
   choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
 
   const choice = await terminal.promptChoice("", choices, "grid");
 
   if (choice === "back" || choice === "sell" || choice === "inventory" || choice === "toggle-filter") return choice;
+
+  if (choice.startsWith("toggle-section-")) {
+    const sectionLabel = choice.slice("toggle-section-".length);
+    if (collapsed.has(sectionLabel)) collapsed.delete(sectionLabel);
+    else collapsed.add(sectionLabel);
+    return "buy"; // re-render
+  }
 
   if (choice.startsWith("buy-")) {
     const idx = parseInt(choice.slice(4), 10);
@@ -218,6 +245,7 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
       if (g.attackBonus) fx.push(`+${g.attackBonus}%Atk`);
       if (g.handsBonus) fx.push(`+${g.handsBonus}H`);
       if (g.dodgeBonus) fx.push(`+${g.dodgeBonus}Dodge`);
+      if (g.accuracyBonus) fx.push(`+${g.accuracyBonus}Acc`);
       if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}%$`);
       const countStr = count > 1 ? ` x${count}` : "";
       const fxStr = fx.length > 0 ? ` — ${fx.join(", ")}` : "";
@@ -253,6 +281,7 @@ function itemSummary(item: Item, player: Robot): string {
     if (g.attackBonus) parts.push(`+${g.attackBonus}% Atk`);
     if (g.handsBonus) parts.push(`+${g.handsBonus} Hands`);
     if (g.dodgeBonus) parts.push(`+${g.dodgeBonus} Dodge`);
+    if (g.accuracyBonus) parts.push(`+${g.accuracyBonus} Acc`);
     if (g.moneyBonusPercent) parts.push(`+${g.moneyBonusPercent}% Money`);
     return parts.length ? parts.join(", ") : item.description;
   }
@@ -264,7 +293,9 @@ function itemSummary(item: Item, player: Robot): string {
     if (c.tempDefence) parts.push(`+${c.tempDefence} Temp Def`);
     if (c.tempAttack) parts.push(`+${c.tempAttack}% Temp Atk`);
     if (c.damage) parts.push(`${c.damage} Dmg`);
+    if (c.damageBlock) parts.push(`Blocks ${c.damageBlock} Dmg`);
     if (c.enemyDodgeReduction) parts.push(`-${c.enemyDodgeReduction} Dodge`);
+    if (c.accuracyBonus) parts.push(`+${c.accuracyBonus} Acc`);
     return parts.length ? parts.join(", ") : item.description;
   }
   return "";

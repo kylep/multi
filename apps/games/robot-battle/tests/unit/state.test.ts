@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { awardExp, awardMoney, createGameState, createPlayer, recordFight } from "../../src/engine/state";
+import { awardExp, awardInterest, awardMoney, calculateInterest, createGameState, createPlayer, depositMoney, recordFight, withdrawMoney } from "../../src/engine/state";
 import { loadAssets } from "../../src/engine/data";
 
 function setup() {
@@ -89,5 +89,64 @@ describe("awardExp", () => {
     awardExp(state, 25);
     expect(state.player!.level).toBe(3);
     expect(state.player!.exp).toBe(3);
+  });
+});
+
+describe("bank", () => {
+  it("deposits money from cash to bank", () => {
+    const state = setup();
+    state.player!.money = 500;
+    expect(depositMoney(state.player!, 200)).toBe(true);
+    expect(state.player!.money).toBe(300);
+    expect(state.player!.bank).toBe(200);
+  });
+
+  it("rejects deposit of more than available", () => {
+    const state = setup();
+    state.player!.money = 100;
+    expect(depositMoney(state.player!, 200)).toBe(false);
+    expect(state.player!.money).toBe(100);
+  });
+
+  it("rejects deposit of zero or negative", () => {
+    const state = setup();
+    expect(depositMoney(state.player!, 0)).toBe(false);
+    expect(depositMoney(state.player!, -10)).toBe(false);
+  });
+
+  it("withdraws money from bank to cash", () => {
+    const state = setup();
+    state.player!.bank = 500;
+    expect(withdrawMoney(state.player!, 200)).toBe(true);
+    expect(state.player!.bank).toBe(300);
+    expect(state.player!.money).toBe(state.registry.startingMoney + 200);
+  });
+
+  it("rejects withdrawal of more than bank balance", () => {
+    const state = setup();
+    state.player!.bank = 100;
+    expect(withdrawMoney(state.player!, 200)).toBe(false);
+  });
+
+  it("calculates 1% interest", () => {
+    const state = setup();
+    state.player!.bank = 10000;
+    expect(calculateInterest(state.player!)).toBe(100);
+  });
+
+  it("calculates interest floor for small amounts", () => {
+    const state = setup();
+    state.player!.bank = 50;
+    expect(calculateInterest(state.player!)).toBe(0);
+  });
+
+  it("awardInterest reinvests interest into bank", () => {
+    const state = setup();
+    state.player!.bank = 5000;
+    state.player!.money = 100;
+    const interest = awardInterest(state.player!);
+    expect(interest).toBe(50);
+    expect(state.player!.money).toBe(100); // cash unchanged
+    expect(state.player!.bank).toBe(5050); // interest added to bank
   });
 });

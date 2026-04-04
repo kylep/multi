@@ -9,6 +9,7 @@ export interface Choice {
   active?: boolean;
   badge?: string;
   badgeClass?: string;
+  btnClass?: string;
 }
 
 export interface Span {
@@ -300,7 +301,8 @@ export function createDomTerminal(root: HTMLElement): Terminal {
             const isBack = choices[i].value === "back";
             const isFirst = i === 0;
             let cls = "btn";
-            if (isBack) cls += " btn-secondary";
+            if (choices[i].btnClass) cls += ` ${choices[i].btnClass}`;
+            else if (isBack) cls += " btn-secondary";
             else if (isFirst) cls += " btn-primary";
             btn.className = cls;
             btn.setAttribute("data-testid", `choice-${choices[i].value}`);

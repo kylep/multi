@@ -15,6 +15,7 @@ import {
   battleDefence,
   battleDodge,
   createBattleRobot,
+  getEffectiveAccuracy,
   getEffectiveAttack,
   getEffectiveHands,
   getEffectiveMaxEnergy,
@@ -131,7 +132,8 @@ export function executeAttack(
 
   for (let i = 0; i < weapons.length; i++) {
     const weapon = weapons[i];
-    const hitChance = calculateHitChance(weapon.accuracy, battleDodge(defender));
+    const accuracyBonus = getEffectiveAccuracy(attacker.robot) + attacker.tempAccuracy;
+    const hitChance = calculateHitChance(weapon.accuracy + accuracyBonus, battleDodge(defender));
     const roll = rng.random();
 
     if (roll < hitChance) {
@@ -179,7 +181,9 @@ export function useConsumable(
   attacker: BattleRobot,
   defender: BattleRobot,
   consumable: Consumable,
+  rng?: Rng,
 ): ActionResult {
+  const r = rng ?? createRng();
   if (attacker.consumablesUsed.includes(consumable.name)) {
     return fail("Already used this consumable");
   }
@@ -218,21 +222,38 @@ export function useConsumable(
     effects.push(`blocks ${consumable.damageBlock} damage this turn`);
   }
   if (consumable.damage > 0) {
-    let dmg = consumable.damage;
-    if (defender.damageBlock > 0) {
-      const blocked = Math.min(dmg, defender.damageBlock);
-      defender.damageBlock -= blocked;
-      dmg -= blocked;
+    // 50% dodge chance against consumable damage
+    const dodge = battleDodge(defender);
+    const dodgeChance = Math.max(0, Math.min(1, dodge / 200)); // half effectiveness
+    if (r.random() < dodgeChance) {
+      effects.push(`enemy dodged ${consumable.name}!`);
+    } else {
+      // Defence reduces consumable damage
+      const defence = battleDefence(defender);
+      let dmg = Math.max(0, consumable.damage - defence);
+      if (defender.damageBlock > 0) {
+        const blocked = Math.min(dmg, defender.damageBlock);
+        defender.damageBlock -= blocked;
+        dmg -= blocked;
+      }
+      defender.currentHealth -= dmg;
+      effects.push(`${dmg} damage to enemy`);
     }
-    defender.currentHealth -= dmg;
-    effects.push(`${dmg} damage to enemy`);
   }
   if (consumable.enemyDodgeReduction > 0) {
     defender.tempDodgeReduction += consumable.enemyDodgeReduction;
     effects.push(`-${consumable.enemyDodgeReduction} enemy dodge`);
   }
+  if (consumable.accuracyBonus > 0) {
+    attacker.tempAccuracy += consumable.accuracyBonus;
+    effects.push(`+${consumable.accuracyBonus} temp accuracy`);
+  }
 
-  log(battle, `${attacker.robot.name} uses ${consumable.name}: ${effects.join(", ")}`);
+  if (consumable.useText) {
+    log(battle, `${attacker.robot.name}: ${consumable.useText}`);
+  } else {
+    log(battle, `${attacker.robot.name} uses ${consumable.name}: ${effects.join(", ")}`);
+  }
   checkVictory(battle);
 
   return ok(`Used ${consumable.name}: ${effects.join(", ")}`, { turnEnded: false });
@@ -354,7 +375,7 @@ function executePlannedAction(
     return executeRest(battle, attacker);
   }
   if (action.actionType === "consumable" && action.consumable) {
-    return useConsumable(battle, attacker, defender, action.consumable);
+    return useConsumable(battle, attacker, defender, action.consumable, rng);
   }
   return fail("Invalid action");
 }
@@ -387,4 +408,13 @@ export function resolveTurn(
   }
 
   return results;
+}
+
+// ── Loot Box ──
+
+export function shouldShowLootBox(turns: number, rng: Rng): boolean {
+  for (let i = 0; i < turns; i++) {
+    if (rng.random() < 0.05) return true;
+  }
+  return false;
 }

@@ -11,6 +11,7 @@ import {
   planRest,
   recordTurnSnapshot,
   resolveTurn,
+  shouldShowLootBox,
   useConsumable,
 } from "../../src/engine/battle";
 import { createBattleRobot } from "../../src/engine/robot";
@@ -28,14 +29,17 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     attack: 0,
     hands: 2,
     dodge: 0,
+    accuracy: 0,
     level: 1,
     exp: 0,
     money: 100,
+    bank: 0,
     wins: 0,
     fights: 0,
     inventorySize: 4,
     inventory: [],
     upgrades: [],
+    repeatableUpgrades: {},
     settings: { mode: "oliver", oliverChallenge: false },
     defeatedEnemies: [],
     challengeDefeatedEnemies: [],
@@ -72,7 +76,10 @@ function makeConsumable(overrides?: Partial<Consumable>): Consumable {
     tempDefence: 0,
     tempAttack: 0,
     damage: 0,
+    damageBlock: 0,
     enemyDodgeReduction: 0,
+    useText: "",
+    accuracyBonus: 0,
     ...overrides,
   };
 }
@@ -264,5 +271,120 @@ describe("planAttack + resolveTurn", () => {
     const results = resolveTurn(battle, rng);
     expect(results.length).toBe(2);
     expect(results.every((r) => r.result.success)).toBe(true);
+  });
+});
+
+describe("accuracy bonus", () => {
+  it("player accuracy stat improves hit chance", () => {
+    // Weapon with 50 accuracy vs 50 dodge = 0% hit
+    // But player has 30 accuracy bonus = (50+30-50)/100 = 30% hit
+    const weapon = makeWeapon({ damage: 5, accuracy: 50 });
+    const player = makeRobot({ accuracy: 30, inventory: [weapon] });
+    const enemy = makeRobot({ name: "Dodger", dodge: 50 });
+    const battle = createBattle(player, enemy);
+
+    // With seeded rng that returns ~0.47 first call, then values for the attack
+    // The key test: weapon accuracy 50 + player accuracy 30 - dodge 50 = 30% chance
+    // Just verify we can attack and it doesn't always miss
+    let hitCount = 0;
+    for (let i = 0; i < 50; i++) {
+      const b = createBattle(
+        makeRobot({ accuracy: 30, inventory: [{ ...weapon }] }),
+        makeRobot({ name: "Dodger", dodge: 50 }),
+      );
+      const rng = createRng(i);
+      executeAttack(b, b.player, b.enemy, [weapon], rng);
+      if (b.battleLog.some((l) => l.includes("hits for"))) hitCount++;
+    }
+    // Should hit roughly 30% of the time
+    expect(hitCount).toBeGreaterThan(5);
+    expect(hitCount).toBeLessThan(25);
+  });
+});
+
+describe("consumable useText", () => {
+  it("uses useText when present", () => {
+    const grenade = makeConsumable({ name: "Grenade", damage: 5, useText: "BOOM goes the grenade!" });
+    const player = makeRobot({ inventory: [grenade] });
+    const battle = createBattle(player, makeRobot());
+    useConsumable(battle, battle.player, battle.enemy, grenade);
+    expect(battle.battleLog.some((l) => l.includes("BOOM goes the grenade!"))).toBe(true);
+  });
+
+  it("falls back to default text without useText", () => {
+    const kit = makeConsumable({ healthRestore: 5 });
+    const player = makeRobot({ inventory: [kit] });
+    const battle = createBattle(player, makeRobot());
+    useConsumable(battle, battle.player, battle.enemy, kit);
+    expect(battle.battleLog.some((l) => l.includes("uses Test Kit:"))).toBe(true);
+  });
+});
+
+describe("consumable accuracyBonus", () => {
+  it("adds temp accuracy to attacker", () => {
+    const lock = makeConsumable({ name: "Lock", accuracyBonus: 30 });
+    const player = makeRobot({ inventory: [lock] });
+    const battle = createBattle(player, makeRobot());
+    useConsumable(battle, battle.player, battle.enemy, lock);
+    expect(battle.player.tempAccuracy).toBe(30);
+  });
+});
+
+describe("consumable damage reduction", () => {
+  it("defence reduces consumable damage", () => {
+    // Enemy has 5 defence, grenade does 30 → 25 after reduction
+    const grenade = makeConsumable({ name: "Grenade", damage: 30 });
+    const player = makeRobot({ inventory: [grenade] });
+    const enemy = makeRobot({ name: "Tank", defence: 5 });
+    const battle = createBattle(player, enemy);
+    // Use a seeded rng that won't dodge (high roll)
+    const rng = createRng(999);
+    useConsumable(battle, battle.player, battle.enemy, grenade, rng);
+    // Enemy started at effectiveMaxHealth, took 25 damage
+    const maxHp = battle.enemy.currentHealth;
+    // Check that damage was reduced (not the full 30)
+    expect(battle.battleLog.some((l) => l.includes("25 damage"))).toBe(true);
+  });
+
+  it("dodge at 50% effectiveness can avoid consumable damage", () => {
+    // Enemy with 200 dodge → 100% dodge chance at half effectiveness
+    const grenade = makeConsumable({ name: "Grenade", damage: 30 });
+    const player = makeRobot({ inventory: [grenade] });
+    const enemy = makeRobot({ name: "Dodger", dodge: 200 });
+    const battle = createBattle(player, enemy);
+    const rng = createRng(42);
+    const startHp = battle.enemy.currentHealth;
+    useConsumable(battle, battle.player, battle.enemy, grenade, rng);
+    // With 200 dodge, half effectiveness = 100% dodge chance, should always dodge
+    expect(battle.enemy.currentHealth).toBe(startHp);
+    expect(battle.battleLog.some((l) => l.includes("dodged"))).toBe(true);
+  });
+
+  it("zero dodge means no dodge chance against consumables", () => {
+    const grenade = makeConsumable({ name: "Grenade", damage: 30 });
+    const player = makeRobot({ inventory: [grenade] });
+    const enemy = makeRobot({ name: "Static", dodge: 0 });
+    const battle = createBattle(player, enemy);
+    const rng = createRng(42);
+    const startHp = battle.enemy.currentHealth;
+    useConsumable(battle, battle.player, battle.enemy, grenade, rng);
+    expect(battle.enemy.currentHealth).toBeLessThan(startHp);
+  });
+});
+
+describe("shouldShowLootBox", () => {
+  it("returns false with 0 turns", () => {
+    const rng = createRng(42);
+    expect(shouldShowLootBox(0, rng)).toBe(false);
+  });
+
+  it("eventually returns true with many turns", () => {
+    // 100 turns, 5% per turn → very likely to trigger at least once
+    let triggered = false;
+    for (let seed = 0; seed < 20; seed++) {
+      const rng = createRng(seed);
+      if (shouldShowLootBox(100, rng)) { triggered = true; break; }
+    }
+    expect(triggered).toBe(true);
   });
 });

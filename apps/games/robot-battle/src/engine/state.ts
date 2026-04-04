@@ -25,14 +25,17 @@ export function createPlayer(state: GameState, name: string): Robot {
     attack: stats.attack,
     hands: stats.hands,
     dodge: stats.dodge,
+    accuracy: 0,
     level: 1,
     exp: 0,
     money: state.registry.startingMoney,
+    bank: 0,
     wins: 0,
     fights: 0,
     inventorySize: stats.inventorySize,
     inventory: [],
     upgrades: [],
+    repeatableUpgrades: {},
     settings: { mode: "oliver", oliverChallenge: false },
     defeatedEnemies: [],
     challengeDefeatedEnemies: [],
@@ -53,6 +56,30 @@ export function awardMoney(state: GameState, baseAmount: number): number {
   const actual = baseAmount + Math.floor((baseAmount * bonusPercent) / 100);
   player.money += actual;
   return actual;
+}
+
+export function depositMoney(player: Robot, amount: number): boolean {
+  if (amount <= 0 || amount > player.money) return false;
+  player.money -= amount;
+  player.bank += amount;
+  return true;
+}
+
+export function withdrawMoney(player: Robot, amount: number): boolean {
+  if (amount <= 0 || amount > player.bank) return false;
+  player.bank -= amount;
+  player.money += amount;
+  return true;
+}
+
+export function calculateInterest(player: Robot): number {
+  return Math.floor(player.bank * 0.01);
+}
+
+export function awardInterest(player: Robot): number {
+  const interest = calculateInterest(player);
+  if (interest > 0) player.bank += interest;
+  return interest;
 }
 
 export function recordFight(state: GameState, won: boolean): void {
