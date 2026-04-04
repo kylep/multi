@@ -89,14 +89,14 @@ describe("loadAssets", () => {
   it("ammo items have maxStack and are stackable", () => {
     const shell = registry.gear.get("Shotgun Shell")!;
     expect(shell.stackable).toBe(true);
-    expect(shell.maxStack).toBe(20);
+    expect(shell.maxStack).toBe(60);
     expect(shell.category).toBe("Ammo");
     const missile = registry.gear.get("Missile")!;
     expect(missile.stackable).toBe(true);
-    expect(missile.maxStack).toBe(10);
+    expect(missile.maxStack).toBe(30);
     const amMissile = registry.gear.get("Antimatter Missile")!;
     expect(amMissile.stackable).toBe(true);
-    expect(amMissile.maxStack).toBe(1);
+    expect(amMissile.maxStack).toBe(3);
   });
 
   it("Missile Launcher requires Missile ammo", () => {

@@ -725,9 +725,9 @@ async function showLootBox(
   ];
 
   const choice = await terminal.promptChoice("", [
-    { label: "Box 1", value: "0", subtitle: boxArt[0] },
-    { label: "Box 2", value: "1", subtitle: boxArt[1] },
-    { label: "Box 3", value: "2", subtitle: boxArt[2] },
+    { label: "Box 1", value: "0", subtitle: boxArt[0], btnClass: "" },
+    { label: "Box 2", value: "1", subtitle: boxArt[1], btnClass: "" },
+    { label: "Box 3", value: "2", subtitle: boxArt[2], btnClass: "" },
   ], "row");
 
   const tier = tiers[parseInt(choice, 10)];

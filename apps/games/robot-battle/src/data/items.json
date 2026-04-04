@@ -171,25 +171,25 @@
       "level": 5,
       "moneyCost": 30,
       "stackable": true,
-      "maxStack": 20,
+      "maxStack": 60,
       "category": "Ammo",
-      "description": "Ammo for the Sawed-off Shotgun. Consumed when fired. Max 20."
+      "description": "Ammo for the Sawed-off Shotgun. Consumed when fired. Max 60."
     },
     "Missile": {
       "level": 30,
       "moneyCost": 500,
       "stackable": true,
-      "maxStack": 10,
+      "maxStack": 30,
       "category": "Ammo",
-      "description": "Ammo for the Missile Launcher. Consumed when fired. Max 10."
+      "description": "Ammo for the Missile Launcher. Consumed when fired. Max 30."
     },
     "Antimatter Missile": {
       "level": 45,
       "moneyCost": 55000,
       "stackable": true,
-      "maxStack": 1,
+      "maxStack": 3,
       "category": "Ammo",
-      "description": "Ammo for the Antimatter Missile Launcher. Consumed when launched. Max 1."
+      "description": "Ammo for the Antimatter Missile Launcher. Consumed when launched. Max 3."
     },
     "Cardboard Armor": {
       "level": 0,
