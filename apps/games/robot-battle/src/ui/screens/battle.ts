@@ -74,7 +74,8 @@ export async function battleScreen(
 
     if (result === "auto") {
       await autoBattle(terminal, battle, nameClass);
-      break;
+      if (battle.winner) break;
+      continue; // stalemate — return to manual control
     }
 
     if (result === "surrendered" || battle.winner) break;
