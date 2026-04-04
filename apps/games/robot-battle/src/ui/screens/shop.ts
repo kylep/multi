@@ -160,14 +160,55 @@ async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: bool
     const idx = parseInt(choice.slice(4), 10);
     if (idx >= 0 && idx < available.length) {
       const item = available[idx];
-      const confirmed = await terminal.promptConfirm(
-        `Buy ${item.name} for $${item.moneyCost}?`,
-        "Buy",
-        "Cancel",
-      );
-      if (confirmed) {
-        buyItem(state, item);
-        sound?.buy();
+      const isConsumable = item.itemType === "consumable";
+      const isAmmo = item.itemType === "gear" && (item as Gear).category === "Ammo";
+      const isStackable = isConsumable || isAmmo;
+
+      if (isStackable) {
+        // Quantity purchase for stackable items
+        const maxStackLimit = isConsumable ? (item as Consumable).maxStack : (item as Gear).maxStack;
+        const owned = player.inventory.filter((inv) => inv.name === item.name).length;
+        const canBuyMax = maxStackLimit > 0 ? maxStackLimit - owned : 99;
+        const affordMax = player.settings.mode === "sandbox" ? canBuyMax : Math.floor(player.money / item.moneyCost);
+        const maxQty = Math.min(canBuyMax, affordMax);
+
+        if (maxQty <= 0) {
+          // Can't buy any
+        } else if (maxQty === 1) {
+          const confirmed = await terminal.promptConfirm(
+            `Buy ${item.name} for $${item.moneyCost}?`,
+            "Buy",
+            "Cancel",
+          );
+          if (confirmed) { buyItem(state, item); sound?.buy(); }
+        } else {
+          // Show quantity prompt
+          const qtyStr = await terminal.promptText(`Buy ${item.name} ($${item.moneyCost} each) — How many? (1-${maxQty}):`);
+          const qty = parseInt(qtyStr, 10);
+          if (!isNaN(qty) && qty > 0) {
+            const actualQty = Math.min(qty, maxQty);
+            const totalCost = actualQty * item.moneyCost;
+            const confirmed = await terminal.promptConfirm(
+              `Buy ${actualQty}x ${item.name} for $${totalCost.toLocaleString()}?`,
+              "Buy",
+              "Cancel",
+            );
+            if (confirmed) {
+              for (let q = 0; q < actualQty; q++) buyItem(state, item);
+              sound?.buy();
+            }
+          }
+        }
+      } else {
+        const confirmed = await terminal.promptConfirm(
+          `Buy ${item.name} for $${item.moneyCost}?`,
+          "Buy",
+          "Cancel",
+        );
+        if (confirmed) {
+          buyItem(state, item);
+          sound?.buy();
+        }
       }
     }
   }
@@ -222,7 +263,7 @@ async function renderSellTab(terminal: Terminal, state: GameState): Promise<stri
 
   addSellSection("--- Equipment ---", equipment);
   addSellSection("--- Ammo ---", ammo);
-  addSellSection("--- Consumables ---", consumableItems);
+  // Consumables cannot be sold
 
   choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
 

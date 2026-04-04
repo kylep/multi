@@ -747,6 +747,21 @@ async function showLootBox(
   }).join(" &nbsp; ");
   terminal.printHTML(`<div style="margin:8px 0">${revealHtml}</div>`);
 
+  function grantConsumable(): string | null {
+    // Try to find a consumable that isn't at max stack
+    const shuffled = [...eligibleConsumables].sort(() => rng.random() - 0.5);
+    for (const item of shuffled) {
+      const c = item as import("../../engine/types").Consumable;
+      if (c.maxStack > 0) {
+        const owned = player.inventory.filter((inv) => inv.name === c.name).length;
+        if (owned >= c.maxStack) continue;
+      }
+      player.inventory.push({ ...item });
+      return item.name;
+    }
+    return null; // all consumables at max
+  }
+
   if (tier === "diamond") {
     const money = enemyDef.reward;
     player.money += money;
@@ -756,16 +771,24 @@ async function showLootBox(
     const label = tier === "gold" ? "Gold!" : "Silver!";
     const color = tier === "gold" ? "t-yellow" : "t-dim";
     const items: string[] = [];
+    let fallbackMoney = 0;
 
     for (let i = 0; i < count; i++) {
-      if (eligibleConsumables.length > 0) {
-        const item = rng.choice(eligibleConsumables);
-        player.inventory.push({ ...item });
-        items.push(item.name);
+      const granted = grantConsumable();
+      if (granted) {
+        items.push(granted);
+      } else {
+        // All full — give money instead
+        fallbackMoney += enemyDef.reward;
       }
     }
 
-    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="${color} t-bold" style="font-size:18px">${label}</div>${items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("")}</div>`);
+    if (fallbackMoney > 0) player.money += fallbackMoney;
+
+    let rewardHtml = items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("");
+    if (fallbackMoney > 0) rewardHtml += `<div class="t-green t-bold" style="margin-top:4px">+ $${fallbackMoney.toLocaleString()} (inventory full)</div>`;
+
+    terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="${color} t-bold" style="font-size:18px">${label}</div>${rewardHtml}</div>`);
   }
 
   await terminal.promptContinue(0);

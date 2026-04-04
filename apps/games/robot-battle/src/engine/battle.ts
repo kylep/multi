@@ -144,10 +144,12 @@ export function executeAttack(
         messages.push(msg);
         log(battle, msg);
       } else {
+        const rawDamage = damage;
         if (defender.damageBlock > 0) {
           const blocked = Math.min(damage, defender.damageBlock);
           defender.damageBlock -= blocked;
           damage -= blocked;
+          log(battle, `  Shield blocked ${blocked} of ${rawDamage} damage!`);
         }
         totalDamage += damage;
         defender.currentHealth -= damage;

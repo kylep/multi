@@ -312,6 +312,7 @@ function esc(s: string): string {
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
     version: "0.10.0", date: "2026-04-04", notes: [
+      "Level cap raised to 100",
       "Cheat Codes: 'omnomnom' for free loot box, pangram for god mode",
       "Cheat indicator: red ✘ on saves that used cheats",
       "God Mode: red border, enemy attacks deal 0 damage",
@@ -319,6 +320,11 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
       "Yellow [+N] tag shows New Game + level next to name",
       "Leaderboard: records fastest 100% challenge completions across saves",
       "TITAN/100% win screens only show on first achievement (not every time)",
+      "Blast shield damage absorption shown in combat log",
+      "Loot boxes: full consumable stacks fall back to money reward",
+      "Quantity purchase for consumables and ammo in shop",
+      "Cannot sell consumables",
+      "Balance: Nuke max 5 ($15,000 each)",
     ],
   },
   {

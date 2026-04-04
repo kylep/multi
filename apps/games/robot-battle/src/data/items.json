@@ -518,11 +518,11 @@
     },
     "Nuke": {
       "level": 40,
-      "moneyCost": 3000,
+      "moneyCost": 15000,
       "damage": 500,
-      "maxStack": 1,
+      "maxStack": 5,
       "useText": "You launch a Nuke. NUCLEAR EXPLOSION! Everything goes white!",
-      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 1."
+      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 5."
     }
   }
 }

@@ -101,7 +101,7 @@ export function getXpToLevel(level: number): number {
   return 10 + 2 * (level - 1);
 }
 
-const MAX_LEVEL = 50;
+const MAX_LEVEL = 100;
 
 export function awardExp(state: GameState, amount: number): boolean {
   const player = state.player!;
