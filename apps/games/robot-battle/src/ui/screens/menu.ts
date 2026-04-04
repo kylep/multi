@@ -316,10 +316,9 @@ async function enemyDetailScreen(
     terminal.printHTML(`
       <div class="panel">
         <div class="${nameClass} t-bold" style="font-size:18px">${esc(displayName)}</div>
-        <div class="t-dim">Level ${enemyDef.level} &bull; [${tag}]</div>
+        <div><span class="t-green">Level ${enemyDef.level}</span> <span class="t-dim">&bull; [${tag}]</span></div>
         ${enemyDef.appearance ? `<div style="margin-top:8px" class="t-dim">${esc(enemyDef.appearance)}</div>` : ""}
         ${enemyDef.backstory ? `<div class="t-dim">${esc(enemyDef.backstory)}</div>` : ""}
-        <div style="margin-top:8px">${enemyDef.description}</div>
         <div style="margin-top:8px">
           <span class="t-cyan">HP: ${hp}</span> &nbsp;
           <span>Dodge: ${dodge}</span> &nbsp;
@@ -354,7 +353,7 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
     version: "0.10.0", date: "2026-04-04", notes: [
       "Level cap raised to 100",
-      "Cheat Codes: 'omnomnom' for free loot box, pangram for god mode",
+      "Cheat Codes: 'omnomnom' for free loot box, 'the quick brown fox jumps over the lazy dog' for god mode",
       "Cheat indicator: red ✘ on saves that used cheats",
       "God Mode: red border, enemy attacks deal 0 damage",
       "New Game +: restart with higher bank interest after beating all enemies",
@@ -369,6 +368,7 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
       "New enemy: Warblade (Lv.18) — melee fighter bridging Laserface to Thunderbot",
       "Consumables limited to one use per turn",
       "Easy enemies show actual halved payout in fight menu",
+      "Expanded enemy descriptions with more physical details and lore",
     ],
   },
   {
