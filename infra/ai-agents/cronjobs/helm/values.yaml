@@ -22,6 +22,9 @@ cronjobs:
   autolearn:
     enabled: false
     schedule: "0 */4 * * *"  # every 4 hours
+  seoBot:
+    enabled: false
+    schedule: "0 3 * * *"   # 11:00 PM EDT (03:00 UTC)
 
 image:
   repository: kpericak/ai-agent-runtime

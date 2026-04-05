@@ -33,3 +33,6 @@ cronjobs:
   autolearn:
     enabled: true
     schedule: "0 */4 * * *"  # every 4 hours
+  seoBot:
+    enabled: true
+    schedule: "0 3 * * *"   # 11:00 PM EDT (03:00 UTC)

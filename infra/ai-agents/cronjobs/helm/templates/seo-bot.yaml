@@ -1,0 +1,219 @@
+{{- if .Values.cronjobs.seoBot }}
+{{- if .Values.cronjobs.seoBot.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: seo-bot
+  namespace: ai-agents
+spec:
+  schedule: {{ .Values.cronjobs.seoBot.schedule | quote }}
+  timeZone: "UTC"
+  startingDeadlineSeconds: 3600
+  suspend: {{ not .Values.cronjobs.seoBot.enabled }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 3600
+      ttlSecondsAfterFinished: 7200
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/role: "ai-agents"
+            vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/pai"
+            vault.hashicorp.com/agent-inject-template-config: |
+              {{`{{- with secret "secret/ai-agents/pai" }}`}}
+              export DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
+              export CLAUDE_CODE_OAUTH_TOKEN="{{`{{ .Data.data.claude_oauth_token }}`}}"
+              export LINEAR_API_KEY="{{`{{ .Data.data.linear_api_key }}`}}"
+              {{`{{ end }}`}}
+              {{`{{- with secret "secret/ai-agents/discord" }}`}}
+              export DISCORD_GUILD_ID="{{`{{ .Data.data.discord_guild_id }}`}}"
+              export DISCORD_LOG_CHANNEL_ID="{{`{{ .Data.data.discord_log_channel_id }}`}}"
+              {{`{{ end }}`}}
+              {{`{{- with secret "secret/ai-agents/github" }}`}}
+              export GITHUB_APP_ID="{{`{{ .Data.data.github_app_id }}`}}"
+              export GITHUB_INSTALL_ID="{{`{{ .Data.data.github_install_id }}`}}"
+              {{`{{ end }}`}}
+            vault.hashicorp.com/agent-inject-secret-github-key: "secret/ai-agents/github"
+            vault.hashicorp.com/agent-inject-template-github-key: |
+              {{`{{- with secret "secret/ai-agents/github" -}}{{ .Data.data.github_app_private_key }}{{- end -}}`}}
+            vault.hashicorp.com/agent-inject-secret-gsc-client: "secret/ai-agents/google"
+            vault.hashicorp.com/agent-inject-template-gsc-client: |
+              {{`{{- with secret "secret/ai-agents/google" -}}{{ .Data.data.gsc_client_secrets }}{{- end -}}`}}
+            vault.hashicorp.com/agent-inject-secret-gsc-token: "secret/ai-agents/google"
+            vault.hashicorp.com/agent-inject-template-gsc-token: |
+              {{`{{- with secret "secret/ai-agents/google" -}}{{ .Data.data.gsc_token }}{{- end -}}`}}
+            vault.hashicorp.com/agent-inject-secret-ga4-creds: "secret/ai-agents/google"
+            vault.hashicorp.com/agent-inject-template-ga4-creds: |
+              {{`{{- with secret "secret/ai-agents/google" -}}{{ .Data.data.ga4_application_credentials }}{{- end -}}`}}
+        spec:
+          serviceAccountName: cronjob-agent
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: agent
+              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  . /vault/secrets/config
+
+                  # --- GitHub token ---
+                  gen_token() {
+                    _header=$(printf '{"alg":"RS256","typ":"JWT"}' \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    _now=$(date +%s); _iat=$((_now - 60)); _exp=$((_now + 300))
+                    _payload=$(printf '{"iss":"%s","iat":%d,"exp":%d}' \
+                      "$GITHUB_APP_ID" "$_iat" "$_exp" \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    _sig=$(printf '%s.%s' "$_header" "$_payload" \
+                      | openssl dgst -sha256 -sign /vault/secrets/github-key -binary \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    curl -sf -X POST \
+                      -H "Authorization: Bearer ${_header}.${_payload}.${_sig}" \
+                      -H "Accept: application/vnd.github+json" \
+                      "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
+                      | jq -r '.token'
+                  }
+                  GITHUB_TOKEN=$(gen_token)
+
+                  RUN_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-8)
+                  TODAY=$(date -u +%Y-%m-%d)
+                  BRANCH="seo-bot/${TODAY}"
+                  AGENT_NAME="seo-bot"
+
+                  discord_post() {
+                    curl -sf -X POST \
+                      "https://discord.com/api/v10/channels/${DISCORD_LOG_CHANNEL_ID}/messages" \
+                      -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"content\":\"$1\"}" || true
+                  }
+                  discord_post "\u25b6 ${RUN_ID} | agent=${AGENT_NAME} | started"
+
+                  # --- Clone and set up branch ---
+                  git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git" /workspace/repo
+                  cd /workspace/repo
+                  git config user.name "PericakAI (Pai)"
+                  git config user.email "pericakai@gmail.com"
+
+                  if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
+                    git fetch origin "${BRANCH}"
+                    git checkout "${BRANCH}"
+                    git merge origin/main --no-edit || true
+                  else
+                    git checkout -b "${BRANCH}"
+                  fi
+
+                  # --- Write Google credentials from Vault ---
+                  mkdir -p /tmp/google-creds
+                  cp /vault/secrets/gsc-client /tmp/google-creds/client_secrets.json
+                  cp /vault/secrets/gsc-token /tmp/google-creds/token.json
+                  cp /vault/secrets/ga4-creds /tmp/google-creds/ga4-credentials.json
+
+                  # --- MCP config ---
+                  cat > /tmp/mcp.json <<'MCPEOF'
+                  {
+                    "mcpServers": {
+                      "discord": {
+                        "type": "stdio",
+                        "command": "python3",
+                        "args": ["/workspace/repo/apps/mcp-servers/discord/server.py"]
+                      },
+                      "linear-server": {
+                        "type": "stdio",
+                        "command": "npx",
+                        "args": ["-y", "@hatcloud/linear-mcp"]
+                      },
+                      "google-search-console": {
+                        "type": "stdio",
+                        "command": "python3",
+                        "args": ["/workspace/repo/apps/mcp-servers/google-search-console/server.py"],
+                        "env": {
+                          "GSC_SITE_URL": "sc-domain:kyle.pericak.com",
+                          "GSC_CLIENT_SECRETS": "/tmp/google-creds/client_secrets.json",
+                          "GSC_TOKEN_PATH": "/tmp/google-creds/token.json"
+                        }
+                      },
+                      "analytics-mcp": {
+                        "type": "stdio",
+                        "command": "pipx",
+                        "args": ["run", "analytics-mcp"],
+                        "env": {
+                          "GOOGLE_APPLICATION_CREDENTIALS": "/tmp/google-creds/ga4-credentials.json"
+                        }
+                      }
+                    }
+                  }
+                  MCPEOF
+
+                  # --- Install GSC MCP deps ---
+                  pip3 install --break-system-packages -q \
+                    "google-api-python-client>=2.100.0" \
+                    "google-auth-oauthlib>=1.2.0" \
+                    "google-auth-httplib2>=0.2.0" 2>/dev/null
+
+                  # --- Run seo-bot agent ---
+                  claude --agent seo-bot \
+                    -p "Run your nightly SEO optimization. Today is ${TODAY}. Follow your full workflow: review prior work, measure current state, pick one action, implement it, and report. Branch: ${BRANCH}. Commit with 'git commit --no-verify'. When done, report results to Discord." \
+                    --mcp-config /tmp/mcp.json \
+                    --max-turns 100 \
+                    --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Agent,Bash(git *),Bash(date *),Bash(gh *),mcp__google-search-console__gsc_search_analytics,mcp__google-search-console__gsc_inspect_url,mcp__google-search-console__gsc_list_sitemaps,mcp__google-search-console__gsc_submit_sitemap,mcp__analytics-mcp__run_report,mcp__analytics-mcp__run_realtime_report,mcp__linear-server__list_issues,mcp__linear-server__save_issue,mcp__linear-server__get_issue,mcp__linear-server__list_comments,mcp__linear-server__save_comment,mcp__linear-server__list_issue_statuses,mcp__linear-server__list_issue_labels,mcp__linear-server__list_teams,mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \
+                    --verbose \
+                    --output-format stream-json
+                  STATUS=$?
+
+                  if [ $STATUS -eq 0 ]; then
+                    GITHUB_TOKEN=$(gen_token)
+                    git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git"
+                    git push origin "${BRANCH}" || git push --force-with-lease origin "${BRANCH}"
+
+                    EXISTING_PR=$(curl -sf \
+                      -H "Authorization: token ${GITHUB_TOKEN}" \
+                      -H "Accept: application/vnd.github+json" \
+                      "https://api.github.com/repos/kylep/multi/pulls?head=kylep:${BRANCH}&state=open" \
+                      | jq 'length')
+                    if [ "${EXISTING_PR}" = "0" ]; then
+                      curl -sf -X POST \
+                        -H "Authorization: token ${GITHUB_TOKEN}" \
+                        -H "Accept: application/vnd.github+json" \
+                        "https://api.github.com/repos/kylep/multi/pulls" \
+                        -d "{\"title\":\"seo-bot: nightly optimization ${TODAY}\",\"body\":\"Automated SEO improvement from seo-bot nightly run.\",\"head\":\"${BRANCH}\",\"base\":\"main\"}" || true
+                    fi
+                    MSG="\u2713 ${RUN_ID} | agent=${AGENT_NAME} | done"
+                  else
+                    MSG="\u2717 ${RUN_ID} | agent=${AGENT_NAME} | failed (exit ${STATUS})"
+                  fi
+                  discord_post "${MSG}"
+                  exit $STATUS
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 512Mi
+                limits:
+                  cpu: 1000m
+                  memory: 2Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: workspace
+                  mountPath: /workspace
+          volumes:
+            - name: workspace
+              emptyDir:
+                sizeLimit: 5Gi
+{{- end }}
+{{- end }}
