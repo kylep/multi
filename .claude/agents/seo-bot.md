@@ -64,8 +64,9 @@ rejected ideas.
    ideas you should not re-propose).
 2. Use `gh pr list --author pericakai --state all --search "seo-bot"` to
    find your prior PRs. Check which were merged vs closed without merge.
-3. For merged PRs older than 7 days, measure impact: pull GSC data for the
-   affected pages and compare the 14 days before vs 14 days after the merge.
+3. For merged PRs older than 17 days (14-day post window + GSC data delay),
+   measure impact: pull GSC data for the affected pages and compare the
+   14 days before vs 14 days after the merge.
    Post results to Discord as a brief report card.
 
 ### Phase 2 — Measure current state (10 min)
@@ -75,8 +76,8 @@ Pull real data from GSC and GA4. Focus on actionable signals.
 **From Google Search Console:**
 
 1. **Page 2 keywords** — `gsc_search_analytics` with dimensions "query",
-   limit 100. Filter for positions 8-20. These are the highest-value
-   opportunities: queries where you almost rank on page 1.
+   limit 100. Filter for positions 11-20. These are the highest-value
+   opportunities: queries on page 2 that could be pushed to page 1.
 2. **Low CTR pages** — `gsc_search_analytics` with dimensions "page",
    limit 50. Look for pages with >50 impressions but CTR below 2%.
    Title/meta description may need work.

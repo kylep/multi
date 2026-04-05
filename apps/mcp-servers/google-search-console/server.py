@@ -19,15 +19,28 @@ TOKEN_PATH = Path(os.environ.get("GSC_TOKEN_PATH", SERVER_DIR / "token.json"))
 SITE_URL = os.environ.get("GSC_SITE_URL", "")
 
 
+def _write_token(creds):
+    """Write OAuth token with restrictive permissions."""
+    fd = os.open(TOKEN_PATH, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write(creds.to_json())
+
+
 def _get_service():
     """Build an authenticated Search Console API service."""
     creds = None
     if TOKEN_PATH.exists():
-        creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
+        try:
+            creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
+        except Exception:
+            creds = None
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except Exception:
+                creds = None
+        if not creds or not creds.valid:
             if not CLIENT_SECRETS.exists():
                 raise FileNotFoundError(
                     f"OAuth client secrets not found at {CLIENT_SECRETS}. "
@@ -35,7 +48,7 @@ def _get_service():
                 )
             flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRETS), SCOPES)
             creds = flow.run_local_server(port=0)
-        TOKEN_PATH.write_text(creds.to_json())
+        _write_token(creds)
     return build("searchconsole", "v1", credentials=creds, cache_discovery=False)
 
 
@@ -82,12 +95,19 @@ async def gsc_search_analytics(
     sd = start_date or (today - timedelta(days=28)).isoformat()
     ed = end_date or (today - timedelta(days=3)).isoformat()
     dims = [d.strip() for d in dimensions.split(",") if d.strip()]
+    if not dims:
+        dims = ["query"]
+    allowed_dims = {"query", "page", "date", "device", "country"}
+    invalid = [d for d in dims if d not in allowed_dims]
+    if invalid:
+        return f"Invalid dimensions: {', '.join(invalid)}. Allowed: {', '.join(sorted(allowed_dims))}"
+    limit = max(1, min(limit, 25000))
 
     body: dict = {
         "startDate": sd,
         "endDate": ed,
         "dimensions": dims,
-        "rowLimit": min(limit, 25000),
+        "rowLimit": limit,
         "dataState": "all",
     }
 

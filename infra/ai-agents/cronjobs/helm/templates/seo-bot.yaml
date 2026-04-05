@@ -105,6 +105,7 @@ spec:
                   # --- Clone and set up branch ---
                   git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git" /workspace/repo
                   cd /workspace/repo
+                  git remote set-url origin "https://github.com/kylep/multi.git"
                   git config user.name "PericakAI (Pai)"
                   git config user.email "pericakai@gmail.com"
 
@@ -166,7 +167,7 @@ spec:
 
                   # --- Run seo-bot agent ---
                   claude --agent seo-bot \
-                    -p "Run your nightly SEO optimization. Today is ${TODAY}. Follow your full workflow: review prior work, measure current state, pick one action, implement it, and report. Branch: ${BRANCH}. Commit with 'git commit --no-verify'. When done, report results to Discord." \
+                    -p "Run your nightly SEO optimization. Today is ${TODAY}. Follow your full workflow: review prior work, measure current state, pick one action, implement it, and report. Branch: ${BRANCH}. Commit your changes with git. When done, report results to Discord." \
                     --mcp-config /tmp/mcp.json \
                     --max-turns 100 \
                     --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Agent,Bash(git *),Bash(date *),Bash(gh *),mcp__google-search-console__gsc_search_analytics,mcp__google-search-console__gsc_inspect_url,mcp__google-search-console__gsc_list_sitemaps,mcp__google-search-console__gsc_submit_sitemap,mcp__analytics-mcp__run_report,mcp__analytics-mcp__run_realtime_report,mcp__linear-server__list_issues,mcp__linear-server__save_issue,mcp__linear-server__get_issue,mcp__linear-server__list_comments,mcp__linear-server__save_comment,mcp__linear-server__list_issue_statuses,mcp__linear-server__list_issue_labels,mcp__linear-server__list_teams,mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \

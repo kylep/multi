@@ -41,8 +41,8 @@ Environment variables:
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `GSC_SITE_URL` | Yes | — | Default site URL (e.g. `https://kyle.pericak.com`) |
-| `GSC_CLIENT_SECRETS` | No | `./client_secrets.json` | Path to OAuth client secrets |
-| `GSC_TOKEN_PATH` | No | `./token.json` | Path to cached OAuth token |
+| `GSC_CLIENT_SECRETS` | No | `<server_dir>/client_secrets.json` | Path to OAuth client secrets (relative to `server.py` directory) |
+| `GSC_TOKEN_PATH` | No | `<server_dir>/token.json` | Path to cached OAuth token (relative to `server.py` directory) |
 
 `.mcp.json` entry:
 ```json
@@ -82,21 +82,21 @@ Environment variables:
 ## Example Usage
 
 Top search queries in the last 28 days:
-```
+```text
 Use gsc_search_analytics with dimensions "query" and limit 20
 ```
 
 Check if a specific page is indexed:
-```
+```text
 Use gsc_inspect_url with page_url "https://kyle.pericak.com/playwright-mcp.html"
 ```
 
 Performance by page:
-```
+```text
 Use gsc_search_analytics with dimensions "page" and limit 10
 ```
 
 Daily trend for a specific query:
-```
+```text
 Use gsc_search_analytics with dimensions "date" and query_filter "claude code"
 ```
