@@ -10,6 +10,7 @@ keywords:
   - google-news
   - cc-usage
   - bitwarden
+  - google-search-console
 related:
   - wiki/agent-team/index.html
   - wiki/custom-tools/index.html
@@ -31,6 +32,7 @@ is in `.mcp.json` at the repo root.
 | [Google News](/wiki/mcp-servers/google-news.html) | TypeScript | 2 | Search news via GNews API (journalist agent) |
 | [CC Usage](/wiki/mcp-servers/cc-usage.html) | TypeScript | 2 | Track Claude Code token usage and estimated costs |
 | [Bitwarden](/wiki/mcp-servers/bitwarden.html) | TypeScript | — | Password vault management |
+| [Google Search Console](/wiki/mcp-servers/google-search-console.html) | Python | 4 | Search analytics, URL inspection, sitemaps |
 
 ## Third-party MCP Servers
 
