@@ -175,6 +175,57 @@ PAI_ARGS=""
 [ -n "$PAI_ARGS" ]              && kv_store pai $PAI_ARGS
 
 echo ""
+echo "=== Google (GSC + GA4) ==="
+EXISTING_GOOGLE=$(get_existing google)
+# GSC client secrets — accept base64 env or file path
+GSC_CLIENT_SECRETS_FILE=""
+if [ -n "${GSC_CLIENT_SECRETS_B64:-}" ]; then
+  echo "GSC client secrets (from base64 env)"
+  GSC_CLIENT_SECRETS_FILE=$(mktemp)
+  echo "$GSC_CLIENT_SECRETS_B64" | base64 -d > "$GSC_CLIENT_SECRETS_FILE"
+else
+  prompt_or_env GSC_CLIENT_SECRETS_PATH "GSC client_secrets.json path$(already_set "$EXISTING_GOOGLE" gsc_client_secrets)"
+  GSC_CLIENT_SECRETS_FILE="${GSC_CLIENT_SECRETS_PATH:-}"
+fi
+# GSC token — accept base64 env or file path
+GSC_TOKEN_FILE=""
+if [ -n "${GSC_TOKEN_B64:-}" ]; then
+  echo "GSC token (from base64 env)"
+  GSC_TOKEN_FILE=$(mktemp)
+  echo "$GSC_TOKEN_B64" | base64 -d > "$GSC_TOKEN_FILE"
+else
+  prompt_or_env GSC_TOKEN_PATH "GSC token.json path$(already_set "$EXISTING_GOOGLE" gsc_token)"
+  GSC_TOKEN_FILE="${GSC_TOKEN_PATH:-}"
+fi
+# GA4 credentials — accept base64 env or file path
+GA4_CREDS_FILE=""
+if [ -n "${GA4_CREDENTIALS_B64:-}" ]; then
+  echo "GA4 credentials (from base64 env)"
+  GA4_CREDS_FILE=$(mktemp)
+  echo "$GA4_CREDENTIALS_B64" | base64 -d > "$GA4_CREDS_FILE"
+else
+  prompt_or_env GA4_CREDENTIALS_PATH "GA4 application_default_credentials.json path$(already_set "$EXISTING_GOOGLE" ga4_application_credentials)"
+  GA4_CREDS_FILE="${GA4_CREDENTIALS_PATH:-}"
+fi
+# Store each JSON file via kubectl cp + @path (same pattern as GitHub key)
+for pair in "gsc_client_secrets:$GSC_CLIENT_SECRETS_FILE" "gsc_token:$GSC_TOKEN_FILE" "ga4_application_credentials:$GA4_CREDS_FILE"; do
+  key="${pair%%:*}"
+  file="${pair#*:}"
+  if [ -n "$file" ] && [ -f "$file" ]; then
+    kubectl cp "$file" vault/vault-0:/tmp/google-cred.json
+    kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+      vault kv patch secret/ai-agents/google "${key}=@/tmp/google-cred.json" 2>/dev/null \
+    || kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+      vault kv put secret/ai-agents/google "${key}=@/tmp/google-cred.json"
+    kubectl exec -n vault vault-0 -- rm -f /tmp/google-cred.json 2>/dev/null || true
+  fi
+done
+# Clean up any base64-decoded temp files
+[ -n "${GSC_CLIENT_SECRETS_B64:-}" ] && [ -n "$GSC_CLIENT_SECRETS_FILE" ] && rm -f "$GSC_CLIENT_SECRETS_FILE"
+[ -n "${GSC_TOKEN_B64:-}" ] && [ -n "$GSC_TOKEN_FILE" ] && rm -f "$GSC_TOKEN_FILE"
+[ -n "${GA4_CREDENTIALS_B64:-}" ] && [ -n "$GA4_CREDS_FILE" ] && rm -f "$GA4_CREDS_FILE"
+
+echo ""
 echo "=== Webhook ==="
 EXISTING_WEBHOOK=$(get_existing webhook)
 prompt_or_env WEBHOOK_TOKEN "Webhook bearer token$(already_set "$EXISTING_WEBHOOK" webhook_token)" secret
@@ -198,7 +249,7 @@ OPENOBSERVE_ARGS=""
 [ -n "$OPENOBSERVE_ARGS" ] && kv_store openobserve $OPENOBSERVE_ARGS
 
 echo ""
-echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,webhook,cloudflare,openobserve}"
+echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,google,webhook,cloudflare,openobserve}"
 echo "  pai: discord_bot_token, claude_oauth_token, linear_api_key"
 echo "  cloudflare: tunnel_token"
 echo "  openobserve: root_user_email, root_user_password"
