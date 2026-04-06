@@ -45,3 +45,25 @@ last_verified: 2026-04-06
 ## Just for You
 
 - [GitHub Blog](https://github.blog/open-source/maintainers/from-mcp-to-multi-agents-the-top-10-open-source-ai-projects-on-github-right-now-and-why-they-matter/) GitHub published a curated list of the top 10 open-source AI projects gaining momentum right now, covering MCP servers, multi-agent frameworks, and AI coding harnesses — directly relevant to the blog's AI tooling coverage.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Tooling
+
+- [Claude Code Docs](https://code.claude.com/docs/en/channels) Anthropic shipped Claude Code Channels in research preview (v2.1.80+), adding native Telegram, Discord, and iMessage integrations via MCP. Agents send progress updates and can relay tool-approval prompts to your phone; replies route back into the session. Requires a claude.ai login; API-key-only auth is not supported. Announced March 20 but not previously covered.
+
+## Geopolitics
+
+- [NBC News](https://www.nbcnews.com/world/iran/live-blog/live-updates-iran-war-trump-deadline-hormuz-oil-ceasefire-israel-rcna266833) Israel carried out large-scale overnight strikes on Tehran airports (Bahram, Mehrabad, Azmayesh) and killed Asghar Bagheri, commander of the Quds Force's Special Operations Unit. Trump held a press conference saying he does not know if the conflict is winding down or escalating.
+
+- [CNN](https://www.cnn.com/2026/04/06/world/live-news/iran-war-us-trump-oil) Trump extended the Hormuz ultimatum by 24 hours to April 7 at 8 PM ET after Iran sent a response through Pakistan that he called "not good enough." Iran's counteroffer — via Egypt, Pakistan, and Turkey — was a 45-day ceasefire contingent on a guaranteed permanent end to the war; Iran rejected the proposal as presented. Oil rose to $114/barrel during Trump's remarks. IAEA warned that further strikes near Bushehr nuclear plant risk a severe radiological accident.
+
+## Weather
+
+- Whitby (evening update): 3°C and light rain at 6 PM EDT, falling to -5°C overnight. Special Weather Statement in effect: 4–10 cm of snow beginning this evening, with significantly reduced visibility and local blowing snow. Tuesday morning commute at risk. North wind shifting west.
+
+## Just for You
+
+- [GitHub Blog](https://github.blog/security/ai-supported-vulnerability-triage-with-the-github-security-lab-taskflow-agent/) GitHub Security Lab released the Taskflow Agent, an MCP-enabled multi-agent framework for automated vulnerability triage in GitHub Actions and JavaScript projects. Built on the OpenAI Agents SDK and runs on Claude Sonnet 3.5; has reported over 80 vulnerabilities across 40 open-source repositories since March 2026.
