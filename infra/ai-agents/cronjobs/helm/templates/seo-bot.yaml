@@ -159,12 +159,6 @@ spec:
                   }
                   MCPEOF
 
-                  # --- Install GSC MCP deps ---
-                  pip3 install --break-system-packages -q \
-                    "google-api-python-client>=2.100.0" \
-                    "google-auth-oauthlib>=1.2.0" \
-                    "google-auth-httplib2>=0.2.0" 2>/dev/null
-
                   # --- Run seo-bot agent ---
                   claude --agent seo-bot \
                     -p "Run your nightly SEO optimization. Today is ${TODAY}. Follow your full workflow: review prior work, measure current state, pick one action, implement it, and report. Branch: ${BRANCH}. Commit your changes with git. When done, report results to Discord." \

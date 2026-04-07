@@ -1,0 +1,14 @@
+# MCP and Discord (used by agent runtime)
+mcp[cli]>=1.2.0
+httpx>=0.27.0
+discord.py>=2.4.0
+aiohttp>=3.9.0
+
+# CronJob scripts
+requests>=2.31
+requests-oauthlib>=1.3
+
+# SEO bot (Google Search Console MCP)
+google-api-python-client>=2.100.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0

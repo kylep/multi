@@ -26,8 +26,12 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 # Claude Code CLI + Playwright MCP
 RUN npm install -g @anthropic-ai/claude-code @playwright/mcp
 
-# Python MCP dependencies
-RUN pip install --no-cache-dir --break-system-packages "mcp[cli]>=1.2.0" "httpx>=0.27.0" "discord.py>=2.4.0" "aiohttp>=3.9.0"
+# uv for fast, hash-verified Python installs
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Python dependencies — pinned with hashes for supply-chain safety
+COPY requirements.txt /tmp/requirements.txt
+RUN uv pip install --system --require-hashes -r /tmp/requirements.txt
 
 # OpenCode binary
 ARG OPENCODE_VERSION=0.0.55

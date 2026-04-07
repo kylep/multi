@@ -61,7 +61,6 @@ spec:
               args:
                 - |
                   . /vault/secrets/config
-                  pip3 install --break-system-packages -q requests requests-oauthlib 2>/dev/null
                   git clone --depth 1 https://github.com/kylep/multi.git /workspace/repo 2>/dev/null
                   python3 /workspace/repo/infra/ai-agents/cronjobs/scripts/tweet-rss.py
               resources:
