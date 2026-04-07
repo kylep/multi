@@ -9,7 +9,9 @@ RUN apk upgrade --no-cache && apk add --no-cache nodejs git gcc musl-dev
 COPY --from=trivy /usr/local/bin/trivy /usr/local/bin/trivy
 COPY --from=gitleaks /usr/bin/gitleaks /usr/local/bin/gitleaks
 
-RUN pip install --no-cache-dir semgrep==1.154.0
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY requirements.txt /tmp/requirements.txt
+RUN uv pip install --system --require-hashes -r /tmp/requirements.txt
 
 COPY .trivyignore /workspace/.trivyignore
 
