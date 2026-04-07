@@ -1,0 +1,160 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: autolearn
+  namespace: ai-agents
+spec:
+  schedule: {{ .Values.cronjobs.autolearn.schedule | quote }}
+  timeZone: "UTC"
+  startingDeadlineSeconds: 600
+  suspend: {{ not .Values.cronjobs.autolearn.enabled }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/role: "ai-agents"
+            vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/pai"
+            vault.hashicorp.com/agent-inject-template-config: |
+              {{`{{- with secret "secret/ai-agents/pai" }}`}}
+              export DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
+              export CLAUDE_CODE_OAUTH_TOKEN="{{`{{ .Data.data.claude_oauth_token }}`}}"
+              export LINEAR_API_KEY="{{`{{ .Data.data.linear_api_key }}`}}"
+              {{`{{ end }}`}}
+              {{`{{- with secret "secret/ai-agents/discord" }}`}}
+              export DISCORD_GUILD_ID="{{`{{ .Data.data.discord_guild_id }}`}}"
+              export DISCORD_LOG_CHANNEL_ID="{{`{{ .Data.data.discord_log_channel_id }}`}}"
+              {{`{{ end }}`}}
+            vault.hashicorp.com/agent-inject-secret-github-key: "secret/ai-agents/github"
+            vault.hashicorp.com/agent-inject-template-github-key: |
+              {{`{{- with secret "secret/ai-agents/github" -}}{{ .Data.data.github_app_private_key }}{{- end -}}`}}
+            vault.hashicorp.com/agent-inject-secret-github-config: "secret/ai-agents/github"
+            vault.hashicorp.com/agent-inject-template-github-config: |
+              {{`{{- with secret "secret/ai-agents/github" }}`}}
+              export GITHUB_APP_ID="{{`{{ .Data.data.github_app_id }}`}}"
+              export GITHUB_INSTALL_ID="{{`{{ .Data.data.github_install_id }}`}}"
+              {{`{{ end }}`}}
+        spec:
+          serviceAccountName: cronjob-agent
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: agent
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  . /vault/secrets/config
+                  . /vault/secrets/github-config
+
+                  # --- GitHub token ---
+                  gen_token() {
+                    _header=$(printf '{"alg":"RS256","typ":"JWT"}' \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    _now=$(date +%s); _iat=$((_now - 60)); _exp=$((_now + 300))
+                    _payload=$(printf '{"iss":"%s","iat":%d,"exp":%d}' \
+                      "$GITHUB_APP_ID" "$_iat" "$_exp" \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    _sig=$(printf '%s.%s' "$_header" "$_payload" \
+                      | openssl dgst -sha256 -sign /vault/secrets/github-key -binary \
+                      | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+                    curl -sf -X POST \
+                      -H "Authorization: Bearer ${_header}.${_payload}.${_sig}" \
+                      -H "Accept: application/vnd.github+json" \
+                      "https://api.github.com/app/installations/${GITHUB_INSTALL_ID}/access_tokens" \
+                      | jq -r '.token'
+                  }
+                  GITHUB_TOKEN=$(gen_token)
+
+                  RUN_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-8)
+                  AGENT_NAME="autolearn"
+
+                  discord_post() {
+                    curl -sf -X POST \
+                      "https://discord.com/api/v10/channels/${DISCORD_LOG_CHANNEL_ID}/messages" \
+                      -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"content\":\"$1\"}" || true
+                  }
+
+                  # --- Clone repo with write access ---
+                  git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git" /workspace/repo
+                  cd /workspace/repo
+                  git config user.name "PericakAI (Pai)"
+                  git config user.email "pericakai@gmail.com"
+
+                  # --- MCP config: Discord (pai bot) + Linear ---
+                  # Use unquoted heredoc so shell vars expand into env blocks.
+                  cat > /tmp/mcp.json <<MCPEOF
+                  {
+                    "mcpServers": {
+                      "pai-discord": {
+                        "type": "stdio",
+                        "command": "python3",
+                        "args": ["/workspace/repo/apps/mcp-servers/discord/server.py"],
+                        "env": {
+                          "DISCORD_BOT_TOKEN": "${DISCORD_BOT_TOKEN}",
+                          "DISCORD_GUILD_ID": "${DISCORD_GUILD_ID}"
+                        }
+                      },
+                      "linear-server": {
+                        "type": "stdio",
+                        "command": "npx",
+                        "args": ["-y", "@hatcloud/linear-mcp"],
+                        "env": {
+                          "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+                        }
+                      }
+                    }
+                  }
+                  MCPEOF
+
+                  discord_post "▶ ${RUN_ID} | agent=${AGENT_NAME} | started"
+
+                  # --- Run autolearn agent ---
+                  claude --agent autolearn \
+                    -p "Run the autolearn pipeline. Check Linear for issues to process, in priority order (AI WIP, AI DD, AI PRD, Backlog). Process exactly one item if found. For git push, use this remote URL: https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git — set it before pushing and reset to https://github.com/kylep/multi.git after. For creating PRs, use: gh pr create --base main --assignee kylep. The GITHUB_TOKEN env var is set for gh CLI auth." \
+                    --mcp-config /tmp/mcp.json \
+                    --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Agent,Bash(git *),Bash(gh pr *),Bash(gh api *),Bash(mkdir *),Bash(ls *),mcp__pai-discord__send_message,mcp__pai-discord__list_channels,mcp__linear-server__list_issues,mcp__linear-server__save_issue,mcp__linear-server__get_issue,mcp__linear-server__list_comments,mcp__linear-server__save_comment,mcp__linear-server__list_issue_statuses,mcp__linear-server__list_issue_labels" \
+                    --verbose \
+                    --output-format stream-json
+                  STATUS=$?
+
+                  if [ $STATUS -eq 0 ]; then
+                    MSG="✓ ${RUN_ID} | agent=${AGENT_NAME} | done"
+                  else
+                    MSG="✗ ${RUN_ID} | agent=${AGENT_NAME} | failed (exit ${STATUS})"
+                  fi
+                  discord_post "${MSG}"
+                  exit $STATUS
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 512Mi
+                limits:
+                  cpu: 1000m
+                  memory: 2Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: workspace
+                  mountPath: /workspace
+          volumes:
+            - name: workspace
+              emptyDir: {}

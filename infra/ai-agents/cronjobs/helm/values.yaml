@@ -16,6 +16,9 @@ cronjobs:
   paiMorning:
     enabled: false
     schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC)
+  autolearn:
+    enabled: false
+    schedule: "*/10 * * * *"  # every 10 min
   tweetRss:
     enabled: false
     schedule: "*/15 * * * *"  # every 15 min
