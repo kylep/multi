@@ -4,7 +4,7 @@ paiResponder:
 
 image:
   repository: kpericak/ai-agent-runtime
-  tag: "0.5"
+  tag: "0.6"
   pullPolicy: Always
 
 discord:

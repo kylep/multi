@@ -1,4 +1,4 @@
 services:
   security-toolkit:
     build: .
-    image: kpericak/ai-security-toolkit-1:0.1
+    image: kpericak/ai-security-toolkit-1:0.2
