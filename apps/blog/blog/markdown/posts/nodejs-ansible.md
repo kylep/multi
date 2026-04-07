@@ -1,9 +1,17 @@
 ---
 title: Installing Node.js with Ansible
-summary: A straightforward approach to installing a current Node.js with Ansible
+summary: How to install a current Node.js version on Ubuntu with Ansible using
+  the nodesource apt repository. Covers why NVM fails in Ansible and includes
+  complete playbook tasks for the apt key, repo, nodejs, and npm packages.
 slug: nodejs-ansible
 category: development
 tags: Node.js,Ansible
+keywords:
+  - ansible nodejs
+  - ansible install nodejs
+  - ansible npm
+  - nodesource ansible
+  - nodejs ubuntu ansible
 date: 2019-12-13
 modified: 2019-12-13
 status: published
