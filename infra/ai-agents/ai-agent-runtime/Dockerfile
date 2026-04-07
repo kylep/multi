@@ -31,7 +31,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Python dependencies — pinned with hashes for supply-chain safety
 COPY requirements.txt /tmp/requirements.txt
-RUN uv pip install --system --require-hashes -r /tmp/requirements.txt
+RUN uv pip install --system --break-system-packages --require-hashes -r /tmp/requirements.txt
 
 # OpenCode binary
 ARG OPENCODE_VERSION=0.0.55
