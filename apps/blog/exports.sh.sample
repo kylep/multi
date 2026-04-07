@@ -25,6 +25,14 @@ export GCP_CREDENTIALS_B64=""
 # Generate: base64 < secrets/pericakai.private-key.pem
 export GITHUB_APP_PRIVATE_KEY_B64=""
 
+# Google Search Console + GA4 (used by seo-bot CronJob)
+# Generate: base64 < apps/mcp-servers/google-search-console/client_secrets.json
+export GSC_CLIENT_SECRETS_B64=""
+# Generate: base64 < apps/mcp-servers/google-search-console/token.json
+export GSC_TOKEN_B64=""
+# Generate: base64 < ~/.config/gcloud/application_default_credentials.json
+export GA4_CREDENTIALS_B64=""
+
 # Agent controller secrets (also used by store-secrets.sh)
 export OPENROUTER_API_KEY=""  # openrouter.ai → Account → API Keys
 export DISCORD_BOT_TOKEN=""  # Discord Developer Portal → Bot → Token

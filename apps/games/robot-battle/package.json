@@ -1,6 +1,6 @@
 {
   "name": "@kylep/robot-battle",
-  "version": "0.7.0",
+  "version": "0.10.1",
   "private": true,
   "type": "module",
   "scripts": {

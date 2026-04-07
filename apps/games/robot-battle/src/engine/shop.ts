@@ -1,14 +1,16 @@
 /** Shop engine — pure functions. */
 
-import type { Gear, Item, Robot, ShopResult } from "./types";
+import type { Consumable, Gear, Item, Robot, ShopResult } from "./types";
 import type { GameState } from "./state";
 import { getGear, hasItem } from "./robot";
 
-/** Count inventory slots used, treating stackable gear groups as 1 slot. */
+/** Count inventory slots used. Consumables and ammo are free, other stackable gear groups count as 1 slot. */
 export function countInventorySlots(player: Robot): number {
   const stacked = new Set<string>();
   let count = 0;
   for (const item of player.inventory) {
+    if (item.itemType === "consumable") continue;
+    if (item.itemType === "gear" && (item as Gear).category === "Ammo") continue;
     if (item.itemType === "gear" && (item as Gear).stackable) {
       if (!stacked.has(item.name)) {
         stacked.add(item.name);
@@ -52,8 +54,34 @@ export function canBuy(state: GameState, item: Item): { ok: boolean; reason: str
     }
   }
 
+  // Consumables don't take inventory space but have max stack
+  if (item.itemType === "consumable") {
+    const c = item as Consumable;
+    if (c.maxStack > 0) {
+      const owned = player.inventory.filter((inv) => inv.name === item.name).length;
+      if (owned >= c.maxStack) return { ok: false, reason: `Max ${c.maxStack} allowed` };
+    }
+    return { ok: true, reason: "" };
+  }
+
+  // Ammo doesn't take inventory space but has a max stack
+  if (item.itemType === "gear" && (item as Gear).category === "Ammo") {
+    const g = item as Gear;
+    if (g.maxStack > 0) {
+      const owned = player.inventory.filter((inv) => inv.name === item.name).length;
+      if (owned >= g.maxStack) return { ok: false, reason: `Max ${g.maxStack} allowed` };
+    }
+    return { ok: true, reason: "" };
+  }
+
   // Stackable items don't need a free slot if you already have one
   if (item.itemType === "gear" && (item as Gear).stackable && hasItem(player, item.name)) {
+    // Enforce max stack limit
+    const g = item as Gear;
+    if (g.maxStack > 0) {
+      const owned = player.inventory.filter((inv) => inv.name === item.name).length;
+      if (owned >= g.maxStack) return { ok: false, reason: `Max ${g.maxStack} allowed` };
+    }
     return { ok: true, reason: "" };
   }
 

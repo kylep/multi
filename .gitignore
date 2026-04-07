@@ -41,6 +41,10 @@ pai-log-*.md
 # MCP config (contains tokens/secrets)
 .mcp.json
 
+# OAuth credentials (MCP servers)
+client_secrets.json
+token.json
+
 # Playwright
 **/.playwright-mcp/
 **/test-results/

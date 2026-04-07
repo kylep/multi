@@ -38,8 +38,11 @@ function loadGear(name: string, d: Record<string, unknown>): Gear {
     attackBonus: (d.attackBonus as number) ?? 0,
     handsBonus: (d.handsBonus as number) ?? 0,
     dodgeBonus: (d.dodgeBonus as number) ?? 0,
+    accuracyBonus: (d.accuracyBonus as number) ?? 0,
     moneyBonusPercent: (d.moneyBonusPercent as number) ?? 0,
     stackable: (d.stackable as boolean) ?? false,
+    maxStack: (d.maxStack as number) ?? 0,
+    category: (d.category as string) ?? "",
   };
 }
 
@@ -58,6 +61,9 @@ function loadConsumable(name: string, d: Record<string, unknown>): Consumable {
     damage: (d.damage as number) ?? 0,
     damageBlock: (d.damageBlock as number) ?? 0,
     enemyDodgeReduction: (d.enemyDodgeReduction as number) ?? 0,
+    useText: (d.useText as string) ?? "",
+    accuracyBonus: (d.accuracyBonus as number) ?? 0,
+    maxStack: (d.maxStack as number) ?? 0,
   };
 }
 
@@ -72,6 +78,9 @@ function loadEnemy(name: string, d: Record<string, unknown>): Enemy {
     reward: (d.reward as number) ?? 0,
     expReward: (d.expReward as number) ?? 1,
     description: (d.description as string) ?? "",
+    appearance: (d.appearance as string) ?? "",
+    backstory: (d.backstory as string) ?? "",
+    challengeName: (d.challengeName as string) ?? "",
   };
 }
 
@@ -171,17 +180,24 @@ export function loadAssets(): AssetRegistry {
         attack: stats.attack,
         hands: stats.hands,
         dodge: stats.dodge,
+        accuracy: 0,
         level: enemy.level,
         exp: 0,
         money: 0,
+        bank: 0,
         wins: 0,
         fights: 0,
         inventorySize: 99,
         inventory: [],
         upgrades: [],
+        repeatableUpgrades: {},
         settings: { mode: "oliver", oliverChallenge: false },
         defeatedEnemies: [],
         challengeDefeatedEnemies: [],
+        cheatsUsed: false,
+        godMode: false,
+        newGamePlusLevel: 0,
+        titanDefeated: false,
       };
 
       for (const wName of enemy.weapons) {

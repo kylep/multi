@@ -101,13 +101,13 @@ describe("countInventorySlots", () => {
     expect(countInventorySlots(state.player!)).toBe(1);
   });
 
-  it("counts stackable gear group as 1 slot", () => {
+  it("ammo gear does not count as inventory slot", () => {
     const state = setup();
     state.player!.level = 5;
     const shell = state.registry.getItem("Shotgun Shell")!;
     state.player!.inventory.push({ ...shell }, { ...shell }, { ...shell });
-    // 1 Stick + 3 Shotgun Shells (counted as 1 slot) = 2 slots
-    expect(countInventorySlots(state.player!)).toBe(2);
+    // 1 Stick + 3 Shotgun Shells (ammo = free) = 1 slot
+    expect(countInventorySlots(state.player!)).toBe(1);
   });
 });
 
@@ -125,12 +125,12 @@ describe("stackable gear buying", () => {
     expect(r2.ok).toBe(true);
     const r3 = buyItem(state, shell);
     expect(r3.success).toBe(true);
-    // Should have 3 items in array but only 2 inventory slots
+    // Should have 3 items in array but ammo doesn't take inventory slots
     expect(state.player!.inventory.filter((i) => i.name === "Shotgun Shell").length).toBe(2);
-    expect(countInventorySlots(state.player!)).toBe(2); // Stick + 1 shell slot
+    expect(countInventorySlots(state.player!)).toBe(1); // Stick only, shells are ammo (free)
   });
 
-  it("allows buying stackable gear even when inventory slots are full", () => {
+  it("allows buying ammo even when inventory slots are full", () => {
     const state = setup();
     state.player!.level = 5;
     state.player!.money = 10000;
@@ -138,10 +138,10 @@ describe("stackable gear buying", () => {
     state.player!.inventory.push(
       { ...state.registry.getItem("Propeller")! },
       { ...state.registry.getItem("Small Battery")! },
-      { ...state.registry.getItem("Shotgun Shell")! },
+      { ...state.registry.getItem("Cardboard Armor")! },
     );
     expect(countInventorySlots(state.player!)).toBe(4);
-    // Buying another Shotgun Shell should work (stacks into existing slot)
+    // Buying Shotgun Shell should work (ammo doesn't take inventory slots)
     const shell = state.registry.getItem("Shotgun Shell")!;
     const result = canBuy(state, shell);
     expect(result.ok).toBe(true);
@@ -161,5 +161,63 @@ describe("stackable gear buying", () => {
 describe("getSellPrice", () => {
   it("returns full buy price", () => {
     expect(getSellPrice({ name: "x", itemType: "weapon", level: 0, moneyCost: 100, description: "", requirements: [], damage: 1, energyCost: 1, accuracy: 100, hands: 1 })).toBe(100);
+  });
+});
+
+describe("consumables and inventory slots", () => {
+  it("consumables do not count as inventory slots", () => {
+    const state = setup();
+    state.player!.level = 10;
+    const grenade = state.registry.getItem("Grenade")!;
+    state.player!.inventory.push({ ...grenade });
+    // Stick = 1 slot, Grenade = 0 slots (consumable)
+    expect(countInventorySlots(state.player!)).toBe(1);
+  });
+
+  it("can buy consumable when inventory is full", () => {
+    const state = setup();
+    state.player!.level = 10;
+    state.player!.money = 10000;
+    // Fill all 4 slots with weapons
+    state.player!.inventory.push(
+      { ...state.registry.getItem("Wrench")! },
+      { ...state.registry.getItem("Wrench")! },
+      { ...state.registry.getItem("Wrench")! },
+    );
+    // 4 slots: Stick + 3 wrenches
+    expect(countInventorySlots(state.player!)).toBe(4);
+    // Should still be able to buy a consumable
+    const grenade = state.registry.getItem("Grenade")!;
+    expect(canBuy(state, grenade).ok).toBe(true);
+  });
+});
+
+describe("ammo maxStack", () => {
+  it("enforces maxStack limit on ammo", () => {
+    const state = setup();
+    state.player!.level = 45;
+    state.player!.money = 1000000;
+    const missile = state.registry.getItem("Antimatter Missile")!;
+    // Buy up to max (3)
+    for (let i = 0; i < 3; i++) {
+      const r = buyItem(state, missile);
+      expect(r.success).toBe(true);
+    }
+    // Next should fail
+    const check = canBuy(state, missile);
+    expect(check.ok).toBe(false);
+    expect(check.reason).toContain("Max 3");
+  });
+
+  it("ammo does not take inventory slots", () => {
+    const state = setup();
+    state.player!.level = 5;
+    state.player!.money = 10000;
+    const shell = state.registry.getItem("Shotgun Shell")!;
+    buyItem(state, shell);
+    buyItem(state, shell);
+    buyItem(state, shell);
+    // 3 shells + 1 Stick, but shells are ammo so only 1 slot used
+    expect(countInventorySlots(state.player!)).toBe(1);
   });
 });

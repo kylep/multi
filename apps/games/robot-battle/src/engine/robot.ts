@@ -49,12 +49,31 @@ export function getRestEnergyBonus(robot: Robot): number {
   return getGear(robot).reduce((s, g) => s + Math.ceil(0.5 * g.energyBonus), 0);
 }
 
+export function getEffectiveAccuracy(robot: Robot): number {
+  return robot.accuracy + getGear(robot).reduce((s, g) => s + g.accuracyBonus, 0);
+}
+
 export function getMoneyBonusPercent(robot: Robot): number {
   return getGear(robot).reduce((s, g) => s + g.moneyBonusPercent, 0);
 }
 
 export function hasItem(robot: Robot, itemName: string): boolean {
   return robot.inventory.some((i) => i.name === itemName);
+}
+
+export function getAmmoCount(robot: Robot, ammoName: string): number {
+  return robot.inventory.filter((i) => i.name === ammoName).length;
+}
+
+/** Get all ammo types the robot carries (for display). */
+export function getAmmoSummary(robot: Robot): Array<{ name: string; count: number }> {
+  const counts = new Map<string, number>();
+  for (const item of robot.inventory) {
+    if (item.itemType === "gear" && (item as Gear).stackable && (item as Gear).category === "Ammo") {
+      counts.set(item.name, (counts.get(item.name) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()].map(([name, count]) => ({ name, count }));
 }
 
 // ── BattleRobot helpers ──
@@ -66,9 +85,11 @@ export function createBattleRobot(robot: Robot): BattleRobot {
     currentEnergy: getEffectiveMaxEnergy(robot),
     tempDefence: 0,
     tempAttack: 0,
+    tempAccuracy: 0,
     tempDodgeReduction: 0,
     damageBlock: 0,
     consumablesUsed: [],
+    consumableUsedThisTurn: false,
   };
 }
 

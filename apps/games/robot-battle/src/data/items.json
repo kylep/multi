@@ -22,10 +22,10 @@
       "level": 2,
       "damage": 5,
       "moneyCost": 150,
-      "energyCost": 4,
+      "energyCost": 2,
       "accuracy": 100,
       "hands": 2,
-      "description": "Metal single-edged longsword with a sharp blade."
+      "description": "Metal single-edged longsword with a sharp blade. Energy efficient but needs two hands."
     },
     "Shock Rod": {
       "level": 3,
@@ -113,14 +113,15 @@
       "level": 30,
       "damage": 150,
       "moneyCost": 12000,
-      "energyCost": 25,
+      "energyCost": 5,
       "accuracy": 85,
       "hands": 2,
-      "description": "Locks on and fires guided missiles. Explosions guaranteed."
+      "requirements": ["Missile"],
+      "description": "Locks on and fires guided missiles. Consumes one Missile per shot."
     },
     "Death Ray": {
       "level": 35,
-      "damage": 100,
+      "damage": 75,
       "moneyCost": 20000,
       "energyCost": 15,
       "accuracy": 100,
@@ -149,7 +150,7 @@
       "level": 45,
       "damage": 800,
       "moneyCost": 80000,
-      "energyCost": 50,
+      "energyCost": 5,
       "accuracy": 90,
       "hands": 2,
       "requirements": ["Antimatter Missile"],
@@ -170,17 +171,31 @@
       "level": 5,
       "moneyCost": 30,
       "stackable": true,
-      "description": "Allows you to fire a Shotgun weapon once. Consumed when fired."
+      "maxStack": 60,
+      "category": "Ammo",
+      "description": "Ammo for the Sawed-off Shotgun. Consumed when fired. Max 60."
+    },
+    "Missile": {
+      "level": 30,
+      "moneyCost": 500,
+      "stackable": true,
+      "maxStack": 30,
+      "category": "Ammo",
+      "description": "Ammo for the Missile Launcher. Consumed when fired. Max 30."
     },
     "Antimatter Missile": {
       "level": 45,
       "moneyCost": 55000,
-      "description": "A missile made of antimatter. Consumed when launched. Erases anything it hits."
+      "stackable": true,
+      "maxStack": 3,
+      "category": "Ammo",
+      "description": "Ammo for the Antimatter Missile Launcher. Consumed when launched. Max 3."
     },
     "Cardboard Armor": {
       "level": 0,
       "moneyCost": 100,
       "healthBonus": 5,
+      "category": "Armor",
       "description": "Cheapest possible armor for a robot. Even a stick could break it."
     },
     "Tin Armor": {
@@ -188,6 +203,7 @@
       "moneyCost": 250,
       "healthBonus": 10,
       "defenceBonus": 1,
+      "category": "Armor",
       "description": "Shiny tin plates bolted together. Better than cardboard!"
     },
     "Iron Armor": {
@@ -195,6 +211,7 @@
       "moneyCost": 500,
       "healthBonus": 20,
       "defenceBonus": 2,
+      "category": "Armor",
       "description": "Solid iron plating. Now we're talking."
     },
     "Steel Armor": {
@@ -202,6 +219,7 @@
       "moneyCost": 1000,
       "healthBonus": 40,
       "defenceBonus": 4,
+      "category": "Armor",
       "description": "Industrial-grade steel. Tanks wish they had this."
     },
     "Titanium Armor": {
@@ -209,6 +227,7 @@
       "moneyCost": 2500,
       "healthBonus": 60,
       "defenceBonus": 8,
+      "category": "Armor",
       "description": "Lightweight but incredibly strong. Space-age protection."
     },
     "Diamond Armor": {
@@ -216,6 +235,7 @@
       "moneyCost": 6000,
       "healthBonus": 100,
       "defenceBonus": 12,
+      "category": "Armor",
       "description": "Coated in synthetic diamond. Sparkly AND tough."
     },
     "Plasma Shield": {
@@ -223,6 +243,7 @@
       "moneyCost": 15000,
       "healthBonus": 200,
       "defenceBonus": 20,
+      "category": "Armor",
       "description": "A force field made of plasma. Sci-fi stuff. Very cool."
     },
     "Cosmic Armor": {
@@ -230,141 +251,147 @@
       "moneyCost": 50000,
       "healthBonus": 400,
       "defenceBonus": 35,
+      "category": "Armor",
       "description": "Forged from the heart of a dying star. The ultimate protection."
-    },
-    "Third Arm": {
-      "level": 2,
-      "moneyCost": 150,
-      "handsBonus": 1,
-      "description": "More hands, more weapons!"
-    },
-    "Fourth Arm": {
-      "level": 5,
-      "moneyCost": 250,
-      "handsBonus": 1,
-      "requirements": ["Third Arm"],
-      "description": "Even more arms, even more weapons!"
-    },
-    "Fifth Arm": {
-      "level": 5,
-      "moneyCost": 350,
-      "handsBonus": 1,
-      "requirements": ["Fourth Arm"],
-      "description": "This is just silly. Who needs 5 arms?"
-    },
-    "Sixth Arm": {
-      "level": 20,
-      "moneyCost": 1000,
-      "handsBonus": 1,
-      "requirements": ["Fifth Arm"],
-      "description": "SIX ARMS. You look like a spider now."
     },
     "Gold Computer Chip": {
       "level": 3,
       "moneyCost": 40,
       "defenceBonus": 1,
+      "category": "Chip",
       "description": "A computer chip that teaches the robot how to defend itself. Protect the face!"
     },
     "Small Computer Chip": {
       "level": 3,
       "moneyCost": 40,
       "dodgeBonus": 10,
+      "category": "Chip",
       "description": "A computer chip that teaches the robot how to dodge. If you can dodge a wrench..."
     },
     "Power Chip": {
       "level": 3,
       "moneyCost": 60,
       "attackBonus": 10,
+      "category": "Chip",
       "description": "A computer chip that boosts attack power. Your attacks deal 10% more damage!"
+    },
+    "Targeting Scope": {
+      "level": 5,
+      "moneyCost": 200,
+      "accuracyBonus": 10,
+      "category": "Chip",
+      "description": "A targeting scope that improves aim. +10 accuracy to all weapons."
     },
     "Advanced Chip": {
       "level": 12,
       "moneyCost": 600,
       "dodgeBonus": 25,
+      "category": "Chip",
       "description": "Advanced dodge programming. Matrix-style bullet dodging."
     },
     "Ultra Power Chip": {
       "level": 15,
       "moneyCost": 1200,
       "attackBonus": 25,
+      "category": "Chip",
       "description": "Overclocked attack algorithms. Hits 25% harder!"
+    },
+    "Auto-Aim Module": {
+      "level": 15,
+      "moneyCost": 1500,
+      "accuracyBonus": 20,
+      "category": "Chip",
+      "description": "Advanced auto-aiming system. +20 accuracy to all weapons."
     },
     "Mega Chip": {
       "level": 20,
       "moneyCost": 2000,
       "defenceBonus": 5,
+      "category": "Chip",
       "description": "Advanced defense protocols. Takes 5 less damage per hit."
     },
     "Quantum Chip": {
       "level": 30,
       "moneyCost": 5000,
       "dodgeBonus": 50,
+      "category": "Chip",
       "description": "Quantum probability dodging. The robot exists in multiple places at once."
     },
     "Hyperdrive": {
       "level": 35,
       "moneyCost": 10000,
       "attackBonus": 40,
+      "category": "Chip",
       "description": "Hypercharged attack systems. Hits 40% harder!"
     },
     "Money Maker": {
       "level": 0,
       "moneyCost": 100,
       "moneyBonusPercent": 20,
+      "category": "Booster",
       "description": "Earn more money from winning. It takes money to make money!"
     },
     "Propeller": {
       "level": 1,
       "moneyCost": 50,
       "dodgeBonus": 10,
+      "category": "Booster",
       "description": "A spinning propeller that helps the robot dodge attacks."
     },
     "Jet Booster": {
       "level": 8,
       "moneyCost": 300,
       "dodgeBonus": 20,
+      "category": "Booster",
       "description": "Jet-powered dodging. WHOOOOSH!"
     },
     "Small Battery": {
       "level": 1,
       "moneyCost": 50,
       "energyBonus": 5,
+      "category": "Battery",
       "description": "A small battery that increases energy capacity."
     },
     "Medium Battery": {
       "level": 4,
       "moneyCost": 150,
       "energyBonus": 20,
+      "category": "Battery",
       "description": "A medium battery that increases energy capacity."
     },
     "Big Battery": {
       "level": 7,
       "moneyCost": 350,
       "energyBonus": 25,
+      "category": "Battery",
       "description": "A big battery that increases energy capacity."
     },
     "Mega Battery": {
       "level": 15,
       "moneyCost": 1000,
       "energyBonus": 50,
+      "category": "Battery",
       "description": "A huge battery. Powers the big guns."
     },
     "Nuclear Battery": {
       "level": 25,
       "moneyCost": 3000,
       "energyBonus": 80,
+      "category": "Battery",
       "description": "Powered by nuclear fission. Don't drop it."
     },
     "Fusion Battery": {
       "level": 35,
       "moneyCost": 8000,
       "energyBonus": 120,
+      "category": "Battery",
       "description": "Powered by nuclear fusion. Clean energy! (Mostly.)"
     },
     "Dark Matter Core": {
       "level": 40,
       "moneyCost": 20000,
       "energyBonus": 200,
+      "category": "Battery",
       "description": "Harvested from the void between galaxies. Infinite-ish energy."
     }
   },
@@ -373,91 +400,129 @@
       "level": 2,
       "moneyCost": 30,
       "healthRestore": 10,
-      "description": "Repairs the robot. Duct tape and hope."
+      "maxStack": 10,
+      "useText": "You deploy a Repair Kit, patching up damage with duct tape and hope!",
+      "description": "Repairs the robot. Duct tape and hope. Max 10."
     },
     "Throwing Net": {
       "level": 4,
       "moneyCost": 100,
       "enemyDodgeReduction": 30,
-      "description": "It's a net. You throw it. Destroys the net."
+      "maxStack": 5,
+      "useText": "You hurl a Throwing Net, tangling the enemy's legs!",
+      "description": "It's a net. You throw it. Destroys the net. Max 5."
     },
     "Shield Boost": {
       "level": 6,
       "moneyCost": 80,
       "tempDefence": 5,
-      "description": "Temporarily hardens your armor. +5 defence for the battle."
+      "maxStack": 5,
+      "useText": "You activate a Shield Boost, hardening your armor plating!",
+      "description": "Temporarily hardens your armor. +5 defence for the battle. Max 5."
     },
     "Blast Shield": {
       "level": 6,
       "moneyCost": 80,
       "damageBlock": 35,
-      "description": "A throwaway shield that absorbs one big hit. Blocks 35 damage this turn."
+      "maxStack": 5,
+      "useText": "You raise a Blast Shield, bracing for impact!",
+      "description": "A throwaway shield that absorbs one big hit. Blocks 35 damage this turn. Max 5."
     },
     "Grenade": {
       "level": 8,
       "moneyCost": 100,
       "damage": 30,
-      "description": "A small bomb you can launch at the enemy. BOOM!"
+      "maxStack": 10,
+      "useText": "You throw a Grenade! BOOM!",
+      "description": "A small bomb you can launch at the enemy. BOOM! Max 10."
+    },
+    "Targeting Lock": {
+      "level": 10,
+      "moneyCost": 150,
+      "accuracyBonus": 30,
+      "maxStack": 3,
+      "useText": "You activate the Targeting Lock, locking onto the enemy!",
+      "description": "Locks onto the enemy for improved aim. +30 temp accuracy for the battle. Max 3."
     },
     "EMP Bomb": {
       "level": 10,
       "moneyCost": 200,
       "enemyDodgeReduction": 50,
-      "description": "Electromagnetic pulse. Scrambles their dodge circuits."
+      "maxStack": 3,
+      "useText": "You detonate an EMP Bomb, scrambling the enemy's circuits!",
+      "description": "Electromagnetic pulse. Scrambles their dodge circuits. Max 3."
     },
     "Mega Repair Kit": {
       "level": 15,
       "moneyCost": 250,
       "healthRestore": 50,
-      "description": "Industrial-grade repair tools. Welds, hammers, and lots of duct tape."
+      "maxStack": 7,
+      "useText": "You deploy a Mega Repair Kit. Industrial welders whir to life!",
+      "description": "Industrial-grade repair tools. Welds, hammers, and lots of duct tape. Max 7."
     },
     "Mega Blast Shield": {
       "level": 18,
       "moneyCost": 350,
       "damageBlock": 120,
-      "description": "Heavy duty blast shield. Blocks 120 damage this turn. Built like a tank door."
+      "maxStack": 3,
+      "useText": "You slam down a Mega Blast Shield. Nothing's getting through!",
+      "description": "Heavy duty blast shield. Blocks 120 damage this turn. Built like a tank door. Max 3."
     },
     "Mega Grenade": {
       "level": 20,
       "moneyCost": 400,
       "damage": 100,
-      "description": "A BIGGER bomb. Shakes the whole arena."
+      "maxStack": 7,
+      "useText": "You lob a Mega Grenade. The whole arena shakes! KABOOM!",
+      "description": "A BIGGER bomb. Shakes the whole arena. Max 7."
     },
     "Force Field": {
       "level": 25,
       "moneyCost": 600,
       "tempDefence": 15,
-      "description": "Projects a temporary force field. +15 defence for the battle."
+      "maxStack": 3,
+      "useText": "You activate a Force Field. A shimmering barrier surrounds you!",
+      "description": "Projects a temporary force field. +15 defence for the battle. Max 3."
     },
     "Ultra Repair Kit": {
       "level": 30,
       "moneyCost": 800,
       "healthRestore": 150,
-      "description": "Nanotechnology repair swarm. Fixes everything instantly."
+      "maxStack": 5,
+      "useText": "You release a Nano Repair Swarm. Thousands of tiny bots fix everything!",
+      "description": "Nanotechnology repair swarm. Fixes everything instantly. Max 5."
     },
     "Plasma Blast Shield": {
       "level": 28,
       "moneyCost": 800,
       "damageBlock": 300,
-      "description": "Plasma-reinforced blast shield. Blocks 300 damage this turn. Almost indestructible."
+      "maxStack": 2,
+      "useText": "You deploy a Plasma Blast Shield. Pure energy absorbs incoming fire!",
+      "description": "Plasma-reinforced blast shield. Blocks 300 damage this turn. Almost indestructible. Max 2."
     },
     "Plasma Grenade": {
       "level": 30,
       "moneyCost": 1000,
       "damage": 250,
-      "description": "Plasma-coated explosive. Melts and explodes at the same time!"
+      "maxStack": 5,
+      "useText": "You launch a Plasma Grenade. It melts AND explodes!",
+      "description": "Plasma-coated explosive. Melts and explodes at the same time! Max 5."
     },
     "Antimatter Shield": {
       "level": 38,
       "moneyCost": 2500,
       "damageBlock": 600,
-      "description": "Antimatter containment shield. Blocks 600 damage this turn. Laughs at nukes."
+      "maxStack": 1,
+      "useText": "You activate an Antimatter Shield. Reality itself bends around you!",
+      "description": "Antimatter containment shield. Blocks 600 damage this turn. Laughs at nukes. Max 1."
     },
     "Nuke": {
       "level": 40,
-      "moneyCost": 3000,
+      "moneyCost": 15000,
       "damage": 500,
-      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed."
+      "maxStack": 5,
+      "useText": "You launch a Nuke. NUCLEAR EXPLOSION! Everything goes white!",
+      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 5."
     }
   }
 }

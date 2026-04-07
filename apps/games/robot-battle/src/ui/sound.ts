@@ -10,6 +10,7 @@ export interface SoundPlayer {
   levelUp(): void;
   buy(): void;
   click(): void;
+  lootBox(): void;
   setEnabled(on: boolean): void;
   isEnabled(): boolean;
 }
@@ -87,6 +88,14 @@ export function createSoundPlayer(): SoundPlayer {
 
     click() {
       tone(800, 0.03, "square", 0.03);
+    },
+
+    lootBox() {
+      tone(587, 0.1, "sine", 0.06);  // D5
+      setTimeout(() => tone(740, 0.1, "sine", 0.06), 80);  // F#5
+      setTimeout(() => tone(880, 0.1, "sine", 0.06), 160); // A5
+      setTimeout(() => tone(1175, 0.15, "sine", 0.07), 240); // D6
+      setTimeout(() => tone(1397, 0.2, "sine", 0.05), 340); // F#6
     },
 
     setEnabled(on: boolean) {

@@ -9,6 +9,8 @@ export interface Choice {
   active?: boolean;
   badge?: string;
   badgeClass?: string;
+  btnClass?: string;
+  labelClass?: string;
 }
 
 export interface Span {
@@ -195,7 +197,7 @@ export function createDomTerminal(root: HTMLElement): Terminal {
               card.setAttribute("data-testid", `choice-${choices[i].value}`);
 
               const title = document.createElement("div");
-              title.className = "card-title";
+              title.className = choices[i].labelClass ? `card-title ${choices[i].labelClass}` : "card-title";
               title.textContent = choices[i].label;
               card.appendChild(title);
 
@@ -300,7 +302,8 @@ export function createDomTerminal(root: HTMLElement): Terminal {
             const isBack = choices[i].value === "back";
             const isFirst = i === 0;
             let cls = "btn";
-            if (isBack) cls += " btn-secondary";
+            if (choices[i].btnClass !== undefined) cls += choices[i].btnClass ? ` ${choices[i].btnClass}` : "";
+            else if (isBack) cls += " btn-secondary";
             else if (isFirst) cls += " btn-primary";
             btn.className = cls;
             btn.setAttribute("data-testid", `choice-${choices[i].value}`);

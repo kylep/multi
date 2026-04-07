@@ -6,7 +6,7 @@ metadata:
 spec:
   schedule: {{ .Values.cronjobs.autolearn.schedule | quote }}
   timeZone: "UTC"
-  startingDeadlineSeconds: 600
+  startingDeadlineSeconds: 3600
   suspend: {{ not .Values.cronjobs.autolearn.enabled }}
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
@@ -14,8 +14,8 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 0
-      activeDeadlineSeconds: 1800
-      ttlSecondsAfterFinished: 3600
+      activeDeadlineSeconds: 3600
+      ttlSecondsAfterFinished: 7200
       template:
         metadata:
           annotations:
@@ -32,15 +32,13 @@ spec:
               export DISCORD_GUILD_ID="{{`{{ .Data.data.discord_guild_id }}`}}"
               export DISCORD_LOG_CHANNEL_ID="{{`{{ .Data.data.discord_log_channel_id }}`}}"
               {{`{{ end }}`}}
-            vault.hashicorp.com/agent-inject-secret-github-key: "secret/ai-agents/github"
-            vault.hashicorp.com/agent-inject-template-github-key: |
-              {{`{{- with secret "secret/ai-agents/github" -}}{{ .Data.data.github_app_private_key }}{{- end -}}`}}
-            vault.hashicorp.com/agent-inject-secret-github-config: "secret/ai-agents/github"
-            vault.hashicorp.com/agent-inject-template-github-config: |
               {{`{{- with secret "secret/ai-agents/github" }}`}}
               export GITHUB_APP_ID="{{`{{ .Data.data.github_app_id }}`}}"
               export GITHUB_INSTALL_ID="{{`{{ .Data.data.github_install_id }}`}}"
               {{`{{ end }}`}}
+            vault.hashicorp.com/agent-inject-secret-github-key: "secret/ai-agents/github"
+            vault.hashicorp.com/agent-inject-template-github-key: |
+              {{`{{- with secret "secret/ai-agents/github" -}}{{ .Data.data.github_app_private_key }}{{- end -}}`}}
         spec:
           serviceAccountName: cronjob-agent
           restartPolicy: Never
@@ -52,14 +50,13 @@ spec:
               type: RuntimeDefault
           containers:
             - name: agent
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
               command: ["/bin/sh", "-c"]
               args:
                 - |
                   set -e
                   . /vault/secrets/config
-                  . /vault/secrets/github-config
 
                   # --- GitHub token ---
                   gen_token() {
@@ -98,7 +95,7 @@ spec:
                   git config user.email "pericakai@gmail.com"
 
                   # --- MCP config: Discord (pai bot) + Linear ---
-                  # Use unquoted heredoc so shell vars expand into env blocks.
+                  # Unquoted heredoc so shell vars expand into env blocks.
                   cat > /tmp/mcp.json <<MCPEOF
                   {
                     "mcpServers": {

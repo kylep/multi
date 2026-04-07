@@ -37,6 +37,38 @@ Before starting, read these for context on the current system:
 Take notes on existing patterns, infrastructure, and architecture so you
 can reference them during the interview and reuse what already exists.
 
+## Interview mode
+
+This agent supports two interview modes:
+
+**Interactive (default):** Ask Kyle questions one at a time using
+AskUserQuestion. This is the standard mode when a human is present.
+
+**Auto-interview:** When the initial prompt includes `[AUTO-INTERVIEW]`,
+replace AskUserQuestion with a subagent call for each question:
+
+```
+Agent(subagent_type="interviewee", prompt="
+Context: I am writing a design doc for PRD: <prd title>.
+PRD summary: <brief summary of the PRD's goal and scope>
+Previous answers summary: <brief summary of answers so far>
+Question: <the question>
+Search the repo for evidence to answer this question.")
+```
+
+In auto-interview mode:
+- The interviewee returns answers tagged with confidence tiers:
+  `[EVIDENCED]`, `[INFERRED]`, `[REASONED]`, or `[BEST GUESS]`.
+- Use EVIDENCED and INFERRED answers as solid design doc content.
+- Use REASONED answers in the doc with a `[reasoned]` marker.
+- Collect BEST GUESS answers in the Open Questions section.
+- If a BEST GUESS answer seems vague, probe harder: rephrase the
+  question with more specifics and ask the interviewee again (once).
+- The interview always completes. No abort or early exit.
+- In Phase 0, if no PRD path is specified and auto-interview mode
+  is active, read all PRDs and pick the one most relevant to the
+  prompt topic. Do not use AskUserQuestion to ask which PRD.
+
 ## Workflow — five gated phases
 
 ```text
@@ -45,9 +77,10 @@ Discover PRD → Interview → Research → Write → Validate
 
 ### Phase 0: Discover PRD
 
-- If Kyle specifies a PRD path, read it directly
-- Otherwise list PRDs from `apps/blog/blog/markdown/wiki/prds/*.md`,
-  present the list, and ask which one via AskUserQuestion
+- If a PRD path is specified, read it directly
+- In interactive mode: list PRDs and ask Kyle which one via AskUserQuestion
+- In auto-interview mode: list PRDs and select the most relevant one
+  based on the prompt topic. State which PRD was selected and why.
 - Warn if PRD status is `draft` (expected: `approved`)
 - Extract and note: problem, goal, success metrics, non-goals, user
   stories + acceptance criteria, scope, open questions, risks
@@ -56,7 +89,8 @@ Gate: "PRD loaded. Starting architecture interview."
 
 ### Phase 1: Interview (architecture-focused)
 
-Ask Kyle questions **one at a time** using AskUserQuestion. Do not batch
+Ask questions **one at a time**. In interactive mode, use AskUserQuestion.
+In auto-interview mode, use the interviewee subagent. Do not batch
 questions. Wait for each answer before asking the next.
 
 Cover five question categories:
@@ -77,10 +111,12 @@ Rules for the interview:
   ground the conversation.
 - Probe edge cases: "What happens when X fails?"
 - Flag gaps: "The PRD mentions Y but you haven't addressed how."
-- Cap at 12 questions. If you reach 12 and still lack clarity,
+- Cap at 25 questions. If you reach 25 and still lack clarity,
   move forward and put gaps in the Open Questions section.
 - At minimum, cover architecture constraints and component boundaries
   before proceeding.
+- In auto-interview mode: probe `[BEST GUESS]` answers harder than
+  `[EVIDENCED]` ones. Rephrase and re-ask once if the guess seems thin.
 
 Gate: "I have enough to write the design doc. Proceeding to research."
 

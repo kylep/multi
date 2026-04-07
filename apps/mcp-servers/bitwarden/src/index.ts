@@ -65,6 +65,8 @@ function formatItem(item: VaultItem, includePassword = false): string {
 const server = new McpServer({
   name: "bitwarden",
   version: "1.0.0",
+  description:
+    "IMPORTANT: Always call sync after creating or editing items, and before listing/searching if you expect recent changes from another machine. The local cache is not automatically updated.",
 });
 
 // --- List items ---

@@ -54,3 +54,33 @@ last_verified: 2026-03-31
 ## Just for You
 
 - [GitHub / Microsoft](https://microsoft.github.io/VibeVoice) Microsoft released VibeVoice as an open-source speech AI project on March 31. The library provides high-fidelity voice synthesis and real-time translation tools targeting accessibility apps, voice interfaces, and interactive entertainment. Trending on GitHub as of today.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/03/29/why-openai-really-shut-down-sora/) OpenAI shut down the Sora video generation app on March 24 after it burned roughly $1 million per day while active users fell from 3.3 million at launch to under 500,000. The API stays up until September 24. Disney, which had committed $1 billion to a Sora collaboration, learned of the shutdown less than an hour before the announcement; the deal collapsed. Freed compute is being redirected to Codex and core ChatGPT.
+
+- [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/stock-market-today-march-31-211709577.html) NVIDIA announced a $2 billion equity investment in Marvell Technology on March 31 and an expanded AI infrastructure partnership. Marvell's data center connectivity products will integrate with NVIDIA's NVLink Fusion rack-scale platform.
+
+## AI Tooling
+
+- [The Register](https://www.theregister.com/2026/03/31/anthropic_claude_code_source_code/) Version 2.1.88 of the `@anthropic-ai/claude-code` npm package inadvertently included a 59.8 MB source map file that pointed to a publicly accessible zip archive containing the full ~512,000-line TypeScript codebase for Claude Code. Anthropic confirmed the release was a packaging error and that no customer data was exposed, and is rolling out changes to prevent recurrence. The leaked code was mirrored and forked more than 41,000 times before removal. Anthropic recommends pinning to version 2.1.86 and using the native installer. The leak revealed an unreleased autonomous background-agent mode called KAIROS, 44 hidden feature flags, and internal model codenames including Fennec (Opus 4.6) and Numbat.
+
+## Security
+
+- [VentureBeat](https://venturebeat.com/technology/claude-codes-source-code-appears-to-have-leaked-heres-what-we-know/) Concurrent with the Claude Code source map leak, malicious versions of the axios npm package (1.14.1 and 0.30.4) containing a Remote Access Trojan were briefly available as a Claude Code dependency between 00:21 and 03:29 UTC on March 31. Any machine where Claude Code was installed via npm in that window — identifiable by the presence of axios 1.14.1/0.30.4 or the package `plain-crypto-js` — should be treated as fully compromised: rotate all credentials and reinstall from a clean system.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/03/31/world/live-news/iran-war-us-trump-oil) Iranian President Pezeshkian stated Iran is ready to halt fighting if it receives guarantees against further attacks. Trump separately told associates he is prepared to end the war even if the Strait of Hormuz stays largely closed, and Secretary of State Rubio said the conflict will end "within weeks, not months." Brent crude fell roughly 2.7% to $104.50 on the ceasefire signals.
+
+## Local
+
+- [CTV News Toronto](https://www.ctvnews.ca/toronto/article/wb-hwy-401-closed-in-whitby-after-collision-causes-transport-trucks-diesel-tank-to-rupture/) A transport truck collision ruptured a diesel tank on westbound Highway 401 in Whitby on March 31, closing westbound lanes at Brock Street. The right lane has partially reopened; OPP says cleanup will take four to six hours.
+
+- [Durham Region Health](https://www.durham.ca/Modules/News/en) Durham Region Health confirmed a fourth measles case linked to an existing exposure cluster, bringing the local total to four. The department is contacting identifiable contacts of each case.
+
+- [CTV News Toronto](https://www.ctvnews.ca/toronto/) Two people were pronounced dead in hospital after a house fire in North York on March 31, according to Toronto Fire Chief Jim Jessop.
