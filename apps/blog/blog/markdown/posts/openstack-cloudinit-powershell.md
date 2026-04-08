@@ -1,8 +1,8 @@
 ---
 title: "OpenStack Cloudbase-init: PowerShell user_data Scripts"
-summary: How to run PowerShell scripts via Cloudbase-init user_data when deploying
+summary: "How to run PowerShell scripts via Cloudbase-init user_data when deploying
   Windows instances in OpenStack. Covers the #ps1 script format and the
-  --user-data launch flag.
+  --user-data launch flag."
 slug: openstack-cloudinit-powershell
 category: cloud
 tags: OpenStack, Windows, Powershell
