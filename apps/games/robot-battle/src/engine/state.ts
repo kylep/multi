@@ -36,7 +36,7 @@ export function createPlayer(state: GameState, name: string): Robot {
     inventory: [],
     upgrades: [],
     repeatableUpgrades: {},
-    settings: { mode: "oliver", oliverChallenge: false },
+    settings: { mode: "oliver", oliverChallenge: false, autoDeposit: false, restockConsumables: false },
     defeatedEnemies: [],
     challengeDefeatedEnemies: [],
     cheatsUsed: false,

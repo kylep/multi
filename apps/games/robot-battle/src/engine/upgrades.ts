@@ -110,7 +110,7 @@ const REPEATABLE_UPGRADES: RepeatableUpgradeDef[] = [
   { id: "rep-damage", name: "+1 Attack", baseCost: 3000, costPerLevel: 1500, description: "+1% Attack per level" },
   { id: "rep-defence", name: "+1 Defence", baseCost: 2500, costPerLevel: 1200, description: "+1 Defence per level" },
   { id: "rep-accuracy", name: "+2 Accuracy", baseCost: 2000, costPerLevel: 1000, description: "+2 Accuracy per level" },
-  { id: "rep-dodge", name: "+2 Dodge", baseCost: 2000, costPerLevel: 1000, description: "+2 Dodge per level" },
+  { id: "rep-dodge", name: "+1 Dodge", baseCost: 2000, costPerLevel: 1000, description: "+1 Dodge per level" },
 ];
 
 export function listRepeatableUpgrades(): RepeatableUpgradeDef[] {
@@ -153,7 +153,7 @@ function applyRepeatableEffect(player: Robot, id: string, levels: number): void 
   if (id === "rep-damage") player.attack += 1 * levels;
   if (id === "rep-defence") player.defence += 1 * levels;
   if (id === "rep-accuracy") player.accuracy += 2 * levels;
-  if (id === "rep-dodge") player.dodge += 2 * levels;
+  if (id === "rep-dodge") player.dodge += 1 * levels;
 }
 
 function applyAllRepeatableUpgrades(player: Robot): void {

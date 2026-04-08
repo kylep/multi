@@ -16,7 +16,8 @@ import {
   getGear,
   getWeapons,
 } from "../../engine/robot";
-import { getXpToLevel } from "../../engine/state";
+import { createPlayer, getXpToLevel } from "../../engine/state";
+import { applyAllUpgrades } from "../../engine/upgrades";
 import { shopScreen } from "./shop";
 import { upgradesScreen } from "./upgrades";
 import { bankScreen } from "./bank";
@@ -44,6 +45,9 @@ export async function mainMenu(
     terminal.printHTML(`<div class="panel-header" style="${panelStyle}"><span class="t-blue t-bold">${player.name}</span>${ngpTag} &nbsp;&nbsp; <span class="t-yellow">$${player.money}</span> &nbsp;&nbsp; <span class="t-magenta">Lv.${player.level} XP ${player.exp}/${getXpToLevel(player.level)}</span> &nbsp;&nbsp; <span class="t-dim">${player.wins}W / ${player.fights}F</span>${cheatTag}</div>`);
 
 
+    const totalEnemies = state.registry.enemies.size;
+    const ngpUnlocked = player.defeatedEnemies.length >= totalEnemies;
+
     const menuChoices: Choice[] = [
       { label: "Fight", value: "fight", subtitle: "Battle enemies" },
       { label: "Shop", value: "shop", subtitle: "Buy & sell gear" },
@@ -53,8 +57,15 @@ export async function mainMenu(
       { label: "Leaderboard", value: "leaderboard", subtitle: "100% challenge records" },
       { label: "Settings", value: "settings", subtitle: "Sound & options" },
       { label: "Change Log", value: "changelog", subtitle: "Version history" },
-      { label: "Quit", value: "quit", subtitle: "Return to title" },
     ];
+    if (ngpUnlocked) {
+      menuChoices.push({
+        label: "New Game +",
+        value: "ngp",
+        subtitle: `Restart with +${player.newGamePlusLevel + 1}% bank interest`,
+      });
+    }
+    menuChoices.push({ label: "Quit", value: "quit", subtitle: "Return to title" });
 
     const choice = await terminal.promptChoice("", menuChoices, "grid");
 
@@ -82,6 +93,23 @@ export async function mainMenu(
       await leaderboardScreen(terminal, storage);
     } else if (choice === "changelog") {
       await changeLogScreen(terminal);
+    } else if (choice === "ngp") {
+      terminal.clear();
+      terminal.printHTML(`<div class="panel-header"><span class="t-yellow t-bold">NEW GAME +</span></div>`);
+      terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div>Start over with a fresh robot but keep your bank savings.</div><div style="margin-top:8px"><span class="t-green">Bank interest:</span> ${player.newGamePlusLevel + 1}% → <span class="t-yellow t-bold">${player.newGamePlusLevel + 2}%</span></div><div class="t-green" style="margin-top:4px">Repeatable upgrades and bank balance carry over.</div><div class="t-red" style="margin-top:4px">Level, inventory, permanent upgrades, and defeated enemies will be reset.</div></div>`);
+      const confirmed = await terminal.promptConfirm("Start New Game +?", "Start", "Cancel");
+      if (confirmed) {
+        const oldPlayer = player;
+        createPlayer(state, oldPlayer.name);
+        const newPlayer = state.player!;
+        newPlayer.newGamePlusLevel = oldPlayer.newGamePlusLevel + 1;
+        newPlayer.cheatsUsed = oldPlayer.cheatsUsed;
+        newPlayer.bank = oldPlayer.bank;
+        newPlayer.settings = oldPlayer.settings;
+        newPlayer.repeatableUpgrades = { ...oldPlayer.repeatableUpgrades };
+        applyAllUpgrades(newPlayer);
+        save?.();
+      }
     }
   }
 }
@@ -205,6 +233,24 @@ async function cheatCodeScreen(
         terminal.printHTML(`<div class="t-red t-bold" style="font-size:20px;margin:16px 0">GOD MODE ON</div>`);
       } else {
         terminal.printHTML(`<div class="t-green t-bold" style="font-size:20px;margin:16px 0">GOD MODE OFF</div>`);
+      }
+      await terminal.promptContinue(0);
+    } else if (trimmed === "the power of friendship") {
+      player.cheatsUsed = true;
+      terminal.clear();
+      const nuke = state.registry.getItem("Nuke");
+      if (!nuke) {
+        terminal.print("Nuke not found in registry!", "t-red");
+      } else {
+        const owned = player.inventory.filter((i) => i.name === "Nuke").length;
+        const maxStack = (nuke as import("../../engine/types").Consumable).maxStack;
+        if (maxStack > 0 && owned >= maxStack) {
+          terminal.printHTML(`<div class="t-yellow t-bold" style="font-size:18px;margin:16px 0">You already have ${owned}/${maxStack} Nukes!</div>`);
+        } else {
+          player.inventory.push({ ...nuke });
+          terminal.printHTML(`<div class="t-green t-bold" style="font-size:18px;margin:16px 0">☢ The power of friendship grants you a Nuke! ☢</div>`);
+          terminal.printHTML(`<div class="t-dim">You now have ${owned + 1}${maxStack > 0 ? `/${maxStack}` : ""} Nukes.</div>`);
+        }
       }
       await terminal.promptContinue(0);
     } else {
@@ -388,6 +434,23 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.11.0", date: "2026-04-07", notes: [
+      "New Game + moved to main menu — only appears after defeating all enemies",
+      "New Game + resets current save in-place (no empty slot required)",
+      "Confirmation screen shows what carries over and what resets",
+      "Shop: new Details tab showing stats with base/gear breakdown, upgrades, and gear bonuses",
+      "Bank: Auto-Deposit toggle sends battle winnings straight to your bank",
+      "Settings: Restock Consumables toggle auto-buys used consumables after each fight",
+      "Attack button shows 'no ammo!' when all weapons need ammo you don't have",
+      "Weapon select disables and labels weapons missing ammo",
+      "Restock auto-withdraws from bank if cash is short",
+      "Repeatable upgrades persist through New Game +",
+      "Balance: Repeatable dodge upgrade nerfed to +1 per level (was +2)",
+      "Upgrades screen preserves scroll position after purchases",
+      "New cheat code: 'the power of friendship'",
+    ],
+  },
   {
     version: "0.10.0", date: "2026-04-04", notes: [
       "Level cap raised to 100",

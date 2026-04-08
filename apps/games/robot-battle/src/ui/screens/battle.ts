@@ -22,8 +22,10 @@ import {
   getEffectiveMaxHealth,
   getWeaponEnergyCost,
   getWeapons,
+  hasItem,
 } from "../../engine/robot";
 import { awardExp, awardInterest, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
+import { buyItem, canBuy } from "../../engine/shop";
 import { shouldShowLootBox } from "../../engine/battle";
 import type { SoundPlayer } from "../sound";
 import type { SaveStorage } from "../../engine/save";
@@ -32,6 +34,71 @@ import { addLeaderboardEntry, loadLeaderboard } from "../../engine/save";
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+interface RestockResult {
+  bought: string[];
+  bankWithdraw: number;
+}
+
+/** Try to rebuy consumed consumables, cheapest first. Withdraws from bank if needed. */
+function restockConsumables(state: GameState, usedNames: string[]): RestockResult {
+  const player = state.player!;
+  if (!player.settings.restockConsumables || usedNames.length === 0) return { bought: [], bankWithdraw: 0 };
+
+  // Count how many of each consumable were used
+  const counts = new Map<string, number>();
+  for (const name of usedNames) {
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+
+  // Resolve to registry items and sort cheapest first
+  const toBuy: Array<{ name: string; qty: number; cost: number }> = [];
+  for (const [name, qty] of counts) {
+    const item = state.registry.getItem(name);
+    if (item && item.itemType === "consumable") toBuy.push({ name, qty, cost: item.moneyCost });
+  }
+  toBuy.sort((a, b) => a.cost - b.cost);
+
+  let bankWithdraw = 0;
+  const bought: string[] = [];
+  for (const { name, qty } of toBuy) {
+    const item = state.registry.getItem(name);
+    if (!item) continue;
+    for (let i = 0; i < qty; i++) {
+      // If we can't afford it but bank has funds, withdraw the difference
+      const sandbox = player.settings.mode === "sandbox";
+      if (!sandbox && player.money < item.moneyCost && player.bank > 0) {
+        const shortfall = item.moneyCost - player.money;
+        const withdraw = Math.min(shortfall, player.bank);
+        player.bank -= withdraw;
+        player.money += withdraw;
+        bankWithdraw += withdraw;
+      }
+      const check = canBuy(state, item);
+      if (!check.ok) break;
+      buyItem(state, item);
+      bought.push(item.name);
+    }
+  }
+  return { bought, bankWithdraw };
+}
+
+function restockSummaryHtml(state: GameState, result: RestockResult): string {
+  const restockCounts = new Map<string, number>();
+  let restockTotal = 0;
+  for (const name of result.bought) {
+    restockCounts.set(name, (restockCounts.get(name) ?? 0) + 1);
+    const item = state.registry.getItem(name);
+    if (item) restockTotal += item.moneyCost;
+  }
+  const restockList = [...restockCounts.entries()].map(([name, count]) => count > 1 ? `${name} ×${count}` : name).join(", ");
+  let html = `<div><span class="t-dim">Restocked: ${esc(restockList)} (-$${restockTotal})</span>`;
+  if (result.bankWithdraw > 0) {
+    html += ` <span class="t-cyan">($${result.bankWithdraw} withdrawn from bank)</span>`;
+  }
+  html += `</div>`;
+  return html;
 }
 
 export async function battleScreen(
@@ -135,7 +202,14 @@ export async function battleScreen(
 
     const leveled = awardExp(state, xpReward);
     const actual = awardMoney(state, goldReward);
+    if (player.settings.autoDeposit && actual > 0) {
+      player.money -= actual;
+      player.bank += actual;
+    }
     const interest = awardInterest(player);
+
+    // Restock consumables used during the fight
+    const restocked = restockConsumables(state, battle.player.consumablesUsed);
 
     // Track defeated enemies (not in sandbox — badges are a normal-mode reward)
     if (player.settings.mode !== "sandbox") {
@@ -208,7 +282,7 @@ export async function battleScreen(
         const hardMode = player.settings.oliverChallenge;
         const msg = hardMode ? "YOU WON THE GAME... ON HARD MODE!" : "YOU WON THE GAME!";
         terminal.printHTML(`<div class="title-center" style="min-height:0;margin:24px 0"><div class="t-yellow t-bold">╔═══════════════════════════════════════╗</div><div class="t-yellow t-bold" style="font-size:26px">${msg}</div><div class="t-yellow t-bold">╚═══════════════════════════════════════╝</div></div>`);
-        terminal.printHTML(`<div class="t-dim" style="margin:0 0 8px 0">Try New Game + from the title screen!</div>`);
+        terminal.printHTML(`<div class="t-dim" style="margin:0 0 8px 0">Try New Game + from the main menu!</div>`);
       } else {
         terminal.printHTML(`<div class="title-center" style="min-height:0;margin:16px 0"><div class="t-green t-bold">╔═══════════════════════════════╗</div><div class="t-green t-bold" style="font-size:22px">VICTORY!</div><div class="t-green t-bold">╚═══════════════════════════════╝</div></div>`);
       }
@@ -219,9 +293,12 @@ export async function battleScreen(
       let challengeTag = "";
       if (firstChallengeWin) challengeTag = ` <span class="t-purple">(2x + 20% challenge bonus!)</span>`;
       else if (isChallenge) challengeTag = ` <span class="t-purple">(+20% challenge bonus)</span>`;
-      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span>${challengeTag} &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
+      rewardsHtml += `<div style="margin-top:8px"><span class="t-green t-bold">+ $${actual}</span>${challengeTag}${player.settings.autoDeposit ? ` <span class="t-cyan">→ bank</span>` : ""} &nbsp; <span class="t-magenta t-bold">+ ${xpReward} XP</span></div>`;
       if (interest > 0) {
         rewardsHtml += `<div><span class="t-green">+ $${interest} bank interest</span></div>`;
+      }
+      if (restocked.bought.length > 0) {
+        rewardsHtml += restockSummaryHtml(state, restocked);
       }
       if (leveled) {
         rewardsHtml += `<div style="margin-top:8px" class="t-yellow t-bold">*** LEVEL UP! Now level ${player.level}! ***</div>`;
@@ -254,6 +331,7 @@ export async function battleScreen(
       sound?.defeat();
     }
     const defeatInterest = awardInterest(player);
+    const defeatRestocked = restockConsumables(state, battle.player.consumablesUsed);
 
     while (true) {
       terminal.clear();
@@ -268,6 +346,9 @@ export async function battleScreen(
         : `<div>Destroyed by <span class="${nameClass} t-bold">${esc(displayName)}</span> after <span class="t-cyan">${turns}</span> ${turns === 1 ? "turn" : "turns"}</div>`;
       if (!surrendered) infoHtml += `<div style="margin-top:4px"><span class="t-green">+$10 consolation</span></div>`;
       if (defeatInterest > 0) infoHtml += `<div><span class="t-green">+ $${defeatInterest} bank interest</span></div>`;
+      if (defeatRestocked.bought.length > 0) {
+        infoHtml += restockSummaryHtml(state, defeatRestocked);
+      }
       infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
       const nextPreview = getLevelUnlockPreview(state, player.level + 1);
       if (nextPreview) infoHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
@@ -488,6 +569,9 @@ async function playerTurn(
     const weapons = getWeapons(player.robot);
     const hasWeapons = weapons.length > 0;
     const canAffordAny = hasWeapons && weapons.some((w) => getWeaponEnergyCost(w, player.robot) <= player.currentEnergy);
+    const hasAmmoForAny = hasWeapons && weapons.some((w) =>
+      w.requirements.length === 0 || w.requirements.every((req) => hasItem(player.robot, req))
+    );
     const usedCounts = new Map<string, number>();
     for (const n of player.consumablesUsed) usedCounts.set(n, (usedCounts.get(n) ?? 0) + 1);
     const hasConsumables = !player.consumableUsedThisTurn && getConsumables(player.robot).some((c) => {
@@ -498,6 +582,8 @@ async function playerTurn(
 
     let attackLabel = "Attack";
     if (!hasWeapons) attackLabel = "Attack (none)";
+    else if (!hasAmmoForAny && !canAffordAny) attackLabel = "Attack (no ammo/energy!)";
+    else if (!hasAmmoForAny) attackLabel = "Attack (no ammo!)";
     else if (!canAffordAny) attackLabel = "Attack (no energy!)";
 
     const choices: Choice[] = [];
@@ -526,6 +612,16 @@ async function playerTurn(
       if (!hasWeapons) {
         redrawBattle();
         terminal.print("You have no weapons!", "t-red");
+        continue;
+      }
+      if (!hasAmmoForAny && !canAffordAny) {
+        redrawBattle();
+        terminal.print("Out of ammo and energy! Rest to recover energy.", "t-red");
+        continue;
+      }
+      if (!hasAmmoForAny) {
+        redrawBattle();
+        terminal.print("Out of ammo! All your weapons need ammo you don't have.", "t-red");
         continue;
       }
       if (!canAffordAny) {
@@ -598,15 +694,26 @@ async function playerPlanAttack(
     const usedHands = [...selected].reduce((s, i) => s + weapons[i].hands, 0);
     const usedEnergy = [...selected].reduce((s, i) => s + getWeaponEnergyCost(weapons[i], player.robot), 0);
 
+    // Deselect weapons that no longer have ammo
+    for (const i of [...selected]) {
+      const w = weapons[i];
+      if (w.requirements.length > 0 && !w.requirements.every((req) => hasItem(player.robot, req))) {
+        selected.delete(i);
+      }
+    }
+
     // Weapon toggles as grid cards
     const weaponChoices: Choice[] = [];
     for (let i = 0; i < weapons.length; i++) {
       const w = weapons[i];
       const check = selected.has(i) ? "[x]" : "[ ]";
+      const missingAmmo = w.requirements.length > 0 && !w.requirements.every((req) => hasItem(player.robot, req));
+      const ammoStr = w.requirements.length > 0 ? ` [${w.requirements[0]}: ${player.robot.inventory.filter((it) => w.requirements.includes(it.name)).length}]` : "";
       weaponChoices.push({
-        label: `${check} ${w.name}`,
+        label: `${check} ${w.name}${missingAmmo ? " (no ammo)" : ""}`,
         value: `toggle-${i}`,
-        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${w.requirements.length > 0 ? ` [${w.requirements[0]}: ${player.robot.inventory.filter((it) => w.requirements.includes(it.name)).length}]` : ""}`,
+        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${ammoStr}`,
+        disabled: missingAmmo,
       });
     }
     // Attack and Back as extra cards in the grid

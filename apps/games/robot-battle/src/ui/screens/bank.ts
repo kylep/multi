@@ -22,9 +22,11 @@ export async function bankScreen(terminal: Terminal, state: GameState): Promise<
       </div>
     `);
 
+    const autoDepLabel = player.settings.autoDeposit ? "Auto-Deposit: ON" : "Auto-Deposit: OFF";
     const choice = await terminal.promptChoice("", [
       { label: "Deposit", value: "deposit", subtitle: "Put money in the bank" },
       { label: "Withdraw", value: "withdraw", subtitle: "Take money out" },
+      { label: autoDepLabel, value: "auto-deposit", subtitle: "Send battle winnings straight to bank" },
       { label: "Back", value: "back", subtitle: "Return to menu" },
     ], "row");
 
@@ -39,6 +41,9 @@ export async function bankScreen(terminal: Terminal, state: GameState): Promise<
       await amountPrompt(terminal, player.money, "Deposit", (amount) => {
         depositMoney(player, amount);
       });
+    } else if (choice === "auto-deposit") {
+      player.settings.autoDeposit = !player.settings.autoDeposit;
+      continue;
     } else if (choice === "withdraw") {
       if (player.bank <= 0) {
         terminal.print("Your bank is empty!", "t-red");

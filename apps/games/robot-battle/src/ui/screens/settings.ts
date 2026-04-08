@@ -54,6 +54,11 @@ export async function settingsScreen(terminal: Terminal, state: GameState): Prom
         value: "challenge",
         subtitle: "Enemies get 3x HP per level. For Oliver only!",
       },
+      {
+        label: player.settings.restockConsumables ? "Restock Consumables: ON" : "Restock Consumables: OFF",
+        value: "restock",
+        subtitle: "Auto-buy used consumables after each fight",
+      },
       { label: "Back", value: "back" },
     ];
 
@@ -65,6 +70,8 @@ export async function settingsScreen(terminal: Terminal, state: GameState): Prom
       player.settings.mode = choice;
     } else if (choice === "challenge") {
       player.settings.oliverChallenge = !player.settings.oliverChallenge;
+    } else if (choice === "restock") {
+      player.settings.restockConsumables = !player.settings.restockConsumables;
     }
   }
 }

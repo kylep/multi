@@ -10,12 +10,16 @@ import {
   getEffectiveAttack,
   getEffectiveDefence,
   getEffectiveDodge,
+  getEffectiveAccuracy,
   getEffectiveHands,
+  getMoneyBonusPercent,
   getWeapons,
   getGear,
   getConsumables,
   getWeaponEnergyCost,
 } from "../../engine/robot";
+import { getUpgrade, listRepeatableUpgrades } from "../../engine/upgrades";
+import { getInterestRate } from "../../engine/state";
 import type { SoundPlayer } from "../sound";
 
 function esc(s: string): string {
@@ -35,7 +39,7 @@ function renderShopHeader(terminal: Terminal, state: GameState): void {
 
 /** Tab bar choices — all tabs always shown, active tab highlighted */
 function shopTabChoices(activeTab: string, filterOn?: boolean): Choice[] {
-  const tabs = ["Buy", "Sell", "Inventory"];
+  const tabs = ["Buy", "Sell", "Inventory", "Details"];
   const choices: Choice[] = tabs.map((t) => ({
     label: t,
     value: t.toLowerCase(),
@@ -79,7 +83,11 @@ export async function shopScreen(terminal: Terminal, state: GameState, sound?: S
     } else if (currentTab === "inventory") {
       const result = await renderInventoryTab(terminal, state);
       if (result === "back") break;
-      if (result === "buy" || result === "sell") { currentTab = result; continue; }
+      if (result === "buy" || result === "sell" || result === "details") { currentTab = result; continue; }
+    } else if (currentTab === "details") {
+      const result = await renderDetailsTab(terminal, state);
+      if (result === "back") break;
+      if (result === "buy" || result === "sell" || result === "inventory") { currentTab = result; continue; }
     }
   }
 }
@@ -147,7 +155,7 @@ async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: bool
 
   const choice = await terminal.promptChoice("", choices, "grid");
 
-  if (choice === "back" || choice === "sell" || choice === "inventory" || choice === "toggle-filter") return choice;
+  if (choice === "back" || choice === "sell" || choice === "inventory" || choice === "details" || choice === "toggle-filter") return choice;
 
   if (choice.startsWith("toggle-section-")) {
     const sectionLabel = choice.slice("toggle-section-".length);
@@ -269,7 +277,7 @@ async function renderSellTab(terminal: Terminal, state: GameState): Promise<stri
 
   const choice = await terminal.promptChoice("", choices, "grid");
 
-  if (choice === "back" || choice === "buy" || choice === "inventory") return choice;
+  if (choice === "back" || choice === "buy" || choice === "inventory" || choice === "details") return choice;
 
   if (choice.startsWith("sell-")) {
     const idx = parseInt(choice.slice(5), 10);
@@ -353,6 +361,116 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
   const choices: Choice[] = [...shopTabChoices("inventory")];
   choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
   const choice = await terminal.promptChoice("", choices, "grid", contentHTML);
+  return choice;
+}
+
+async function renderDetailsTab(terminal: Terminal, state: GameState): Promise<string> {
+  const player = state.player!;
+  const gear = getGear(player);
+
+  // Base stats (from level-ups, upgrades, and base values)
+  const baseMaxHp = player.maxHealth + player.level * 2;
+  const baseMaxEn = player.maxEnergy;
+  const baseAtk = player.attack;
+  const baseDef = player.defence;
+  const baseDodge = player.dodge;
+  const baseAcc = player.accuracy;
+  const baseHands = player.hands;
+
+  // Gear bonuses
+  const gearHp = gear.reduce((s, g) => s + g.healthBonus, 0);
+  const gearEn = gear.reduce((s, g) => s + g.energyBonus, 0);
+  const gearAtk = gear.reduce((s, g) => s + g.attackBonus, 0);
+  const gearDef = gear.reduce((s, g) => s + g.defenceBonus, 0);
+  const gearDodge = gear.reduce((s, g) => s + g.dodgeBonus, 0);
+  const gearAcc = gear.reduce((s, g) => s + g.accuracyBonus, 0);
+  const gearHands = gear.reduce((s, g) => s + g.handsBonus, 0);
+  const gearMoney = getMoneyBonusPercent(player);
+
+  // Effective totals
+  const effHp = getEffectiveMaxHealth(player);
+  const effEn = getEffectiveMaxEnergy(player);
+  const effAtk = getEffectiveAttack(player);
+  const effDef = getEffectiveDefence(player);
+  const effDodge = getEffectiveDodge(player);
+  const effAcc = getEffectiveAccuracy(player);
+  const effHands = getEffectiveHands(player);
+
+  function statLine(label: string, base: number, gearBonus: number, total: number, suffix: string = ""): string {
+    const gearStr = gearBonus !== 0
+      ? ` <span class="t-cyan">+${gearBonus}</span>`
+      : "";
+    return `<div><span class="t-dim" style="display:inline-block;width:90px">${label}</span> <span class="t-yellow t-bold">${total}${suffix}</span> <span class="t-dim">(base ${base}${gearStr})</span></div>`;
+  }
+
+  let html = `<div class="panel" style="padding:12px 16px">`;
+  html += `<div class="t-yellow t-bold" style="margin-bottom:8px">STATS</div>`;
+  html += statLine("Max HP", baseMaxHp, gearHp, effHp);
+  html += statLine("Max Energy", baseMaxEn, gearEn, effEn);
+  html += statLine("Attack", baseAtk, gearAtk, effAtk, "%");
+  html += statLine("Defence", baseDef, gearDef, effDef);
+  html += statLine("Dodge", baseDodge, gearDodge, effDodge);
+  html += statLine("Accuracy", baseAcc, gearAcc, effAcc);
+  html += statLine("Hands", baseHands, gearHands, effHands);
+  if (gearMoney > 0) {
+    html += `<div><span class="t-dim" style="display:inline-block;width:90px">Money Bonus</span> <span class="t-yellow t-bold">+${gearMoney}%</span></div>`;
+  }
+  html += `<div><span class="t-dim" style="display:inline-block;width:90px">Bank Rate</span> <span class="t-yellow t-bold">${getInterestRate(player)}%</span></div>`;
+  html += `</div>`;
+
+  // Upgrades section
+  if (player.upgrades.length > 0 || Object.keys(player.repeatableUpgrades).length > 0) {
+    html += `<div class="panel" style="padding:12px 16px">`;
+    html += `<div class="t-yellow t-bold" style="margin-bottom:8px">UPGRADES</div>`;
+    for (const id of player.upgrades) {
+      const def = getUpgrade(id);
+      if (def) {
+        html += `<div><span class="t-green">✔</span> ${esc(def.name)} <span class="t-dim">— ${esc(def.description)}</span></div>`;
+      }
+    }
+    const repDefs = listRepeatableUpgrades();
+    for (const def of repDefs) {
+      const level = player.repeatableUpgrades[def.id] ?? 0;
+      if (level > 0) {
+        html += `<div><span class="t-green">✔</span> ${esc(def.name)} <span class="t-magenta">×${level}</span> <span class="t-dim">— ${esc(def.description)}</span></div>`;
+      }
+    }
+    html += `</div>`;
+  }
+
+  // Gear contributing bonuses
+  const bonusGear = gear.filter((g) =>
+    g.healthBonus || g.energyBonus || g.defenceBonus || g.attackBonus ||
+    g.handsBonus || g.dodgeBonus || g.accuracyBonus || g.moneyBonusPercent
+  );
+  if (bonusGear.length > 0) {
+    html += `<div class="panel" style="padding:12px 16px">`;
+    html += `<div class="t-yellow t-bold" style="margin-bottom:8px">GEAR BONUSES</div>`;
+    const gearCounts = new Map<string, { g: Gear; count: number }>();
+    for (const g of bonusGear) {
+      const existing = gearCounts.get(g.name);
+      if (existing) existing.count++;
+      else gearCounts.set(g.name, { g, count: 1 });
+    }
+    for (const [, { g, count }] of gearCounts) {
+      const fx: string[] = [];
+      if (g.healthBonus) fx.push(`+${g.healthBonus} HP`);
+      if (g.energyBonus) fx.push(`+${g.energyBonus} EN`);
+      if (g.defenceBonus) fx.push(`+${g.defenceBonus} Def`);
+      if (g.attackBonus) fx.push(`+${g.attackBonus}% Atk`);
+      if (g.handsBonus) fx.push(`+${g.handsBonus} Hand`);
+      if (g.dodgeBonus) fx.push(`+${g.dodgeBonus} Dodge`);
+      if (g.accuracyBonus) fx.push(`+${g.accuracyBonus} Acc`);
+      if (g.moneyBonusPercent) fx.push(`+${g.moneyBonusPercent}% Money`);
+      const countStr = count > 1 ? ` ×${count}` : "";
+      html += `<div><span class="t-cyan">${esc(g.name)}${countStr}</span> <span class="t-dim">— ${fx.join(", ")}</span></div>`;
+    }
+    html += `</div>`;
+  }
+
+  const choices: Choice[] = [...shopTabChoices("details")];
+  choices.push({ label: "Back", value: "back", subtitle: "Return to main menu" });
+  const choice = await terminal.promptChoice("", choices, "grid", html);
   return choice;
 }
 

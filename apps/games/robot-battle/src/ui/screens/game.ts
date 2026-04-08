@@ -47,7 +47,6 @@ export async function startGame(
     // Show save slot selection
     const slots = listSlots(storage);
     const choices: Choice[] = [];
-    const totalEnemies = registry.enemies.size;
     for (const s of slots) {
       if (s.player) {
         const ngpTag = s.player.newGamePlusLevel > 0 ? ` [+${s.player.newGamePlusLevel}]` : "";
@@ -60,19 +59,6 @@ export async function startGame(
           label: `Slot ${s.slot}: Empty`,
           value: `new-${s.slot}`,
           subtitle: "Start a new game",
-        });
-      }
-    }
-
-    // Add New Game + for saves that have beaten all enemies
-    const ngpSlots = slots.filter((s) => s.player && s.player.defeatedEnemies.length >= totalEnemies);
-    for (const s of ngpSlots) {
-      const emptySlot = slots.find((es) => !es.player);
-      if (emptySlot) {
-        choices.push({
-          label: `New Game + (${s.player!.name})`,
-          value: `ngp-${s.slot}-${emptySlot.slot}`,
-          subtitle: `Reset progress, keep stats, +${s.player!.newGamePlusLevel + 1}% bank interest`,
         });
       }
     }
@@ -108,23 +94,7 @@ export async function startGame(
       continue; // Return to title screen
     }
 
-    if (choice.startsWith("ngp-")) {
-      const parts = choice.split("-");
-      const sourceSlot = parseInt(parts[1], 10);
-      const targetSlot = parseInt(parts[2], 10);
-      const sourceData = loadSlot(storage, sourceSlot);
-      if (!sourceData) continue;
-      const oldPlayer = sourceData.player;
-      // Create fresh player with same name, carry over stats and NG+ level
-      createPlayer(state, oldPlayer.name);
-      const newPlayer = state.player!;
-      newPlayer.newGamePlusLevel = oldPlayer.newGamePlusLevel + 1;
-      newPlayer.cheatsUsed = oldPlayer.cheatsUsed;
-      newPlayer.bank = oldPlayer.bank;
-      newPlayer.settings = oldPlayer.settings;
-      activeSlot = targetSlot;
-      saveSlot(storage, activeSlot, newPlayer, settings);
-    } else if (choice.startsWith("load-")) {
+    if (choice.startsWith("load-")) {
       activeSlot = parseInt(choice.slice(5), 10);
       const loaded = loadSlot(storage, activeSlot);
       if (loaded) {

@@ -24,7 +24,7 @@ describe("createPlayer", () => {
     const state = setup();
     const p = state.player!;
     expect(p.upgrades).toEqual([]);
-    expect(p.settings).toEqual({ mode: "oliver", oliverChallenge: false });
+    expect(p.settings).toEqual({ mode: "oliver", oliverChallenge: false, autoDeposit: false, restockConsumables: false });
   });
 
   it("gives player a free Stick", () => {
