@@ -39,8 +39,10 @@ function parseSave(raw: string | null): SaveData | null {
     if (data.version !== 1 && data.version !== 2 && data.version !== SAVE_VERSION) return null;
     // Soft migration for v1→v2 fields
     if (!data.player.upgrades) data.player.upgrades = [];
-    if (!data.player.settings) data.player.settings = { mode: "oliver", oliverChallenge: false };
+    if (!data.player.settings) data.player.settings = { mode: "oliver", oliverChallenge: false, autoDeposit: false, restockConsumables: false };
     if (data.player.settings.oliverChallenge === undefined) data.player.settings.oliverChallenge = false;
+    if (data.player.settings.autoDeposit === undefined) data.player.settings.autoDeposit = false;
+    if (data.player.settings.restockConsumables === undefined) data.player.settings.restockConsumables = false;
     if (!data.player.defeatedEnemies) data.player.defeatedEnemies = [];
     if (!data.player.challengeDefeatedEnemies) data.player.challengeDefeatedEnemies = [];
     // Soft migration for v2→v3 fields

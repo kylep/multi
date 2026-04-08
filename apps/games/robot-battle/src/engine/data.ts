@@ -191,7 +191,7 @@ export function loadAssets(): AssetRegistry {
         inventory: [],
         upgrades: [],
         repeatableUpgrades: {},
-        settings: { mode: "oliver", oliverChallenge: false },
+        settings: { mode: "oliver", oliverChallenge: false, autoDeposit: false, restockConsumables: false },
         defeatedEnemies: [],
         challengeDefeatedEnemies: [],
         cheatsUsed: false,

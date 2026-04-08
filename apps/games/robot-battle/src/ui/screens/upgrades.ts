@@ -21,6 +21,7 @@ const SECTION_ORDER: Array<{ key: string; label: string }> = [
 
 export async function upgradesScreen(terminal: Terminal, state: GameState): Promise<void> {
   const player = state.player!;
+  let restoreScrollY = -1;
 
   while (true) {
     terminal.clear();
@@ -83,9 +84,19 @@ export async function upgradesScreen(terminal: Terminal, state: GameState): Prom
 
     choices.push({ label: "Back", value: "back" });
 
+    // Restore scroll position after grid renders (double-rAF to run after scrollIntoView)
+    if (restoreScrollY >= 0) {
+      const target = restoreScrollY;
+      restoreScrollY = -1;
+      requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, target)));
+    }
+
     const choice = await terminal.promptChoice("", choices, "grid");
 
     if (choice === "back") return;
+
+    // Save scroll position before confirm dialog
+    const scrollY = window.scrollY;
 
     if (choice.startsWith("rep-")) {
       const repId = choice.slice(4);
@@ -99,6 +110,7 @@ export async function upgradesScreen(terminal: Terminal, state: GameState): Prom
           "Cancel",
         );
         if (confirmed) buyRepeatableUpgrade(player, rep);
+        restoreScrollY = scrollY;
       }
     } else {
       const upgrade = upgrades.find((u) => u.id === choice);
@@ -109,6 +121,7 @@ export async function upgradesScreen(terminal: Terminal, state: GameState): Prom
           "Cancel",
         );
         if (confirmed) buyUpgrade(player, upgrade);
+        restoreScrollY = scrollY;
       }
     }
   }

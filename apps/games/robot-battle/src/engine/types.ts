@@ -71,7 +71,7 @@ export interface Robot {
   inventory: Item[];
   upgrades: string[];
   repeatableUpgrades: Record<string, number>;
-  settings: { mode: "oliver" | "lucas" | "sandbox"; oliverChallenge: boolean };
+  settings: { mode: "oliver" | "lucas" | "sandbox"; oliverChallenge: boolean; autoDeposit: boolean; restockConsumables: boolean };
   defeatedEnemies: string[];
   challengeDefeatedEnemies: string[];
   cheatsUsed: boolean;
