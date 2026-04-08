@@ -1,5 +1,11 @@
 ---
-title: "TASK-001: OAuth Token Validation"
+title: "CLAUDE_CODE_OAUTH_TOKEN: Headless Auth Setup and OpenRouter Conflict Fix"
+summary: "How to authenticate Claude Code headlessly using CLAUDE_CODE_OAUTH_TOKEN, the required .claude.json config, and the fix for OpenRouter's Missing Authentication Header error when conflicting env vars are set."
+keywords:
+  - CLAUDE_CODE_OAUTH_TOKEN
+  - claude-code
+  - headless-auth
+  - openrouter
 status: complete
 date: 2026-03-16
 ---
