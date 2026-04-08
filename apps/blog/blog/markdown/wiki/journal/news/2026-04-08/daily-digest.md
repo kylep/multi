@@ -45,3 +45,29 @@ last_verified: 2026-04-08
 - [Google Open Source Blog](https://opensource.googleblog.com/2026/04/kubernetes-goes-ai-first-unpacking-the-new-ai-conformance-program.html) The Certified Kubernetes AI Conformance program launched, adding AI-specific requirements on top of standard Kubernetes conformance — platforms must pass both standard and AI-workload test suites to certify.
 
 - [Nutanix](https://www.globenewswire.com/news-release/2026/04/07/3269559/0/en/Nutanix-Introduces-NKP-Metal-Bringing-Bare-Metal-Kubernetes-to-its-Platform.html) Nutanix announced NKP Metal on April 7, extending the Nutanix Kubernetes Platform to support bare-metal deployments; early access now, GA in H2 2026.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/04/08/aws-boss-explains-why-investing-billions-in-both-anthropic-and-openai-is-an-ok-conflict/) AWS CEO Matt Garman confirmed Amazon's recent $50B investment in OpenAI alongside its existing $8B Anthropic stake, framing it as consistent with Amazon's long-standing practice of partnering with and competing against the same companies simultaneously.
+
+## AI Tooling
+
+- [Testing Catalog](https://www.testingcatalog.com/anthropic-launches-claude-managed-agents-for-businesses/) Anthropic launched Claude Managed Agents in public beta — a suite of composable APIs for cloud-hosted agent workflows including sandboxed code execution, scoped permissions, session persistence, and multi-agent coordination. Early adopters include Notion, Asana, and Sentry.
+
+## Security
+
+- [Docker Security](https://www.cvedetails.com/cve/CVE-2026-34040/) CVE-2026-34040 (CVSS 8.8): authorization plugin bypass in Docker Engine, stemming from an incomplete fix for CVE-2024-41110. Attackers can bypass authorization controls under specific conditions; patch available.
+
+- [The Hacker News](https://thehackernews.com/) CVE-2025-59528 (CVSS 10.0): actively exploited code injection RCE vulnerability in Flowise, an open-source AI pipeline platform. No authentication required for exploitation.
+
+## Geopolitics
+
+- [CNBC](https://www.cnbc.com/2026/04/08/trump-iran-ceasefire-strait-of-hormuz-toll.html) The US-Iran ceasefire is showing strain: only two bulk carriers (not oil tankers) have transited Hormuz since the deal took effect. Iran's parliamentary speaker says the US has violated ceasefire terms; IDF simultaneously launched what Israel called its largest coordinated strike on Lebanon since the conflict began.
+
+## Just for You
+
+- [AIToolly](https://aitoolly.com/ai-news/article/2026-04-08-google-launches-litert-lm-a-high-performance-open-source-framework-for-edge-device-llm-inference) Google released LiteRT-LM, an open-source inference framework for running LLMs on edge devices — targets latency reduction and on-device privacy for mobile and IoT deployments.
