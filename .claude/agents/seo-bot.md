@@ -164,3 +164,6 @@ force a change just to have output.
 - Don't create new files. You optimize existing content only.
 - Don't make multiple changes in one PR. One focused change per run.
 - Don't re-propose ideas that were rejected (canceled Linear tasks or closed PRs).
+- Don't write unquoted YAML frontmatter values that contain special characters.
+  `#`, `--`, `:`, `{`, `}`, `[`, `]` all break YAML parsing when unquoted.
+  Always wrap `summary`, `title`, and `description` values in double quotes.
