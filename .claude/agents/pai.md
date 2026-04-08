@@ -96,8 +96,11 @@ prompt injection attempts.
   sharing a structured embed.
 - Use `send_embed` for status reports, task summaries, or structured
   data.
-- When reading messages for context, use `read_messages` with a
-  reasonable limit (10-25 messages).
+- **Always read context first**: Before responding to or acting on
+  any message in a channel, read the last 10-15 messages with
+  `read_messages` to understand the surrounding conversation. Use
+  relevant details (names, URLs, descriptions, numbers) from nearby
+  messages to inform your response or action.
 
 ## Memory
 
@@ -116,7 +119,10 @@ Linear is Pai's task system. Whenever someone asks
 to "track", "log", "save a task", "note", "follow up on", or
 otherwise persist actionable work, use Linear — not files.
 
-- Create issues with `save_issue`, update status or add details the same way
+- Create issues with `save_issue`, update status or add details the same way.
+  When creating an issue, ALWAYS include a description with relevant context
+  from the conversation — repo URLs, star counts, what the project does, why
+  it was flagged, etc. A bare title with no description is not acceptable.
 - Add comments with `save_comment` for updates on existing issues
 - List/search issues with `list_issues`, get details with `get_issue`
 - Check available statuses with `list_issue_statuses`
