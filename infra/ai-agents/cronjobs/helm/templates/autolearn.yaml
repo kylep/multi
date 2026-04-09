@@ -88,92 +88,53 @@ spec:
                       -d "{\"content\":\"$1\"}" || true
                   }
 
-                  # --- Query Linear for autolearn issues ---
-                  # Find issues with label "autolearn" in "Todo" status.
-                  ISSUE_JSON=$(curl -sf -X POST \
-                    -H "Authorization: ${LINEAR_API_KEY}" \
-                    -H "Content-Type: application/json" \
-                    "https://api.linear.app/graphql" \
-                    -d '{"query":"{ issues(filter: { labels: { name: { eq: \"autolearn\" } }, state: { name: { in: [\"Todo\", \"Backlog\"] } } }, first: 1, orderBy: createdAt) { nodes { id identifier title description } } }"}')
-
-                  ISSUE_ID=$(echo "$ISSUE_JSON" | jq -r '.data.issues.nodes[0].identifier // empty')
-                  ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.data.issues.nodes[0].title // empty')
-                  ISSUE_UUID=$(echo "$ISSUE_JSON" | jq -r '.data.issues.nodes[0].id // empty')
-
-                  if [ -z "$ISSUE_ID" ]; then
-                    echo "No autolearn issues found in Todo/Backlog. Exiting."
-                    exit 0
-                  fi
-
-                  echo "Found issue: ${ISSUE_ID} - ${ISSUE_TITLE}"
-                  discord_post "▶ ${RUN_ID} | agent=${AGENT_NAME} | issue=${ISSUE_ID} | ${ISSUE_TITLE}"
-
-                  # --- Derive branch and slug ---
-                  SLUG=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-' | cut -c1-50)
-                  BRANCH="autolearn/${ISSUE_ID}-${SLUG}"
-
-                  # --- Clone and set up branch ---
+                  # --- Clone repo with write access ---
                   git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git" /workspace/repo
                   cd /workspace/repo
                   git config user.name "PericakAI (Pai)"
                   git config user.email "pericakai@gmail.com"
 
-                  if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
-                    git fetch origin "${BRANCH}"
-                    git checkout "${BRANCH}"
-                    git merge origin/main --no-edit || true
-                  else
-                    git checkout -b "${BRANCH}"
-                  fi
-
-                  # --- MCP config (discord + linear) ---
-                  cat > /tmp/mcp.json <<'MCPEOF'
+                  # --- MCP config: Discord (pai bot) + Linear ---
+                  # Unquoted heredoc so shell vars expand into env blocks.
+                  cat > /tmp/mcp.json <<MCPEOF
                   {
                     "mcpServers": {
-                      "discord": {
+                      "pai-discord": {
                         "type": "stdio",
                         "command": "python3",
-                        "args": ["/workspace/repo/apps/mcp-servers/discord/server.py"]
+                        "args": ["/workspace/repo/apps/mcp-servers/discord/server.py"],
+                        "env": {
+                          "DISCORD_BOT_TOKEN": "${DISCORD_BOT_TOKEN}",
+                          "DISCORD_GUILD_ID": "${DISCORD_GUILD_ID}"
+                        }
                       },
                       "linear-server": {
                         "type": "stdio",
                         "command": "npx",
-                        "args": ["-y", "@hatcloud/linear-mcp"]
+                        "args": ["-y", "@hatcloud/linear-mcp"],
+                        "env": {
+                          "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+                        }
                       }
                     }
                   }
                   MCPEOF
 
+                  discord_post "▶ ${RUN_ID} | agent=${AGENT_NAME} | started"
+
                   # --- Run autolearn agent ---
                   claude --agent autolearn \
-                    -p "Investigate the tool described in Linear issue ${ISSUE_ID}: ${ISSUE_TITLE}. Issue description: $(echo "$ISSUE_JSON" | jq -r '.data.issues.nodes[0].description // "No description provided."'). The Linear issue UUID is ${ISSUE_UUID}. Run the full autolearn pipeline: claim the issue, scope it, execute the PoC, evaluate against the stack, write the wiki page, and report results." \
+                    -p "Run the autolearn pipeline. Check Linear for issues to process, in priority order (AI WIP, AI DD, AI PRD, Backlog). Process exactly one item if found. For git push, use this remote URL: https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git — set it before pushing and reset to https://github.com/kylep/multi.git after. For creating PRs, use: gh pr create --base main --assignee kylep. The GITHUB_TOKEN env var is set for gh CLI auth." \
                     --mcp-config /tmp/mcp.json \
-                    --max-turns 100 \
-                    --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Agent,Bash(*),mcp__linear-server__list_issues,mcp__linear-server__save_issue,mcp__linear-server__get_issue,mcp__linear-server__list_comments,mcp__linear-server__save_comment,mcp__linear-server__list_issue_statuses,mcp__linear-server__list_issue_labels,mcp__linear-server__list_teams,mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \
+                    --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Agent,Bash(git *),Bash(gh pr *),Bash(gh api *),Bash(mkdir *),Bash(ls *),mcp__pai-discord__send_message,mcp__pai-discord__list_channels,mcp__linear-server__list_issues,mcp__linear-server__save_issue,mcp__linear-server__get_issue,mcp__linear-server__list_comments,mcp__linear-server__save_comment,mcp__linear-server__list_issue_statuses,mcp__linear-server__list_issue_labels" \
                     --verbose \
                     --output-format stream-json
                   STATUS=$?
 
                   if [ $STATUS -eq 0 ]; then
-                    GITHUB_TOKEN=$(gen_token)
-                    git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git"
-                    git push origin "${BRANCH}" || git push --force-with-lease origin "${BRANCH}"
-
-                    EXISTING_PR=$(curl -sf \
-                      -H "Authorization: token ${GITHUB_TOKEN}" \
-                      -H "Accept: application/vnd.github+json" \
-                      "https://api.github.com/repos/kylep/multi/pulls?head=kylep:${BRANCH}&state=open" \
-                      | jq 'length')
-                    if [ "${EXISTING_PR}" = "0" ]; then
-                      curl -sf -X POST \
-                        -H "Authorization: token ${GITHUB_TOKEN}" \
-                        -H "Accept: application/vnd.github+json" \
-                        "https://api.github.com/repos/kylep/multi/pulls" \
-                        -d "{\"title\":\"autolearn: ${ISSUE_ID} ${ISSUE_TITLE}\",\"body\":\"Automated tool evaluation from autolearn pipeline.\\n\\nLinear: ${ISSUE_ID}\",\"head\":\"${BRANCH}\",\"base\":\"main\"}" || true
-                    fi
-                    MSG="✓ ${RUN_ID} | agent=${AGENT_NAME} | issue=${ISSUE_ID} | done"
+                    MSG="✓ ${RUN_ID} | agent=${AGENT_NAME} | done"
                   else
-                    MSG="✗ ${RUN_ID} | agent=${AGENT_NAME} | issue=${ISSUE_ID} | failed (exit ${STATUS})"
+                    MSG="✗ ${RUN_ID} | agent=${AGENT_NAME} | failed (exit ${STATUS})"
                   fi
                   discord_post "${MSG}"
                   exit $STATUS
@@ -193,5 +154,4 @@ spec:
                   mountPath: /workspace
           volumes:
             - name: workspace
-              emptyDir:
-                sizeLimit: 5Gi
+              emptyDir: {}
