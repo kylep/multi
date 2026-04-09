@@ -24,6 +24,7 @@ import { bankScreen } from "./bank";
 import { settingsScreen } from "./settings";
 import { battleScreen } from "./battle";
 import packageJson from "../../../package.json";
+import factsData from "../../data/facts.json";
 
 export async function mainMenu(
   terminal: Terminal,
@@ -224,6 +225,8 @@ async function cheatCodeScreen(
         }
         terminal.printHTML(`<div class="panel" style="padding:12px 16px"><div class="${color} t-bold" style="font-size:18px">${label}</div>${items.map((n) => `<div class="t-green" style="margin-top:4px">+ ${esc(n)}</div>`).join("")}</div>`);
       }
+      const fact = factsData.cheat_omnomnom[Math.floor(Math.random() * factsData.cheat_omnomnom.length)];
+      terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Odds & Ends:</span> <span class="t-dim">${esc(fact)}</span></div>`);
       await terminal.promptContinue(0);
     } else if (trimmed === "the quick brown fox jumps over the lazy dog") {
       player.cheatsUsed = true;
@@ -234,8 +237,10 @@ async function cheatCodeScreen(
       } else {
         terminal.printHTML(`<div class="t-green t-bold" style="font-size:20px;margin:16px 0">GOD MODE OFF</div>`);
       }
+      const fact = factsData.cheat_godmode[Math.floor(Math.random() * factsData.cheat_godmode.length)];
+      terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Divine Knowledge:</span> <span class="t-dim">${esc(fact)}</span></div>`);
       await terminal.promptContinue(0);
-    } else if (trimmed === "the power of friendship") {
+    } else if (trimmed === "nuclear fission") {
       player.cheatsUsed = true;
       terminal.clear();
       const nuke = state.registry.getItem("Nuke");
@@ -248,10 +253,12 @@ async function cheatCodeScreen(
           terminal.printHTML(`<div class="t-yellow t-bold" style="font-size:18px;margin:16px 0">You already have ${owned}/${maxStack} Nukes!</div>`);
         } else {
           player.inventory.push({ ...nuke });
-          terminal.printHTML(`<div class="t-green t-bold" style="font-size:18px;margin:16px 0">☢ The power of friendship grants you a Nuke! ☢</div>`);
+          terminal.printHTML(`<div class="t-green t-bold" style="font-size:18px;margin:16px 0">☢ Nuclear fission achieved! You got a Nuke! ☢</div>`);
           terminal.printHTML(`<div class="t-dim">You now have ${owned + 1}${maxStack > 0 ? `/${maxStack}` : ""} Nukes.</div>`);
         }
       }
+      const fact = factsData.cheat_nuke[Math.floor(Math.random() * factsData.cheat_nuke.length)];
+      terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Nuclear Science:</span> <span class="t-dim">${esc(fact)}</span></div>`);
       await terminal.promptContinue(0);
     } else {
       terminal.print("Invalid cheat code!", "t-red");
@@ -448,7 +455,7 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
       "Repeatable upgrades persist through New Game +",
       "Balance: Repeatable dodge upgrade nerfed to +1 per level (was +2)",
       "Upgrades screen preserves scroll position after purchases",
-      "New cheat code: 'the power of friendship'",
+      "New cheat code: 'nuclear fission'",
     ],
   },
   {

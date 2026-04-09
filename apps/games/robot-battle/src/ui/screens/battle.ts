@@ -30,7 +30,11 @@ import { shouldShowLootBox } from "../../engine/battle";
 import type { SoundPlayer } from "../sound";
 import type { SaveStorage } from "../../engine/save";
 import { addLeaderboardEntry, loadLeaderboard } from "../../engine/save";
+import factsData from "../../data/facts.json";
 
+function getRandomFact(pool: string[]): string {
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -312,6 +316,9 @@ export async function battleScreen(
       }
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${rewardsHtml}</div>`);
 
+      const fact = getRandomFact(factsData.victory);
+      terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Did you know?</span> <span class="t-dim">${esc(fact)}</span></div>`);
+
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
         { label: "Fight Again", value: "fight-again" },
@@ -353,6 +360,11 @@ export async function battleScreen(
       const nextPreview = getLevelUnlockPreview(state, player.level + 1);
       if (nextPreview) infoHtml += `<div style="margin-top:4px" class="t-dim">Next level: ${nextPreview}</div>`;
       terminal.printHTML(`<div class="panel" style="padding:12px 16px">${infoHtml}</div>`);
+
+      if (!surrendered) {
+        const fact = getRandomFact(factsData.defeat);
+        terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Keep going!</span> <span class="t-dim">${esc(fact)}</span></div>`);
+      }
 
       const choice = await terminal.promptChoice("", [
         { label: "Continue", value: "continue" },
