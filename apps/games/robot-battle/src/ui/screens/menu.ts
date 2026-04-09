@@ -442,6 +442,14 @@ function esc(s: string): string {
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
+    version: "0.12.0", date: "2026-04-08", notes: [
+      "Victory facts: random 'Did you know?' after every win (154 facts)",
+      "Defeat facts: perseverance stories shown when destroyed",
+      "Cheat code facts: god mode shows religion history, 'nuclear fission' shows nuclear science, 'omnomnom' shows probability math",
+      "Cheat code renamed: 'nuclear fission' grants a Nuke (was 'the power of friendship')",
+    ],
+  },
+  {
     version: "0.11.0", date: "2026-04-07", notes: [
       "New Game + moved to main menu — only appears after defeating all enemies",
       "New Game + resets current save in-place (no empty slot required)",
