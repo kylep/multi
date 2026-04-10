@@ -66,11 +66,11 @@ spec:
                     --allowedTools "WebSearch,WebFetch,mcp__pai-discord__send_message,mcp__pai-discord__list_channels,mcp__pai-discord__read_messages"
               resources:
                 requests:
-                  cpu: 100m
+                  cpu: 1m
                   memory: 256Mi
                 limits:
-                  cpu: 500m
-                  memory: 1Gi
+                  cpu: 200m
+                  memory: 512Mi
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
