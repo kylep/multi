@@ -54,7 +54,7 @@ last_verified: 2026-04-10
 
 ### AI Industry
 
-- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-06/openai-anthropic-google-unite-to-combat-model-copying-in-china) OpenAI, Anthropic, and Google are now sharing threat intelligence through the Frontier Model Forum to detect Chinese AI firms extracting model outputs via adversarial distillation. Anthropic named DeepSeek, Moonshot AI, and MiniMax as responsible for over 16 million exchanges via roughly 24,000 fraudulent accounts, and has banned all Chinese-controlled companies from accessing Claude. The Forum had previously focused on research and policy; this marks its first operational role.
+- [SiliconAngle](https://siliconangle.com/2026/04/10/anthropic-tries-keep-new-ai-model-away-cyberattackers-enterprises-look-tame-ai-chaos/) Anthropic has banned all Chinese-controlled companies from accessing Claude outright, going further than the Frontier Model Forum intelligence-sharing approach previously reported. Separately, Anthropic is limiting early access to the Mythos model specifically to prevent adversarial distillation before the model's public release.
 
 ### AI Tooling
 
