@@ -146,7 +146,7 @@ spec:
                   exit $STATUS
               resources:
                 requests:
-                  cpu: 100m
+                  cpu: 1m
                   memory: 512Mi
                 limits:
                   cpu: 1000m

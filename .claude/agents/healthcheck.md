@@ -88,10 +88,24 @@ kubectl get jobs -n ai-agents --sort-by=.metadata.creationTimestamp -o custom-co
 ```
 
 Check the most recent job for each CronJob (journalist-morning,
-journalist-noon, journalist-evening, pai-morning, healthcheck).
+journalist-noon, journalist-evening, pai-morning, healthcheck,
+autolearn).
 The latest run should show `Complete`. Flag: `Failed`, or no recent
 run in 24h. Ignore manually-triggered jobs (names ending in `-manual`
-or `-test` or `-v2` etc).
+or `-test` or `-debug` or `-v2` etc).
+
+**Also check `lastSuccessfulTime` on each CronJob directly:**
+
+```bash
+kubectl get cronjobs -n ai-agents -o custom-columns=NAME:.metadata.name,SCHEDULE:.spec.schedule,SUSPEND:.spec.suspend,LAST_SCHEDULE:.status.lastScheduleTime,LAST_SUCCESS:.status.lastSuccessfulTime --no-headers
+```
+
+If `LAST_SCHEDULE` has a value but `LAST_SUCCESS` is `<none>`, the
+cronjob has never succeeded — flag this as critical. If
+`LAST_SUCCESS` is more than 24h behind `LAST_SCHEDULE`, the cronjob
+is silently failing — flag this too. This catches jobs that fail
+because pods never start (e.g., insufficient CPU) where the job
+gets TTL-cleaned before you can inspect it.
 
 ### 4. OpenObserve Error Scan
 
