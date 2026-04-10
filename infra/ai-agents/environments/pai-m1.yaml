@@ -31,8 +31,8 @@ cronjobs:
     enabled: true
     schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC)
   autolearn:
-    enabled: true
-    schedule: "*/10 * * * *"  # every 10 min
+    enabled: false
+    schedule: "*/10 * * * *"  # every 10 min (suspended — was starving other cronjobs)
   seoBot:
     enabled: true
     schedule: "0 3 * * *"   # 11:00 PM EDT (03:00 UTC)
