@@ -47,3 +47,25 @@ last_verified: 2026-04-10
 ## Just for You
 
 - [GitHub](https://github.com/openclaw-rocks/openclaw-operator) An OpenClaw Kubernetes operator is available for self-hosting OpenClaw AI agents with production-grade security, observability, and lifecycle management — relevant to teams running OpenClaw on k8s with ArgoCD.
+
+---
+
+## Update — 22:22 UTC
+
+### AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-06/openai-anthropic-google-unite-to-combat-model-copying-in-china) OpenAI, Anthropic, and Google are now sharing threat intelligence through the Frontier Model Forum to detect Chinese AI firms extracting model outputs via adversarial distillation. Anthropic named DeepSeek, Moonshot AI, and MiniMax as responsible for over 16 million exchanges via roughly 24,000 fraudulent accounts, and has banned all Chinese-controlled companies from accessing Claude. The Forum had previously focused on research and policy; this marks its first operational role.
+
+### AI Tooling
+
+- [Windows Latest](https://www.windowslatest.com/2026/04/10/microsoft-denies-copilot-is-only-for-entertainment-purpose-after-its-own-document-says-do-not-trust-ai/) Microsoft's Copilot terms of service were found to label the product "for entertainment purposes only." Microsoft confirmed the language is a legacy artifact from Copilot's earlier Bing search companion days and said it will be updated in the next release cycle. The $30/month Pro tier is affected by the same wording.
+
+### Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/fortinet-patches-actively-exploited-cve.html) Fortinet patched CVE-2026-35616 (CVSS 9.1) in FortiClient EMS — an unauthenticated API access bypass that allows remote code execution. Active exploitation was recorded starting March 31. CISA added it to the Known Exploited Vulnerabilities catalog on April 6 with a federal remediation deadline of April 9. Affected versions are 7.4.5 and 7.4.6; hotfix is available pending a full patch in 7.4.7.
+
+- [The Hacker News](https://thehackernews.com/2026/04/new-chrome-zero-day-cve-2026-5281-under.html) Google patched CVE-2026-5281, a use-after-free in Chrome's Dawn WebGPU component with confirmed in-the-wild exploitation. This is the fourth Chrome zero-day fixed in 2026. CISA added it to KEV with a federal deadline of April 15. Update Chrome to 146.0.7680.177/178. Other Chromium-based browsers are also affected.
+
+### Geopolitics
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-03-13/trump-xi-agenda-to-be-mapped-out-as-negotiators-meet-in-paris) The Trump-Xi Beijing summit (March 31–April 2) ended without major breakthroughs. The main tangible deliverable was a commitment to commercial purchases such as agricultural goods. Both sides framed the meeting as the start of a longer conversation on trade, semiconductors, and technology controls.
