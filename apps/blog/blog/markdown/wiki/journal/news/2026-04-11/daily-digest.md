@@ -43,3 +43,21 @@ last_verified: 2026-04-11
 - [VentureBeat](https://venturebeat.com/technology/anthropic-cuts-off-the-ability-to-use-claude-subscriptions-with-openclaw-and) OpenClaw's subscription access to Claude was cut on April 4; the creator was subsequently temporarily banned from Claude on April 10. This affects developers running Claude-powered agent workflows via OpenClaw outside the API.
 
 - [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) New GitHub trending entry at #7 (3,741 stars this week): a single CLAUDE.md file distilling Andrej Karpathy's observations on common LLM coding pitfalls into a drop-in prompt improvement for Claude Code projects.
+
+---
+
+## Update — 18:00 UTC
+
+### AI Tooling
+
+- [StartupNews](https://startupnews.fyi/2026/04/11/openai-says-to-update-mac-apps-including-chatgpt-and-codex-as-security-precaution/) OpenAI is asking Mac users to update ChatGPT and Codex immediately as a precautionary measure following a security issue in a third-party dependency. The company found no evidence that user data was accessed.
+
+### Open Source
+
+- [Cloudflare Blog](https://blog.cloudflare.com/emdash-wordpress/) Cloudflare released EmDash v0.1.0 on April 1, a serverless CMS written in TypeScript on Astro 6.0, open source under MIT and built to run on Cloudflare Workers. Plugins run in isolated sandboxes with explicitly declared capabilities, addressing the class of vulnerability responsible for 96% of WordPress security incidents.
+
+- [Kubernetes Blog](https://kubernetes.io/blog/2026/03/30/kubernetes-v1-36-sneak-peek/) Kubernetes v1.36 release is scheduled for April 22, 2026. Notable features include workload-aware preemption for AI/ML jobs, Ingress-Nginx retirement in favor of Gateway API, and Dynamic Resource Allocation enhancements.
+
+### Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-municipalities-funding-gap-9.7150596) Ontario municipalities are at a "critical" point and calling on the Ford government to fill a $4B funding gap from downloaded provincial responsibilities. Whitby's mayor specifically cited years of deferred parks and road repairs as a result.
