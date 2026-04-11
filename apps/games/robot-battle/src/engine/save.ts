@@ -54,6 +54,7 @@ function parseSave(raw: string | null): SaveData | null {
     if (data.player.godMode === undefined) data.player.godMode = false;
     if (data.player.newGamePlusLevel === undefined) data.player.newGamePlusLevel = 0;
     if (data.player.titanDefeated === undefined) data.player.titanDefeated = false;
+    if (data.player.endGameBoss === undefined) data.player.endGameBoss = null;
     // Migrate arm gear items to arm upgrades
     const armGearNames = ["Third Arm", "Fourth Arm", "Fifth Arm", "Sixth Arm"];
     const armUpgradeIds = ["third-arm", "fourth-arm", "fifth-arm", "sixth-arm"];

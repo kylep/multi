@@ -78,6 +78,16 @@ export interface Robot {
   godMode: boolean;
   newGamePlusLevel: number;
   titanDefeated: boolean;
+  endGameBoss: EndGameBossSpec | null;
+}
+
+export interface EndGameBossSpec {
+  name: string;
+  level: number;
+  weapons: string[];
+  gear: string[];
+  consumables: string[];
+  repeatableUpgrades: Record<string, number>;
 }
 
 export interface Enemy {
