@@ -10,7 +10,9 @@ import {
   listRepeatableUpgrades,
   canBuyRepeatableUpgrade,
   buyRepeatableUpgrade,
+  buyRepeatableUpgradeMulti,
   getRepeatableUpgradeCost,
+  getAffordableRepeatableLevels,
 } from "../../engine/upgrades";
 
 const SECTION_ORDER: Array<{ key: string; label: string }> = [
@@ -104,12 +106,34 @@ export async function upgradesScreen(terminal: Terminal, state: GameState): Prom
       if (rep) {
         const level = player.repeatableUpgrades[rep.id] ?? 0;
         const cost = getRepeatableUpgradeCost(rep, level);
-        const confirmed = await terminal.promptConfirm(
-          `Buy ${rep.name} (Lv.${level + 1}) for $${cost.toLocaleString()}?`,
-          "Buy",
-          "Cancel",
-        );
-        if (confirmed) buyRepeatableUpgrade(player, rep);
+        const { maxLevels, totalCost } = getAffordableRepeatableLevels(player, rep);
+        if (player.settings.mode === "sandbox" || maxLevels <= 1) {
+          const confirmed = await terminal.promptConfirm(
+            `Buy ${rep.name} (Lv.${level + 1}) for $${cost.toLocaleString()}?`,
+            "Buy",
+            "Cancel",
+          );
+          if (confirmed) buyRepeatableUpgrade(player, rep);
+        } else {
+          const qtyStr = await terminal.promptText(
+            `Buy ${rep.name} (next costs $${cost.toLocaleString()}) — How many? (1-${maxLevels}, all = $${totalCost.toLocaleString()}):`,
+          );
+          const qty = parseInt(qtyStr, 10);
+          if (!isNaN(qty) && qty > 0) {
+            const actualQty = Math.min(qty, maxLevels);
+            // Recompute total for the chosen quantity
+            let runningCost = 0;
+            for (let i = 0; i < actualQty; i++) {
+              runningCost += getRepeatableUpgradeCost(rep, level + i);
+            }
+            const confirmed = await terminal.promptConfirm(
+              `Buy ${actualQty}× ${rep.name} for $${runningCost.toLocaleString()}?`,
+              "Buy",
+              "Cancel",
+            );
+            if (confirmed) buyRepeatableUpgradeMulti(player, rep, actualQty);
+          }
+        }
         restoreScrollY = scrollY;
       }
     } else {

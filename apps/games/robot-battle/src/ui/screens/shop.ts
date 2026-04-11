@@ -369,12 +369,15 @@ async function renderDetailsTab(terminal: Terminal, state: GameState): Promise<s
   const gear = getGear(player);
 
   // Base stats (from level-ups, upgrades, and base values)
-  const baseMaxHp = player.maxHealth + player.level * 2;
+  const ngp = player.newGamePlusLevel ?? 0;
+  const levelStatBonus = player.level * (1 + ngp);
+  const levelHpBonus = player.level * (2 + ngp);
+  const baseMaxHp = player.maxHealth + levelHpBonus;
   const baseMaxEn = player.maxEnergy;
-  const baseAtk = player.attack;
-  const baseDef = player.defence;
-  const baseDodge = player.dodge;
-  const baseAcc = player.accuracy;
+  const baseAtk = player.attack; // attack % — level bonus is flat dmg, shown separately
+  const baseDef = player.defence + levelStatBonus;
+  const baseDodge = player.dodge + levelStatBonus;
+  const baseAcc = player.accuracy + levelStatBonus;
   const baseHands = player.hands;
 
   // Gear bonuses
@@ -408,6 +411,9 @@ async function renderDetailsTab(terminal: Terminal, state: GameState): Promise<s
   html += statLine("Max HP", baseMaxHp, gearHp, effHp);
   html += statLine("Max Energy", baseMaxEn, gearEn, effEn);
   html += statLine("Attack", baseAtk, gearAtk, effAtk, "%");
+  if (levelStatBonus > 0) {
+    html += `<div><span class="t-dim" style="display:inline-block;width:90px">Lv Dmg Bonus</span> <span class="t-yellow t-bold">+${levelStatBonus}</span> <span class="t-dim">(flat per attack)</span></div>`;
+  }
   html += statLine("Defence", baseDef, gearDef, effDef);
   html += statLine("Dodge", baseDodge, gearDodge, effDodge);
   html += statLine("Accuracy", baseAcc, gearAcc, effAcc);

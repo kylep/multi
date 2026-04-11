@@ -108,17 +108,47 @@ export interface RepeatableUpgradeDef {
 const REPEATABLE_UPGRADES: RepeatableUpgradeDef[] = [
   { id: "rep-hp", name: "+5 Max HP", baseCost: 2000, costPerLevel: 1000, description: "+5 Max HP per level" },
   { id: "rep-damage", name: "+1 Attack", baseCost: 3000, costPerLevel: 1500, description: "+1% Attack per level" },
+  { id: "rep-damage-plus", name: "+3 Attack II", baseCost: 30000, costPerLevel: 15000, description: "+3% Attack per level (premium)" },
   { id: "rep-defence", name: "+1 Defence", baseCost: 2500, costPerLevel: 1200, description: "+1 Defence per level" },
   { id: "rep-accuracy", name: "+2 Accuracy", baseCost: 2000, costPerLevel: 1000, description: "+2 Accuracy per level" },
   { id: "rep-dodge", name: "+1 Dodge", baseCost: 2000, costPerLevel: 1000, description: "+1 Dodge per level" },
+  { id: "rep-energy", name: "+5 Max Energy", baseCost: 2500, costPerLevel: 1200, description: "+5 Max Energy per level" },
 ];
 
 export function listRepeatableUpgrades(): RepeatableUpgradeDef[] {
   return REPEATABLE_UPGRADES;
 }
 
+/** Cost scales with flat per-level increase AND +2% compounding per level. */
 export function getRepeatableUpgradeCost(def: RepeatableUpgradeDef, currentLevel: number): number {
-  return def.baseCost + def.costPerLevel * currentLevel;
+  const linear = def.baseCost + def.costPerLevel * currentLevel;
+  const compounded = linear * Math.pow(1.02, currentLevel);
+  return Math.floor(compounded);
+}
+
+/** Compute how many levels of this upgrade a player can afford right now,
+ *  and the total cost for that many levels. */
+export function getAffordableRepeatableLevels(
+  player: Robot,
+  def: RepeatableUpgradeDef,
+): { maxLevels: number; totalCost: number } {
+  const startLevel = player.repeatableUpgrades[def.id] ?? 0;
+  if (player.settings.mode === "sandbox") {
+    // Sandbox: allow "buy 1" only (no money to spend)
+    return { maxLevels: 1, totalCost: 0 };
+  }
+  let budget = player.money;
+  let levels = 0;
+  let totalCost = 0;
+  while (true) {
+    const cost = getRepeatableUpgradeCost(def, startLevel + levels);
+    if (cost > budget) break;
+    budget -= cost;
+    totalCost += cost;
+    levels++;
+    if (levels > 9999) break; // safety
+  }
+  return { maxLevels: levels, totalCost };
 }
 
 export function allNormalUpgradesPurchased(player: Robot): boolean {
@@ -148,12 +178,34 @@ export function buyRepeatableUpgrade(player: Robot, def: RepeatableUpgradeDef): 
   applyRepeatableEffect(player, def.id, 1);
 }
 
+/** Buy multiple levels of a repeatable upgrade at once. Returns levels actually purchased. */
+export function buyRepeatableUpgradeMulti(
+  player: Robot,
+  def: RepeatableUpgradeDef,
+  desired: number,
+): number {
+  if (desired <= 0) return 0;
+  let bought = 0;
+  for (let i = 0; i < desired; i++) {
+    const level = player.repeatableUpgrades[def.id] ?? 0;
+    const cost = getRepeatableUpgradeCost(def, level);
+    if (player.settings.mode !== "sandbox" && player.money < cost) break;
+    if (player.settings.mode !== "sandbox") player.money -= cost;
+    player.repeatableUpgrades[def.id] = level + 1;
+    applyRepeatableEffect(player, def.id, 1);
+    bought++;
+  }
+  return bought;
+}
+
 function applyRepeatableEffect(player: Robot, id: string, levels: number): void {
   if (id === "rep-hp") player.maxHealth += 5 * levels;
   if (id === "rep-damage") player.attack += 1 * levels;
+  if (id === "rep-damage-plus") player.attack += 3 * levels;
   if (id === "rep-defence") player.defence += 1 * levels;
   if (id === "rep-accuracy") player.accuracy += 2 * levels;
   if (id === "rep-dodge") player.dodge += 1 * levels;
+  if (id === "rep-energy") player.maxEnergy += 5 * levels;
 }
 
 function applyAllRepeatableUpgrades(player: Robot): void {

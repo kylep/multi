@@ -43,6 +43,7 @@ export function createPlayer(state: GameState, name: string): Robot {
     godMode: false,
     newGamePlusLevel: 0,
     titanDefeated: false,
+    endGameBoss: null,
   };
   // Give player a free starter Stick
   const stick = state.registry.getItem("Stick");

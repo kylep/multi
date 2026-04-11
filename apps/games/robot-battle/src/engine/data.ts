@@ -198,6 +198,7 @@ export function loadAssets(): AssetRegistry {
         godMode: false,
         newGamePlusLevel: 0,
         titanDefeated: false,
+        endGameBoss: null,
       };
 
       for (const wName of enemy.weapons) {
