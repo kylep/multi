@@ -61,3 +61,15 @@ last_verified: 2026-04-11
 ### Local
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-municipalities-funding-gap-9.7150596) Ontario municipalities are at a "critical" point and calling on the Ford government to fill a $4B funding gap from downloaded provincial responsibilities. Whitby's mayor specifically cited years of deferred parks and road repairs as a result.
+
+---
+
+## Update — 22:00 UTC
+
+### AI Tooling
+
+- [Engadget](https://www.engadget.com/ai/googles-gemini-will-now-generate-presentations-for-you-010040637.html) Gemini Canvas can now generate full presentation decks from a text prompt or uploaded document — formatted with themes, images, and data visualizations. Rolling out to Pro subscribers now and free users in coming weeks; exports directly to Google Slides.
+
+### Geopolitics
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/4/11/us-says-two-naval-ships-transited-strait-of-hormuz-for-mine-clearing) US CENTCOM announced that USS Frank E. Peterson and USS Michael Murphy transited the Strait of Hormuz on April 11 to begin mine-clearing operations — the first US naval vessels through the strait since the war began. Iran disputed the claim and framed Hormuz control as a core sticking point in the Islamabad talks.
