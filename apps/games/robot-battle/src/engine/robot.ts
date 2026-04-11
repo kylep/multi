@@ -53,7 +53,9 @@ export function getEffectiveMaxEnergy(robot: Robot): number {
 }
 
 export function getEffectiveAttack(robot: Robot): number {
-  return robot.attack + getLevelStatBonus(robot) + getGear(robot).reduce((s, g) => s + g.attackBonus, 0);
+  // Attack is a % multiplier stat. Level scaling contributes flat damage
+  // per attack instead (see calculateDamage), so it's not folded in here.
+  return robot.attack + getGear(robot).reduce((s, g) => s + g.attackBonus, 0);
 }
 
 export function getRestEnergyBonus(robot: Robot): number {
