@@ -55,12 +55,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const storedAutoSummarize = useSettingsStore((s) => s.autoSummarize);
   const storedSummaryBudget = useSettingsStore((s) => s.summaryBudgetPct);
   const storedDedupRetry = useSettingsStore((s) => s.deduplicateRetry);
+  const storedTemperature = useSettingsStore((s) => s.temperature);
   const setSystemPrompt = useSettingsStore((s) => s.setSystemPrompt);
   const setSeedPrompt = useSettingsStore((s) => s.setSeedPrompt);
   const setContextOverride = useSettingsStore((s) => s.setContextOverride);
   const setAutoSummarize = useSettingsStore((s) => s.setAutoSummarize);
   const setSummaryBudgetPct = useSettingsStore((s) => s.setSummaryBudgetPct);
   const setDeduplicateRetry = useSettingsStore((s) => s.setDeduplicateRetry);
+  const setTemperature = useSettingsStore((s) => s.setTemperature);
 
   const [spSrc, setSpSrc] = useState<PromptSource>(storedSpSrc);
   const [spText, setSpText] = useState(storedSp);
@@ -80,6 +82,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [localAutoSummarize, setLocalAutoSummarize] = useState(storedAutoSummarize);
   const [localSummaryBudget, setLocalSummaryBudget] = useState(storedSummaryBudget);
   const [localDedupRetry, setLocalDedupRetry] = useState(storedDedupRetry);
+  const [localTemp, setLocalTemp] = useState(String(storedTemperature));
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -96,9 +99,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       setLocalAutoSummarize(storedAutoSummarize);
       setLocalSummaryBudget(storedSummaryBudget);
       setLocalDedupRetry(storedDedupRetry);
+      setLocalTemp(String(storedTemperature));
       setError(null);
     }
-  }, [open, storedSpSrc, storedSp, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedAutoSummarize, storedSummaryBudget, storedDedupRetry]);
+  }, [open, storedSpSrc, storedSp, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedAutoSummarize, storedSummaryBudget, storedDedupRetry, storedTemperature]);
 
   const serverMax = perSlotCtx(serverInfo);
 
@@ -146,6 +150,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     setAutoSummarize(localAutoSummarize);
     setSummaryBudgetPct(localSummaryBudget);
     setDeduplicateRetry(localDedupRetry);
+
+    const parsedTemp = parseFloat(localTemp);
+    if (Number.isNaN(parsedTemp) || parsedTemp < 0 || parsedTemp > 2) {
+      setError("Temperature must be a number between 0 and 2.");
+      return;
+    }
+    setTemperature(parsedTemp);
+
     onOpenChange(false);
   };
 
@@ -269,8 +281,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             </label>
             {localAutoSummarize && (
               <div className="mt-3 flex items-center gap-3 border-t border-border/50 pt-3">
-                <span className="text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                   Summary budget
+                  <HintIcon text="Max % of the context window the 'Story so far' summary can use. Higher = more memory of old conversation but less room for recent messages. Lower = more room for recent turns but the summary gets truncated." />
                 </span>
                 <input
                   type="range"
@@ -305,6 +318,26 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               data-testid="toggle-dedup-retry"
             />
           </label>
+        </div>
+
+        {/* Temperature */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="temperature">Temperature</Label>
+            <HintIcon text="Controls randomness. Lower (0.1-0.3) = focused and deterministic, good for code or factual Q&A. Higher (0.7-1.0) = creative and varied, good for stories and brainstorming. Range: 0-2." />
+          </div>
+          <input
+            id="temperature"
+            type="number"
+            min="0"
+            max="2"
+            step="0.1"
+            value={localTemp}
+            onChange={(e) => setLocalTemp(e.target.value)}
+            placeholder="0.7"
+            className="h-9 w-full rounded-md border border-border bg-background px-3 font-mono text-sm outline-none focus:border-ring"
+            data-testid="temperature-input"
+          />
         </div>
 
         {error && (

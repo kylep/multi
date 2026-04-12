@@ -41,6 +41,7 @@ export function ChatPane() {
   const autoSummarize = useSettingsStore((s) => s.autoSummarize);
   const summaryBudgetPct = useSettingsStore((s) => s.summaryBudgetPct);
   const deduplicateRetry = useSettingsStore((s) => s.deduplicateRetry);
+  const temperature = useSettingsStore((s) => s.temperature);
 
   const [draft, setDraft] = useState("");
 
@@ -148,7 +149,7 @@ export function ChatPane() {
 
       const runStream = async (
         msgs: ChatMessage[],
-        temperature?: number,
+        tempOverride?: number,
       ): Promise<string> => {
         let accumulated = "";
         for await (const delta of streamChat({
@@ -156,7 +157,7 @@ export function ChatPane() {
           messages: msgs,
           signal: controller.signal,
           maxTokens: REPLY_BUDGET,
-          temperature,
+          temperature: tempOverride ?? temperature,
         })) {
           accumulated += delta;
           appendToLastMessage(chatId, delta);
@@ -190,7 +191,7 @@ export function ChatPane() {
                 };
               });
 
-              const bumpedTemp = 0.7 + DEDUP_TEMP_BUMP * (retry + 1);
+              const bumpedTemp = temperature + DEDUP_TEMP_BUMP * (retry + 1);
               const retryResponse = await runStream(
                 requestMessages,
                 bumpedTemp,
@@ -232,6 +233,7 @@ export function ChatPane() {
       setSummary,
       setStreaming,
       summaryBudgetPct,
+      temperature,
     ],
   );
 
