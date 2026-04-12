@@ -3,6 +3,7 @@ import {
   type ChatMessage,
   buildRequestMessages,
   computeInputBudget,
+  computeReplyBudget,
   INPUT_BUDGET,
   previewContext,
   REPLY_BUDGET,
@@ -96,36 +97,53 @@ describe("buildRequestMessages with seedPrompt", () => {
 });
 
 describe("buildRequestMessages with summary", () => {
-  it("injects summary as system message", () => {
+  it("embeds summary in first user message content", () => {
     const history = makeHistory(4);
     const result = buildRequestMessages(history, {
       summary: "Player met Lyra.",
       inputBudget: 10000,
     });
-    const summaryMsg = result.messages.find((m) =>
-      m.content.includes("[Story so far]"),
-    );
-    expect(summaryMsg).toBeDefined();
-    expect(summaryMsg!.content).toContain("Player met Lyra.");
+    expect(result.messages[0].role).toBe("user");
+    expect(result.messages[0].content).toContain("[Story so far]");
+    expect(result.messages[0].content).toContain("Player met Lyra.");
   });
 
-  it("places summary after seed, before recent messages", () => {
+  it("places seed + summary together in first user message", () => {
     const history = makeHistory(4);
     const result = buildRequestMessages(history, {
       seedPrompt: "SEED",
       summary: "Summary here.",
       inputBudget: 10000,
     });
-    expect(result.messages[0].content).toContain("SEED");
-    expect(result.messages[1].content).toContain("[Story so far]");
-    expect(result.messages[2].role).toBe("assistant");
+    const first = result.messages[0];
+    expect(first.role).toBe("user");
+    expect(first.content).toContain("SEED");
+    expect(first.content).toContain("[Story so far]: Summary here.");
+    expect(first.content).toContain("message 0");
+  });
+});
+
+describe("computeReplyBudget", () => {
+  it("caps at 512 for large contexts", () => {
+    expect(computeReplyBudget(4096)).toBe(512);
+    expect(computeReplyBudget(8192)).toBe(512);
+  });
+
+  it("scales to 25% for small contexts", () => {
+    expect(computeReplyBudget(600)).toBe(150);
+    expect(computeReplyBudget(400)).toBe(100);
   });
 });
 
 describe("computeInputBudget", () => {
-  it("subtracts reply budget and safety from per-slot context", () => {
+  it("subtracts scaled reply budget and safety from per-slot context", () => {
     expect(computeInputBudget(2048)).toBe(2048 - REPLY_BUDGET - SAFETY);
     expect(computeInputBudget(8192)).toBe(8192 - REPLY_BUDGET - SAFETY);
+  });
+
+  it("uses proportional reply budget for small contexts", () => {
+    // 600: reply=150, safety=64, input=386
+    expect(computeInputBudget(600)).toBe(600 - 150 - SAFETY);
   });
 
   it("floors at 64 for absurdly small slots", () => {

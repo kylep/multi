@@ -5,8 +5,13 @@ export const REPLY_BUDGET = 512;
 export const SAFETY = 64;
 export const INPUT_BUDGET = PER_SLOT_CTX - REPLY_BUDGET - SAFETY;
 
+export function computeReplyBudget(perSlotCtx: number): number {
+  return Math.min(REPLY_BUDGET, Math.floor(perSlotCtx * 0.25));
+}
+
 export function computeInputBudget(perSlotCtx: number): number {
-  return Math.max(64, perSlotCtx - REPLY_BUDGET - SAFETY);
+  const reply = computeReplyBudget(perSlotCtx);
+  return Math.max(64, perSlotCtx - reply - SAFETY);
 }
 
 export type ChatRole = "system" | "user" | "assistant";
@@ -49,40 +54,48 @@ export function buildRequestMessages(
     : null;
   const systemCost = systemMsg ? estimateTokens(systemMsg.content) + 4 : 0;
 
-  // Seed: prepended to first user message, always kept.
-  let seedAugmentedFirst: ChatMessage | null = null;
-  let seedCost = 0;
-  if (seedPrompt && history.length > 0 && history[0].role === "user") {
-    seedAugmentedFirst = {
-      role: "user",
-      content: seedPrompt + "\n\n" + history[0].content,
-    };
-    seedCost = estimateTokens(seedAugmentedFirst.content) + 4;
-  }
-
-  // Summary: injected after system/seed, before recent messages.
-  let summaryMsg: ChatMessage | null = null;
+  // Summary: truncated to fit within the summary budget.
+  let effectiveSummary = "";
   let summaryCost = 0;
   if (summary) {
-    const rawCost = estimateTokens(summary) + 4;
-    summaryCost = Math.min(rawCost, summaryBudgetTokens);
-    const content =
-      rawCost > summaryBudgetTokens
-        ? summary.slice(0, summaryBudgetTokens * 4)
-        : summary;
-    summaryMsg = {
-      role: "system",
-      content: `[Story so far]: ${content}`,
-    };
+    const rawCost = estimateTokens(summary);
+    if (rawCost <= summaryBudgetTokens) {
+      effectiveSummary = summary;
+      summaryCost = rawCost;
+    } else {
+      effectiveSummary = summary.slice(0, summaryBudgetTokens * 4);
+      summaryCost = summaryBudgetTokens;
+    }
   }
 
-  const fixedCost = systemCost + seedCost + summaryCost + 2;
+  // Seed + summary: both prepended to first user message content.
+  // This avoids breaking chat templates that require strict role alternation.
+  let seedAugmentedFirst: ChatMessage | null = null;
+  let seedCost = 0;
+  if (history.length > 0 && history[0].role === "user") {
+    let prefix = "";
+    if (seedPrompt) prefix += seedPrompt;
+    if (effectiveSummary) {
+      if (prefix) prefix += "\n\n";
+      prefix += `[Story so far]: ${effectiveSummary}`;
+    }
+    if (prefix) {
+      seedAugmentedFirst = {
+        role: "user",
+        content: prefix + "\n\n" + history[0].content,
+      };
+    }
+    seedCost = seedAugmentedFirst
+      ? estimateTokens(seedAugmentedFirst.content) + 4
+      : estimateTokens(history[0].content) + 4;
+  }
+
+  const fixedCost = systemCost + seedCost + 2;
   const remaining = budget - fixedCost;
 
   if (history.length === 0) {
     const msgs: ChatMessage[] = [];
     if (systemMsg) msgs.push(systemMsg);
-    if (summaryMsg) msgs.push(summaryMsg);
     return { messages: msgs, truncated: false, droppedCount: 0, droppedMessages: [] };
   }
 
@@ -109,9 +122,39 @@ export function buildRequestMessages(
   // Assemble final message array.
   const messages: ChatMessage[] = [];
   if (systemMsg) messages.push(systemMsg);
-  if (seedAugmentedFirst) messages.push(seedAugmentedFirst);
-  if (summaryMsg) messages.push(summaryMsg);
+
+  // Include seed-augmented first message only if it won't break alternation.
+  // If the first kept message is also a user message, skip the seed to avoid
+  // consecutive same-role messages (which crash Mistral-style templates).
+  const firstKeptRole = kept.length > 0 ? kept[0].role : null;
+  if (seedAugmentedFirst) {
+    if (!firstKeptRole || firstKeptRole === "assistant") {
+      messages.push(seedAugmentedFirst);
+    } else {
+      // Can't include seed as standalone — embed seed+summary into the
+      // first kept user message instead.
+      kept[0] = {
+        role: kept[0].role,
+        content: seedAugmentedFirst.content + "\n\n" + kept[0].content,
+      };
+    }
+  } else if (history.length > 0) {
+    if (!firstKeptRole || firstKeptRole !== history[0].role) {
+      messages.push({ role: history[0].role, content: history[0].content });
+    }
+  }
   messages.push(...kept);
+
+  // Final alternation validation: drop messages that would create
+  // consecutive same-role entries (defensive, shouldn't trigger normally).
+  for (let i = messages.length - 1; i > 0; i--) {
+    if (
+      messages[i].role === messages[i - 1].role &&
+      messages[i].role !== "system"
+    ) {
+      messages.splice(i, 1);
+    }
+  }
 
   return {
     messages,
@@ -150,24 +193,42 @@ export function previewContext(
     ? estimateTokens(opts.systemPrompt) + 4
     : 0;
   const draftCost = draft ? estimateTokens(draft) + 4 : 0;
-  const hasSeed =
-    !!opts.seedPrompt && history.length > 0 && history[0].role === "user";
-  const seedCost = hasSeed
-    ? estimateTokens(opts.seedPrompt + "\n\n" + history[0].content) + 4
-    : 0;
-
   const summaryBudgetPct = opts.summaryBudgetPct ?? 25;
   const summaryBudgetTokens = Math.floor(
     (opts.inputBudget * summaryBudgetPct) / 100,
   );
   const summaryTokens = opts.summary
-    ? Math.min(estimateTokens(opts.summary) + 4, summaryBudgetTokens)
+    ? Math.min(estimateTokens(opts.summary), summaryBudgetTokens)
     : 0;
 
-  const fixedCost = systemCost + seedCost + summaryTokens + draftCost + 2;
+  // Build the combined first-message content (seed + summary + first user msg)
+  const hasFirstUser = history.length > 0 && history[0].role === "user";
+  let firstMsgContent = hasFirstUser ? history[0].content : "";
+  if (opts.seedPrompt && hasFirstUser) {
+    firstMsgContent = opts.seedPrompt + "\n\n" + firstMsgContent;
+  }
+  if (opts.summary && hasFirstUser) {
+    const effectiveSummary =
+      estimateTokens(opts.summary) <= summaryBudgetTokens
+        ? opts.summary
+        : opts.summary.slice(0, summaryBudgetTokens * 4);
+    const sep = opts.seedPrompt ? "\n\n" : "";
+    firstMsgContent = firstMsgContent.replace(
+      history[0].content,
+      `${sep}[Story so far]: ${effectiveSummary}\n\n${history[0].content}`,
+    );
+    if (!opts.seedPrompt) {
+      firstMsgContent = `[Story so far]: ${effectiveSummary}\n\n${history[0].content}`;
+    }
+  }
+  const seedCost = hasFirstUser
+    ? estimateTokens(firstMsgContent) + 4
+    : 0;
+
+  const fixedCost = systemCost + seedCost + draftCost + 2;
   const remaining = opts.inputBudget - fixedCost;
 
-  const startIdx = hasSeed ? 1 : 0;
+  const startIdx = hasFirstUser ? 1 : 0;
   let used = 0;
   let droppedCount = 0;
   let recentStartIndex = history.length;

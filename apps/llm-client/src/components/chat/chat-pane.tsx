@@ -7,8 +7,8 @@ import {
   buildRequestMessages,
   type ChatMessage,
   computeInputBudget,
+  computeReplyBudget,
   previewContext,
-  REPLY_BUDGET,
 } from "@/lib/context-manager";
 import { estimateTokens } from "@/lib/tokens";
 import { streamChat, LlamaClientError } from "@/lib/llama-client";
@@ -52,6 +52,7 @@ export function ChatPane() {
     seedPromptSource === "none" ? undefined : seedPrompt || undefined;
   const perSlot = effectivePerSlot(serverInfo, contextOverride);
   const inputBudget = computeInputBudget(perSlot);
+  const replyBudget = computeReplyBudget(perSlot);
 
   const preview = useMemo(() => {
     const history = (chat?.messages ?? []).map((m) => ({
@@ -117,7 +118,7 @@ export function ChatPane() {
             endpoint,
             existingSummary: currentSummary || undefined,
             maxTokens: Math.floor(
-              (inputBudget * summaryBudgetPct) / 100 / 4,
+              (inputBudget * summaryBudgetPct) / 100,
             ),
           },
         );
@@ -146,7 +147,7 @@ export function ChatPane() {
           endpoint,
           messages: msgs,
           signal: controller.signal,
-          maxTokens: REPLY_BUDGET,
+          maxTokens: replyBudget,
           temperature: tempOverride ?? temperature,
         })) {
           accumulated += delta;
