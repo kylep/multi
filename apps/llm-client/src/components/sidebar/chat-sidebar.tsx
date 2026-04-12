@@ -13,18 +13,19 @@ import { ChatRow } from "./chat-row";
 
 interface ChatSidebarProps {
   onSettingsOpen: () => void;
+  onChatSelect: (id: string) => void;
   settingsActive: boolean;
 }
 
 export function ChatSidebar({
   onSettingsOpen,
+  onChatSelect,
   settingsActive,
 }: ChatSidebarProps) {
   const chatOrder = useChatStore((s) => s.chatOrder);
   const chats = useChatStore((s) => s.chats);
   const activeChatId = useChatStore((s) => s.activeChatId);
   const newChat = useChatStore((s) => s.newChat);
-  const selectChat = useChatStore((s) => s.selectChat);
   const deleteChat = useChatStore((s) => s.deleteChat);
   const endpoint = useSettingsStore((s) => s.endpoint);
   const [endpointOpen, setEndpointOpen] = useState(false);
@@ -70,7 +71,7 @@ export function ChatSidebar({
                   title={chat.title}
                   updatedAt={chat.updatedAt}
                   active={id === activeChatId && !settingsActive}
-                  onSelect={() => selectChat(id)}
+                  onSelect={() => onChatSelect(id)}
                   onDelete={() => deleteChat(id)}
                 />
               );

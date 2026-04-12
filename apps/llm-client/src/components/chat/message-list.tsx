@@ -12,6 +12,7 @@ interface MessageListProps {
   droppedCount: number;
   summary: string;
   onSummaryChange: (next: string) => void;
+  onRetry?: () => void;
   summaryTokens: number;
   inputBudget: number;
 }
@@ -23,6 +24,7 @@ export function MessageList({
   droppedCount,
   summary,
   onSummaryChange,
+  onRetry,
   summaryTokens,
   inputBudget,
 }: MessageListProps) {
@@ -49,6 +51,11 @@ export function MessageList({
   }, []);
 
   const hasTruncation = droppedCount > 0;
+  const lastMsg = messages[messages.length - 1];
+  const lastIsError =
+    lastMsg?.role === "assistant" &&
+    lastMsg.content.includes("⚠️") &&
+    lastMsg.id !== streamingMessageId;
 
   return (
     <div
@@ -58,7 +65,6 @@ export function MessageList({
       data-testid="message-list"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-6 px-6 py-8">
-        {/* Seed message (index 0) always shown */}
         {messages.length > 0 && (
           <MessageBubble
             role={messages[0].role}
@@ -67,7 +73,6 @@ export function MessageList({
           />
         )}
 
-        {/* Summary panel + truncation boundary */}
         {hasTruncation && (
           <SummaryPanel
             summary={summary}
@@ -78,15 +83,20 @@ export function MessageList({
           />
         )}
 
-        {/* Recent messages in context */}
-        {messages.slice(hasTruncation ? recentStartIndex : 1).map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            role={msg.role}
-            content={msg.content}
-            streaming={msg.id === streamingMessageId}
-          />
-        ))}
+        {messages.slice(hasTruncation ? recentStartIndex : 1).map((msg) => {
+          const isLast = msg.id === lastMsg?.id;
+          const isError = isLast && lastIsError;
+          return (
+            <MessageBubble
+              key={msg.id}
+              role={msg.role}
+              content={msg.content}
+              streaming={msg.id === streamingMessageId}
+              hasError={isError}
+              onRetry={isError ? onRetry : undefined}
+            />
+          );
+        })}
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ export function ChatRow({
       <button
         type="button"
         onClick={onSelect}
-        className="flex-1 truncate px-3 py-2 text-left text-sm"
+        className="min-w-0 flex-1 truncate px-3 py-2 text-left text-sm"
         title={title}
       >
         {title}
@@ -47,7 +47,7 @@ export function ChatRow({
       <DropdownMenu>
         <DropdownMenuTrigger
           className={cn(
-            "mr-1 rounded p-1 opacity-0 transition-opacity hover:bg-background/30 focus:opacity-100 group-hover:opacity-100",
+            "mr-1 shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-background/30 focus:opacity-100 group-hover:opacity-100",
             active && "opacity-100",
           )}
           aria-label="Chat actions"

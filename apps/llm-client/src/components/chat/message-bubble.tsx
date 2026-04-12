@@ -3,6 +3,8 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ChatRole } from "@/lib/context-manager";
 
@@ -10,12 +12,16 @@ interface MessageBubbleProps {
   role: ChatRole;
   content: string;
   streaming?: boolean;
+  hasError?: boolean;
+  onRetry?: () => void;
 }
 
 export function MessageBubble({
   role,
   content,
   streaming,
+  hasError,
+  onRetry,
 }: MessageBubbleProps) {
   const isUser = role === "user";
   const label = isUser ? "User:" : role === "assistant" ? "Bot:" : "System:";
@@ -65,6 +71,18 @@ export function MessageBubble({
             </>
           )}
         </div>
+        {hasError && onRetry && !streaming && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRetry}
+            className="mt-1 gap-1.5 text-xs text-destructive hover:text-destructive"
+            data-testid="retry-btn"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Retry
+          </Button>
+        )}
       </div>
     </div>
   );

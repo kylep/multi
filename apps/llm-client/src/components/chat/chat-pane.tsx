@@ -10,6 +10,7 @@ import {
   previewContext,
   REPLY_BUDGET,
 } from "@/lib/context-manager";
+import { estimateTokens } from "@/lib/tokens";
 import { streamChat, LlamaClientError } from "@/lib/llama-client";
 import { effectivePerSlot } from "@/lib/verify-endpoint";
 import { summarizeMessages } from "@/lib/summarize";
@@ -91,23 +92,12 @@ export function ChatPane() {
     [activeChatId, setSummary],
   );
 
-  const handleSend = useCallback(
-    async (text: string) => {
-      let chatId = activeChatId;
-      if (!chatId) chatId = newChat();
+  const doSend = useCallback(
+    async (chatId: string, historyForRequest: ChatMessage[]) => {
+      const currentSummary =
+        useChatStore.getState().chats[chatId]?.summary || "";
 
-      appendMessage(chatId, { role: "user", content: text });
-      appendMessage(chatId, { role: "assistant", content: "" });
-
-      const chatState = useChatStore.getState().chats[chatId];
-      const currentMessages = chatState.messages.slice(0, -1);
-      const currentSummary = chatState.summary || "";
-      const historyForRequest = currentMessages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
-      const buildResult = buildRequestMessages(historyForRequest, {
+      let buildResult = buildRequestMessages(historyForRequest, {
         inputBudget,
         systemPrompt: effectiveSystemPrompt,
         seedPrompt: effectiveSeedPrompt,
@@ -115,7 +105,7 @@ export function ChatPane() {
         summaryBudgetPct,
       });
 
-      // Auto-summarize: extend the rolling summary with dropped messages.
+      // Auto-summarize: compact ALL dropped messages at once.
       if (
         autoSummarize &&
         buildResult.truncated &&
@@ -126,20 +116,20 @@ export function ChatPane() {
           {
             endpoint,
             existingSummary: currentSummary || undefined,
-            maxTokens: 200,
+            maxTokens: Math.floor(
+              (inputBudget * summaryBudgetPct) / 100 / 4,
+            ),
           },
         );
         if (newSummary) {
           setSummary(chatId, newSummary);
-          // Rebuild with the new summary.
-          const rebuilt = buildRequestMessages(historyForRequest, {
+          buildResult = buildRequestMessages(historyForRequest, {
             inputBudget,
             systemPrompt: effectiveSystemPrompt,
             seedPrompt: effectiveSeedPrompt,
             summary: newSummary,
             summaryBudgetPct,
           });
-          buildResult.messages = rebuilt.messages;
         }
       }
 
@@ -169,7 +159,7 @@ export function ChatPane() {
         const fullResponse = await runStream(requestMessages);
 
         if (deduplicateRetry && fullResponse) {
-          const priorMessages = currentMessages.map((m) => ({
+          const priorMessages = historyForRequest.map((m) => ({
             role: m.role,
             content: m.content,
           }));
@@ -220,8 +210,6 @@ export function ChatPane() {
       }
     },
     [
-      activeChatId,
-      appendMessage,
       appendToLastMessage,
       autoSummarize,
       deduplicateRetry,
@@ -229,13 +217,59 @@ export function ChatPane() {
       effectiveSystemPrompt,
       endpoint,
       inputBudget,
-      newChat,
       setSummary,
       setStreaming,
       summaryBudgetPct,
       temperature,
     ],
   );
+
+  const handleSend = useCallback(
+    async (text: string) => {
+      let chatId = activeChatId;
+      if (!chatId) chatId = newChat();
+
+      appendMessage(chatId, { role: "user", content: text });
+      appendMessage(chatId, { role: "assistant", content: "" });
+
+      const currentMessages = useChatStore
+        .getState()
+        .chats[chatId].messages.slice(0, -1);
+      const historyForRequest = currentMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      await doSend(chatId, historyForRequest);
+    },
+    [activeChatId, appendMessage, doSend, newChat],
+  );
+
+  const handleRetry = useCallback(() => {
+    if (!activeChatId || !chat) return;
+    const messages = chat.messages;
+    if (messages.length < 2) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg.role !== "assistant") return;
+
+    // Clear the error response
+    useChatStore.setState((s) => {
+      const c = s.chats[activeChatId];
+      if (!c) return s;
+      const msgs = c.messages.slice();
+      msgs[msgs.length - 1] = { ...msgs[msgs.length - 1], content: "" };
+      return {
+        chats: { ...s.chats, [activeChatId]: { ...c, messages: msgs } },
+      };
+    });
+
+    const historyForRequest = messages.slice(0, -1).map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
+    doSend(activeChatId, historyForRequest);
+  }, [activeChatId, chat, doSend]);
 
   const isStreaming = Boolean(
     streaming && chat && streaming.chatId === chat.id,
@@ -256,6 +290,7 @@ export function ChatPane() {
           droppedCount={preview.droppedCount}
           summary={chat.summary ?? ""}
           onSummaryChange={handleSummaryChange}
+          onRetry={handleRetry}
           summaryTokens={preview.summaryTokens}
           inputBudget={preview.inputBudget}
         />
