@@ -36,6 +36,13 @@ export function PromptField({
   const activeText = source === "file" ? fileValue : textValue;
   const tokenCount = estimateTokens(activeText);
 
+  const handleSourceChange = (v: PromptSource) => {
+    if (v === "text" && fileValue) {
+      onTextChange(fileValue);
+    }
+    onSourceChange(v);
+  };
+
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -44,6 +51,7 @@ export function PromptField({
     try {
       const text = await file.text();
       onFileLoaded(text, file.name);
+      onTextChange(text);
       setError(null);
     } catch (err) {
       setError(`Couldn't read file: ${(err as Error).message}`);
@@ -56,7 +64,7 @@ export function PromptField({
     <div className="flex flex-col gap-1.5">
       <Tabs
         value={source === "none" ? "text" : source}
-        onValueChange={(v) => onSourceChange(v as PromptSource)}
+        onValueChange={(v) => handleSourceChange(v as PromptSource)}
       >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="text" data-testid={`${id}-tab-text`}>
