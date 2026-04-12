@@ -45,6 +45,7 @@ export function ChatPane() {
   const temperature = useSettingsStore((s) => s.temperature);
 
   const [draft, setDraft] = useState("");
+  const [compacting, setCompacting] = useState(false);
 
   const effectiveSystemPrompt =
     systemPromptSource === "none" ? undefined : systemPrompt || undefined;
@@ -119,6 +120,7 @@ export function ChatPane() {
               inputBudget * 0.8));
 
       if (shouldCompact) {
+        setCompacting(true);
         // For proactive compaction (no drops yet), compact the oldest
         // 50% of non-seed messages to make room.
         let messagesToCompact = buildResult.droppedMessages;
@@ -148,6 +150,7 @@ export function ChatPane() {
             });
           }
         }
+        setCompacting(false);
       }
 
       const requestMessages = buildResult.messages;
@@ -334,6 +337,7 @@ export function ChatPane() {
         inputBudget={preview.inputBudget}
         usedPercent={preview.usedPercent}
         truncated={preview.truncated}
+        compacting={compacting}
       />
     </section>
   );

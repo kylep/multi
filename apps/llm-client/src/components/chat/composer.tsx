@@ -16,6 +16,7 @@ interface ComposerProps {
   inputBudget: number;
   usedPercent: number;
   truncated: boolean;
+  compacting?: boolean;
 }
 
 export function Composer({
@@ -29,6 +30,7 @@ export function Composer({
   inputBudget,
   usedPercent,
   truncated,
+  compacting,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -115,6 +117,16 @@ export function Composer({
         <p className="text-muted-foreground">
           This is a local model. Nothing leaves 127.0.0.1.
         </p>
+        <div className="flex items-center gap-3">
+          {compacting && (
+            <span
+              className="animate-pulse text-amber-500"
+              data-testid="compacting-indicator"
+            >
+              compacting…
+            </span>
+          )}
+        </div>
         <p
           className={cn("font-mono", meterColor)}
           data-testid="context-meter"
