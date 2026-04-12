@@ -28,7 +28,7 @@ export function ChatRow({
   return (
     <div
       className={cn(
-        "group flex items-center rounded-md transition-colors",
+        "group flex items-center overflow-hidden rounded-md transition-colors",
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : "hover:bg-sidebar-accent/60",
