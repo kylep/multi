@@ -1,15 +1,16 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useChatStore } from "@/store/chat-store";
 import { useSettingsStore } from "@/store/settings-store";
 import {
   buildRequestMessages,
   computeInputBudget,
+  previewContext,
   REPLY_BUDGET,
 } from "@/lib/context-manager";
 import { streamChat, LlamaClientError } from "@/lib/llama-client";
-import { perSlotCtx } from "@/lib/verify-endpoint";
+import { effectivePerSlot } from "@/lib/verify-endpoint";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
 
@@ -23,8 +24,36 @@ export function ChatPane() {
   const appendMessage = useChatStore((s) => s.appendMessage);
   const appendToLastMessage = useChatStore((s) => s.appendToLastMessage);
   const setStreaming = useChatStore((s) => s.setStreaming);
+  const togglePin = useChatStore((s) => s.togglePin);
   const endpoint = useSettingsStore((s) => s.endpoint);
   const serverInfo = useSettingsStore((s) => s.serverInfo);
+  const systemPrompt = useSettingsStore((s) => s.systemPrompt);
+  const systemPromptSource = useSettingsStore((s) => s.systemPromptSource);
+  const seedPrompt = useSettingsStore((s) => s.seedPrompt);
+  const seedPromptSource = useSettingsStore((s) => s.seedPromptSource);
+  const contextOverride = useSettingsStore((s) => s.contextOverride);
+
+  const [draft, setDraft] = useState("");
+
+  const effectiveSystemPrompt =
+    systemPromptSource === "none" ? undefined : systemPrompt || undefined;
+  const effectiveSeedPrompt =
+    seedPromptSource === "none" ? undefined : seedPrompt || undefined;
+  const perSlot = effectivePerSlot(serverInfo, contextOverride);
+  const inputBudget = computeInputBudget(perSlot);
+
+  const preview = useMemo(() => {
+    const history = (chat?.messages ?? []).map((m) => ({
+      role: m.role,
+      content: m.content,
+      pinned: m.pinned,
+    }));
+    return previewContext(history, draft, {
+      inputBudget,
+      systemPrompt: effectiveSystemPrompt,
+      seedPrompt: effectiveSeedPrompt,
+    });
+  }, [chat?.messages, draft, inputBudget, effectiveSystemPrompt, effectiveSeedPrompt]);
 
   const streamingMessageId = useMemo(() => {
     if (!chat || !streaming || streaming.chatId !== chat.id) return null;
@@ -35,6 +64,13 @@ export function ChatPane() {
   const handleStop = useCallback(() => {
     streaming?.abort();
   }, [streaming]);
+
+  const handleTogglePin = useCallback(
+    (messageId: string) => {
+      if (activeChatId) togglePin(activeChatId, messageId);
+    },
+    [activeChatId, togglePin],
+  );
 
   const handleSend = useCallback(
     async (text: string) => {
@@ -47,12 +83,15 @@ export function ChatPane() {
       const historyForRequest = useChatStore
         .getState()
         .chats[chatId].messages.slice(0, -1)
-        .map((m) => ({ role: m.role, content: m.content }));
+        .map((m) => ({ role: m.role, content: m.content, pinned: m.pinned }));
 
-      const inputBudget = computeInputBudget(perSlotCtx(serverInfo));
       const { messages: requestMessages } = buildRequestMessages(
         historyForRequest,
-        { inputBudget },
+        {
+          inputBudget,
+          systemPrompt: effectiveSystemPrompt,
+          seedPrompt: effectiveSeedPrompt,
+        },
       );
 
       const controller = new AbortController();
@@ -72,7 +111,7 @@ export function ChatPane() {
           (err as Error)?.name === "AbortError" ||
           controller.signal.aborted
         ) {
-          // user-initiated, keep partial text
+          // user-initiated stop
         } else {
           const msg =
             err instanceof LlamaClientError
@@ -88,9 +127,11 @@ export function ChatPane() {
       activeChatId,
       appendMessage,
       appendToLastMessage,
+      effectiveSeedPrompt,
+      effectiveSystemPrompt,
       endpoint,
+      inputBudget,
       newChat,
-      serverInfo,
       setStreaming,
     ],
   );
@@ -110,6 +151,11 @@ export function ChatPane() {
         <MessageList
           messages={chat.messages}
           streamingMessageId={streamingMessageId}
+          truncationIndex={
+            preview.truncated ? preview.firstKeptIndex : null
+          }
+          keptSet={preview.truncated ? preview.keptSet : null}
+          onTogglePin={handleTogglePin}
         />
       ) : (
         <div className="flex-1 overflow-y-auto">
@@ -125,9 +171,15 @@ export function ChatPane() {
         </div>
       )}
       <Composer
+        value={draft}
+        onValueChange={setDraft}
         onSend={handleSend}
         onStop={handleStop}
         streaming={Boolean(isStreaming)}
+        usedTokens={preview.usedTokens}
+        inputBudget={preview.inputBudget}
+        usedPercent={preview.usedPercent}
+        truncated={preview.truncated}
       />
     </section>
   );

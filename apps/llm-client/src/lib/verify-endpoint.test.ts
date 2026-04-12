@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { perSlotCtx, verifyEndpoint } from "./verify-endpoint";
+import {
+  effectivePerSlot,
+  perSlotCtx,
+  verifyEndpoint,
+} from "./verify-endpoint";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -173,5 +177,34 @@ describe("perSlotCtx", () => {
         totalSlots: 1,
       }),
     ).toBe(32000);
+  });
+});
+
+describe("effectivePerSlot", () => {
+  const info = {
+    endpoint: "x",
+    modelId: "m",
+    probedProps: true,
+    nCtx: 8192,
+    totalSlots: 4,
+  };
+
+  it("returns server max when override is null/undefined", () => {
+    expect(effectivePerSlot(info, null)).toBe(2048);
+    expect(effectivePerSlot(info, undefined)).toBe(2048);
+  });
+
+  it("returns override when override is below server max", () => {
+    expect(effectivePerSlot(info, 1024)).toBe(1024);
+  });
+
+  it("clamps override to server max when override exceeds it", () => {
+    expect(effectivePerSlot(info, 9999)).toBe(2048);
+  });
+
+  it("returns server max for invalid overrides", () => {
+    expect(effectivePerSlot(info, 0)).toBe(2048);
+    expect(effectivePerSlot(info, -100)).toBe(2048);
+    expect(effectivePerSlot(info, Number.NaN)).toBe(2048);
   });
 });

@@ -4,6 +4,7 @@ import {
   buildRequestMessages,
   computeInputBudget,
   INPUT_BUDGET,
+  previewContext,
   REPLY_BUDGET,
   SAFETY,
 } from "./context-manager";
@@ -111,5 +112,108 @@ describe("computeInputBudget", () => {
   it("floors at 64 for absurdly small slots", () => {
     expect(computeInputBudget(0)).toBe(64);
     expect(computeInputBudget(100)).toBe(64);
+  });
+});
+
+describe("previewContext", () => {
+  it("keeps every message and reports low usage for small history", () => {
+    const history = makeHistory(3);
+    const preview = previewContext(history, "hi", { inputBudget: 10000 });
+    expect(preview.firstKeptIndex).toBe(0);
+    expect(preview.droppedCount).toBe(0);
+    expect(preview.truncated).toBe(false);
+    expect(preview.usedPercent).toBeLessThan(5);
+  });
+
+  it("drops oldest messages and advances firstKeptIndex under tight budget", () => {
+    const history = makeHistory(20, (i) => `m ${i} ` + "x".repeat(400));
+    const preview = previewContext(history, "new", { inputBudget: 1000 });
+    expect(preview.firstKeptIndex).toBeGreaterThan(0);
+    expect(preview.droppedCount).toBeGreaterThan(0);
+    expect(preview.truncated).toBe(true);
+  });
+
+  it("counts system prompt + draft against the budget", () => {
+    const history = makeHistory(5, (i) => `msg ${i}`);
+    const withoutPrompt = previewContext(history, "hi", {
+      inputBudget: 10000,
+    });
+    const withPrompt = previewContext(history, "hi", {
+      inputBudget: 10000,
+      systemPrompt: "x".repeat(400),
+    });
+    expect(withPrompt.usedTokens).toBeGreaterThan(withoutPrompt.usedTokens);
+  });
+
+  it("caps usedPercent at 100", () => {
+    const history = makeHistory(10, (i) => `m ${i} ` + "x".repeat(1000));
+    const preview = previewContext(history, "a".repeat(5000), {
+      inputBudget: 100,
+    });
+    expect(preview.usedPercent).toBeLessThanOrEqual(100);
+  });
+
+  it("pins index 0 implicitly when seedPrompt is provided", () => {
+    const history = makeHistory(10, (i) => `m ${i} ` + "x".repeat(300));
+    const preview = previewContext(history, "", {
+      inputBudget: 500,
+      seedPrompt: "x".repeat(200),
+    });
+    expect(preview.truncated).toBe(true);
+    expect(preview.keptSet.has(0)).toBe(true);
+  });
+
+  it("keeps explicitly pinned messages even when over budget", () => {
+    const history = makeHistory(10, (i) => `m ${i} ` + "x".repeat(300));
+    history[5].pinned = true;
+    const preview = previewContext(history, "", { inputBudget: 500 });
+    expect(preview.truncated).toBe(true);
+    expect(preview.keptSet.has(5)).toBe(true);
+  });
+
+  it("keptSet indices map to original history array", () => {
+    const history = makeHistory(5, (i) => `m ${i}`);
+    const preview = previewContext(history, "", {
+      inputBudget: 10000,
+      seedPrompt: "seed",
+    });
+    // All should be kept with a large budget
+    for (let i = 0; i < 5; i++) {
+      expect(preview.keptSet.has(i)).toBe(true);
+    }
+  });
+});
+
+describe("buildRequestMessages with seedPrompt", () => {
+  it("prepends seed to first user message content", () => {
+    const history: ChatMessage[] = [
+      { role: "user", content: "hello" },
+      { role: "assistant", content: "hi" },
+    ];
+    const result = buildRequestMessages(history, {
+      seedPrompt: "SEED",
+      inputBudget: 10000,
+    });
+    expect(result.messages[0].role).toBe("user");
+    expect(result.messages[0].content).toBe("SEED\n\nhello");
+  });
+
+  it("always keeps the seed-augmented first message even under tight budget", () => {
+    const history = makeHistory(20, (i) => `m ${i} ` + "x".repeat(200));
+    const result = buildRequestMessages(history, {
+      seedPrompt: "SEED_PROMPT",
+      inputBudget: 500,
+    });
+    expect(result.messages[0].content).toContain("SEED_PROMPT");
+    expect(result.truncated).toBe(true);
+    expect(result.droppedCount).toBeGreaterThan(0);
+  });
+
+  it("keeps explicitly pinned messages during truncation", () => {
+    const history = makeHistory(20, (i) => `m ${i} ` + "x".repeat(200));
+    history[3].pinned = true;
+    const result = buildRequestMessages(history, { inputBudget: 500 });
+    const contents = result.messages.map((m) => m.content);
+    expect(contents.some((c) => c.includes("m 3"))).toBe(true);
   });
 });

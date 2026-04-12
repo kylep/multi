@@ -139,3 +139,16 @@ export function perSlotCtx(info: ServerInfo | null | undefined): number {
   if (!info.nCtx || !info.totalSlots || info.totalSlots < 1) return 2048;
   return Math.floor(info.nCtx / info.totalSlots);
 }
+
+/**
+ * Effective per-slot context: the user's override clamped to the server's
+ * real per-slot maximum. Null / undefined / NaN override → server default.
+ */
+export function effectivePerSlot(
+  info: ServerInfo | null | undefined,
+  override: number | null | undefined,
+): number {
+  const serverMax = perSlotCtx(info);
+  if (!override || Number.isNaN(override) || override < 1) return serverMax;
+  return Math.min(override, serverMax);
+}

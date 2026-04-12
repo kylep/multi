@@ -1,24 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowUp, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ComposerProps {
+  value: string;
+  onValueChange: (next: string) => void;
   onSend: (text: string) => void;
   onStop: () => void;
   streaming: boolean;
   disabled?: boolean;
+  usedTokens: number;
+  inputBudget: number;
+  usedPercent: number;
+  truncated: boolean;
 }
 
 export function Composer({
+  value,
+  onValueChange,
   onSend,
   onStop,
   streaming,
   disabled,
+  usedTokens,
+  inputBudget,
+  usedPercent,
+  truncated,
 }: ComposerProps) {
-  const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -34,7 +45,7 @@ export function Composer({
   const submit = () => {
     if (!canSend) return;
     onSend(value.trim());
-    setValue("");
+    onValueChange("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -43,6 +54,13 @@ export function Composer({
       submit();
     }
   };
+
+  const meterColor =
+    usedPercent >= 100 || truncated
+      ? "text-destructive"
+      : usedPercent >= 80
+        ? "text-amber-500"
+        : "text-muted-foreground";
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-6">
@@ -54,7 +72,7 @@ export function Composer({
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => onValueChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
             disabled
@@ -93,9 +111,19 @@ export function Composer({
           </Button>
         )}
       </div>
-      <p className="mt-2 text-center text-[11px] text-muted-foreground">
-        This is a local model. Nothing leaves 127.0.0.1.
-      </p>
+      <div className="mt-2 flex items-center justify-between text-[11px]">
+        <p className="text-muted-foreground">
+          This is a local model. Nothing leaves 127.0.0.1.
+        </p>
+        <p
+          className={cn("font-mono", meterColor)}
+          data-testid="context-meter"
+          title={`${usedTokens.toLocaleString()} / ${inputBudget.toLocaleString()} tokens`}
+        >
+          {truncated ? "⚠ " : ""}
+          {usedPercent}% ctx
+        </p>
+      </div>
     </div>
   );
 }

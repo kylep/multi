@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Server } from "lucide-react";
+import { Plus, Server, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useChatStore } from "@/store/chat-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { EndpointDialog } from "@/components/settings/endpoint-dialog";
+import { SettingsDialog } from "@/components/settings/settings-dialog";
 import { ChatRow } from "./chat-row";
 
 export function ChatSidebar() {
@@ -19,6 +20,7 @@ export function ChatSidebar() {
   const deleteChat = useChatStore((s) => s.deleteChat);
   const endpoint = useSettingsStore((s) => s.endpoint);
   const [endpointOpen, setEndpointOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <aside className="flex h-dvh w-[280px] flex-col border-r border-border bg-sidebar text-sidebar-foreground">
@@ -69,27 +71,39 @@ export function ChatSidebar() {
           )}
         </nav>
       </ScrollArea>
-      <button
-        type="button"
-        onClick={() => setEndpointOpen(true)}
-        data-testid="endpoint-open"
-        className="group flex items-center gap-2 border-t border-border px-4 py-3 text-left text-[11px] text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
-      >
-        <span
-          aria-hidden
-          className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_theme(colors.emerald.500)]"
-        />
-        <Server className="h-3 w-3" />
-        <span className="truncate">
-          <span className="text-[9px] uppercase tracking-wider opacity-70">
-            Connected to
-          </span>{" "}
-          <span className="font-mono text-foreground/90">
-            {endpoint.replace(/^https?:\/\//, "")}
+      <div className="flex items-stretch border-t border-border">
+        <button
+          type="button"
+          onClick={() => setEndpointOpen(true)}
+          data-testid="endpoint-open"
+          className="group flex flex-1 items-center gap-2 px-4 py-3 text-left text-[11px] text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+        >
+          <span
+            aria-hidden
+            className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_theme(colors.emerald.500)]"
+          />
+          <Server className="h-3 w-3" />
+          <span className="truncate">
+            <span className="text-[9px] uppercase tracking-wider opacity-70">
+              Connected to
+            </span>{" "}
+            <span className="font-mono text-foreground/90">
+              {endpoint.replace(/^https?:\/\//, "")}
+            </span>
           </span>
-        </span>
-      </button>
+        </button>
+        <button
+          type="button"
+          onClick={() => setSettingsOpen(true)}
+          data-testid="settings-open"
+          aria-label="Settings"
+          className="flex items-center justify-center border-l border-border px-3 text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+        >
+          <SettingsIcon className="h-4 w-4" />
+        </button>
+      </div>
       <EndpointDialog open={endpointOpen} onOpenChange={setEndpointOpen} />
+      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
     </aside>
   );
 }
