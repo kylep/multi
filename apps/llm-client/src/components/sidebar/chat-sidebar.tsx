@@ -5,13 +5,21 @@ import { Plus, Server, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import { useChatStore } from "@/store/chat-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { EndpointDialog } from "@/components/settings/endpoint-dialog";
-import { SettingsDialog } from "@/components/settings/settings-dialog";
 import { ChatRow } from "./chat-row";
 
-export function ChatSidebar() {
+interface ChatSidebarProps {
+  onSettingsOpen: () => void;
+  settingsActive: boolean;
+}
+
+export function ChatSidebar({
+  onSettingsOpen,
+  settingsActive,
+}: ChatSidebarProps) {
   const chatOrder = useChatStore((s) => s.chatOrder);
   const chats = useChatStore((s) => s.chats);
   const activeChatId = useChatStore((s) => s.activeChatId);
@@ -20,7 +28,6 @@ export function ChatSidebar() {
   const deleteChat = useChatStore((s) => s.deleteChat);
   const endpoint = useSettingsStore((s) => s.endpoint);
   const [endpointOpen, setEndpointOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <aside className="flex h-dvh w-[280px] flex-col border-r border-border bg-sidebar text-sidebar-foreground">
@@ -62,7 +69,7 @@ export function ChatSidebar() {
                   id={id}
                   title={chat.title}
                   updatedAt={chat.updatedAt}
-                  active={id === activeChatId}
+                  active={id === activeChatId && !settingsActive}
                   onSelect={() => selectChat(id)}
                   onDelete={() => deleteChat(id)}
                 />
@@ -94,16 +101,20 @@ export function ChatSidebar() {
         </button>
         <button
           type="button"
-          onClick={() => setSettingsOpen(true)}
+          onClick={onSettingsOpen}
           data-testid="settings-open"
           aria-label="Settings"
-          className="flex items-center justify-center border-l border-border px-3 text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+          className={cn(
+            "flex items-center justify-center border-l border-border px-3 transition-colors hover:bg-sidebar-accent/60 hover:text-foreground",
+            settingsActive
+              ? "bg-sidebar-accent text-foreground"
+              : "text-muted-foreground",
+          )}
         >
           <SettingsIcon className="h-4 w-4" />
         </button>
       </div>
       <EndpointDialog open={endpointOpen} onOpenChange={setEndpointOpen} />
-      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
     </aside>
   );
 }
