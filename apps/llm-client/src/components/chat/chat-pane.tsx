@@ -15,6 +15,7 @@ import { streamChat, LlamaClientError } from "@/lib/llama-client";
 import { effectivePerSlot } from "@/lib/verify-endpoint";
 import { summarizeMessages } from "@/lib/summarize";
 import { isDuplicateResponse } from "@/lib/dedup";
+import { generateTitle } from "@/lib/generate-title";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
 
@@ -227,6 +228,31 @@ export function ChatPane() {
         }
       } finally {
         setStreaming(null);
+
+        // Auto-generate title after first assistant response or at ~10% ctx
+        const chatNow = useChatStore.getState().chats[chatId];
+        if (chatNow && chatNow.messages.length >= 2) {
+          const firstUserContent = chatNow.messages[0]?.content ?? "";
+          const currentTitle = chatNow.title;
+          const isDefaultTitle =
+            currentTitle === "New chat" ||
+            currentTitle === firstUserContent.trim().slice(0, 40) ||
+            currentTitle ===
+              firstUserContent.trim().slice(0, 40) + "…";
+          if (isDefaultTitle) {
+            generateTitle(
+              chatNow.messages.map((m) => ({
+                role: m.role,
+                content: m.content,
+              })),
+              endpoint,
+            ).then((t) => {
+              if (t) {
+                useChatStore.getState().renameChat(chatId, t);
+              }
+            });
+          }
+        }
       }
     },
     [

@@ -22,11 +22,9 @@ test("sidebar lists chats, supports selection and delete", async ({ page }) => {
   await sidebar.getByText("alpha").click();
   await expect(page.getByTestId("msg-user").last()).toContainText("alpha");
 
-  await sidebar
-    .getByText("alpha")
-    .locator("xpath=..")
-    .getByLabel("Chat actions")
-    .click();
-  await page.getByRole("menuitem", { name: "Delete" }).click();
+  // Delete via the inline delete button (visible on hover)
+  const alphaRow = sidebar.getByText("alpha").locator("xpath=..");
+  await alphaRow.hover();
+  await alphaRow.getByTestId("chat-delete-btn").click();
   await expect(sidebar).not.toContainText("alpha");
 });

@@ -27,6 +27,7 @@ export function ChatSidebar({
   const activeChatId = useChatStore((s) => s.activeChatId);
   const newChat = useChatStore((s) => s.newChat);
   const deleteChat = useChatStore((s) => s.deleteChat);
+  const renameChat = useChatStore((s) => s.renameChat);
   const endpoint = useSettingsStore((s) => s.endpoint);
   const [endpointOpen, setEndpointOpen] = useState(false);
 
@@ -69,10 +70,10 @@ export function ChatSidebar({
                   key={id}
                   id={id}
                   title={chat.title}
-                  updatedAt={chat.updatedAt}
                   active={id === activeChatId && !settingsActive}
                   onSelect={() => onChatSelect(id)}
                   onDelete={() => deleteChat(id)}
+                  onRename={(t) => renameChat(id, t)}
                 />
               );
             })
