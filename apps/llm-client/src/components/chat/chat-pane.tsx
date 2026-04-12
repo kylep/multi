@@ -1,18 +1,24 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useChatStore } from "@/store/chat-store";
 import { useSettingsStore } from "@/store/settings-store";
 import {
   buildRequestMessages,
+  type ChatMessage,
   computeInputBudget,
   previewContext,
   REPLY_BUDGET,
 } from "@/lib/context-manager";
 import { streamChat, LlamaClientError } from "@/lib/llama-client";
 import { effectivePerSlot } from "@/lib/verify-endpoint";
+import { summarizeMessages } from "@/lib/summarize";
+import { isDuplicateResponse } from "@/lib/dedup";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
+
+const MAX_DEDUP_RETRIES = 2;
+const DEDUP_TEMP_BUMP = 0.15;
 
 export function ChatPane() {
   const activeChatId = useChatStore((s) => s.activeChatId);
@@ -32,8 +38,11 @@ export function ChatPane() {
   const seedPrompt = useSettingsStore((s) => s.seedPrompt);
   const seedPromptSource = useSettingsStore((s) => s.seedPromptSource);
   const contextOverride = useSettingsStore((s) => s.contextOverride);
+  const autoSummarize = useSettingsStore((s) => s.autoSummarize);
+  const deduplicateRetry = useSettingsStore((s) => s.deduplicateRetry);
 
   const [draft, setDraft] = useState("");
+  const summaryRef = useRef<string | null>(null);
 
   const effectiveSystemPrompt =
     systemPromptSource === "none" ? undefined : systemPrompt || undefined;
@@ -53,7 +62,13 @@ export function ChatPane() {
       systemPrompt: effectiveSystemPrompt,
       seedPrompt: effectiveSeedPrompt,
     });
-  }, [chat?.messages, draft, inputBudget, effectiveSystemPrompt, effectiveSeedPrompt]);
+  }, [
+    chat?.messages,
+    draft,
+    inputBudget,
+    effectiveSystemPrompt,
+    effectiveSeedPrompt,
+  ]);
 
   const streamingMessageId = useMemo(() => {
     if (!chat || !streaming || streaming.chatId !== chat.id) return null;
@@ -80,31 +95,150 @@ export function ChatPane() {
       appendMessage(chatId, { role: "user", content: text });
       appendMessage(chatId, { role: "assistant", content: "" });
 
-      const historyForRequest = useChatStore
+      const currentMessages = useChatStore
         .getState()
-        .chats[chatId].messages.slice(0, -1)
-        .map((m) => ({ role: m.role, content: m.content, pinned: m.pinned }));
+        .chats[chatId].messages.slice(0, -1);
+      const historyForRequest = currentMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+        pinned: m.pinned,
+      }));
 
-      const { messages: requestMessages } = buildRequestMessages(
-        historyForRequest,
-        {
-          inputBudget,
-          systemPrompt: effectiveSystemPrompt,
-          seedPrompt: effectiveSeedPrompt,
-        },
-      );
+      const buildResult = buildRequestMessages(historyForRequest, {
+        inputBudget,
+        systemPrompt: effectiveSystemPrompt,
+        seedPrompt: effectiveSeedPrompt,
+      });
+
+      let requestMessages = buildResult.messages;
+
+      // Auto-summarize: when messages are being dropped, generate a
+      // summary of the dropped portion and inject it as context.
+      if (
+        autoSummarize &&
+        buildResult.truncated &&
+        buildResult.droppedCount > 0
+      ) {
+        const droppedMsgs: ChatMessage[] = [];
+        const keptIndices = new Set<number>();
+        // Rebuild which indices were kept by running the same logic
+        for (let i = 0; i < historyForRequest.length; i++) {
+          if (
+            requestMessages.some(
+              (rm) =>
+                rm.content === historyForRequest[i].content &&
+                rm.role === historyForRequest[i].role,
+            )
+          ) {
+            keptIndices.add(i);
+          }
+        }
+        for (let i = 0; i < historyForRequest.length; i++) {
+          if (!keptIndices.has(i)) {
+            droppedMsgs.push({
+              role: historyForRequest[i].role,
+              content: historyForRequest[i].content,
+            });
+          }
+        }
+
+        if (droppedMsgs.length > 0) {
+          const summary = await summarizeMessages(droppedMsgs, {
+            endpoint,
+            maxTokens: 150,
+          });
+          if (summary) {
+            summaryRef.current = summary;
+            const summaryMsg: ChatMessage = {
+              role: "system",
+              content: `[Summary of earlier conversation]: ${summary}`,
+            };
+            // Insert summary after any system prompt, before conversation
+            const systemIdx = requestMessages.findIndex(
+              (m) => m.role === "system",
+            );
+            if (systemIdx >= 0) {
+              requestMessages = [
+                ...requestMessages.slice(0, systemIdx + 1),
+                summaryMsg,
+                ...requestMessages.slice(systemIdx + 1),
+              ];
+            } else {
+              requestMessages = [summaryMsg, ...requestMessages];
+            }
+          }
+        }
+      }
 
       const controller = new AbortController();
       setStreaming({ chatId, abort: () => controller.abort() });
 
-      try {
+      const runStream = async (
+        msgs: ChatMessage[],
+        temperature?: number,
+      ): Promise<string> => {
+        let accumulated = "";
         for await (const delta of streamChat({
           endpoint,
-          messages: requestMessages,
+          messages: msgs,
           signal: controller.signal,
           maxTokens: REPLY_BUDGET,
+          temperature,
         })) {
+          accumulated += delta;
           appendToLastMessage(chatId, delta);
+        }
+        return accumulated;
+      };
+
+      try {
+        const fullResponse = await runStream(requestMessages);
+
+        // Dedup retry: if the response matches a recent assistant message,
+        // clear it and retry with bumped temperature.
+        if (deduplicateRetry && fullResponse) {
+          const priorMessages = currentMessages.map((m) => ({
+            role: m.role,
+            content: m.content,
+          }));
+          if (isDuplicateResponse(fullResponse, priorMessages)) {
+            for (let retry = 0; retry < MAX_DEDUP_RETRIES; retry++) {
+              // Clear the current assistant message and start fresh
+              const chatState = useChatStore.getState().chats[chatId];
+              if (!chatState) break;
+              const lastMsg =
+                chatState.messages[chatState.messages.length - 1];
+              if (lastMsg?.role === "assistant") {
+                // Replace content by appending negative of current + new
+                const clearDelta = "";
+                // We need to reset the message. Use set directly.
+                useChatStore.setState((s) => {
+                  const c = s.chats[chatId];
+                  if (!c) return s;
+                  const msgs = c.messages.slice();
+                  msgs[msgs.length - 1] = {
+                    ...msgs[msgs.length - 1],
+                    content: "",
+                  };
+                  return {
+                    chats: { ...s.chats, [chatId]: { ...c, messages: msgs } },
+                  };
+                });
+              }
+
+              const bumpedTemp =
+                0.7 + DEDUP_TEMP_BUMP * (retry + 1);
+              const retryResponse = await runStream(
+                requestMessages,
+                bumpedTemp,
+              );
+              if (
+                !isDuplicateResponse(retryResponse, priorMessages)
+              ) {
+                break;
+              }
+            }
+          }
         }
       } catch (err) {
         if (
@@ -127,6 +261,8 @@ export function ChatPane() {
       activeChatId,
       appendMessage,
       appendToLastMessage,
+      autoSummarize,
+      deduplicateRetry,
       effectiveSeedPrompt,
       effectiveSystemPrompt,
       endpoint,

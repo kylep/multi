@@ -16,6 +16,8 @@ export interface SettingsStore {
   seedPromptSource: PromptSource;
   seedPromptFilename: string | null;
   contextOverride: number | null;
+  autoSummarize: boolean;
+  deduplicateRetry: boolean;
   setEndpoint(next: string): void;
   setServerInfo(info: ServerInfo | null): void;
   setSystemPrompt(
@@ -29,6 +31,8 @@ export interface SettingsStore {
     filename?: string | null,
   ): void;
   setContextOverride(next: number | null): void;
+  setAutoSummarize(v: boolean): void;
+  setDeduplicateRetry(v: boolean): void;
 }
 
 function normalizeEndpoint(raw: string): string {
@@ -50,6 +54,8 @@ export const useSettingsStore = create<SettingsStore>()(
       seedPromptSource: "none",
       seedPromptFilename: null,
       contextOverride: null,
+      autoSummarize: true,
+      deduplicateRetry: true,
       setEndpoint(next) {
         set({ endpoint: normalizeEndpoint(next) });
       },
@@ -75,6 +81,12 @@ export const useSettingsStore = create<SettingsStore>()(
           contextOverride:
             next === null || Number.isNaN(next) ? null : Math.max(1, next),
         });
+      },
+      setAutoSummarize(v) {
+        set({ autoSummarize: v });
+      },
+      setDeduplicateRetry(v) {
+        set({ deduplicateRetry: v });
       },
     }),
     {

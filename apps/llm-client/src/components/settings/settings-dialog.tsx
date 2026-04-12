@@ -52,9 +52,13 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const storedSeedSrc = useSettingsStore((s) => s.seedPromptSource);
   const storedSeedFile = useSettingsStore((s) => s.seedPromptFilename);
   const storedCtxOvr = useSettingsStore((s) => s.contextOverride);
+  const storedAutoSummarize = useSettingsStore((s) => s.autoSummarize);
+  const storedDedupRetry = useSettingsStore((s) => s.deduplicateRetry);
   const setSystemPrompt = useSettingsStore((s) => s.setSystemPrompt);
   const setSeedPrompt = useSettingsStore((s) => s.setSeedPrompt);
   const setContextOverride = useSettingsStore((s) => s.setContextOverride);
+  const setAutoSummarize = useSettingsStore((s) => s.setAutoSummarize);
+  const setDeduplicateRetry = useSettingsStore((s) => s.setDeduplicateRetry);
 
   const [spSrc, setSpSrc] = useState<PromptSource>(storedSpSrc);
   const [spText, setSpText] = useState(storedSp);
@@ -71,6 +75,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [overrideStr, setOverrideStr] = useState(
     storedCtxOvr === null ? "" : String(storedCtxOvr),
   );
+  const [localAutoSummarize, setLocalAutoSummarize] = useState(storedAutoSummarize);
+  const [localDedupRetry, setLocalDedupRetry] = useState(storedDedupRetry);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -84,9 +90,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       setSeedFile(storedSeedSrc === "file" ? storedSeed : "");
       setSeedFilename(storedSeedFile);
       setOverrideStr(storedCtxOvr === null ? "" : String(storedCtxOvr));
+      setLocalAutoSummarize(storedAutoSummarize);
+      setLocalDedupRetry(storedDedupRetry);
       setError(null);
     }
-  }, [open, storedSpSrc, storedSp, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr]);
+  }, [open, storedSpSrc, storedSp, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedAutoSummarize, storedDedupRetry]);
 
   const serverMax = perSlotCtx(serverInfo);
 
@@ -131,6 +139,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       setContextOverride(parsed);
     }
 
+    setAutoSummarize(localAutoSummarize);
+    setDeduplicateRetry(localDedupRetry);
     onOpenChange(false);
   };
 
@@ -229,6 +239,43 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 max; will be clamped to {serverMax.toLocaleString()}.
               </p>
             )}
+        </div>
+
+        {/* Behavior toggles */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-1.5">
+            <Label>Behavior</Label>
+          </div>
+          <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
+            <div>
+              <div className="text-sm font-medium">Auto-summarize</div>
+              <div className="text-[11px] text-muted-foreground">
+                When old messages are dropped from context, generate a summary and inject it so the model retains memory.
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              checked={localAutoSummarize}
+              onChange={(e) => setLocalAutoSummarize(e.target.checked)}
+              className="h-4 w-4 accent-primary"
+              data-testid="toggle-auto-summarize"
+            />
+          </label>
+          <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
+            <div>
+              <div className="text-sm font-medium">Duplicate retry</div>
+              <div className="text-[11px] text-muted-foreground">
+                If the model repeats a previous response, automatically retry with higher temperature (up to 2 times).
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              checked={localDedupRetry}
+              onChange={(e) => setLocalDedupRetry(e.target.checked)}
+              className="h-4 w-4 accent-primary"
+              data-testid="toggle-dedup-retry"
+            />
+          </label>
         </div>
 
         {error && (

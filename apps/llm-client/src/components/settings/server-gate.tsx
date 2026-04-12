@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useSettingsStore } from "@/store/settings-store";
 import { verifyEndpoint } from "@/lib/verify-endpoint";
+import { setTokenizeEndpoint } from "@/lib/tokens";
 import { EndpointDialog } from "./endpoint-dialog";
 
 type GateState =
@@ -25,6 +26,7 @@ export function ServerGate({ children }: { children: React.ReactNode }) {
       if (cancelled) return;
       if (result.ok && result.info) {
         setServerInfo(result.info);
+        setTokenizeEndpoint(result.info.endpoint);
         setGate({ kind: "ok" });
       } else {
         setGate({
