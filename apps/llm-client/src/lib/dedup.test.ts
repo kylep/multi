@@ -46,7 +46,7 @@ describe("isDuplicateResponse", () => {
     ).toBe(false);
   });
 
-  it("only checks the most recent assistant message", () => {
+  it("checks multiple recent assistant messages, not just the last", () => {
     const history = [
       { role: "user", content: "a" },
       { role: "assistant", content: "First response that was unique and interesting" },
@@ -58,6 +58,6 @@ describe("isDuplicateResponse", () => {
         "First response that was unique and interesting",
         history,
       ),
-    ).toBe(false);
+    ).toBe(true);
   });
 });

@@ -1,3 +1,5 @@
+const MAX_LOOKBACK = 5;
+
 export function isDuplicateResponse(
   newContent: string,
   history: { role: string; content: string }[],
@@ -9,6 +11,7 @@ export function isDuplicateResponse(
     s.toLowerCase().replace(/\s+/g, " ").trim();
 
   const newNorm = normalize(newContent);
+  let checked = 0;
 
   for (let i = history.length - 1; i >= 0; i--) {
     if (history[i].role !== "assistant") continue;
@@ -19,22 +22,27 @@ export function isDuplicateResponse(
 
     const shorter = newNorm.length < prevNorm.length ? newNorm : prevNorm;
     const longer = newNorm.length < prevNorm.length ? prevNorm : newNorm;
-    if (shorter.length / longer.length < 0.5) continue;
+    if (shorter.length / longer.length >= 0.5) {
+      if (
+        longer.startsWith(
+          shorter.slice(0, Math.floor(shorter.length * threshold)),
+        )
+      ) {
+        return true;
+      }
 
-    if (longer.startsWith(shorter.slice(0, Math.floor(shorter.length * threshold)))) {
-      return true;
+      let matches = 0;
+      const len = Math.min(newNorm.length, prevNorm.length);
+      for (let j = 0; j < len; j++) {
+        if (newNorm[j] === prevNorm[j]) matches++;
+      }
+      if (matches / Math.max(newNorm.length, prevNorm.length) >= threshold) {
+        return true;
+      }
     }
 
-    let matches = 0;
-    const len = Math.min(newNorm.length, prevNorm.length);
-    for (let j = 0; j < len; j++) {
-      if (newNorm[j] === prevNorm[j]) matches++;
-    }
-    if (matches / Math.max(newNorm.length, prevNorm.length) >= threshold) {
-      return true;
-    }
-
-    break;
+    checked++;
+    if (checked >= MAX_LOOKBACK) break;
   }
   return false;
 }

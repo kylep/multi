@@ -1,4 +1,5 @@
 import type { ChatMessage } from "./context-manager";
+import { estimateTokens } from "./tokens";
 
 const SUMMARIZE_PROMPT =
   "Summarize the following conversation excerpt in 2-3 concise sentences. " +
@@ -12,29 +13,22 @@ const EXTEND_PROMPT =
   "character names, decisions, and the current situation. Write in third " +
   "person, past tense.";
 
-export async function summarizeMessages(
-  messages: ChatMessage[],
-  opts: {
-    endpoint: string;
-    existingSummary?: string;
-    maxTokens?: number;
-  },
+const SHORTEN_PROMPT =
+  "Shorten the following summary to fit within the specified token budget. " +
+  "Keep the most important facts, drop less critical details. " +
+  "Write in third person, past tense.";
+
+const MAX_RETRIES = 2;
+
+async function callModel(
+  endpoint: string,
+  systemContent: string,
+  userContent: string,
+  maxTokens: number,
 ): Promise<string | null> {
-  if (messages.length === 0 && !opts.existingSummary) return null;
-
-  const excerpt = messages
-    .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
-    .join("\n\n");
-
-  const hasExisting = !!opts.existingSummary?.trim();
-  const systemContent = hasExisting ? EXTEND_PROMPT : SUMMARIZE_PROMPT;
-  const userContent = hasExisting
-    ? `## Existing summary\n${opts.existingSummary}\n\n## New conversation to fold in\n${excerpt}`
-    : excerpt;
-
   try {
     const res = await fetch(
-      `${opts.endpoint.replace(/\/+$/, "")}/v1/chat/completions`,
+      `${endpoint.replace(/\/+$/, "")}/v1/chat/completions`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -43,7 +37,7 @@ export async function summarizeMessages(
             { role: "system", content: systemContent },
             { role: "user", content: userContent },
           ],
-          max_tokens: opts.maxTokens ?? 200,
+          max_tokens: maxTokens,
           temperature: 0.3,
           stream: false,
         }),
@@ -58,4 +52,54 @@ export async function summarizeMessages(
   } catch {
     return null;
   }
+}
+
+export async function summarizeMessages(
+  messages: ChatMessage[],
+  opts: {
+    endpoint: string;
+    existingSummary?: string;
+    maxTokens?: number;
+    tokenBudget?: number;
+  },
+): Promise<string | null> {
+  if (messages.length === 0 && !opts.existingSummary) return null;
+
+  const excerpt = messages
+    .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+    .join("\n\n");
+
+  const hasExisting = !!opts.existingSummary?.trim();
+  const systemContent = hasExisting ? EXTEND_PROMPT : SUMMARIZE_PROMPT;
+  const userContent = hasExisting
+    ? `## Existing summary\n${opts.existingSummary}\n\n## New conversation to fold in\n${excerpt}`
+    : excerpt;
+
+  const maxTokens = opts.maxTokens ?? 200;
+  let result = await callModel(
+    opts.endpoint,
+    systemContent,
+    userContent,
+    maxTokens,
+  );
+  if (!result) return null;
+
+  // If a token budget is specified, check and retry if overshot.
+  if (opts.tokenBudget && opts.tokenBudget > 0) {
+    for (let retry = 0; retry < MAX_RETRIES; retry++) {
+      const tokens = estimateTokens(result);
+      if (tokens <= opts.tokenBudget) break;
+
+      const shortened = await callModel(
+        opts.endpoint,
+        SHORTEN_PROMPT,
+        `Token budget: ${opts.tokenBudget} tokens.\n\nSummary to shorten:\n${result}`,
+        Math.floor(opts.tokenBudget * 0.9),
+      );
+      if (!shortened) break;
+      result = shortened;
+    }
+  }
+
+  return result;
 }

@@ -106,31 +106,47 @@ export function ChatPane() {
         summaryBudgetPct,
       });
 
-      // Auto-summarize: compact ALL dropped messages at once.
-      if (
+      // Auto-summarize: compact dropped messages. Triggers at truncation
+      // OR when context usage exceeds 80% (proactive compaction).
+      const shouldCompact =
         autoSummarize &&
-        buildResult.truncated &&
-        buildResult.droppedMessages.length > 0
-      ) {
-        const newSummary = await summarizeMessages(
-          buildResult.droppedMessages,
-          {
+        (buildResult.truncated ||
+          (buildResult.droppedMessages.length === 0 &&
+            historyForRequest.length > 2 &&
+            estimateTokens(
+              historyForRequest.map((m) => m.content).join(""),
+            ) >
+              inputBudget * 0.8));
+
+      if (shouldCompact) {
+        // For proactive compaction (no drops yet), compact the oldest
+        // 50% of non-seed messages to make room.
+        let messagesToCompact = buildResult.droppedMessages;
+        if (messagesToCompact.length === 0 && historyForRequest.length > 2) {
+          const half = Math.ceil((historyForRequest.length - 1) / 2);
+          messagesToCompact = historyForRequest.slice(1, 1 + half);
+        }
+
+        if (messagesToCompact.length > 0) {
+          const summaryTokenBudget = Math.floor(
+            (inputBudget * summaryBudgetPct) / 100,
+          );
+          const newSummary = await summarizeMessages(messagesToCompact, {
             endpoint,
             existingSummary: currentSummary || undefined,
-            maxTokens: Math.floor(
-              (inputBudget * summaryBudgetPct) / 100,
-            ),
-          },
-        );
-        if (newSummary) {
-          setSummary(chatId, newSummary);
-          buildResult = buildRequestMessages(historyForRequest, {
-            inputBudget,
-            systemPrompt: effectiveSystemPrompt,
-            seedPrompt: effectiveSeedPrompt,
-            summary: newSummary,
-            summaryBudgetPct,
+            maxTokens: summaryTokenBudget,
+            tokenBudget: summaryTokenBudget,
           });
+          if (newSummary) {
+            setSummary(chatId, newSummary);
+            buildResult = buildRequestMessages(historyForRequest, {
+              inputBudget,
+              systemPrompt: effectiveSystemPrompt,
+              seedPrompt: effectiveSeedPrompt,
+              summary: newSummary,
+              summaryBudgetPct,
+            });
+          }
         }
       }
 
