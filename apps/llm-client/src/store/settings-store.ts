@@ -17,6 +17,7 @@ export interface SettingsStore {
   seedPromptFilename: string | null;
   contextOverride: number | null;
   autoSummarize: boolean;
+  summaryBudgetPct: number;
   deduplicateRetry: boolean;
   setEndpoint(next: string): void;
   setServerInfo(info: ServerInfo | null): void;
@@ -32,6 +33,7 @@ export interface SettingsStore {
   ): void;
   setContextOverride(next: number | null): void;
   setAutoSummarize(v: boolean): void;
+  setSummaryBudgetPct(v: number): void;
   setDeduplicateRetry(v: boolean): void;
 }
 
@@ -55,6 +57,7 @@ export const useSettingsStore = create<SettingsStore>()(
       seedPromptFilename: null,
       contextOverride: null,
       autoSummarize: true,
+      summaryBudgetPct: 25,
       deduplicateRetry: true,
       setEndpoint(next) {
         set({ endpoint: normalizeEndpoint(next) });
@@ -84,6 +87,9 @@ export const useSettingsStore = create<SettingsStore>()(
       },
       setAutoSummarize(v) {
         set({ autoSummarize: v });
+      },
+      setSummaryBudgetPct(v) {
+        set({ summaryBudgetPct: Math.max(5, Math.min(50, v)) });
       },
       setDeduplicateRetry(v) {
         set({ deduplicateRetry: v });

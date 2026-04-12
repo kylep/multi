@@ -7,13 +7,13 @@ export interface Message {
   role: ChatRole;
   content: string;
   createdAt: number;
-  pinned?: boolean;
 }
 
 export interface Chat {
   id: string;
   title: string;
   messages: Message[];
+  summary: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -38,7 +38,7 @@ export interface ChatStore {
     msg: Omit<Message, "id" | "createdAt">,
   ): string;
   appendToLastMessage(chatId: string, delta: string): void;
-  togglePin(chatId: string, messageId: string): void;
+  setSummary(chatId: string, summary: string): void;
   setStreaming(streaming: StreamingState | null): void;
 }
 
@@ -76,6 +76,7 @@ export const useChatStore = create<ChatStore>()(
           id,
           title: "New chat",
           messages: [],
+          summary: "",
           createdAt: now,
           updatedAt: now,
         };
@@ -161,15 +162,15 @@ export const useChatStore = create<ChatStore>()(
         });
       },
 
-      togglePin(chatId, messageId) {
+      setSummary(chatId, summary) {
         set((s) => {
           const chat = s.chats[chatId];
           if (!chat) return s;
-          const messages = chat.messages.map((m) =>
-            m.id === messageId ? { ...m, pinned: !m.pinned } : m,
-          );
           return {
-            chats: { ...s.chats, [chatId]: { ...chat, messages } },
+            chats: {
+              ...s.chats,
+              [chatId]: { ...chat, summary, updatedAt: Date.now() },
+            },
           };
         });
       },

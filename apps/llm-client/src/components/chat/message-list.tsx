@@ -1,23 +1,30 @@
 "use client";
 
-import { Fragment, useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { Message } from "@/store/chat-store";
 import { MessageBubble } from "./message-bubble";
+import { SummaryPanel } from "./summary-panel";
 
 interface MessageListProps {
   messages: Message[];
   streamingMessageId: string | null;
-  truncationIndex: number | null;
-  keptSet: Set<number> | null;
-  onTogglePin?: (messageId: string) => void;
+  recentStartIndex: number;
+  droppedCount: number;
+  summary: string;
+  onSummaryChange: (next: string) => void;
+  summaryTokens: number;
+  inputBudget: number;
 }
 
 export function MessageList({
   messages,
   streamingMessageId,
-  truncationIndex,
-  keptSet,
-  onTogglePin,
+  recentStartIndex,
+  droppedCount,
+  summary,
+  onSummaryChange,
+  summaryTokens,
+  inputBudget,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isPinnedRef = useRef(true);
@@ -41,24 +48,7 @@ export function MessageList({
     isPinnedRef.current = true;
   }, []);
 
-  const hasDrops = keptSet !== null;
-
-  // Count how many messages are dropped (not in keptSet, before the tail of kept messages).
-  const droppedCount =
-    keptSet && hasDrops
-      ? messages.filter((_, i) => !keptSet.has(i)).length
-      : truncationIndex ?? 0;
-
-  // Find the first dropped (non-kept, non-pinned) message index for the rule.
-  let ruleBeforeIndex: number | null = null;
-  if (hasDrops && keptSet) {
-    for (let i = 0; i < messages.length; i++) {
-      if (!keptSet.has(i)) {
-        ruleBeforeIndex = i;
-        break;
-      }
-    }
-  }
+  const hasTruncation = droppedCount > 0;
 
   return (
     <div
@@ -68,39 +58,35 @@ export function MessageList({
       data-testid="message-list"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-6 px-6 py-8">
-        {messages.map((msg, index) => {
-          const isDropped =
-            hasDrops && keptSet ? !keptSet.has(index) && !msg.pinned : false;
+        {/* Seed message (index 0) always shown */}
+        {messages.length > 0 && (
+          <MessageBubble
+            role={messages[0].role}
+            content={messages[0].content}
+            streaming={messages[0].id === streamingMessageId}
+          />
+        )}
 
-          return (
-            <Fragment key={msg.id}>
-              {ruleBeforeIndex === index ? (
-                <div
-                  className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-wider text-destructive"
-                  data-testid="truncation-rule"
-                >
-                  <span className="h-px flex-1 bg-destructive/60" />
-                  <span>
-                    context cutoff — {droppedCount} older{" "}
-                    {droppedCount === 1 ? "message" : "messages"} dropped
-                  </span>
-                  <span className="h-px flex-1 bg-destructive/60" />
-                </div>
-              ) : null}
-              {isDropped ? null : (
-                <MessageBubble
-                  role={msg.role}
-                  content={msg.content}
-                  streaming={msg.id === streamingMessageId}
-                  pinned={msg.pinned}
-                  onTogglePin={
-                    onTogglePin ? () => onTogglePin(msg.id) : undefined
-                  }
-                />
-              )}
-            </Fragment>
-          );
-        })}
+        {/* Summary panel + truncation boundary */}
+        {hasTruncation && (
+          <SummaryPanel
+            summary={summary}
+            onSummaryChange={onSummaryChange}
+            droppedCount={droppedCount}
+            summaryTokens={summaryTokens}
+            inputBudget={inputBudget}
+          />
+        )}
+
+        {/* Recent messages in context */}
+        {messages.slice(hasTruncation ? recentStartIndex : 1).map((msg) => (
+          <MessageBubble
+            key={msg.id}
+            role={msg.role}
+            content={msg.content}
+            streaming={msg.id === streamingMessageId}
+          />
+        ))}
       </div>
     </div>
   );

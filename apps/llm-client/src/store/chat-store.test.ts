@@ -26,6 +26,11 @@ describe("chat store", () => {
     expect(state.activeChatId).toBe(b);
   });
 
+  it("newChat initializes with empty summary", () => {
+    const id = useChatStore.getState().newChat();
+    expect(useChatStore.getState().chats[id].summary).toBe("");
+  });
+
   it("appendMessage sets title from first user message", () => {
     const id = useChatStore.getState().newChat();
     useChatStore
@@ -70,6 +75,20 @@ describe("chat store", () => {
     const id = useChatStore.getState().newChat();
     useChatStore.getState().renameChat(id, "Renamed");
     expect(useChatStore.getState().chats[id].title).toBe("Renamed");
+  });
+
+  it("setSummary persists rolling summary", () => {
+    const id = useChatStore.getState().newChat();
+    useChatStore.getState().setSummary(id, "Player fought wolves.");
+    expect(useChatStore.getState().chats[id].summary).toBe(
+      "Player fought wolves.",
+    );
+    useChatStore
+      .getState()
+      .setSummary(id, "Player fought wolves. Then met Lyra.");
+    expect(useChatStore.getState().chats[id].summary).toBe(
+      "Player fought wolves. Then met Lyra.",
+    );
   });
 
   it("partialize excludes streaming state from persistence", () => {

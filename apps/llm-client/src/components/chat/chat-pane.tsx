@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useChatStore } from "@/store/chat-store";
 import { useSettingsStore } from "@/store/settings-store";
 import {
@@ -30,7 +30,7 @@ export function ChatPane() {
   const appendMessage = useChatStore((s) => s.appendMessage);
   const appendToLastMessage = useChatStore((s) => s.appendToLastMessage);
   const setStreaming = useChatStore((s) => s.setStreaming);
-  const togglePin = useChatStore((s) => s.togglePin);
+  const setSummary = useChatStore((s) => s.setSummary);
   const endpoint = useSettingsStore((s) => s.endpoint);
   const serverInfo = useSettingsStore((s) => s.serverInfo);
   const systemPrompt = useSettingsStore((s) => s.systemPrompt);
@@ -39,10 +39,10 @@ export function ChatPane() {
   const seedPromptSource = useSettingsStore((s) => s.seedPromptSource);
   const contextOverride = useSettingsStore((s) => s.contextOverride);
   const autoSummarize = useSettingsStore((s) => s.autoSummarize);
+  const summaryBudgetPct = useSettingsStore((s) => s.summaryBudgetPct);
   const deduplicateRetry = useSettingsStore((s) => s.deduplicateRetry);
 
   const [draft, setDraft] = useState("");
-  const summaryRef = useRef<string | null>(null);
 
   const effectiveSystemPrompt =
     systemPromptSource === "none" ? undefined : systemPrompt || undefined;
@@ -55,19 +55,22 @@ export function ChatPane() {
     const history = (chat?.messages ?? []).map((m) => ({
       role: m.role,
       content: m.content,
-      pinned: m.pinned,
     }));
     return previewContext(history, draft, {
       inputBudget,
       systemPrompt: effectiveSystemPrompt,
       seedPrompt: effectiveSeedPrompt,
+      summary: chat?.summary,
+      summaryBudgetPct,
     });
   }, [
     chat?.messages,
+    chat?.summary,
     draft,
     inputBudget,
     effectiveSystemPrompt,
     effectiveSeedPrompt,
+    summaryBudgetPct,
   ]);
 
   const streamingMessageId = useMemo(() => {
@@ -80,11 +83,11 @@ export function ChatPane() {
     streaming?.abort();
   }, [streaming]);
 
-  const handleTogglePin = useCallback(
-    (messageId: string) => {
-      if (activeChatId) togglePin(activeChatId, messageId);
+  const handleSummaryChange = useCallback(
+    (next: string) => {
+      if (activeChatId) setSummary(activeChatId, next);
     },
-    [activeChatId, togglePin],
+    [activeChatId, setSummary],
   );
 
   const handleSend = useCallback(
@@ -95,81 +98,51 @@ export function ChatPane() {
       appendMessage(chatId, { role: "user", content: text });
       appendMessage(chatId, { role: "assistant", content: "" });
 
-      const currentMessages = useChatStore
-        .getState()
-        .chats[chatId].messages.slice(0, -1);
+      const chatState = useChatStore.getState().chats[chatId];
+      const currentMessages = chatState.messages.slice(0, -1);
+      const currentSummary = chatState.summary || "";
       const historyForRequest = currentMessages.map((m) => ({
         role: m.role,
         content: m.content,
-        pinned: m.pinned,
       }));
 
       const buildResult = buildRequestMessages(historyForRequest, {
         inputBudget,
         systemPrompt: effectiveSystemPrompt,
         seedPrompt: effectiveSeedPrompt,
+        summary: currentSummary,
+        summaryBudgetPct,
       });
 
-      let requestMessages = buildResult.messages;
-
-      // Auto-summarize: when messages are being dropped, generate a
-      // summary of the dropped portion and inject it as context.
+      // Auto-summarize: extend the rolling summary with dropped messages.
       if (
         autoSummarize &&
         buildResult.truncated &&
-        buildResult.droppedCount > 0
+        buildResult.droppedMessages.length > 0
       ) {
-        const droppedMsgs: ChatMessage[] = [];
-        const keptIndices = new Set<number>();
-        // Rebuild which indices were kept by running the same logic
-        for (let i = 0; i < historyForRequest.length; i++) {
-          if (
-            requestMessages.some(
-              (rm) =>
-                rm.content === historyForRequest[i].content &&
-                rm.role === historyForRequest[i].role,
-            )
-          ) {
-            keptIndices.add(i);
-          }
-        }
-        for (let i = 0; i < historyForRequest.length; i++) {
-          if (!keptIndices.has(i)) {
-            droppedMsgs.push({
-              role: historyForRequest[i].role,
-              content: historyForRequest[i].content,
-            });
-          }
-        }
-
-        if (droppedMsgs.length > 0) {
-          const summary = await summarizeMessages(droppedMsgs, {
+        const newSummary = await summarizeMessages(
+          buildResult.droppedMessages,
+          {
             endpoint,
-            maxTokens: 150,
+            existingSummary: currentSummary || undefined,
+            maxTokens: 200,
+          },
+        );
+        if (newSummary) {
+          setSummary(chatId, newSummary);
+          // Rebuild with the new summary.
+          const rebuilt = buildRequestMessages(historyForRequest, {
+            inputBudget,
+            systemPrompt: effectiveSystemPrompt,
+            seedPrompt: effectiveSeedPrompt,
+            summary: newSummary,
+            summaryBudgetPct,
           });
-          if (summary) {
-            summaryRef.current = summary;
-            const summaryMsg: ChatMessage = {
-              role: "system",
-              content: `[Summary of earlier conversation]: ${summary}`,
-            };
-            // Insert summary after any system prompt, before conversation
-            const systemIdx = requestMessages.findIndex(
-              (m) => m.role === "system",
-            );
-            if (systemIdx >= 0) {
-              requestMessages = [
-                ...requestMessages.slice(0, systemIdx + 1),
-                summaryMsg,
-                ...requestMessages.slice(systemIdx + 1),
-              ];
-            } else {
-              requestMessages = [summaryMsg, ...requestMessages];
-            }
-          }
+          buildResult.messages = rebuilt.messages;
         }
       }
 
+      const requestMessages = buildResult.messages;
       const controller = new AbortController();
       setStreaming({ chatId, abort: () => controller.abort() });
 
@@ -194,8 +167,6 @@ export function ChatPane() {
       try {
         const fullResponse = await runStream(requestMessages);
 
-        // Dedup retry: if the response matches a recent assistant message,
-        // clear it and retry with bumped temperature.
         if (deduplicateRetry && fullResponse) {
           const priorMessages = currentMessages.map((m) => ({
             role: m.role,
@@ -203,38 +174,28 @@ export function ChatPane() {
           }));
           if (isDuplicateResponse(fullResponse, priorMessages)) {
             for (let retry = 0; retry < MAX_DEDUP_RETRIES; retry++) {
-              // Clear the current assistant message and start fresh
-              const chatState = useChatStore.getState().chats[chatId];
-              if (!chatState) break;
-              const lastMsg =
-                chatState.messages[chatState.messages.length - 1];
-              if (lastMsg?.role === "assistant") {
-                // Replace content by appending negative of current + new
-                const clearDelta = "";
-                // We need to reset the message. Use set directly.
-                useChatStore.setState((s) => {
-                  const c = s.chats[chatId];
-                  if (!c) return s;
-                  const msgs = c.messages.slice();
-                  msgs[msgs.length - 1] = {
-                    ...msgs[msgs.length - 1],
-                    content: "",
-                  };
-                  return {
-                    chats: { ...s.chats, [chatId]: { ...c, messages: msgs } },
-                  };
-                });
-              }
+              useChatStore.setState((s) => {
+                const c = s.chats[chatId];
+                if (!c) return s;
+                const msgs = c.messages.slice();
+                msgs[msgs.length - 1] = {
+                  ...msgs[msgs.length - 1],
+                  content: "",
+                };
+                return {
+                  chats: {
+                    ...s.chats,
+                    [chatId]: { ...c, messages: msgs },
+                  },
+                };
+              });
 
-              const bumpedTemp =
-                0.7 + DEDUP_TEMP_BUMP * (retry + 1);
+              const bumpedTemp = 0.7 + DEDUP_TEMP_BUMP * (retry + 1);
               const retryResponse = await runStream(
                 requestMessages,
                 bumpedTemp,
               );
-              if (
-                !isDuplicateResponse(retryResponse, priorMessages)
-              ) {
+              if (!isDuplicateResponse(retryResponse, priorMessages)) {
                 break;
               }
             }
@@ -245,7 +206,7 @@ export function ChatPane() {
           (err as Error)?.name === "AbortError" ||
           controller.signal.aborted
         ) {
-          // user-initiated stop
+          // user stop
         } else {
           const msg =
             err instanceof LlamaClientError
@@ -268,7 +229,9 @@ export function ChatPane() {
       endpoint,
       inputBudget,
       newChat,
+      setSummary,
       setStreaming,
+      summaryBudgetPct,
     ],
   );
 
@@ -287,11 +250,12 @@ export function ChatPane() {
         <MessageList
           messages={chat.messages}
           streamingMessageId={streamingMessageId}
-          truncationIndex={
-            preview.truncated ? preview.firstKeptIndex : null
-          }
-          keptSet={preview.truncated ? preview.keptSet : null}
-          onTogglePin={handleTogglePin}
+          recentStartIndex={preview.recentStartIndex}
+          droppedCount={preview.droppedCount}
+          summary={chat.summary ?? ""}
+          onSummaryChange={handleSummaryChange}
+          summaryTokens={preview.summaryTokens}
+          inputBudget={preview.inputBudget}
         />
       ) : (
         <div className="flex-1 overflow-y-auto">

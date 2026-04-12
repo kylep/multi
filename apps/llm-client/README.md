@@ -1,96 +1,150 @@
 # llm-client
 
-A local, browser-based chat UI for [`llama-server`](https://github.com/ggerganov/llama.cpp/tree/master/tools/server).
-Next.js 16 + Tailwind v4 + shadcn/ui + zustand. Everything runs on
-`127.0.0.1` — nothing leaves your machine.
+A local, browser-based chat UI for [`llama-server`](https://github.com/ggerganov/llama.cpp/tree/master/tools/server)
+or any OpenAI-compatible endpoint. Next.js 16 + Tailwind v4 + shadcn/ui +
+zustand. Everything runs on `127.0.0.1` — nothing leaves your machine.
 
-## Features (v1)
+## Quick start
 
+```bash
+# First time
+bin/install.sh
+
+# Start the dev server (default port 3100)
+bin/start-dev.sh
+
+# Or with a custom port
+bin/start-dev.sh 3200
+
+# Stop
+bin/kill-dev.sh
+```
+
+Requires a running llama-server (or compatible) at `http://127.0.0.1:8080`.
+The endpoint is configurable in the UI — click the "Connected to" pill in the
+sidebar footer.
+
+## Features
+
+### Chat
 - ChatGPT-style sidebar with multiple chats
-- Streaming assistant replies over SSE
-- Stop button to abort an in-flight response (keeps partial text)
+- Streaming assistant replies over SSE with Stop button
 - Markdown rendering in bot replies (GFM + syntax-highlighted code)
-- Context-window management: oldest messages are dropped to fit the
-  server's per-slot budget (tail-truncation, no summarization)
-- Chats + history persisted to `localStorage` via zustand `persist`
+- Chat history persisted to `localStorage` (no server-side storage)
 
-## Prerequisites
+### Prompts
+- **System prompt** — sent as `role: "system"`. Controls *how* the model
+  behaves (style, tone, formatting). Re-applied by the model's chat template
+  each turn. Supports text or file input.
+- **Seed prompt** — prepended to the first user message content. Defines
+  *what* the conversation is about (scenario, rules, context). Stays anchored
+  at conversation start, never re-injected. Always pinned. Supports text or
+  file input.
 
-A running `llama-server` on `http://127.0.0.1:8080` that exposes the
-OpenAI-compatible `/v1/chat/completions` streaming endpoint.
+The distinction matters for models like Mistral whose chat template
+re-injects system messages with the last user turn. Use seed prompt for
+context that shouldn't repeat.
 
-Verify it's up:
+### Context management
+- **Dynamic budget** — reads `n_ctx / total_slots` from the server's `/props`
+  endpoint. Falls back to 2048 tokens/slot.
+- **Tail-drop truncation** — oldest unpinned messages are dropped first.
+  Pinned messages and the seed-augmented first message survive truncation.
+- **Auto-summarize** (on by default) — when messages are about to be dropped,
+  generates a 2-3 sentence summary via the model and injects it as context.
+  Preserves narrative memory across the truncation boundary.
+- **Pin messages** — click the pin icon on any message to protect it from
+  truncation.
+- **Context meter** — bottom-right shows live `X% ctx` usage. Red at 100%
+  with a "CONTEXT CUTOFF" rule in the transcript.
+- **Context override** — cap per-slot tokens in Settings for testing or
+  headroom reservation.
+- **Real tokenizer** — uses llama-server's `/tokenize` endpoint for accurate
+  counts. Falls back to `chars/4` when unavailable.
 
-```bash
-curl -s http://127.0.0.1:8080/health
-# → {"status":"ok"}
-```
+### Response quality
+- **Duplicate retry** (on by default) — detects when the model repeats a
+  previous response (≥85% similarity). Retries up to 2x with progressively
+  higher temperature.
 
-If your server is on a different host/port, edit `DEFAULT_ENDPOINT` in
-`src/lib/llama-client.ts`.
+### Server
+- Any OpenAI-compatible `/v1/chat/completions` endpoint works.
+- Endpoint verified via `/v1/models` before use. Optionally probes
+  `/props` for llama-server metadata (model, params, context, slots,
+  modalities).
+- Server info card in the endpoint dialog with ELI5 tooltips on each field.
+- Blocking modal on startup if the server is unreachable.
 
-## Development
+## Scripts
 
-```bash
-pnpm install
-pnpm dev          # http://localhost:3000
-```
+| Script | Purpose |
+|---|---|
+| `bin/install.sh` | `pnpm install` + Playwright browsers |
+| `bin/start-dev.sh [port]` | Start dev server (default 3100) |
+| `bin/kill-dev.sh` | Stop dev server |
+| `bin/test.sh` | Run unit + E2E tests |
 
 ## Tests
 
-Unit tests (Vitest, jsdom):
-
 ```bash
-pnpm test         # run once
-pnpm test:watch   # watch mode
-```
+# Unit tests (Vitest, jsdom) — 75 tests
+pnpm test
 
-End-to-end tests (Playwright, mocks `/v1/chat/completions`):
-
-```bash
-pnpm exec playwright install chromium   # first time only
+# E2E tests (Playwright, mocked endpoints) — 7 specs
 pnpm e2e
+
+# Both
+bin/test.sh
 ```
 
-The E2E tests do **not** require a running llama-server — they mock the
-streaming endpoint via `page.route`.
+E2E tests mock `/v1/chat/completions`, `/v1/models`, and `/props` via
+Playwright route handlers — no running llama-server needed.
 
 ## Project layout
 
 ```
 src/
-├── app/               Next.js App Router entry (single-page chat UI)
+├── app/                 Next.js App Router (single page)
 ├── components/
-│   ├── chat/          chat-pane, composer, message list/bubble
-│   ├── sidebar/       chat list + row actions
-│   └── ui/            shadcn primitives
+│   ├── chat/            chat-pane, composer, message list/bubble
+│   ├── settings/        endpoint dialog, settings dialog, server info
+│   ├── sidebar/         chat list, row actions
+│   └── ui/              shadcn primitives
 ├── lib/
-│   ├── llama-client.ts    SSE streaming fetch client
-│   ├── context-manager.ts budgeted truncation
-│   └── tokens.ts          rough token estimator
+│   ├── llama-client.ts  SSE streaming fetch client
+│   ├── context-manager.ts  budget + truncation + seed logic
+│   ├── tokens.ts        real tokenizer (via /tokenize) + chars/4 fallback
+│   ├── verify-endpoint.ts  /v1/models + /props probe, perSlotCtx math
+│   ├── summarize.ts     auto-summary of dropped messages
+│   └── dedup.ts         duplicate response detection
 └── store/
-    └── chat-store.ts  zustand + persist(localStorage)
+    ├── chat-store.ts    chats, messages, pins (zustand + persist)
+    └── settings-store.ts  endpoint, prompts, toggles (zustand + persist)
 ```
 
-## Context budget (v1)
+## Architecture notes
 
-The context manager assumes a tight per-slot budget. Defaults in
-`src/lib/context-manager.ts`:
+### Seed vs system prompt
+The Mistral Instruct chat template re-injects the system message before the
+*last* user turn, not the first. This means `role: "system"` content is
+re-read by the model every turn — fine for style guidance, bad for scenario
+setup (the model re-executes "define a victory condition" each turn).
 
-- `PER_SLOT_CTX = 2048`
-- `REPLY_BUDGET = 512`
-- `INPUT_BUDGET = PER_SLOT_CTX − REPLY_BUDGET − 64`
+The fix: seed prompts are prepended to the first `role: "user"` message
+content, so the chat template sees them once at conversation start.
 
-Oldest messages are dropped first; if even the newest single message is
-oversized, its leading characters are truncated. No summarization or
-compaction is performed in this release.
+### Context budget
+```
+perSlotCtx = floor(server.n_ctx / server.total_slots)  // e.g. 2048
+inputBudget = perSlotCtx - REPLY_BUDGET(512) - SAFETY(64)  // e.g. 1472
+```
 
-## Explicitly out of scope (v1)
+Pinned messages (including the seed-augmented first message) are always
+included. Remaining budget fills newest→oldest unpinned messages. When
+auto-summarize is on, dropped messages are summarized and injected as a
+system message.
 
-- Summarization / compaction of old turns
-- Settings panel (temperature, system prompt, model picker)
-- Auth and multi-user
-- Light-mode toggle
-- Mobile-first layout
-- Message editing / regeneration
-- Tool-calling / function-calling
+### Persistence
+Two localStorage keys:
+- `llm-client/chat-store/v1` — chats, messages, pins
+- `llm-client/settings/v1` — endpoint, server info, prompts, toggles

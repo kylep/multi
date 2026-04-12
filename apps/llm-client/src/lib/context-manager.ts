@@ -14,19 +14,21 @@ export type ChatRole = "system" | "user" | "assistant";
 export interface ChatMessage {
   role: ChatRole;
   content: string;
-  pinned?: boolean;
 }
 
 export interface BuildOptions {
   inputBudget?: number;
   systemPrompt?: string;
   seedPrompt?: string;
+  summary?: string;
+  summaryBudgetPct?: number;
 }
 
 export interface BuildResult {
   messages: ChatMessage[];
   truncated: boolean;
   droppedCount: number;
+  droppedMessages: ChatMessage[];
 }
 
 export function buildRequestMessages(
@@ -36,86 +38,87 @@ export function buildRequestMessages(
   const budget = options.inputBudget ?? INPUT_BUDGET;
   const systemPrompt = options.systemPrompt?.trim();
   const seedPrompt = options.seedPrompt?.trim();
+  const summary = options.summary?.trim();
+  const summaryBudgetPct = options.summaryBudgetPct ?? 25;
+  const summaryBudgetTokens = Math.floor(
+    (budget * summaryBudgetPct) / 100,
+  );
 
   const systemMsg: ChatMessage | null = systemPrompt
     ? { role: "system", content: systemPrompt }
     : null;
   const systemCost = systemMsg ? estimateTokens(systemMsg.content) + 4 : 0;
 
-  // Seed prompt: prepended to the first user message's content.
-  // The first message (with seed) is always pinned — never truncated.
-  let historyWithSeed = history;
+  // Seed: prepended to first user message, always kept.
+  let seedAugmentedFirst: ChatMessage | null = null;
+  let seedCost = 0;
   if (seedPrompt && history.length > 0 && history[0].role === "user") {
-    historyWithSeed = [
-      {
-        ...history[0],
-        content: seedPrompt + "\n\n" + history[0].content,
-        pinned: true,
-      },
-      ...history.slice(1),
-    ];
+    seedAugmentedFirst = {
+      role: "user",
+      content: seedPrompt + "\n\n" + history[0].content,
+    };
+    seedCost = estimateTokens(seedAugmentedFirst.content) + 4;
   }
 
-  // Separate pinned vs unpinned. Pinned messages are always included.
-  const pinnedCost = historyWithSeed
-    .filter((m) => m.pinned)
-    .reduce((sum, m) => sum + estimateTokens(m.content) + 4, 0);
-
-  const remaining = budget - systemCost - pinnedCost - 2;
-
-  if (historyWithSeed.length === 0) {
-    return {
-      messages: systemMsg ? [systemMsg] : [],
-      truncated: false,
-      droppedCount: 0,
+  // Summary: injected after system/seed, before recent messages.
+  let summaryMsg: ChatMessage | null = null;
+  let summaryCost = 0;
+  if (summary) {
+    const rawCost = estimateTokens(summary) + 4;
+    summaryCost = Math.min(rawCost, summaryBudgetTokens);
+    const content =
+      rawCost > summaryBudgetTokens
+        ? summary.slice(0, summaryBudgetTokens * 4)
+        : summary;
+    summaryMsg = {
+      role: "system",
+      content: `[Story so far]: ${content}`,
     };
   }
 
-  // Walk unpinned messages newest→oldest, fitting into remaining budget.
-  const keptIndices = new Set<number>();
-  // Always keep pinned indices.
-  for (let i = 0; i < historyWithSeed.length; i++) {
-    if (historyWithSeed[i].pinned) keptIndices.add(i);
+  const fixedCost = systemCost + seedCost + summaryCost + 2;
+  const remaining = budget - fixedCost;
+
+  if (history.length === 0) {
+    const msgs: ChatMessage[] = [];
+    if (systemMsg) msgs.push(systemMsg);
+    if (summaryMsg) msgs.push(summaryMsg);
+    return { messages: msgs, truncated: false, droppedCount: 0, droppedMessages: [] };
   }
 
+  // Walk history (excluding index 0 if seed-augmented) newest→oldest.
+  const startIdx = seedAugmentedFirst ? 1 : 0;
+  const kept: ChatMessage[] = [];
+  const dropped: ChatMessage[] = [];
   let used = 0;
-  let dropped = 0;
-  for (let i = historyWithSeed.length - 1; i >= 0; i--) {
-    if (keptIndices.has(i)) continue;
-    const cost = estimateTokens(historyWithSeed[i].content) + 4;
+
+  for (let i = history.length - 1; i >= startIdx; i--) {
+    const cost = estimateTokens(history[i].content) + 4;
     if (used + cost <= remaining) {
-      keptIndices.add(i);
+      kept.push({ role: history[i].role, content: history[i].content });
       used += cost;
     } else {
-      dropped++;
+      dropped.push({ role: history[i].role, content: history[i].content });
     }
   }
 
-  // Build final ordered list preserving original order.
-  const kept: ChatMessage[] = [];
-  for (let i = 0; i < historyWithSeed.length; i++) {
-    if (keptIndices.has(i)) {
-      kept.push({
-        role: historyWithSeed[i].role,
-        content: historyWithSeed[i].content,
-      });
-    }
-  }
+  kept.reverse();
+  dropped.reverse();
+  const truncated = dropped.length > 0;
 
-  const truncated = dropped > 0;
+  // Assemble final message array.
+  const messages: ChatMessage[] = [];
+  if (systemMsg) messages.push(systemMsg);
+  if (seedAugmentedFirst) messages.push(seedAugmentedFirst);
+  if (summaryMsg) messages.push(summaryMsg);
+  messages.push(...kept);
 
-  if (kept.length === 0 && historyWithSeed.length > 0) {
-    const newest = historyWithSeed[historyWithSeed.length - 1];
-    const charBudget = Math.max(0, (budget - systemCost - 4 - 2) * 4);
-    const truncatedContent =
-      newest.content.length > charBudget
-        ? newest.content.slice(newest.content.length - charBudget)
-        : newest.content;
-    kept.push({ role: newest.role, content: truncatedContent });
-  }
-
-  const messages = systemMsg ? [systemMsg, ...kept] : kept;
-  return { messages, truncated, droppedCount: dropped };
+  return {
+    messages,
+    truncated,
+    droppedCount: dropped.length,
+    droppedMessages: dropped,
+  };
 }
 
 export function totalTokenEstimate(messages: ChatMessage[]): number {
@@ -126,19 +129,21 @@ export interface ContextPreview {
   inputBudget: number;
   usedTokens: number;
   usedPercent: number;
-  firstKeptIndex: number;
+  recentStartIndex: number;
   droppedCount: number;
   truncated: boolean;
-  keptSet: Set<number>;
+  summaryTokens: number;
 }
 
 export function previewContext(
-  history: { role: ChatRole; content: string; pinned?: boolean }[],
+  history: { role: ChatRole; content: string }[],
   draft: string,
   opts: {
     inputBudget: number;
     systemPrompt?: string;
     seedPrompt?: string;
+    summary?: string;
+    summaryBudgetPct?: number;
   },
 ): ContextPreview {
   const systemCost = opts.systemPrompt
@@ -147,62 +152,49 @@ export function previewContext(
   const draftCost = draft ? estimateTokens(draft) + 4 : 0;
   const hasSeed =
     !!opts.seedPrompt && history.length > 0 && history[0].role === "user";
+  const seedCost = hasSeed
+    ? estimateTokens(opts.seedPrompt + "\n\n" + history[0].content) + 4
+    : 0;
 
-  // Compute pinned cost. Index 0 is implicitly pinned when there's a seed.
-  // Use the seed-augmented content for token estimation.
-  const pinnedIndices = new Set<number>();
-  let pinnedCost = 0;
-  for (let i = 0; i < history.length; i++) {
-    const isPinned = history[i].pinned || (i === 0 && hasSeed);
-    if (isPinned) {
-      pinnedIndices.add(i);
-      const content =
-        i === 0 && hasSeed
-          ? opts.seedPrompt + "\n\n" + history[i].content
-          : history[i].content;
-      pinnedCost += estimateTokens(content) + 4;
-    }
-  }
+  const summaryBudgetPct = opts.summaryBudgetPct ?? 25;
+  const summaryBudgetTokens = Math.floor(
+    (opts.inputBudget * summaryBudgetPct) / 100,
+  );
+  const summaryTokens = opts.summary
+    ? Math.min(estimateTokens(opts.summary) + 4, summaryBudgetTokens)
+    : 0;
 
-  const remaining =
-    opts.inputBudget - systemCost - draftCost - pinnedCost - 2;
+  const fixedCost = systemCost + seedCost + summaryTokens + draftCost + 2;
+  const remaining = opts.inputBudget - fixedCost;
 
-  // Indices use the original history array, so the UI can map directly.
-  const keptSet = new Set(pinnedIndices);
+  const startIdx = hasSeed ? 1 : 0;
   let used = 0;
   let droppedCount = 0;
-  for (let i = history.length - 1; i >= 0; i--) {
-    if (keptSet.has(i)) continue;
+  let recentStartIndex = history.length;
+
+  for (let i = history.length - 1; i >= startIdx; i--) {
     const cost = estimateTokens(history[i].content) + 4;
     if (used + cost <= remaining) {
-      keptSet.add(i);
       used += cost;
+      recentStartIndex = i;
     } else {
       droppedCount++;
     }
   }
 
-  const usedTokens = systemCost + draftCost + pinnedCost + used + 2;
+  const usedTokens = fixedCost + used;
   const usedPercent = Math.min(
     100,
     Math.round((usedTokens / opts.inputBudget) * 100),
   );
 
-  let firstKeptIndex = history.length;
-  for (let i = 0; i < history.length; i++) {
-    if (keptSet.has(i)) {
-      firstKeptIndex = i;
-      break;
-    }
-  }
-
   return {
     inputBudget: opts.inputBudget,
     usedTokens,
     usedPercent,
-    firstKeptIndex,
+    recentStartIndex,
     droppedCount,
     truncated: droppedCount > 0,
-    keptSet,
+    summaryTokens,
   };
 }

@@ -53,11 +53,13 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const storedSeedFile = useSettingsStore((s) => s.seedPromptFilename);
   const storedCtxOvr = useSettingsStore((s) => s.contextOverride);
   const storedAutoSummarize = useSettingsStore((s) => s.autoSummarize);
+  const storedSummaryBudget = useSettingsStore((s) => s.summaryBudgetPct);
   const storedDedupRetry = useSettingsStore((s) => s.deduplicateRetry);
   const setSystemPrompt = useSettingsStore((s) => s.setSystemPrompt);
   const setSeedPrompt = useSettingsStore((s) => s.setSeedPrompt);
   const setContextOverride = useSettingsStore((s) => s.setContextOverride);
   const setAutoSummarize = useSettingsStore((s) => s.setAutoSummarize);
+  const setSummaryBudgetPct = useSettingsStore((s) => s.setSummaryBudgetPct);
   const setDeduplicateRetry = useSettingsStore((s) => s.setDeduplicateRetry);
 
   const [spSrc, setSpSrc] = useState<PromptSource>(storedSpSrc);
@@ -76,6 +78,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     storedCtxOvr === null ? "" : String(storedCtxOvr),
   );
   const [localAutoSummarize, setLocalAutoSummarize] = useState(storedAutoSummarize);
+  const [localSummaryBudget, setLocalSummaryBudget] = useState(storedSummaryBudget);
   const [localDedupRetry, setLocalDedupRetry] = useState(storedDedupRetry);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,10 +94,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       setSeedFilename(storedSeedFile);
       setOverrideStr(storedCtxOvr === null ? "" : String(storedCtxOvr));
       setLocalAutoSummarize(storedAutoSummarize);
+      setLocalSummaryBudget(storedSummaryBudget);
       setLocalDedupRetry(storedDedupRetry);
       setError(null);
     }
-  }, [open, storedSpSrc, storedSp, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedAutoSummarize, storedDedupRetry]);
+  }, [open, storedSpSrc, storedSp, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedAutoSummarize, storedSummaryBudget, storedDedupRetry]);
 
   const serverMax = perSlotCtx(serverInfo);
 
@@ -140,6 +144,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     }
 
     setAutoSummarize(localAutoSummarize);
+    setSummaryBudgetPct(localSummaryBudget);
     setDeduplicateRetry(localDedupRetry);
     onOpenChange(false);
   };
@@ -246,21 +251,45 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           <div className="flex items-center gap-1.5">
             <Label>Behavior</Label>
           </div>
-          <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
-            <div>
-              <div className="text-sm font-medium">Auto-summarize</div>
-              <div className="text-[11px] text-muted-foreground">
-                When old messages are dropped from context, generate a summary and inject it so the model retains memory.
+          <div className="rounded-md border border-border px-3 py-2.5">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-medium">Auto-summarize</div>
+                <div className="text-[11px] text-muted-foreground">
+                  When old messages are dropped, generate a rolling "Story so far" summary. Editable in the chat transcript.
+                </div>
               </div>
-            </div>
-            <input
-              type="checkbox"
-              checked={localAutoSummarize}
-              onChange={(e) => setLocalAutoSummarize(e.target.checked)}
-              className="h-4 w-4 accent-primary"
-              data-testid="toggle-auto-summarize"
-            />
-          </label>
+              <input
+                type="checkbox"
+                checked={localAutoSummarize}
+                onChange={(e) => setLocalAutoSummarize(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+                data-testid="toggle-auto-summarize"
+              />
+            </label>
+            {localAutoSummarize && (
+              <div className="mt-3 flex items-center gap-3 border-t border-border/50 pt-3">
+                <span className="text-[11px] text-muted-foreground">
+                  Summary budget
+                </span>
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
+                  step="5"
+                  value={localSummaryBudget}
+                  onChange={(e) =>
+                    setLocalSummaryBudget(parseInt(e.target.value, 10))
+                  }
+                  className="flex-1"
+                  data-testid="summary-budget-slider"
+                />
+                <span className="w-10 text-right font-mono text-xs text-muted-foreground">
+                  {localSummaryBudget}%
+                </span>
+              </div>
+            )}
+          </div>
           <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
             <div>
               <div className="text-sm font-medium">Duplicate retry</div>
