@@ -21,6 +21,8 @@ export interface VerifyResult {
   error?: string;
 }
 
+import { log } from "./logger";
+
 const PROPS_TIMEOUT = 3000;
 
 export async function verifyEndpoint(
@@ -92,6 +94,8 @@ export async function verifyEndpoint(
     };
   }
 
+  log.info(`verifyEndpoint: /v1/models OK, modelId=${modelId}`);
+
   const info: ServerInfo = {
     endpoint,
     modelId,
@@ -119,6 +123,7 @@ export async function verifyEndpoint(
         default_generation_settings?: { n_ctx?: number };
       };
       info.probedProps = true;
+      log.info(`verifyEndpoint: /props OK, nCtx=${props.default_generation_settings?.n_ctx} slots=${props.total_slots}`);
       info.modelAlias = props.model_alias;
       info.modelPath = props.model_path;
       info.totalSlots = props.total_slots;

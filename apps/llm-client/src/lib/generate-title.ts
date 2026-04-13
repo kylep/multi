@@ -1,8 +1,11 @@
+import { log } from "./logger";
+
 export async function generateTitle(
   messages: { role: string; content: string }[],
   endpoint: string,
 ): Promise<string | null> {
   if (messages.length < 2) return null;
+  log.info(`generateTitle: ${messages.length} messages, asking for max 6-word title`);
 
   const excerpt = messages
     .slice(0, 6)
@@ -38,7 +41,9 @@ export async function generateTitle(
     };
     const raw = json.choices?.[0]?.message?.content?.trim();
     if (!raw) return null;
-    return raw.replace(/^["']|["']$/g, "").slice(0, 60);
+    const title = raw.replace(/^["']|["']$/g, "").slice(0, 60);
+    log.info(`generateTitle: "${title}"`);
+    return title;
   } catch {
     return null;
   }

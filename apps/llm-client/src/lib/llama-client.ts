@@ -1,4 +1,5 @@
 import type { ChatMessage } from "./context-manager";
+import { log } from "./logger";
 
 export const DEFAULT_ENDPOINT = "http://127.0.0.1:8080";
 export const DEFAULT_MODEL = "local-model";
@@ -27,6 +28,8 @@ export async function* streamChat(
   const endpoint = options.endpoint ?? DEFAULT_ENDPOINT;
   const url = `${endpoint.replace(/\/$/, "")}/v1/chat/completions`;
 
+  log.info(`streamChat: POST ${url} messages=${options.messages.length} maxTokens=${options.maxTokens} temp=${options.temperature ?? 0.7}`);
+
   const res = await fetch(url, {
     method: "POST",
     headers: {
@@ -45,6 +48,7 @@ export async function* streamChat(
 
   if (!res.ok || !res.body) {
     const text = await res.text().catch(() => "");
+    log.error(`streamChat: server responded ${res.status}: ${text.slice(0, 200)}`);
     throw new LlamaClientError(
       `llama-server ${res.status}: ${text.slice(0, 200)}`,
       res.status,

@@ -1,3 +1,4 @@
+import { log } from "./logger";
 import { estimateMessagesTokens, estimateTokens } from "./tokens";
 
 export const PER_SLOT_CTX = 2048;
@@ -93,6 +94,8 @@ export function buildRequestMessages(
   const fixedCost = systemCost + seedCost + 2;
   const remaining = budget - fixedCost;
 
+  log.info(`buildRequestMessages: budget=${budget} fixed=${fixedCost} remaining=${remaining} history=${history.length} seed=${!!seedPrompt} summary=${!!summary} summaryLen=${summary?.length ?? 0}`);
+
   if (history.length === 0) {
     const msgs: ChatMessage[] = [];
     if (systemMsg) msgs.push(systemMsg);
@@ -144,6 +147,11 @@ export function buildRequestMessages(
     }
   }
   messages.push(...kept);
+
+  log.info(`buildRequestMessages: kept=${kept.length} dropped=${dropped.length} truncated=${truncated} finalMsgCount=${messages.length}`);
+  if (truncated) {
+    log.info(`buildRequestMessages: dropped roles=[${dropped.map(m => m.role).join(",")}]`);
+  }
 
   // Final alternation validation: drop messages that would create
   // consecutive same-role entries (defensive, shouldn't trigger normally).

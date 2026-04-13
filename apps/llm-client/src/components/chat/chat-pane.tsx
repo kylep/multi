@@ -16,6 +16,7 @@ import { effectivePerSlot } from "@/lib/verify-endpoint";
 import { summarizeMessages } from "@/lib/summarize";
 import { isDuplicateResponse } from "@/lib/dedup";
 import { generateTitle } from "@/lib/generate-title";
+import { log } from "@/lib/logger";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
 
@@ -110,6 +111,8 @@ export function ChatPane() {
 
       // Auto-summarize: compact dropped messages. Triggers at truncation
       // OR when context usage exceeds 80% (proactive compaction).
+      log.info(`doSend: chatId=${chatId} historyLen=${historyForRequest.length} currentSummaryLen=${currentSummary.length}`);
+
       const shouldCompact =
         autoSummarize &&
         (buildResult.truncated ||
@@ -121,6 +124,7 @@ export function ChatPane() {
               inputBudget * 0.8));
 
       if (shouldCompact) {
+        log.info(`doSend: compaction triggered (truncated=${buildResult.truncated} droppedMsgs=${buildResult.droppedMessages.length})`);
         setCompacting(true);
         // For proactive compaction (no drops yet), compact the oldest
         // 50% of non-seed messages to make room.
@@ -130,6 +134,7 @@ export function ChatPane() {
           messagesToCompact = historyForRequest.slice(1, 1 + half);
         }
 
+        log.info(`doSend: compacting ${messagesToCompact.length} messages`);
         if (messagesToCompact.length > 0) {
           const summaryTokenBudget = Math.floor(
             (inputBudget * summaryBudgetPct) / 100,
@@ -141,6 +146,7 @@ export function ChatPane() {
             tokenBudget: summaryTokenBudget,
           });
           if (newSummary) {
+            log.info(`doSend: summary updated (${newSummary.length} chars)`);
             setSummary(chatId, newSummary);
             buildResult = buildRequestMessages(historyForRequest, {
               inputBudget,
@@ -179,12 +185,15 @@ export function ChatPane() {
       try {
         const fullResponse = await runStream(requestMessages);
 
+        log.info(`doSend: stream complete, ${fullResponse.length} chars`);
+
         if (deduplicateRetry && fullResponse) {
           const priorMessages = historyForRequest.map((m) => ({
             role: m.role,
             content: m.content,
           }));
           if (isDuplicateResponse(fullResponse, priorMessages)) {
+            log.warn("doSend: duplicate response detected, retrying with higher temp");
             for (let retry = 0; retry < MAX_DEDUP_RETRIES; retry++) {
               useChatStore.setState((s) => {
                 const c = s.chats[chatId];
@@ -203,6 +212,7 @@ export function ChatPane() {
               });
 
               const bumpedTemp = temperature + DEDUP_TEMP_BUMP * (retry + 1);
+              log.info(`doSend: dedup retry ${retry + 1}/${MAX_DEDUP_RETRIES} at temp=${bumpedTemp.toFixed(2)}`);
               const retryResponse = await runStream(
                 requestMessages,
                 bumpedTemp,
@@ -240,6 +250,7 @@ export function ChatPane() {
             currentTitle ===
               firstUserContent.trim().slice(0, 40) + "…";
           if (isDefaultTitle) {
+            log.info("doSend: triggering auto-title generation");
             generateTitle(
               chatNow.messages.map((m) => ({
                 role: m.role,

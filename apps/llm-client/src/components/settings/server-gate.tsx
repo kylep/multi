@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useSettingsStore } from "@/store/settings-store";
 import { verifyEndpoint } from "@/lib/verify-endpoint";
+import { log } from "@/lib/logger";
 import { setTokenizeEndpoint } from "@/lib/tokens";
 import { EndpointDialog } from "./endpoint-dialog";
 
@@ -21,14 +22,17 @@ export function ServerGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     setGate({ kind: "checking" });
+    log.info(`serverGate: verifying ${endpoint}`);
     (async () => {
       const result = await verifyEndpoint(endpoint);
       if (cancelled) return;
       if (result.ok && result.info) {
+        log.info(`serverGate: connected to ${result.info.endpoint}, model=${result.info.modelId}`);
         setServerInfo(result.info);
         setTokenizeEndpoint(result.info.endpoint);
         setGate({ kind: "ok" });
       } else {
+        log.warn(`serverGate: failed to verify ${endpoint}: ${result.error}`);
         setGate({
           kind: "error",
           error: result.error ?? "Unreachable",

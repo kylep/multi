@@ -1,4 +1,5 @@
 import type { ChatMessage } from "./context-manager";
+import { log } from "./logger";
 import { estimateTokens } from "./tokens";
 
 const SUMMARIZE_PROMPT =
@@ -75,6 +76,8 @@ export async function summarizeMessages(
     ? `## Existing summary\n${opts.existingSummary}\n\n## New conversation to fold in\n${excerpt}`
     : excerpt;
 
+  log.info(`summarize: ${messages.length} messages, existing=${!!opts.existingSummary}, maxTokens=${opts.maxTokens ?? 200}, tokenBudget=${opts.tokenBudget ?? "none"}`);
+
   const maxTokens = opts.maxTokens ?? 200;
   let result = await callModel(
     opts.endpoint,
@@ -82,13 +85,19 @@ export async function summarizeMessages(
     userContent,
     maxTokens,
   );
-  if (!result) return null;
+  if (!result) {
+    log.warn("summarize: model returned null");
+    return null;
+  }
+
+  log.info(`summarize: got ${result.length} chars (~${estimateTokens(result)} tokens)`);
 
   // If a token budget is specified, check and retry if overshot.
   if (opts.tokenBudget && opts.tokenBudget > 0) {
     for (let retry = 0; retry < MAX_RETRIES; retry++) {
       const tokens = estimateTokens(result);
       if (tokens <= opts.tokenBudget) break;
+      log.info(`summarize: overshot budget (${tokens}/${opts.tokenBudget}), retry ${retry + 1}`);
 
       const shortened = await callModel(
         opts.endpoint,

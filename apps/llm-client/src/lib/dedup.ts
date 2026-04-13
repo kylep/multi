@@ -1,3 +1,5 @@
+import { log } from "./logger";
+
 const MAX_LOOKBACK = 5;
 
 export function isDuplicateResponse(
@@ -6,6 +8,7 @@ export function isDuplicateResponse(
   threshold = 0.85,
 ): boolean {
   if (!newContent || newContent.length < 20) return false;
+  log.debug(`dedup: checking ${newContent.length} chars against last ${MAX_LOOKBACK} assistant msgs`);
 
   const normalize = (s: string) =>
     s.toLowerCase().replace(/\s+/g, " ").trim();
@@ -18,7 +21,10 @@ export function isDuplicateResponse(
     const prevNorm = normalize(history[i].content);
     if (!prevNorm) continue;
 
-    if (newNorm === prevNorm) return true;
+    if (newNorm === prevNorm) {
+      log.info(`dedup: exact match with assistant msg at index ${i}`);
+      return true;
+    }
 
     const shorter = newNorm.length < prevNorm.length ? newNorm : prevNorm;
     const longer = newNorm.length < prevNorm.length ? prevNorm : newNorm;
@@ -28,6 +34,7 @@ export function isDuplicateResponse(
           shorter.slice(0, Math.floor(shorter.length * threshold)),
         )
       ) {
+        log.info(`dedup: prefix match with assistant msg at index ${i} (${(shorter.length / longer.length * 100).toFixed(0)}% overlap)`);
         return true;
       }
 
@@ -36,7 +43,9 @@ export function isDuplicateResponse(
       for (let j = 0; j < len; j++) {
         if (newNorm[j] === prevNorm[j]) matches++;
       }
-      if (matches / Math.max(newNorm.length, prevNorm.length) >= threshold) {
+      const similarity = matches / Math.max(newNorm.length, prevNorm.length);
+      if (similarity >= threshold) {
+        log.info(`dedup: char-level match with assistant msg at index ${i} (${(similarity * 100).toFixed(0)}% similar)`);
         return true;
       }
     }
