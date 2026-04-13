@@ -20,6 +20,7 @@ export interface SettingsStore {
   summaryBudgetPct: number;
   deduplicateRetry: boolean;
   temperature: number;
+  colorSupport: boolean;
   setEndpoint(next: string): void;
   setServerInfo(info: ServerInfo | null): void;
   setSystemPrompt(
@@ -37,6 +38,7 @@ export interface SettingsStore {
   setSummaryBudgetPct(v: number): void;
   setDeduplicateRetry(v: boolean): void;
   setTemperature(v: number): void;
+  setColorSupport(v: boolean): void;
 }
 
 function normalizeEndpoint(raw: string): string {
@@ -62,6 +64,7 @@ export const useSettingsStore = create<SettingsStore>()(
       summaryBudgetPct: 25,
       deduplicateRetry: true,
       temperature: 0.7,
+      colorSupport: true,
       setEndpoint(next) {
         set({ endpoint: normalizeEndpoint(next) });
       },
@@ -99,6 +102,9 @@ export const useSettingsStore = create<SettingsStore>()(
       },
       setTemperature(v) {
         set({ temperature: Math.max(0, Math.min(2, v)) });
+      },
+      setColorSupport(v) {
+        set({ colorSupport: v });
       },
     }),
     {

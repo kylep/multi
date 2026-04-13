@@ -52,8 +52,10 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const setContextOverride = useSettingsStore((s) => s.setContextOverride);
   const setAutoSummarize = useSettingsStore((s) => s.setAutoSummarize);
   const setSummaryBudgetPct = useSettingsStore((s) => s.setSummaryBudgetPct);
+  const storedColorSupport = useSettingsStore((s) => s.colorSupport);
   const setDeduplicateRetry = useSettingsStore((s) => s.setDeduplicateRetry);
   const setTemperature = useSettingsStore((s) => s.setTemperature);
+  const setColorSupport = useSettingsStore((s) => s.setColorSupport);
 
   const [spSrc, setSpSrc] = useState<PromptSource>(storedSpSrc);
   const [spText, setSpText] = useState(storedSp);
@@ -74,6 +76,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     useState(storedSummaryBudget);
   const [localDedupRetry, setLocalDedupRetry] = useState(storedDedupRetry);
   const [localTemp, setLocalTemp] = useState(String(storedTemperature));
+  const [localColorSupport, setLocalColorSupport] = useState(storedColorSupport);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -134,6 +137,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     setAutoSummarize(localAutoSummarize);
     setSummaryBudgetPct(localSummaryBudget);
     setDeduplicateRetry(localDedupRetry);
+    setColorSupport(localColorSupport);
 
     setSaved(true);
   };
@@ -332,6 +336,25 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
                 onChange={(e) => setLocalDedupRetry(e.target.checked)}
                 className="h-4 w-4 accent-primary"
                 data-testid="toggle-dedup-retry"
+              />
+            </label>
+
+            <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
+              <div>
+                <div className="text-sm font-medium">Colour support</div>
+                <div className="text-[11px] text-muted-foreground">
+                  Inject a colour legend into the system prompt so the model can use{" "}
+                  <code className="text-[10px]">{"{r}"}red{"{/r}"}</code>{" "}
+                  <code className="text-[10px]">{"{g}"}green{"{/g}"}</code>{" "}
+                  etc. Rendered as coloured text in the chat.
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                checked={localColorSupport}
+                onChange={(e) => setLocalColorSupport(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+                data-testid="toggle-color-support"
               />
             </label>
           </section>

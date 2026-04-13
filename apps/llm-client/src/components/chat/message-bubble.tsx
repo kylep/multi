@@ -3,7 +3,9 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import { RefreshCw } from "lucide-react";
+import { processColors } from "@/lib/colors";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ChatRole } from "@/lib/context-manager";
@@ -58,9 +60,9 @@ export function MessageBubble({
             <>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight]}
+                rehypePlugins={[rehypeRaw, rehypeHighlight]}
               >
-                {content || ""}
+                {processColors(content || "")}
               </ReactMarkdown>
               {streaming ? (
                 <span

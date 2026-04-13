@@ -16,6 +16,7 @@ import { effectivePerSlot } from "@/lib/verify-endpoint";
 import { summarizeMessages } from "@/lib/summarize";
 import { isDuplicateResponse } from "@/lib/dedup";
 import { generateTitle } from "@/lib/generate-title";
+import { COLOR_PROMPT } from "@/lib/colors";
 import { log } from "@/lib/logger";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
@@ -45,12 +46,16 @@ export function ChatPane() {
   const summaryBudgetPct = useSettingsStore((s) => s.summaryBudgetPct);
   const deduplicateRetry = useSettingsStore((s) => s.deduplicateRetry);
   const temperature = useSettingsStore((s) => s.temperature);
+  const colorSupport = useSettingsStore((s) => s.colorSupport);
 
   const [draft, setDraft] = useState("");
   const [compacting, setCompacting] = useState(false);
 
-  const effectiveSystemPrompt =
+  const rawSystemPrompt =
     systemPromptSource === "none" ? undefined : systemPrompt || undefined;
+  const effectiveSystemPrompt = colorSupport
+    ? [rawSystemPrompt, COLOR_PROMPT].filter(Boolean).join("\n") || COLOR_PROMPT
+    : rawSystemPrompt;
   const effectiveSeedPrompt =
     seedPromptSource === "none" ? undefined : seedPrompt || undefined;
   const perSlot = effectivePerSlot(serverInfo, contextOverride);
