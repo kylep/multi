@@ -16,6 +16,7 @@ interface MessageBubbleProps {
   streaming?: boolean;
   hasError?: boolean;
   onRetry?: () => void;
+  onRegen?: () => void;
 }
 
 export function MessageBubble({
@@ -24,6 +25,7 @@ export function MessageBubble({
   streaming,
   hasError,
   onRetry,
+  onRegen,
 }: MessageBubbleProps) {
   const isUser = role === "user";
   const label = isUser ? "User:" : role === "assistant" ? "Bot:" : "System:";
@@ -73,17 +75,33 @@ export function MessageBubble({
             </>
           )}
         </div>
-        {hasError && onRetry && !streaming && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onRetry}
-            className="mt-1 gap-1.5 text-xs text-destructive hover:text-destructive"
-            data-testid="retry-btn"
-          >
-            <RefreshCw className="h-3 w-3" />
-            Retry
-          </Button>
+        {!isUser && !streaming && (
+          <div className="mt-1 flex gap-1">
+            {hasError && onRetry && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onRetry}
+                className="gap-1.5 text-xs text-destructive hover:text-destructive"
+                data-testid="retry-btn"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Retry
+              </Button>
+            )}
+            {onRegen && !hasError && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onRegen}
+                className="gap-1.5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                data-testid="regen-btn"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Regen
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -81,8 +81,10 @@ export function ChatRow({
       </button>
       <div
         className={cn(
-          "mr-1 flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100",
-          active && "opacity-100",
+          "mr-1 flex shrink-0 items-center gap-0.5 transition-opacity",
+          active
+            ? "opacity-100"
+            : "opacity-0 group-hover:opacity-100",
         )}
       >
         <button

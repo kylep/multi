@@ -4,6 +4,7 @@ import {
   buildRequestMessages,
   computeInputBudget,
   computeReplyBudget,
+  effectiveMaxTokens,
   INPUT_BUDGET,
   previewContext,
   REPLY_BUDGET,
@@ -124,31 +125,54 @@ describe("buildRequestMessages with summary", () => {
 });
 
 describe("computeReplyBudget", () => {
-  it("caps at 512 for large contexts", () => {
-    expect(computeReplyBudget(4096)).toBe(512);
-    expect(computeReplyBudget(8192)).toBe(512);
+  it("caps at 1024 for large contexts", () => {
+    expect(computeReplyBudget(4096)).toBe(1024);
+    expect(computeReplyBudget(8192)).toBe(1024);
   });
 
-  it("scales to 25% for small contexts", () => {
-    expect(computeReplyBudget(600)).toBe(150);
-    expect(computeReplyBudget(400)).toBe(100);
+  it("scales to 50% for small contexts", () => {
+    expect(computeReplyBudget(600)).toBe(300);
+    expect(computeReplyBudget(400)).toBe(200);
+  });
+
+  it("respects override", () => {
+    expect(computeReplyBudget(8192, 2000)).toBe(2000);
+  });
+
+  it("clamps override to perSlot - safety", () => {
+    expect(computeReplyBudget(1000, 5000)).toBe(1000 - SAFETY);
   });
 });
 
 describe("computeInputBudget", () => {
   it("subtracts scaled reply budget and safety from per-slot context", () => {
-    expect(computeInputBudget(2048)).toBe(2048 - REPLY_BUDGET - SAFETY);
+    // 8192: reply=min(1024, 4096)=1024, input=8192-1024-64=7104
     expect(computeInputBudget(8192)).toBe(8192 - REPLY_BUDGET - SAFETY);
   });
 
   it("uses proportional reply budget for small contexts", () => {
-    // 600: reply=150, safety=64, input=386
-    expect(computeInputBudget(600)).toBe(600 - 150 - SAFETY);
+    // 600: reply=300, safety=64, input=236
+    expect(computeInputBudget(600)).toBe(600 - 300 - SAFETY);
   });
 
   it("floors at 64 for absurdly small slots", () => {
     expect(computeInputBudget(0)).toBe(64);
     expect(computeInputBudget(100)).toBe(64);
+  });
+});
+
+describe("effectiveMaxTokens", () => {
+  it("returns reply budget when plenty of room", () => {
+    expect(effectiveMaxTokens(1024, 8192, 2000)).toBe(1024);
+  });
+
+  it("caps to available space when context is mostly used", () => {
+    // 8192 slot, 7000 used, safety 64 → available = 1128
+    expect(effectiveMaxTokens(4096, 8192, 7000)).toBe(1128);
+  });
+
+  it("returns at least 1 even when over budget", () => {
+    expect(effectiveMaxTokens(1024, 8192, 9000)).toBe(1);
   });
 });
 

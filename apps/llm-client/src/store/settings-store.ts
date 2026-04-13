@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { DEFAULT_COLORIZE_PROMPT } from "@/lib/colorize-pass";
 import type { ServerInfo } from "@/lib/verify-endpoint";
 
 export const DEFAULT_ENDPOINT = "http://127.0.0.1:8080";
@@ -16,11 +17,15 @@ export interface SettingsStore {
   seedPromptSource: PromptSource;
   seedPromptFilename: string | null;
   contextOverride: number | null;
+  replyBudgetOverride: number | null;
   autoSummarize: boolean;
   summaryBudgetPct: number;
   deduplicateRetry: boolean;
   temperature: number;
   colorSupport: boolean;
+  colorPrompt: string;
+  minReplyTokens: number;
+  extractChoices: boolean;
   setEndpoint(next: string): void;
   setServerInfo(info: ServerInfo | null): void;
   setSystemPrompt(
@@ -34,11 +39,15 @@ export interface SettingsStore {
     filename?: string | null,
   ): void;
   setContextOverride(next: number | null): void;
+  setReplyBudgetOverride(next: number | null): void;
   setAutoSummarize(v: boolean): void;
   setSummaryBudgetPct(v: number): void;
   setDeduplicateRetry(v: boolean): void;
   setTemperature(v: number): void;
   setColorSupport(v: boolean): void;
+  setColorPrompt(v: string): void;
+  setMinReplyTokens(v: number): void;
+  setExtractChoices(v: boolean): void;
 }
 
 function normalizeEndpoint(raw: string): string {
@@ -60,11 +69,15 @@ export const useSettingsStore = create<SettingsStore>()(
       seedPromptSource: "none",
       seedPromptFilename: null,
       contextOverride: null,
+      replyBudgetOverride: null,
       autoSummarize: true,
       summaryBudgetPct: 25,
       deduplicateRetry: true,
       temperature: 0.7,
       colorSupport: true,
+      colorPrompt: DEFAULT_COLORIZE_PROMPT,
+      minReplyTokens: 500,
+      extractChoices: true,
       setEndpoint(next) {
         set({ endpoint: normalizeEndpoint(next) });
       },
@@ -91,6 +104,12 @@ export const useSettingsStore = create<SettingsStore>()(
             next === null || Number.isNaN(next) ? null : Math.max(1, next),
         });
       },
+      setReplyBudgetOverride(next) {
+        set({
+          replyBudgetOverride:
+            next === null || Number.isNaN(next) ? null : Math.max(1, next),
+        });
+      },
       setAutoSummarize(v) {
         set({ autoSummarize: v });
       },
@@ -105,6 +124,15 @@ export const useSettingsStore = create<SettingsStore>()(
       },
       setColorSupport(v) {
         set({ colorSupport: v });
+      },
+      setColorPrompt(v) {
+        set({ colorPrompt: v });
+      },
+      setMinReplyTokens(v) {
+        set({ minReplyTokens: Math.max(1, v) });
+      },
+      setExtractChoices(v) {
+        set({ extractChoices: v });
       },
     }),
     {

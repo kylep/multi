@@ -44,8 +44,17 @@ export function processColors(content: string): string {
   );
 }
 
-// Compact legend: ~50 tokens. Abbreviated names save tokens vs full words.
-export const COLOR_PROMPT =
-  `[Fmt: ${Object.entries(STYLE_CODES)
-    .map(([k, v]) => `{${k}}${v.name}`)
-    .join(" ")} — close {/X}. For emphasis on names/places/items only, 2-4 per reply max.]`;
+// 188 tokens. Emphasizes restraint with correct vs wrong examples.
+export const COLOR_PROMPT = `[COLOR]
+Most text must be plain. Color only 1-2 words per response, often none. Response length is unaffected — write fully.
+Wrap: {X}word{/X}
+
+r=damage-numbers-only g=common-item b=rare/magic-item o=person-name t=place-name
+
+CORRECT — notice how little color is used:
+You enter the tavern. {o}Old Meg{/o} slides you a drink and warns about the crypt.
+
+WRONG — too much color:
+{o}You{/o} enter the {t}tavern{/t}. {o}Old Meg{/o} slides you a {g}drink{/g} and {i}warns{/i} about the {t}crypt{/t}.
+
+Only color proper nouns and specific item names. Never color verbs, adjectives, common nouns like stone/campfire/smoke, or descriptions. This limit applies to color usage only — write responses as long as needed.`;

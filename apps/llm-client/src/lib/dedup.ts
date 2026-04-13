@@ -5,7 +5,7 @@ const MAX_LOOKBACK = 5;
 export function isDuplicateResponse(
   newContent: string,
   history: { role: string; content: string }[],
-  threshold = 0.85,
+  threshold = 0.7,
 ): boolean {
   if (!newContent || newContent.length < 20) return false;
   log.debug(`dedup: checking ${newContent.length} chars against last ${MAX_LOOKBACK} assistant msgs`);

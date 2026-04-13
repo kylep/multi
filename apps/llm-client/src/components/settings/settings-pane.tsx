@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Info, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { computeReplyBudget } from "@/lib/context-manager";
 import { perSlotCtx } from "@/lib/verify-endpoint";
 import { type PromptSource, useSettingsStore } from "@/store/settings-store";
 import { PromptField } from "./prompt-field";
@@ -43,6 +45,8 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const storedSeedSrc = useSettingsStore((s) => s.seedPromptSource);
   const storedSeedFile = useSettingsStore((s) => s.seedPromptFilename);
   const storedCtxOvr = useSettingsStore((s) => s.contextOverride);
+  const storedReplyBudget = useSettingsStore((s) => s.replyBudgetOverride);
+  const storedMinReply = useSettingsStore((s) => s.minReplyTokens);
   const storedAutoSummarize = useSettingsStore((s) => s.autoSummarize);
   const storedSummaryBudget = useSettingsStore((s) => s.summaryBudgetPct);
   const storedDedupRetry = useSettingsStore((s) => s.deduplicateRetry);
@@ -50,12 +54,18 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const setSystemPrompt = useSettingsStore((s) => s.setSystemPrompt);
   const setSeedPrompt = useSettingsStore((s) => s.setSeedPrompt);
   const setContextOverride = useSettingsStore((s) => s.setContextOverride);
+  const setReplyBudgetOverride = useSettingsStore((s) => s.setReplyBudgetOverride);
+  const setMinReplyTokens = useSettingsStore((s) => s.setMinReplyTokens);
   const setAutoSummarize = useSettingsStore((s) => s.setAutoSummarize);
   const setSummaryBudgetPct = useSettingsStore((s) => s.setSummaryBudgetPct);
+  const storedExtractChoices = useSettingsStore((s) => s.extractChoices);
   const storedColorSupport = useSettingsStore((s) => s.colorSupport);
+  const storedColorPrompt = useSettingsStore((s) => s.colorPrompt);
   const setDeduplicateRetry = useSettingsStore((s) => s.setDeduplicateRetry);
   const setTemperature = useSettingsStore((s) => s.setTemperature);
+  const setExtractChoices = useSettingsStore((s) => s.setExtractChoices);
   const setColorSupport = useSettingsStore((s) => s.setColorSupport);
+  const setColorPrompt = useSettingsStore((s) => s.setColorPrompt);
 
   const [spSrc, setSpSrc] = useState<PromptSource>(storedSpSrc);
   const [spText, setSpText] = useState(storedSp);
@@ -70,15 +80,50 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const [overrideStr, setOverrideStr] = useState(
     storedCtxOvr === null ? "" : String(storedCtxOvr),
   );
+  const [replyBudgetStr, setReplyBudgetStr] = useState(
+    storedReplyBudget === null ? "" : String(storedReplyBudget),
+  );
+  const [localMinReply, setLocalMinReply] = useState(String(storedMinReply));
   const [localAutoSummarize, setLocalAutoSummarize] =
     useState(storedAutoSummarize);
   const [localSummaryBudget, setLocalSummaryBudget] =
     useState(storedSummaryBudget);
   const [localDedupRetry, setLocalDedupRetry] = useState(storedDedupRetry);
   const [localTemp, setLocalTemp] = useState(String(storedTemperature));
+  const [localExtractChoices, setLocalExtractChoices] = useState(storedExtractChoices);
   const [localColorSupport, setLocalColorSupport] = useState(storedColorSupport);
+  const [localColorPrompt, setLocalColorPrompt] = useState(storedColorPrompt);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  // Sync local state from store. Runs on mount and whenever the store
+  // rehydrates from localStorage. Uses a ref to avoid overwriting
+  // in-progress user edits — only syncs when the store value actually
+  // differs from what we last synced.
+  const lastSyncRef = useRef("");
+  useEffect(() => {
+    const key = [storedSp, storedSpSrc, storedSeed, storedSeedSrc, storedCtxOvr, storedReplyBudget, storedMinReply, storedTemperature, storedColorPrompt].join("|");
+    if (key === lastSyncRef.current) return;
+    lastSyncRef.current = key;
+    setSpSrc(storedSpSrc);
+    setSpText(storedSp);
+    setSpFile(storedSpSrc === "file" ? storedSp : "");
+    setSpFilename(storedSpFile);
+    setSeedSrc(storedSeedSrc);
+    setSeedText(storedSeed);
+    setSeedFile(storedSeedSrc === "file" ? storedSeed : "");
+    setSeedFilename(storedSeedFile);
+    setOverrideStr(storedCtxOvr === null ? "" : String(storedCtxOvr));
+    setReplyBudgetStr(storedReplyBudget === null ? "" : String(storedReplyBudget));
+    setLocalMinReply(String(storedMinReply));
+    setLocalAutoSummarize(storedAutoSummarize);
+    setLocalSummaryBudget(storedSummaryBudget);
+    setLocalDedupRetry(storedDedupRetry);
+    setLocalTemp(String(storedTemperature));
+    setLocalExtractChoices(storedExtractChoices);
+    setLocalColorSupport(storedColorSupport);
+    setLocalColorPrompt(storedColorPrompt);
+  }, [storedSp, storedSpSrc, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedReplyBudget, storedMinReply, storedAutoSummarize, storedSummaryBudget, storedDedupRetry, storedTemperature, storedExtractChoices, storedColorSupport, storedColorPrompt]);
 
   const serverMax = perSlotCtx(serverInfo);
 
@@ -92,9 +137,11 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const save = () => {
     setError(null);
 
-    if (spSrc === "text") {
+    const effectiveSpSrc =
+      spSrc === "none" && spText.trim() ? "text" : spSrc;
+    if (effectiveSpSrc === "text") {
       setSystemPrompt(spText.trim() ? "text" : "none", spText, null);
-    } else if (spSrc === "file") {
+    } else if (effectiveSpSrc === "file") {
       if (!spFile) {
         setError("System prompt: pick a file first.");
         return;
@@ -104,9 +151,11 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
       setSystemPrompt("none", "", null);
     }
 
-    if (seedSrc === "text") {
+    const effectiveSeedSrc =
+      seedSrc === "none" && seedText.trim() ? "text" : seedSrc;
+    if (effectiveSeedSrc === "text") {
       setSeedPrompt(seedText.trim() ? "text" : "none", seedText, null);
-    } else if (seedSrc === "file") {
+    } else if (effectiveSeedSrc === "file") {
       if (!seedFile) {
         setError("Seed prompt: pick a file first.");
         return;
@@ -127,6 +176,22 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
       setContextOverride(parsed);
     }
 
+    if (replyBudgetStr.trim() === "") {
+      setReplyBudgetOverride(null);
+    } else {
+      const parsed = parseInt(replyBudgetStr, 10);
+      if (Number.isNaN(parsed) || parsed < 1) {
+        setError("Reply budget must be a positive number.");
+        return;
+      }
+      setReplyBudgetOverride(parsed);
+    }
+
+    const parsedMinReply = parseInt(localMinReply, 10);
+    if (!Number.isNaN(parsedMinReply) && parsedMinReply > 0) {
+      setMinReplyTokens(parsedMinReply);
+    }
+
     const parsedTemp = parseFloat(localTemp);
     if (Number.isNaN(parsedTemp) || parsedTemp < 0 || parsedTemp > 2) {
       setError("Temperature must be a number between 0 and 2.");
@@ -137,10 +202,29 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     setAutoSummarize(localAutoSummarize);
     setSummaryBudgetPct(localSummaryBudget);
     setDeduplicateRetry(localDedupRetry);
+    setExtractChoices(localExtractChoices);
     setColorSupport(localColorSupport);
+    setColorPrompt(localColorPrompt);
 
     setSaved(true);
   };
+
+  // Auto-save on change (debounced 1s)
+  const mountedRef = useRef(false);
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => {
+      saveRef.current();
+    }, 1000);
+    return () => clearTimeout(autoSaveTimer.current);
+  }, [spSrc, spText, spFile, seedSrc, seedText, seedFile, overrideStr, replyBudgetStr, localMinReply, localAutoSummarize, localSummaryBudget, localDedupRetry, localTemp, localExtractChoices, localColorSupport, localColorPrompt]);
 
   return (
     <section className="flex h-dvh flex-1 flex-col bg-background">
@@ -272,6 +356,54 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
                   </p>
                 )}
             </div>
+
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="reply-budget">Reply budget</Label>
+                <HintIcon
+                  text={`Max tokens the model can generate per response. Leave blank for default (${computeReplyBudget(serverMax).toLocaleString()} = 50% of per-slot). Automatically capped to available space based on how much context is used.`}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="reply-budget"
+                  type="number"
+                  min="1"
+                  value={replyBudgetStr}
+                  onChange={(e) => setReplyBudgetStr(e.target.value)}
+                  placeholder={`default (${computeReplyBudget(serverMax).toLocaleString()})`}
+                  className="h-9 w-full rounded-md border border-border bg-background px-3 font-mono text-sm outline-none focus:border-ring"
+                  data-testid="reply-budget-input"
+                />
+                {replyBudgetStr !== "" && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setReplyBudgetStr("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="min-reply">Min reply tokens</Label>
+                <HintIcon text="After compaction, if the model would have fewer than this many tokens to reply, the summary gets trimmed to make room. Prevents cut-off responses at high context usage." />
+              </div>
+              <input
+                id="min-reply"
+                type="number"
+                min="1"
+                value={localMinReply}
+                onChange={(e) => setLocalMinReply(e.target.value)}
+                placeholder="500"
+                className="h-9 w-full rounded-md border border-border bg-background px-3 font-mono text-sm outline-none focus:border-ring"
+                data-testid="min-reply-input"
+              />
+            </div>
           </section>
 
           {/* Behavior */}
@@ -321,6 +453,13 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
                 </div>
               )}
             </div>
+          </section>
+
+          {/* Post-processing */}
+          <section className="flex flex-col gap-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Post-processing
+            </h2>
 
             <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
               <div>
@@ -341,22 +480,54 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
 
             <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
               <div>
-                <div className="text-sm font-medium">Colour support</div>
+                <div className="text-sm font-medium">Extract choices</div>
                 <div className="text-[11px] text-muted-foreground">
-                  Inject a colour legend into the system prompt so the model can use{" "}
-                  <code className="text-[10px]">{"{r}"}red{"{/r}"}</code>{" "}
-                  <code className="text-[10px]">{"{g}"}green{"{/g}"}</code>{" "}
-                  etc. Rendered as coloured text in the chat.
+                  Detect numbered option lists at the end of responses and
+                  present them as clickable buttons above the composer.
                 </div>
               </div>
               <input
                 type="checkbox"
-                checked={localColorSupport}
-                onChange={(e) => setLocalColorSupport(e.target.checked)}
+                checked={localExtractChoices}
+                onChange={(e) => setLocalExtractChoices(e.target.checked)}
                 className="h-4 w-4 accent-primary"
-                data-testid="toggle-color-support"
+                data-testid="toggle-extract-choices"
               />
             </label>
+
+            <div className="rounded-md border border-border px-3 py-2.5">
+              <label className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-medium">Colour support</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    After each response, a second pass annotates text with{" "}
+                    <code className="text-[10px]">{"{r}"}word{"{/r}"}</code>{" "}
+                    colour codes. Rendered inline in the chat.
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={localColorSupport}
+                  onChange={(e) => setLocalColorSupport(e.target.checked)}
+                  className="h-4 w-4 accent-primary"
+                  data-testid="toggle-color-support"
+                />
+              </label>
+              {localColorSupport && (
+                <div className="mt-3 flex flex-col gap-1.5 border-t border-border/50 pt-3">
+                  <div className="flex items-center gap-1.5">
+                    <Label>Colour prompt</Label>
+                    <HintIcon text="Instructions sent to the model in a second pass after each response. Tells it how to annotate the text with colour codes. Edit to change which words get coloured and how." />
+                  </div>
+                  <Textarea
+                    value={localColorPrompt}
+                    onChange={(e) => setLocalColorPrompt(e.target.value)}
+                    className="min-h-[120px] font-mono text-xs"
+                    data-testid="color-prompt-textarea"
+                  />
+                </div>
+              )}
+            </div>
           </section>
 
           {/* Error + Save */}

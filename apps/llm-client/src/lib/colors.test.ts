@@ -88,10 +88,13 @@ describe("processColors", () => {
 });
 
 describe("COLOR_PROMPT", () => {
-  it("contains all codes and usage guidance", () => {
-    for (const key of Object.keys(STYLE_CODES)) {
-      expect(COLOR_PROMPT).toContain(`{${key}}`);
+  it("contains codes, correct example, wrong example, and rules", () => {
+    for (const cat of ["r=", "g=", "b=", "o=", "t="]) {
+      expect(COLOR_PROMPT).toContain(cat);
     }
-    expect(COLOR_PROMPT).toContain("emphasis");
+    expect(COLOR_PROMPT).toContain("CORRECT");
+    expect(COLOR_PROMPT).toContain("WRONG");
+    expect(COLOR_PROMPT).toContain("{o}Old Meg{/o}");
+    expect(COLOR_PROMPT).toContain("1-2 words per response");
   });
 });

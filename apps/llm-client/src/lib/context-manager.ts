@@ -2,17 +2,33 @@ import { log } from "./logger";
 import { estimateMessagesTokens, estimateTokens } from "./tokens";
 
 export const PER_SLOT_CTX = 2048;
-export const REPLY_BUDGET = 512;
+export const REPLY_BUDGET = 1024;
 export const SAFETY = 64;
 export const INPUT_BUDGET = PER_SLOT_CTX - REPLY_BUDGET - SAFETY;
 
-export function computeReplyBudget(perSlotCtx: number): number {
-  return Math.min(REPLY_BUDGET, Math.floor(perSlotCtx * 0.25));
+export function computeReplyBudget(
+  perSlotCtx: number,
+  override?: number | null,
+): number {
+  if (override && override > 0) return Math.min(override, perSlotCtx - SAFETY);
+  return Math.min(REPLY_BUDGET, Math.floor(perSlotCtx * 0.5));
 }
 
-export function computeInputBudget(perSlotCtx: number): number {
-  const reply = computeReplyBudget(perSlotCtx);
+export function computeInputBudget(
+  perSlotCtx: number,
+  replyBudgetOverride?: number | null,
+): number {
+  const reply = computeReplyBudget(perSlotCtx, replyBudgetOverride);
   return Math.max(64, perSlotCtx - reply - SAFETY);
+}
+
+export function effectiveMaxTokens(
+  replyBudget: number,
+  perSlotCtx: number,
+  usedInputTokens: number,
+): number {
+  const available = perSlotCtx - usedInputTokens - SAFETY;
+  return Math.max(1, Math.min(replyBudget, available));
 }
 
 export type ChatRole = "system" | "user" | "assistant";

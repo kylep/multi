@@ -13,6 +13,7 @@ interface MessageListProps {
   summary: string;
   onSummaryChange: (next: string) => void;
   onRetry?: () => void;
+  onRegen?: (messageId: string) => void;
   summaryTokens: number;
   inputBudget: number;
 }
@@ -25,6 +26,7 @@ export function MessageList({
   summary,
   onSummaryChange,
   onRetry,
+  onRegen,
   summaryTokens,
   inputBudget,
 }: MessageListProps) {
@@ -94,6 +96,11 @@ export function MessageList({
               streaming={msg.id === streamingMessageId}
               hasError={isError}
               onRetry={isError ? onRetry : undefined}
+              onRegen={
+                msg.role === "assistant" && !isError && onRegen
+                  ? () => onRegen(msg.id)
+                  : undefined
+              }
             />
           );
         })}

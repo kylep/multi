@@ -42,15 +42,21 @@ async function callModel(
           temperature: 0.3,
           stream: false,
         }),
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(120000),
       },
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      log.warn(`summarize: server returned ${res.status}`);
+      return null;
+    }
     const json = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
     };
-    return json.choices?.[0]?.message?.content?.trim() ?? null;
-  } catch {
+    const content = json.choices?.[0]?.message?.content?.trim() ?? null;
+    if (!content) log.warn("summarize: model returned empty content");
+    return content;
+  } catch (err) {
+    log.warn(`summarize: ${(err as Error)?.message ?? "unknown error"}`);
     return null;
   }
 }

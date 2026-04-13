@@ -28,9 +28,14 @@ sidebar footer.
 
 ### Chat
 - ChatGPT-style sidebar with multiple chats
+- LLM-generated chat titles (max 6 words, async after first response)
+- Inline rename (pencil icon) and delete (trash icon) on hover
 - Streaming assistant replies over SSE with Stop button
+- Regenerate button on hover over any bot message (temp +0.15)
+- Retry button on error responses
 - Markdown rendering in bot replies (GFM + syntax-highlighted code)
 - Chat history persisted to `localStorage` (no server-side storage)
+- New Chat button reuses empty chats instead of creating duplicates
 
 ### Prompts
 - **System prompt** — sent as `role: "system"`. Controls *how* the model
@@ -38,8 +43,8 @@ sidebar footer.
   each turn. Supports text or file input.
 - **Seed prompt** — prepended to the first user message content. Defines
   *what* the conversation is about (scenario, rules, context). Stays anchored
-  at conversation start, never re-injected. Always pinned. Supports text or
-  file input.
+  at conversation start, never re-injected. Always kept in context. Supports
+  text or file input.
 
 The distinction matters for models like Mistral whose chat template
 re-injects system messages with the last user turn. Use seed prompt for
@@ -47,25 +52,84 @@ context that shouldn't repeat.
 
 ### Context management
 - **Dynamic budget** — reads `n_ctx / total_slots` from the server's `/props`
-  endpoint. Falls back to 2048 tokens/slot.
-- **Tail-drop truncation** — oldest unpinned messages are dropped first.
-  Pinned messages and the seed-augmented first message survive truncation.
-- **Auto-summarize** (on by default) — when messages are about to be dropped,
-  generates a 2-3 sentence summary via the model and injects it as context.
-  Preserves narrative memory across the truncation boundary.
-- **Pin messages** — click the pin icon on any message to protect it from
-  truncation.
-- **Context meter** — bottom-right shows live `X% ctx` usage. Red at 100%
-  with a "CONTEXT CUTOFF" rule in the transcript.
+  endpoint. Falls back to 2048 tokens/slot. Reply budget scales proportionally
+  (`min(1024, 50% of per-slot)`, configurable in Settings).
+- **Tail-drop truncation** — oldest messages are dropped first. The
+  seed-augmented first message is always kept.
+- **Rolling compaction** (on by default) — when context hits 80%, the
+  oldest 50% of non-seed messages are summarized into a persistent
+  "Story so far" that grows across compaction events. Editable in the
+  chat transcript. Summary budget capped at a configurable % (default 25%).
+  If the summary overshoots its budget, retries up to 2x with a "shorten"
+  prompt. After compaction, if reply room would be below the min reply
+  tokens threshold (default 500, configurable), the summary is trimmed
+  to guarantee the model has room to respond.
+- **Context meter** — bottom-right shows live `X% ctx` usage. Amber at
+  80%, red at 100%. "compacting..." indicator during summarization.
 - **Context override** — cap per-slot tokens in Settings for testing or
   headroom reservation.
 - **Real tokenizer** — uses llama-server's `/tokenize` endpoint for accurate
-  counts. Falls back to `chars/4` when unavailable.
+  counts with LRU cache. Falls back to `chars/4` when unavailable.
 
-### Response quality
+### Post-processing
+
+All post-processing runs after streaming completes (Stop button clears
+immediately). Configurable in Settings > Post-processing.
+
 - **Duplicate retry** (on by default) — detects when the model repeats a
-  previous response (≥85% similarity). Retries up to 2x with progressively
-  higher temperature.
+  previous response (≥70% similarity, checks last 5 assistant messages).
+  Retries up to 2x with progressively higher temperature.
+- **Choice extraction** (on by default) — detects numbered option lists
+  (2-5 items) at the end of responses. Strips them from the message bubble
+  and presents them as clickable buttons above the composer. Clicking a
+  button sends that choice. User can still type freely.
+- **Colour support** (on by default) — a second-pass call asks the model
+  to annotate its own response with `{X}word{/X}` colour codes. No tokens
+  consumed from the main context. Editable colour prompt in Settings.
+
+### Colour & style codes
+
+18 codes available (15 colours + 3 formats). All render via inline styles.
+The second-pass prompt only promotes a subset; the rest render if used.
+
+**Colours (15):**
+
+| Code | Colour | Hex | Code | Colour | Hex |
+|------|--------|---------|------|--------|---------|
+| `{r}` | Red | `#ef4444` | `{p}` | Purple | `#a855f7` |
+| `{g}` | Green | `#22c55e` | `{k}` | Pink | `#f472b6` |
+| `{b}` | Blue | `#3b82f6` | `{n}` | Brown | `#a16207` |
+| `{y}` | Yellow | `#eab308` | `{l}` | Lime | `#84cc16` |
+| `{m}` | Magenta | `#d946ef` | `{t}` | Teal | `#2dd4bf` |
+| `{c}` | Cyan | `#06b6d4` | `{s}` | Slate | `#94a3b8` |
+| `{o}` | Orange | `#f97316` | `{a}` | Amber | `#f59e0b` |
+| `{w}` | Bold white | `#f8fafc` | | | |
+
+**Formats (3):**
+
+| Code | Effect |
+|------|--------|
+| `{i}` | Italic |
+| `{d}` | Dim (50% opacity) |
+| `{u}` | Underline |
+
+**Cost:** 5 tokens per use (2 open + 3 close). Zero context cost — the
+colour prompt is a separate second-pass call, not injected into the main
+conversation. Adding codes: one line in `STYLE_CODES` in
+`src/lib/colors.ts`.
+
+### Settings
+
+Full-pane settings (replaces chat area, sidebar stays). Sections:
+
+- **Prompts** — system prompt, seed prompt (text or file picker)
+- **Model** — temperature (0-2), context override, reply budget, min reply tokens
+- **Behavior** — auto-summarize + summary budget slider
+- **Post-processing** — duplicate retry, choice extraction, colour support
+  + editable colour prompt
+
+Auto-saves on change (1s debounce). Explicit Save button also available.
+Settings survive page reload via localStorage.
 
 ### Server
 - Any OpenAI-compatible `/v1/chat/completions` endpoint works.
@@ -74,6 +138,14 @@ context that shouldn't repeat.
   modalities).
 - Server info card in the endpoint dialog with ELI5 tooltips on each field.
 - Blocking modal on startup if the server is unreachable.
+
+### Logging
+
+Structured logging via `src/lib/logger.ts`. Level set to `"info"` by
+default (change to `"debug"` or `"none"` in the source). Output prefixed
+with `[llm-client] + timestamp + level`. Logs at: server gate, context
+manager, streaming, compaction, summarize, dedup, colorize, title
+generation.
 
 ## Scripts
 
@@ -87,10 +159,10 @@ context that shouldn't repeat.
 ## Tests
 
 ```bash
-# Unit tests (Vitest, jsdom) — 75 tests
+# Unit tests (Vitest, jsdom) — 108 tests
 pnpm test
 
-# E2E tests (Playwright, mocked endpoints) — 7 specs
+# E2E tests (Playwright, mocked endpoints) — 10 specs
 pnpm e2e
 
 # Both
@@ -106,20 +178,27 @@ Playwright route handlers — no running llama-server needed.
 src/
 ├── app/                 Next.js App Router (single page)
 ├── components/
-│   ├── chat/            chat-pane, composer, message list/bubble
-│   ├── settings/        endpoint dialog, settings dialog, server info
-│   ├── sidebar/         chat list, row actions
+│   ├── chat/            chat-pane, composer, message list/bubble,
+│   │                    choice-buttons, summary-panel
+│   ├── settings/        endpoint dialog, settings pane, server info,
+│   │                    prompt field
+│   ├── sidebar/         chat list, chat row (inline edit/delete)
 │   └── ui/              shadcn primitives
 ├── lib/
-│   ├── llama-client.ts  SSE streaming fetch client
-│   ├── context-manager.ts  budget + truncation + seed logic
-│   ├── tokens.ts        real tokenizer (via /tokenize) + chars/4 fallback
-│   ├── verify-endpoint.ts  /v1/models + /props probe, perSlotCtx math
-│   ├── summarize.ts     auto-summary of dropped messages
-│   └── dedup.ts         duplicate response detection
+│   ├── llama-client.ts      SSE streaming fetch client
+│   ├── context-manager.ts   budget + truncation + compaction logic
+│   ├── tokens.ts            real tokenizer (via /tokenize) + fallback
+│   ├── verify-endpoint.ts   /v1/models + /props probe, perSlotCtx
+│   ├── summarize.ts         rolling compaction with retry
+│   ├── dedup.ts             duplicate response detection (5-msg lookback)
+│   ├── colors.ts            style code definitions + processColors()
+│   ├── colorize-pass.ts     second-pass colour annotation
+│   ├── extract-choices.ts   numbered option list extraction
+│   ├── generate-title.ts    LLM-generated chat titles
+│   └── logger.ts            structured logging with levels
 └── store/
-    ├── chat-store.ts    chats, messages, pins (zustand + persist)
-    └── settings-store.ts  endpoint, prompts, toggles (zustand + persist)
+    ├── chat-store.ts        chats, messages, summary (zustand + persist)
+    └── settings-store.ts    endpoint, prompts, toggles (zustand + persist)
 ```
 
 ## Architecture notes
@@ -133,18 +212,39 @@ setup (the model re-executes "define a victory condition" each turn).
 The fix: seed prompts are prepended to the first `role: "user"` message
 content, so the chat template sees them once at conversation start.
 
-### Context budget
+### Context layout
 ```
-perSlotCtx = floor(server.n_ctx / server.total_slots)  // e.g. 2048
-inputBudget = perSlotCtx - REPLY_BUDGET(512) - SAFETY(64)  // e.g. 1472
+[system prompt (role:system)]
+→ [seed + story-so-far + first user msg]
+→ [recent user/assistant turns that fit]
 ```
 
-Pinned messages (including the seed-augmented first message) are always
-included. Remaining budget fills newest→oldest unpinned messages. When
-auto-summarize is on, dropped messages are summarized and injected as a
-system message.
+### Context budget
+```
+replyBudget = min(1024, perSlotCtx * 0.5)  // or user override
+inputBudget = perSlotCtx - replyBudget - SAFETY(64)
+effectiveMaxTokens = min(replyBudget, perSlot - usedInput - SAFETY)
+```
+
+The seed-augmented first message (with compacted summary embedded) is always
+kept. Remaining budget fills newest→oldest messages. When compaction fires,
+dropped messages are summarized and the summary is embedded in the first
+user message alongside the seed.
+
+Role alternation is enforced: if truncation would create consecutive
+same-role messages (breaking Mistral-style templates), the seed message
+is merged into the first kept user message instead of being a separate
+entry.
+
+### Post-processing pipeline
+After streaming completes:
+1. Colorize (second-pass annotation call, if enabled)
+2. Dedup check + retry (if enabled)
+3. Choice extraction (if enabled)
+4. Title generation (async, first response only)
 
 ### Persistence
 Two localStorage keys:
-- `llm-client/chat-store/v1` — chats, messages, pins
-- `llm-client/settings/v1` — endpoint, server info, prompts, toggles
+- `llm-client/chat-store/v1` — chats, messages, summary
+- `llm-client/settings/v1` — endpoint, server info, prompts, toggles,
+  temperature, colour prompt

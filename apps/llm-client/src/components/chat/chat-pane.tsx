@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useChatStore } from "@/store/chat-store";
 import { useSettingsStore } from "@/store/settings-store";
 import {
@@ -8,6 +8,7 @@ import {
   type ChatMessage,
   computeInputBudget,
   computeReplyBudget,
+  effectiveMaxTokens,
   previewContext,
 } from "@/lib/context-manager";
 import { estimateTokens } from "@/lib/tokens";
@@ -16,8 +17,10 @@ import { effectivePerSlot } from "@/lib/verify-endpoint";
 import { summarizeMessages } from "@/lib/summarize";
 import { isDuplicateResponse } from "@/lib/dedup";
 import { generateTitle } from "@/lib/generate-title";
-import { COLOR_PROMPT } from "@/lib/colors";
+import { colorizeResponse } from "@/lib/colorize-pass";
+import { extractChoices, type Choice } from "@/lib/extract-choices";
 import { log } from "@/lib/logger";
+import { ChoiceButtons } from "./choice-buttons";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
 
@@ -42,25 +45,32 @@ export function ChatPane() {
   const seedPrompt = useSettingsStore((s) => s.seedPrompt);
   const seedPromptSource = useSettingsStore((s) => s.seedPromptSource);
   const contextOverride = useSettingsStore((s) => s.contextOverride);
+  const replyBudgetOverride = useSettingsStore((s) => s.replyBudgetOverride);
   const autoSummarize = useSettingsStore((s) => s.autoSummarize);
   const summaryBudgetPct = useSettingsStore((s) => s.summaryBudgetPct);
   const deduplicateRetry = useSettingsStore((s) => s.deduplicateRetry);
   const temperature = useSettingsStore((s) => s.temperature);
   const colorSupport = useSettingsStore((s) => s.colorSupport);
+  const colorPrompt = useSettingsStore((s) => s.colorPrompt);
+  const minReplyTokens = useSettingsStore((s) => s.minReplyTokens);
+  const extractChoicesEnabled = useSettingsStore((s) => s.extractChoices);
 
   const [draft, setDraft] = useState("");
   const [compacting, setCompacting] = useState(false);
+  const [activeChoices, setActiveChoices] = useState<Choice[]>([]);
 
-  const rawSystemPrompt =
+  const effectiveSystemPrompt =
     systemPromptSource === "none" ? undefined : systemPrompt || undefined;
-  const effectiveSystemPrompt = colorSupport
-    ? [rawSystemPrompt, COLOR_PROMPT].filter(Boolean).join("\n") || COLOR_PROMPT
-    : rawSystemPrompt;
   const effectiveSeedPrompt =
     seedPromptSource === "none" ? undefined : seedPrompt || undefined;
   const perSlot = effectivePerSlot(serverInfo, contextOverride);
-  const inputBudget = computeInputBudget(perSlot);
-  const replyBudget = computeReplyBudget(perSlot);
+  const inputBudget = computeInputBudget(perSlot, replyBudgetOverride);
+  const replyBudget = computeReplyBudget(perSlot, replyBudgetOverride);
+
+  // Clear choices when switching chats
+  useEffect(() => {
+    setActiveChoices([]);
+  }, [activeChatId]);
 
   const preview = useMemo(() => {
     const history = (chat?.messages ?? []).map((m) => ({
@@ -102,7 +112,7 @@ export function ChatPane() {
   );
 
   const doSend = useCallback(
-    async (chatId: string, historyForRequest: ChatMessage[]) => {
+    async (chatId: string, historyForRequest: ChatMessage[], tempOverride?: number) => {
       const currentSummary =
         useChatStore.getState().chats[chatId]?.summary || "";
 
@@ -128,8 +138,9 @@ export function ChatPane() {
             ) >
               inputBudget * 0.8));
 
+      log.info(`doSend: shouldCompact=${shouldCompact} truncated=${buildResult.truncated} droppedMsgs=${buildResult.droppedMessages.length}`);
       if (shouldCompact) {
-        log.info(`doSend: compaction triggered (truncated=${buildResult.truncated} droppedMsgs=${buildResult.droppedMessages.length})`);
+        log.info(`doSend: compaction triggered`);
         setCompacting(true);
         // For proactive compaction (no drops yet), compact the oldest
         // 50% of non-seed messages to make room.
@@ -160,6 +171,26 @@ export function ChatPane() {
               summary: newSummary,
               summaryBudgetPct,
             });
+
+            // After compaction, check if reply budget is still too small.
+            // If so, trim the summary to make room.
+            const usedAfter = estimateTokens(
+              buildResult.messages.map((m) => m.content).join(""),
+            );
+            const replyRoom = effectiveMaxTokens(replyBudget, perSlot, usedAfter);
+            if (replyRoom < minReplyTokens) {
+              const trimTarget = Math.floor(newSummary.length * 0.5);
+              const trimmed = newSummary.slice(0, trimTarget);
+              log.warn(`doSend: reply room only ${replyRoom} tokens after compaction, trimming summary from ${newSummary.length} to ${trimmed.length} chars`);
+              setSummary(chatId, trimmed);
+              buildResult = buildRequestMessages(historyForRequest, {
+                inputBudget,
+                systemPrompt: effectiveSystemPrompt,
+                seedPrompt: effectiveSeedPrompt,
+                summary: trimmed,
+                summaryBudgetPct,
+              });
+            }
           }
         }
         setCompacting(false);
@@ -169,17 +200,23 @@ export function ChatPane() {
       const controller = new AbortController();
       setStreaming({ chatId, abort: () => controller.abort() });
 
+      const baseTemp = tempOverride ?? temperature;
       const runStream = async (
         msgs: ChatMessage[],
-        tempOverride?: number,
+        streamTempOverride?: number,
       ): Promise<string> => {
+        const usedInput = estimateTokens(
+          msgs.map((m) => m.content).join(""),
+        );
+        const maxTok = effectiveMaxTokens(replyBudget, perSlot, usedInput);
+        log.info(`runStream: replyBudget=${replyBudget} usedInput≈${usedInput} effectiveMax=${maxTok}`);
         let accumulated = "";
         for await (const delta of streamChat({
           endpoint,
           messages: msgs,
           signal: controller.signal,
-          maxTokens: replyBudget,
-          temperature: tempOverride ?? temperature,
+          maxTokens: maxTok,
+          temperature: streamTempOverride ?? baseTemp,
         })) {
           accumulated += delta;
           appendToLastMessage(chatId, delta);
@@ -191,6 +228,26 @@ export function ChatPane() {
         const fullResponse = await runStream(requestMessages);
 
         log.info(`doSend: stream complete, ${fullResponse.length} chars`);
+        setStreaming(null);
+
+        // Second-pass colorization
+        if (colorSupport && fullResponse && !fullResponse.includes("⚠️")) {
+          const colorized = await colorizeResponse(fullResponse, endpoint, colorPrompt || undefined);
+          if (colorized !== fullResponse) {
+            useChatStore.setState((s) => {
+              const c = s.chats[chatId];
+              if (!c) return s;
+              const msgs = c.messages.slice();
+              msgs[msgs.length - 1] = {
+                ...msgs[msgs.length - 1],
+                content: colorized,
+              };
+              return {
+                chats: { ...s.chats, [chatId]: { ...c, messages: msgs } },
+              };
+            });
+          }
+        }
 
         if (deduplicateRetry && fullResponse) {
           const priorMessages = historyForRequest.map((m) => ({
@@ -216,7 +273,7 @@ export function ChatPane() {
                 };
               });
 
-              const bumpedTemp = temperature + DEDUP_TEMP_BUMP * (retry + 1);
+              const bumpedTemp = baseTemp + DEDUP_TEMP_BUMP * (retry + 1);
               log.info(`doSend: dedup retry ${retry + 1}/${MAX_DEDUP_RETRIES} at temp=${bumpedTemp.toFixed(2)}`);
               const retryResponse = await runStream(
                 requestMessages,
@@ -226,6 +283,51 @@ export function ChatPane() {
                 break;
               }
             }
+          }
+        }
+
+        // Choice extraction: parse numbered options from the final response
+        if (extractChoicesEnabled) {
+          const chatNowForChoices = useChatStore.getState().chats[chatId];
+          const lastMsg = chatNowForChoices?.messages[chatNowForChoices.messages.length - 1];
+          if (lastMsg?.role === "assistant" && lastMsg.content) {
+            const { cleanedText, choices } = extractChoices(lastMsg.content);
+            if (choices.length > 0) {
+              log.info(`doSend: extracted ${choices.length} choices`);
+              setActiveChoices(choices);
+              useChatStore.setState((s) => {
+                const c = s.chats[chatId];
+                if (!c) return s;
+                const msgs = c.messages.slice();
+                msgs[msgs.length - 1] = { ...msgs[msgs.length - 1], content: cleanedText };
+                return { chats: { ...s.chats, [chatId]: { ...c, messages: msgs } } };
+              });
+            } else {
+              setActiveChoices([]);
+            }
+          }
+        }
+
+        // Auto-generate title (runs after all other post-processing)
+        const chatNowTitle = useChatStore.getState().chats[chatId];
+        if (chatNowTitle && chatNowTitle.messages.length >= 2) {
+          const firstUserContent = chatNowTitle.messages[0]?.content ?? "";
+          const currentTitle = chatNowTitle.title;
+          const isDefaultTitle =
+            currentTitle === "New chat" ||
+            currentTitle === firstUserContent.trim().slice(0, 40) ||
+            currentTitle ===
+              firstUserContent.trim().slice(0, 40) + "…";
+          if (isDefaultTitle) {
+            log.info("doSend: triggering auto-title generation");
+            const t = await generateTitle(
+              chatNowTitle.messages.map((m) => ({
+                role: m.role,
+                content: m.content,
+              })),
+              endpoint,
+            );
+            if (t) useChatStore.getState().renameChat(chatId, t);
           }
         }
       } catch (err) {
@@ -243,32 +345,6 @@ export function ChatPane() {
         }
       } finally {
         setStreaming(null);
-
-        // Auto-generate title after first assistant response or at ~10% ctx
-        const chatNow = useChatStore.getState().chats[chatId];
-        if (chatNow && chatNow.messages.length >= 2) {
-          const firstUserContent = chatNow.messages[0]?.content ?? "";
-          const currentTitle = chatNow.title;
-          const isDefaultTitle =
-            currentTitle === "New chat" ||
-            currentTitle === firstUserContent.trim().slice(0, 40) ||
-            currentTitle ===
-              firstUserContent.trim().slice(0, 40) + "…";
-          if (isDefaultTitle) {
-            log.info("doSend: triggering auto-title generation");
-            generateTitle(
-              chatNow.messages.map((m) => ({
-                role: m.role,
-                content: m.content,
-              })),
-              endpoint,
-            ).then((t) => {
-              if (t) {
-                useChatStore.getState().renameChat(chatId, t);
-              }
-            });
-          }
-        }
       }
     },
     [
@@ -288,6 +364,7 @@ export function ChatPane() {
 
   const handleSend = useCallback(
     async (text: string) => {
+      setActiveChoices([]);
       let chatId = activeChatId;
       if (!chatId) chatId = newChat();
 
@@ -333,6 +410,36 @@ export function ChatPane() {
     doSend(activeChatId, historyForRequest);
   }, [activeChatId, chat, doSend]);
 
+  const handleRegen = useCallback(
+    (messageId: string) => {
+      if (!activeChatId || !chat) return;
+      const idx = chat.messages.findIndex((m) => m.id === messageId);
+      if (idx < 0 || chat.messages[idx].role !== "assistant") return;
+
+      log.info(`regen: message ${messageId} at index ${idx}, bumping temp +0.15`);
+
+      // Clear the target message
+      useChatStore.setState((s) => {
+        const c = s.chats[activeChatId];
+        if (!c) return s;
+        const msgs = c.messages.slice();
+        msgs[idx] = { ...msgs[idx], content: "" };
+        return {
+          chats: { ...s.chats, [activeChatId]: { ...c, messages: msgs } },
+        };
+      });
+
+      // Build history up to (not including) the target message
+      const historyForRequest = chat.messages.slice(0, idx).map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      doSend(activeChatId, historyForRequest, temperature + 0.15);
+    },
+    [activeChatId, chat, doSend, temperature],
+  );
+
   const isStreaming = Boolean(
     streaming && chat && streaming.chatId === chat.id,
   );
@@ -353,6 +460,7 @@ export function ChatPane() {
           summary={chat.summary ?? ""}
           onSummaryChange={handleSummaryChange}
           onRetry={handleRetry}
+          onRegen={handleRegen}
           summaryTokens={preview.summaryTokens}
           inputBudget={preview.inputBudget}
         />
@@ -369,6 +477,11 @@ export function ChatPane() {
           </div>
         </div>
       )}
+      <ChoiceButtons
+        choices={activeChoices}
+        onSelect={handleSend}
+        disabled={Boolean(isStreaming)}
+      />
       <Composer
         value={draft}
         onValueChange={setDraft}
