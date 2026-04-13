@@ -60,11 +60,12 @@ describe("processColors", () => {
 });
 
 describe("COLOR_PROMPT", () => {
-  it("is concise and contains all codes", () => {
+  it("contains all codes and usage guidance", () => {
     for (const key of Object.keys(COLOR_CODES)) {
       expect(COLOR_PROMPT).toContain(`{${key}}`);
       expect(COLOR_PROMPT).toContain(`{/${key}}`);
     }
-    expect(COLOR_PROMPT.length).toBeLessThan(200);
+    expect(COLOR_PROMPT).toContain("sparingly");
+    expect(COLOR_PROMPT.length).toBeLessThan(300);
   });
 });

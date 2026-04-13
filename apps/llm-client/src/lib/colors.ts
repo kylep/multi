@@ -30,6 +30,8 @@ export function processColors(content: string): string {
 }
 
 export const COLOR_PROMPT =
-  `[Colors: ${Object.entries(COLOR_CODES)
+  `[Colors for emphasis only — names, places, items, not adjectives. ` +
+  `Codes: ${Object.entries(COLOR_CODES)
     .map(([k, v]) => `{${k}}${v.name}{/${k}}`)
-    .join(" ")} — wrap text in {X}...{/X}]`;
+    .join(" ")}. ` +
+  `Use sparingly: 2-4 per response max. Never colour common words.]`;
