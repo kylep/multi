@@ -31,6 +31,19 @@ export function ChatSidebar({
   const endpoint = useSettingsStore((s) => s.endpoint);
   const [endpointOpen, setEndpointOpen] = useState(false);
 
+  const handleNewChat = () => {
+    const existing = chatOrder.find((id) => {
+      const c = chats[id];
+      return c && c.messages.length === 0 && c.title === "New chat";
+    });
+    if (existing) {
+      onChatSelect(existing);
+    } else {
+      const id = newChat();
+      onChatSelect(id);
+    }
+  };
+
   return (
     <aside className="flex h-dvh w-[280px] flex-col border-r border-border bg-sidebar text-sidebar-foreground">
       <div className="flex items-center justify-between px-4 py-3">
@@ -44,7 +57,7 @@ export function ChatSidebar({
       </div>
       <div className="px-3 pb-2">
         <Button
-          onClick={() => newChat()}
+          onClick={handleNewChat}
           className="w-full justify-start gap-2"
           variant="secondary"
           data-testid="new-chat-btn"
