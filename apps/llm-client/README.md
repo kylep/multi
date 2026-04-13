@@ -174,7 +174,7 @@ Playwright route handlers — no running llama-server needed.
 
 ## Project layout
 
-```
+```text
 src/
 ├── app/                 Next.js App Router (single page)
 ├── components/
@@ -213,14 +213,14 @@ The fix: seed prompts are prepended to the first `role: "user"` message
 content, so the chat template sees them once at conversation start.
 
 ### Context layout
-```
+```text
 [system prompt (role:system)]
 → [seed + story-so-far + first user msg]
 → [recent user/assistant turns that fit]
 ```
 
 ### Context budget
-```
+```text
 replyBudget = min(1024, perSlotCtx * 0.5)  // or user override
 inputBudget = perSlotCtx - replyBudget - SAFETY(64)
 effectiveMaxTokens = min(replyBudget, perSlot - usedInput - SAFETY)

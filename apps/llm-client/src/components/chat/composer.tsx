@@ -115,7 +115,7 @@ export function Composer({
       </div>
       <div className="mt-2 flex items-center justify-between text-[11px]">
         <p className="text-muted-foreground">
-          This is a local model. Nothing leaves 127.0.0.1.
+          Local model — data stays on your network.
         </p>
         <div className="flex items-center gap-3">
           {compacting && (

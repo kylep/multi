@@ -65,6 +65,8 @@ export async function* streamChat(
       if (done) break;
       buffer += decoder.decode(value, { stream: true });
 
+      const normalizedBuffer = buffer.replace(/\r\n/g, "\n");
+      buffer = normalizedBuffer;
       let sepIndex = buffer.indexOf("\n\n");
       while (sepIndex !== -1) {
         const rawEvent = buffer.slice(0, sepIndex);

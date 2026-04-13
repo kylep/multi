@@ -10,16 +10,18 @@ export function computeReplyBudget(
   perSlotCtx: number,
   override?: number | null,
 ): number {
-  if (override && override > 0) return Math.min(override, perSlotCtx - SAFETY);
-  return Math.min(REPLY_BUDGET, Math.floor(perSlotCtx * 0.5));
+  const slot = Number.isFinite(perSlotCtx) && perSlotCtx > 0 ? perSlotCtx : PER_SLOT_CTX;
+  if (override && override > 0) return Math.min(override, slot - SAFETY);
+  return Math.min(REPLY_BUDGET, Math.floor(slot * 0.5));
 }
 
 export function computeInputBudget(
   perSlotCtx: number,
   replyBudgetOverride?: number | null,
 ): number {
-  const reply = computeReplyBudget(perSlotCtx, replyBudgetOverride);
-  return Math.max(64, perSlotCtx - reply - SAFETY);
+  const slot = Number.isFinite(perSlotCtx) && perSlotCtx > 0 ? perSlotCtx : PER_SLOT_CTX;
+  const reply = computeReplyBudget(slot, replyBudgetOverride);
+  return Math.max(64, slot - reply - SAFETY);
 }
 
 export function effectiveMaxTokens(

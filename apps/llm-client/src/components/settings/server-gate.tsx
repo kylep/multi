@@ -33,6 +33,7 @@ export function ServerGate({ children }: { children: React.ReactNode }) {
         setGate({ kind: "ok" });
       } else {
         log.warn(`serverGate: failed to verify ${endpoint}: ${result.error}`);
+        setServerInfo(null);
         setGate({
           kind: "error",
           error: result.error ?? "Unreachable",

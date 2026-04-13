@@ -127,10 +127,11 @@ export function EndpointDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-muted-foreground">
+          <label htmlFor="endpoint-url" className="text-xs font-medium text-muted-foreground">
             Base URL
           </label>
           <input
+            id="endpoint-url"
             value={draft}
             onChange={(e) => handleDraftChange(e.target.value)}
             placeholder={DEFAULT_ENDPOINT}

@@ -6,6 +6,7 @@ import {
   computeReplyBudget,
   effectiveMaxTokens,
   INPUT_BUDGET,
+  PER_SLOT_CTX,
   previewContext,
   REPLY_BUDGET,
   SAFETY,
@@ -155,8 +156,12 @@ describe("computeInputBudget", () => {
     expect(computeInputBudget(600)).toBe(600 - 300 - SAFETY);
   });
 
-  it("floors at 64 for absurdly small slots", () => {
-    expect(computeInputBudget(0)).toBe(64);
+  it("falls back to default for non-positive slots", () => {
+    expect(computeInputBudget(0)).toBe(PER_SLOT_CTX - REPLY_BUDGET - SAFETY);
+    expect(computeInputBudget(-1)).toBe(PER_SLOT_CTX - REPLY_BUDGET - SAFETY);
+  });
+
+  it("floors at 64 for very small positive slots", () => {
     expect(computeInputBudget(100)).toBe(64);
   });
 });
