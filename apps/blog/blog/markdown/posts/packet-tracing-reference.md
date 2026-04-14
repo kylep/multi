@@ -9,6 +9,12 @@ modified: 2020-06-04
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - tcpdump filter examples
+  - tshark capture http traffic
+  - packet capture ubuntu
+  - tcpdump filter by port and host
+  - wireshark command line tshark
 ---
 
 

@@ -9,6 +9,12 @@ modified: 2019-08-11
 status: published
 image: openstack-kolla.png
 thumbnail: openstack-kolla-thumb.png
+keywords:
+  - openstack all in one vm install
+  - kolla-ansible vm deployment
+  - openstack dev environment setup
+  - openstack rocky kolla-ansible guide
+  - openstack on openstack nested
 ---
 
 ### Table of Contents

@@ -9,6 +9,12 @@ modified: 2019-09-26
 status: published
 image: aws-s3.png
 thumbnail: aws-s3-thumb.png
+keywords:
+  - aws s3 python boto3
+  - upload file to s3 python
+  - download file from s3 python
+  - boto3 s3 example
+  - aws iam s3 access
 ---
 
 

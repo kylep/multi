@@ -9,6 +9,13 @@ modified: 2019-09-26
 status: published
 image: python.png
 thumbnail: python-thumb.png
+keywords:
+  - python cheat sheet
+  - pylint disable comment
+  - python list comprehension examples
+  - python jinja2 template example
+  - python replace string in file
+  - python mysql query example
 ---
 
 

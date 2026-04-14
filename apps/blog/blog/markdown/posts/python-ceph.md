@@ -9,6 +9,12 @@ modified: 2020-02-03
 status: published
 image: ceph.png
 thumbnail: ceph-thumb.png
+keywords:
+  - python ceph rados example
+  - python rbd library
+  - ceph python api
+  - manage ceph from python
+  - python ceph block device
 ---
 
 

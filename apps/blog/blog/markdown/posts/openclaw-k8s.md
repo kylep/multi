@@ -13,6 +13,13 @@ thumbnail: openclaw-k8s-thumb.png
 imgprompt: A cute cartoon lobster wearing a captain hat
   standing on a ship wheel made of hexagonal pods, floating
   in clouds, flat illustration style
+keywords:
+  - openclaw kubernetes deployment
+  - secure ai agent k8s
+  - hashicorp vault kubernetes secrets
+  - kubernetes network policy ai agent
+  - pod security standards k3s
+  - ai agent security hardening
 ---
 
 

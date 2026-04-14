@@ -9,6 +9,13 @@ modified: 2019-11-25
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - openstack private cloud
+  - openstack vs vmware
+  - install openstack kolla ansible
+  - why use openstack
+  - openstack deep dive
+  - private cloud on premises
 ---
 
 

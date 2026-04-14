@@ -9,6 +9,12 @@ modified: 2019-09-05
 status: published
 image: python.png
 thumbnail: python-thumb.png
+keywords:
+  - python read json from mysql
+  - python update json sql database
+  - mariadb json column python
+  - python mysql connector json
+  - edit json in database python
 ---
 
 

@@ -11,6 +11,13 @@ status: published
 image: opencode.png
 thumbnail: opencode-thumb.png
 imgprompt: Three logos arranged in a triangle; Claude (anthropic logo), Cursor (the IDE), and OpenCode (a dark rectangle with a white inner rectangle cutout). Clean white background, flat design.
+keywords:
+  - opencode vs claude code vs cursor
+  - opencode setup guide
+  - multi-agent ai coding workflow
+  - opencode agents tutorial
+  - ai coding assistant comparison
+  - open source claude code alternative
 ---
 
 # OpenCode vs Cursor vs Claude

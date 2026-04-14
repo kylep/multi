@@ -11,6 +11,13 @@ status: published
 image: ga4-mcp.png
 thumbnail: ga4-mcp-thumb.png
 imgprompt: three rounded bar chart columns stepping upward left to right, flat colour, shades of orange to bright yellow-orange, minimal, white background
+keywords:
+  - google analytics 4 mcp server
+  - ga4 next js setup
+  - claude code analytics mcp
+  - add google analytics to next js
+  - query ga4 with claude
+  - mcp server google analytics
 ---
 
 Two things in this post. First, wiring up GA4 on this blog, which turns out to

@@ -9,6 +9,12 @@ modified: 2019-09-06
 status: published
 image: Docker.png
 thumbnail: docker-thumb.png
+keywords:
+  - docker shared memory size
+  - docker shm-size increase
+  - docker dev shm too small
+  - change docker default shared memory
+  - docker container shared memory configuration
 ---
 
 

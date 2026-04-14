@@ -9,6 +9,12 @@ modified: 2019-09-19
 status: published
 image: aws-ecr.png
 thumbnail: aws-ecr-thumb.png
+keywords:
+  - aws ecr setup guide
+  - elastic container registry docker
+  - push docker image to ecr
+  - aws ecr iam permissions
+  - docker login ecr cli
 ---
 
 

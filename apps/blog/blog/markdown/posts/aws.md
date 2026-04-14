@@ -9,6 +9,12 @@ modified: 2019-11-27
 status: published
 image: aws.png
 thumbnail: aws-thumb.png
+keywords:
+  - aws deep dive
+  - learn aws services
+  - aws ec2 lambda s3 tutorial
+  - amazon web services getting started
+  - aws fargate ecr codepipeline
 ---
 
 **This project is a "Deep Dive":** In a Deep Dive project I'll be investigating

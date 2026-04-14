@@ -9,6 +9,12 @@ modified: 2019-09-02
 status: published
 image: ftb.png
 thumbnail: ftb-thumb.png
+keywords:
+  - feed the beast server setup
+  - minecraft modded server ubuntu
+  - ftb ultimate reloaded server
+  - private minecraft server hosting
+  - multimc ftb setup
 ---
 
 

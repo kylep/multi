@@ -9,6 +9,12 @@ modified: 2019-08-15
 status: published
 image: postfix.png
 thumbnail: postfix-thumb.png
+keywords:
+  - postfix send only mail server
+  - configure postfix ubuntu
+  - send email from linux command line
+  - postfix local mail server setup
+  - ubuntu smtp server configuration
 ---
 
 In order to send emails from a VM you need a mail server. Often you can use

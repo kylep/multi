@@ -9,6 +9,12 @@ modified: 2019-08-09
 status: published
 image: google-cloud-storage.png
 thumbnail: google-cloud-storage-thumb.png
+keywords:
+  - host static website google cloud storage
+  - gcs static website hosting
+  - google cloud storage bucket website
+  - gsutil rsync website deploy
+  - cheap static site hosting gcp
 ---
 
 Google Cloud Storage has a feature where storage buckets can be used as a cost

@@ -9,6 +9,12 @@ modified: 2020-01-09
 status: published
 image: aws.png
 thumbnail: aws-thumb.png
+keywords:
+  - create ec2 instance python boto3
+  - aws ec2 python script
+  - boto3 run instances example
+  - terminate ec2 instance python
+  - aws sdk python ec2
 ---
 
 

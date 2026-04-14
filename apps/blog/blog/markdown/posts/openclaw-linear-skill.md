@@ -13,6 +13,13 @@ thumbnail: openclaw-linear-skill-thumb.png
 imgprompt: A cute cartoon lobster holding a clipboard with
   checkboxes, standing next to a small kanban board with
   colorful sticky notes, cozy flat illustration style
+keywords:
+  - openclaw custom skill tutorial
+  - linear graphql api skill
+  - clawhavoc malicious skills
+  - build your own openclaw skill
+  - ai agent linear integration
+  - self-hosted ai agent security
 ---
 
 

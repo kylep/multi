@@ -9,6 +9,11 @@ modified: 2020-01-13
 status: published
 image: python.png
 thumbnail: python-thumb.png
+keywords:
+  - python simplehttpserver file transfer
+  - transfer files linux to windows
+  - python http server share files
+  - windows download from linux server
 ---
 
 

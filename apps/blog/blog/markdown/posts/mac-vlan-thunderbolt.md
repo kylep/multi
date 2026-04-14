@@ -9,6 +9,12 @@ modified: 2020-07-23
 status: published
 image: mac.png
 thumbnail: mac-thumb.png
+keywords:
+  - mac vlan tagging thunderbolt ethernet
+  - macos vlan configuration
+  - trunk port macbook testing
+  - virtual interface mac network
+  - 802.1q vlan tag macos
 ---
 
 

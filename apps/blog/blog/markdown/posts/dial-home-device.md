@@ -9,6 +9,12 @@ modified: 2019-09-17
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - reverse ssh tunnel remote access
+  - dial home device ssh
+  - persistent reverse ssh tunnel cron
+  - remote server access without vpn
+  - ssh jump box setup
 ---
 
 

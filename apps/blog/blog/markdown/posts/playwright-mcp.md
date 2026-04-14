@@ -12,6 +12,13 @@ status: published
 image: playwright-mcp.png
 thumbnail: playwright-mcp-thumb.png
 imgprompt: flat colour comedy and tragedy masks, comedy green, tragedy red, comedy half in front of tragedy.
+keywords:
+  - playwright mcp claude code
+  - ai agent browser testing
+  - gherkin playwright test generation
+  - claude code verify changes browser
+  - playwright mcp setup
+  - ai coding agent visual testing
 ---
 
 Playwright MCP gives Claude Code a real browser to drive. Coding agents are kind of

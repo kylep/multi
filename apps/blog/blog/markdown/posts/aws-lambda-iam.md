@@ -9,6 +9,12 @@ modified: 2020-01-09
 status: published
 image: aws-lambda.png
 thumbnail: aws-lambda-thumb.png
+keywords:
+  - aws lambda iam authentication
+  - invoke lambda function python boto3
+  - lambda iam policy example
+  - restrict access aws lambda
+  - aws lambda invoke permission
 ---
 
 

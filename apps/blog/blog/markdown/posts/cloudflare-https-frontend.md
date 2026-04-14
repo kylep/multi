@@ -9,6 +9,12 @@ modified: 2019-12-02
 status: published
 image: Cloudflare.png
 thumbnail: Cloudflare-thumb.png
+keywords:
+  - cloudflare free https
+  - add https to static site
+  - cloudflare flexible ssl setup
+  - cloudflare always use https
+  - https for google cloud storage site
 ---
 
 

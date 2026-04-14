@@ -9,6 +9,12 @@ modified: 2020-01-08
 status: published
 image: aws-lambda.png
 thumbnail: aws-lambda-thumb.png
+keywords:
+  - aws lambda tutorial python
+  - create lambda function hello world
+  - aws lambda api gateway setup
+  - lambda function basics
+  - aws serverless function example
 ---
 
 This post covers the basics of using AWS Lambda functions.

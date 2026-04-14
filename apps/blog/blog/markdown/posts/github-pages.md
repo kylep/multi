@@ -9,6 +9,12 @@ modified: 2019-10-25
 status: published
 image: git.png
 thumbnail: git-thumb.png
+keywords:
+  - github pages setup tutorial
+  - github pages custom domain
+  - github pages jekyll configuration
+  - host website on github pages
+  - github pages docs folder
 ---
 
 

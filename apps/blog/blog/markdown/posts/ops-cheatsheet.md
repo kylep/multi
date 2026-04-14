@@ -9,6 +9,13 @@ modified: 2020-11-09
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - linux operations cheatsheet
+  - tcpdump examples
+  - vim find and replace
+  - passwordless sudo ubuntu
+  - bash trap exit cleanup
+  - loopback volume ubuntu
 ---
 
 

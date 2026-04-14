@@ -9,6 +9,11 @@ modified: 2020-06-25
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - openstack cli no module named queue
+  - python-openstackclient import error fix
+  - openstack cli python2 broken
+  - importerror no module named queue openstack
 ---
 
 

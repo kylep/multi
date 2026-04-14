@@ -9,6 +9,12 @@ modified: 2026-01-01
 status: published
 image: ai-generated-blog-images.png
 thumbnail: ai-generated-blog-images-thumb.png
+keywords:
+  - automate blog images with ai
+  - dall-e api blog images
+  - openai image generation
+  - automated thumbnail generation
+  - next.js build pipeline images
 ---
 
 Making blog thumbnails and images is tedious. I don't want to fight with Gimp or whatever and I don't think anyone cares what the image really is. 

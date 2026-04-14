@@ -13,6 +13,13 @@ thumbnail: openclaw-mvp-thumb.png
 imgprompt: A cute cartoon lobster wearing headphones, sitting
   at a small desk with a phone showing chat bubbles, cozy home
   office vibe, flat illustration style
+keywords:
+  - openclaw setup macos
+  - self-hosted ai telegram bot
+  - openclaw gemini free tier
+  - ai chatbot telegram setup
+  - openclaw install guide
+  - personal ai assistant self-hosted
 ---
 
 

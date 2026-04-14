@@ -13,6 +13,12 @@ image: cloudflare-mcp.png
 thumbnail: cloudflare-mcp-thumb.png
 imgprompt: a cloud with a small orange shield icon in front of it, flat
   minimal vector style, white background
+keywords:
+  - cloudflare mcp server claude code
+  - query dns records from terminal
+  - cloudflare api mcp integration
+  - claude code cloudflare setup
+  - mcp remote server oauth
 ---
 
 This is a companion to the [GA4 MCP post](/ga4-mcp.html). Same idea,

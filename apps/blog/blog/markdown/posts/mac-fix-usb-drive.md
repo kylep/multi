@@ -9,6 +9,12 @@ modified: 2019-12-16
 status: published
 image: mac.png
 thumbnail: mac-thumb.png
+keywords:
+  - fix usb drive after boot disk
+  - usb stick shows wrong size mac
+  - diskutil erase usb drive
+  - restore usb full capacity macos
+  - dd shrunken usb partition fix
 ---
 
 

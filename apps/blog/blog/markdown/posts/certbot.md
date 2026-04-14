@@ -9,6 +9,12 @@ modified: 2020-01-13
 status: published
 image: LetsEncrypt.png
 thumbnail: LetsEncrypt-thumb.png
+keywords:
+  - letsencrypt certbot tutorial
+  - free https certificate
+  - certbot standalone certificate
+  - install ssl certificate ubuntu
+  - letsencrypt haproxy cert
 ---
 
 

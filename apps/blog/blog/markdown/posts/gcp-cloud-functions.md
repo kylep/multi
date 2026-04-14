@@ -9,6 +9,12 @@ modified: 2019-10-11
 status: published
 image: google-cloud-functions.png
 thumbnail: google-cloud-functions-thumb.png
+keywords:
+  - google cloud functions tutorial
+  - gcp serverless api python
+  - cloud functions hello world
+  - google cloud functions pricing
+  - deploy cloud function python
 ---
 
 

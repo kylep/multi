@@ -9,6 +9,12 @@ modified: 2020-10-20
 status: published
 image: openssl-csr-san.png
 thumbnail: openssl-csr-san-thumb.png
+keywords:
+  - openssl csr with san
+  - subject alternative name certificate
+  - err_cert_common_name_invalid fix
+  - openssl san config file
+  - generate csr with subjectaltname
 ---
 
 

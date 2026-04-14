@@ -14,6 +14,13 @@ imgprompt: A cartoon robot sitting at a desk with magnifying
   glass, examining floating documents that connect with
   glowing lines, warm library setting, flat illustration
   style with soft gradients, bookshelves in background
+keywords:
+  - build rag pipeline python
+  - faiss vector search tutorial
+  - retrieval augmented generation example
+  - openrouter embeddings api
+  - python faiss semantic search
+  - rag chunking strategy
 ---
 
 The [bot-wiki post](/bot-wiki.html) introduced a structured wiki
