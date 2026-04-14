@@ -31,3 +31,19 @@ last_verified: 2026-04-14
 ## Weather
 
 - Whitby: 19°C high, 11°C overnight. Showers throughout the day with 10–15 mm expected; additional 5–10 mm overnight with a risk of thunderstorms. No alerts. Source: [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898,-78.939)
+
+---
+
+## Update — 16:03 UTC
+
+## AI Tooling
+
+- [Releasebot / Anthropic](https://releasebot.io/updates/anthropic/claude-code) Claude Code v2.1.105 ships today. New: `path` parameter added to the `EnterWorktree` tool for switching into an existing worktree, PreCompact hook support so hooks can exit with code 2 to block compaction, and a top-level `monitors` manifest key enabling background plugin monitors. The `/proactive` command now aliases to `/loop`.
+
+## Geopolitics
+
+- [CBC News](https://www.cbc.ca/news/politics/byelection-liberal-conservatives-carney-majority-government-9.7161054) PM Mark Carney's Liberals won all three federal byelections Monday — including University-Rosedale and Scarborough Southwest in Toronto — bringing their seat count to 174 and converting a minority into a majority government.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/church-street-pedestrianization-plan-9.7159680) Toronto's Church-Wellesley Village could go car-free this summer under a proposed pilot that would close Church Street to vehicles from June 19 to Aug. 21. The proposal goes to Toronto and East York Community Council on April 30 and City Council on May 20.
