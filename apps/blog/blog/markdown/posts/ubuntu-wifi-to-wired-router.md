@@ -9,6 +9,12 @@ modified: 2019-08-20
 status: published
 image: wifi.png
 thumbnail: wifi-thumb.png
+keywords:
+  - ubuntu server as wireless router
+  - share wifi to ethernet ubuntu
+  - ubuntu iptables nat masquerade
+  - linux wifi to wired bridge
+  - ubuntu ip forwarding setup
 ---
 
 

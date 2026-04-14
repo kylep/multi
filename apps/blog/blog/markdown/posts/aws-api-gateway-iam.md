@@ -9,6 +9,12 @@ modified: 2020-01-21
 status: published
 image: aws.png
 thumbnail: aws-thumb.png
+keywords:
+  - aws api gateway iam authentication
+  - api gateway aws_iam authorization
+  - invoke api gateway from python
+  - aws signature v4 python
+  - api gateway lambda iam
 ---
 
 

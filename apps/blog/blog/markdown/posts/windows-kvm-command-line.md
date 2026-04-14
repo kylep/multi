@@ -9,6 +9,13 @@ modified: 2020-06-05
 status: published
 image: ubuntu.png
 thumbnail: ubuntu-thumb.png
+keywords:
+  - create windows vm kvm command line
+  - virt-install windows server
+  - kvm virtio drivers windows
+  - windows kvm ubuntu 18.04
+  - virsh create windows vm
+  - kvm network bridge setup
 ---
 
 # Install KVM

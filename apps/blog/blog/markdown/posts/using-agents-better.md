@@ -14,6 +14,13 @@ thumbnail: using-agents-better-thumb.png
 imgprompt: seven small happy crabs in a row, each a different pastel
   colour, flat minimal vector style, plenty of white space around them,
   white background
+keywords:
+  - claude code agent best practices
+  - multi agent ai architecture
+  - claude code subagents
+  - ai agent delegation patterns
+  - anthropic agent design research
+  - coding agent prompt engineering
 ---
 
 

@@ -9,6 +9,12 @@ modified: 2019-08-13
 status: published
 image: openstack-kolla.png
 thumbnail: openstack-kolla-thumb.png
+keywords:
+  - openstack all in one bare metal
+  - kolla-ansible single server install
+  - openstack rocky install guide
+  - openstack on intel nuc
+  - kolla-ansible vlan provider network
 ---
 
 This guide installs OpenStack on a single metal server.

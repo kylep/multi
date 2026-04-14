@@ -9,6 +9,12 @@ modified: 2019-08-01
 status: published
 image: blog.png
 thumbnail: project-blog-thumb.png
+keywords:
+  - build a blog with pelican
+  - static site google cloud storage
+  - pelican blog gcp hosting
+  - google cloud build github
+  - cheap blog hosting with custom domain
 ---
 
 

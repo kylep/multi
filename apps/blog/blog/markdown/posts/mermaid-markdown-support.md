@@ -10,6 +10,12 @@ status: published
 image: mermaid-markdown-support.png
 thumbnail: mermaid-markdown-support-thumb.png
 imgprompt: A minimalist flowchart with 1 black box pointing to 2 boxes
+keywords:
+  - mermaid diagrams in markdown
+  - mermaid next.js blog
+  - render mermaid in remark pipeline
+  - mermaid syntax reference
+  - flowchart sequence diagram markdown
 ---
 
 # (Aside) Leveraging AI for Blog Content

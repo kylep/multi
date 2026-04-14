@@ -9,6 +9,12 @@ modified: 2020-10-21
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - rhel virtio drivers initrd
+  - openstack vm dracut prompt
+  - inject kvm drivers rhel
+  - migrate vmware to openstack rhel
+  - dracut add virtio drivers
 ---
 
 

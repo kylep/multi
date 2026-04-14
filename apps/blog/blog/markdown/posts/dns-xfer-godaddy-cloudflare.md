@@ -9,6 +9,12 @@ modified: 2019-08-8
 status: published
 image: Cloudflare.png
 thumbnail: Cloudflare-thumb.png
+keywords:
+  - transfer domain godaddy to cloudflare
+  - godaddy to cloudflare migration
+  - domain registrar transfer steps
+  - cloudflare domain registration
+  - move dns to cloudflare
 ---
 
 

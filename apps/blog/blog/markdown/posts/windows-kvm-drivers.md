@@ -9,6 +9,12 @@ modified: 2019-12-17
 status: published
 image: windows.png
 thumbnail: windows-thumb.png
+keywords:
+  - inject kvm drivers windows image
+  - windows virtio drivers openstack
+  - dism add driver windows 10
+  - convert vmdk to qcow2 windows
+  - windows image openstack glance
 ---
 
 ### Table of Contents

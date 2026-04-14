@@ -13,6 +13,14 @@ imgprompt: A friendly cartoon octopus wearing glasses,
   each tentacle holding a different glowing tool or cable,
   plugging them all into a single glowing hub, cozy flat
   illustration style with a soft gradient background
+keywords:
+  - openrouter claude code setup
+  - openrouter api key configuration
+  - unified ai billing openrouter
+  - openrouter opencode openclaw
+  - claude code through openrouter
+  - ai model pricing comparison
+  - custom mcp server openrouter
 ---
 
 

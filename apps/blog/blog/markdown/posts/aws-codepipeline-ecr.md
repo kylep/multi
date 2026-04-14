@@ -9,6 +9,12 @@ modified: 2020-01-15
 status: published
 image: aws.png
 thumbnail: aws-thumb.png
+keywords:
+  - aws codepipeline docker ecr
+  - continuous delivery docker aws
+  - codecommit codebuild ecr pipeline
+  - aws docker ci cd pipeline
+  - buildspec.yml docker image
 ---
 
 

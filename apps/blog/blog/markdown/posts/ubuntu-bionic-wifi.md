@@ -9,6 +9,12 @@ modified: 2020-03-09
 status: published
 image: wifi.png
 thumbnail: wifi-thumb.png
+keywords:
+  - ubuntu 18.04 connect wifi command line
+  - ubuntu server wpa supplicant
+  - netplan wifi configuration
+  - ubuntu bionic wireless setup
+  - connect ubuntu server to wifi
 ---
 
 # Setup

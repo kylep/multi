@@ -12,6 +12,13 @@ status: published
 image: claude-code-coderabbit.png
 thumbnail: claude-code-coderabbit-thumb.png
 imgprompt: A robot holding a magnifying glass reviewing a pull request on a laptop screen
+keywords:
+  - claude code coderabbit setup
+  - ai code review before pull request
+  - coderabbit cli local review
+  - claude code plugin coderabbit
+  - automated code review workflow
+  - coderabbit yaml config
 ---
 
 CodeRabbit is an AI code review tool. It can review your PRs on GitHub / MRs on GitLab

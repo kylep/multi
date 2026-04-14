@@ -9,6 +9,12 @@ modified: 2019-12-04
 status: published
 image: git.png
 thumbnail: git-thumb.png
+keywords:
+  - git delete file from history
+  - git filter-branch remove file
+  - git merge abort undo
+  - git rename branch
+  - git reference cheat sheet
 ---
 
 

@@ -9,6 +9,11 @@ modified: 2019-08-04
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - pelican local development docker
+  - pelican static site preview
+  - pelican autoreload dev server
+  - pelican docker container setup
 ---
 
 

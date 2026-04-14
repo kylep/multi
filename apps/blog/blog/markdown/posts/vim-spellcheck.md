@@ -9,6 +9,12 @@ modified: 2019-10-25
 status: published
 image: vim.png
 thumbnail: vim-thumb.png
+keywords:
+  - vim spell check
+  - enable spell check vim
+  - vim spellcheck commands
+  - vim spelling suggestions
+  - vim spelllang
 ---
 
 

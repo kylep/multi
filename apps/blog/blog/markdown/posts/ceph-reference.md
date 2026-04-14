@@ -9,6 +9,12 @@ modified: 2020-03-05
 status: published
 image: ceph.png
 thumbnail: ceph-thumb.png
+keywords:
+  - ceph commands reference
+  - ceph rbd volume management
+  - ceph pool replica count
+  - rbd snapshot rollback
+  - ceph osd pool commands
 ---
 
 ### Table of Contents

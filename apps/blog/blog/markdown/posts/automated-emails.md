@@ -9,6 +9,12 @@ modified: 2019-08-12
 status: published
 image: project-email.png
 thumbnail: project-email-thumb.png
+keywords:
+  - send automated emails without spam
+  - email deliverability automated systems
+  - postfix send only mail server
+  - spf email authentication
+  - cron email alerts
 ---
 
 

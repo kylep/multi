@@ -9,6 +9,12 @@ modified: 2019-09-10
 status: published
 image: aws-fargate.png
 thumbnail: aws-fargate-thumb.png
+keywords:
+  - run docker container aws fargate
+  - aws ecs fargate tutorial
+  - deploy container to fargate
+  - aws fargate load balancer
+  - fargate container as a service
 ---
 
 How to run a docker container on AWS ECS (Elastic Compute Cloud)  using the AWS 

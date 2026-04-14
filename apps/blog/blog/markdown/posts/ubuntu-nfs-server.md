@@ -9,6 +9,12 @@ modified: 2020-03-09
 status: published
 image: ubuntu.png
 thumbnail: ubuntu-thumb.png
+keywords:
+  - ubuntu nfs server setup
+  - nfs server ubuntu 18.04
+  - install nfs kernel server
+  - nfs client mount ubuntu
+  - linux nfs exports configuration
 ---
 
 

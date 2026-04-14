@@ -9,6 +9,12 @@ modified: 2020-01-27
 status: published
 image: aws.png
 thumbnail: aws-thumb.png
+keywords:
+  - aws lambda ci cd codebuild
+  - deploy lambda with codepipeline
+  - aws sam lambda deployment
+  - codebuild lambda python
+  - aws serverless ci cd pipeline
 ---
 
 

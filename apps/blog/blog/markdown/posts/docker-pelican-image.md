@@ -9,6 +9,12 @@ modified: 2019-08-01
 status: published
 image: Docker.png
 thumbnail: docker-thumb.png
+keywords:
+  - docker pelican image
+  - pelican static site generator docker
+  - containerize pelican blog
+  - pelican dockerfile example
+  - docker static website generator
 ---
 
 

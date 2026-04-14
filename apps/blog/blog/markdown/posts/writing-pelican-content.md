@@ -9,6 +9,12 @@ modified: 2019-08-03
 status: published
 image: pelican.png
 thumbnail: pelican-thumb.png
+keywords:
+  - pelican static site generator tutorial
+  - pelican markdown blog
+  - pelican blog setup
+  - python static website generator
+  - pelican content format
 ---
 
 # What is Pelican

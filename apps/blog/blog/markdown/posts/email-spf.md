@@ -9,6 +9,12 @@ modified: 2019-08-20
 status: published
 image: project-email.png
 thumbnail: project-email-thumb.png
+keywords:
+  - spf record setup
+  - email spf dns configuration
+  - sender policy framework tutorial
+  - spf txt record example
+  - prevent email spoofing spf
 ---
 
 

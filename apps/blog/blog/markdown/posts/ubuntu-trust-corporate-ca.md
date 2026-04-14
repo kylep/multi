@@ -9,6 +9,12 @@ modified: 2020-01-08
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - ubuntu trust corporate ca certificate
+  - add custom ca certificate ubuntu
+  - update-ca-certificates ubuntu
+  - trust self signed certificate linux
+  - corporate ssl certificate ubuntu
 ---
 
 

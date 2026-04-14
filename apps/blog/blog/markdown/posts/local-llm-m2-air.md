@@ -11,6 +11,13 @@ status: published
 image: local-llm-m2-air.png
 thumbnail: local-llm-m2-air-thumb.png
 imgprompt: A cute robot wearing a small chef's hat with an empty speech bubble
+keywords:
+  - run llm locally on mac
+  - llama.cpp apple silicon
+  - local llm m2 macbook air
+  - qwen3 vs mistral vs deepseek comparison
+  - best local llm for 16gb ram
+  - gguf quantization explained
 ---
 
 No API costs, no data leaving the machine, works offline. The catch is you're

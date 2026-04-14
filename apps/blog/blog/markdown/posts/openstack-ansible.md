@@ -9,6 +9,12 @@ modified: 2019-12-03
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - openstack ansible modules tutorial
+  - ansible create openstack instance
+  - openstack automation with ansible
+  - os_server ansible example
+  - openstack networking ansible playbook
 ---
 
 **Assumption:** To avoid dealing with varying OpenStack policy configuration,

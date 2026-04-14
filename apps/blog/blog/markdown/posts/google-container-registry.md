@@ -9,6 +9,12 @@ modified: 2019-08-05
 status: published
 image: google-container-registry.png
 thumbnail: google-container-registry-thumb.png
+keywords:
+  - google container registry tutorial
+  - gcr push docker image
+  - google container registry authentication
+  - gcr vs docker hub
+  - gcloud auth configure docker
 ---
 
 ### Table of Contents

@@ -9,6 +9,12 @@ modified: 2019-10-2
 status: published
 image: pypi.png
 thumbnail: pypi-thumb.png
+keywords:
+  - upload python package pypi
+  - pypi setup.py example
+  - publish python package pip
+  - twine upload pypi
+  - python package distribution
 ---
 
 

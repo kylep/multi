@@ -17,6 +17,12 @@ modified: 2026-04-11
 status: published
 image: google-firestore.png
 thumbnail: google-firestore-thumb.png
+keywords:
+  - firebase getting started tutorial
+  - firebase cli deploy hello world
+  - firebase hosting setup
+  - firebase init web app
+  - google firebase basics
 ---
 
 

@@ -9,6 +9,13 @@ modified: 2019-10-14
 status: published
 image: google-firestore.png
 thumbnail: google-firestore-thumb.png
+keywords:
+  - google cloud firestore python
+  - firestore vs datastore
+  - firestore python tutorial
+  - gcp firestore read write python
+  - google cloud nosql database python
+  - firestore service account setup
 ---
 
 

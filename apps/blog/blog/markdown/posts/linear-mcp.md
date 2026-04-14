@@ -10,6 +10,13 @@ status: published
 image: linear-mcp.png
 thumbnail: linear-mcp-thumb.png
 imgprompt: The Linear Logo; a blue circle, top-right-half solid blue, bott-left-half the same blue but striped with 3 black diagonal lines along the lower left half oriented from top-left to bottom-right
+keywords:
+  - linear mcp server setup
+  - ai agent project management
+  - claude code linear integration
+  - nightly ai agent automation
+  - linear api ai workflow
+  - mcp server oauth
 ---
 
 

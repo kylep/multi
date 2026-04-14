@@ -13,6 +13,13 @@ image: ai-lint-toolkit.png
 thumbnail: ai-lint-toolkit-thumb.png
 imgprompt: The Docker whale wearing reading glasses, holding a
   red pen, proofreading a stack of code on a desk
+keywords:
+  - docker linting toolkit
+  - ruff biome hadolint tflint
+  - ai agent code linting
+  - lightweight linter docker image
+  - pre-commit hook linters
+  - megalinter alternative
 ---
 
 

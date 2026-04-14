@@ -9,6 +9,12 @@ modified: 2019-08-19
 status: published
 image: x-windows.png
 thumbnail: x-windows-thumb.png
+keywords:
+  - x11 forwarding ssh ubuntu
+  - run chrome remote ubuntu server
+  - ssh x11 forwarding mac
+  - xquartz ssh forwarding
+  - launch gui application over ssh
 ---
 
 

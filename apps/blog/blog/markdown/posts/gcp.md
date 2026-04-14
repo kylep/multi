@@ -9,6 +9,11 @@ modified: 2019-11-28
 status: published
 image: gcp.png
 thumbnail: gcp-thumb.png
+keywords:
+  - google cloud platform deep dive
+  - gcp services overview
+  - learning google cloud platform
+  - gcp tutorial series
 ---
 
 

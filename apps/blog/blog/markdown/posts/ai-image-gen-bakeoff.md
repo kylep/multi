@@ -10,6 +10,12 @@ status: published
 image: ai-image-gen-bakeoff.png
 thumbnail: ai-image-gen-bakeoff-thumb.png
 imgprompt: A cute robot wearing a short chefs hat and holding a paint brush
+keywords:
+  - ai image generator comparison
+  - gpt image vs gemini vs flux
+  - best ai image generation api
+  - dall-e alternative 2026
+  - ai image generation cost comparison
 ---
 
 I wrote about this blog's [automated image generation](/ai-generate-blog-images.html) previously. The short version: `generate-images.mjs` runs before each build, finds posts with missing images, builds a prompt from the `imgprompt` front matter field (or has `gpt-4o-mini` summarize the post), then calls DALL-E 3 to produce a 1024x1024 image.

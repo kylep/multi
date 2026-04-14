@@ -13,6 +13,13 @@ thumbnail: claude-hooks-thumb.png
 imgprompt: A cute cartoon crab wearing a hardhat, holding a
   fishing pole with a standard fishing hook on the line,
   cozy flat illustration style
+keywords:
+  - claude code hooks tutorial
+  - claude code safety hooks
+  - block destructive commands claude
+  - claude code audit log
+  - pretooluse posttooluse hooks
+  - ai coding tool security
 ---
 
 

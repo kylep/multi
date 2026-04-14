@@ -9,6 +9,12 @@ modified: 2019-12-05
 status: published
 image: google-cloud-build.png
 thumbnail: google-cloud-build-thumb.png
+keywords:
+  - google cloud build tutorial
+  - cloudbuild yaml example
+  - cloud build docker image
+  - gcp ci cd pipeline
+  - cloud build trigger github
 ---
 
 ### Table of Contents

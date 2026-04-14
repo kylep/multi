@@ -9,6 +9,12 @@ modified: 2019-08-26
 status: published
 image: openstack-kolla.png
 thumbnail: openstack-kolla-thumb.png
+keywords:
+  - openstack kolla custom docker image
+  - kolla build custom cinder plugin
+  - openstack cinder pure storage
+  - modify kolla container images
+  - kolla template override
 ---
 
 

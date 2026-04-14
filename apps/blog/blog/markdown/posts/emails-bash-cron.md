@@ -9,6 +9,12 @@ modified: 2019-08-18
 status: published
 image: clock.png
 thumbnail: clock-thumb.png
+keywords:
+  - bash ping alert script
+  - cron job email notification
+  - server monitoring with bash
+  - ping failure email alert
+  - scheduled availability monitoring linux
 ---
 
 This post covers how to create a bash script that runs every minute to send an

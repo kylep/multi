@@ -9,6 +9,12 @@ modified: 2020-01-16
 status: published
 image: google-firestore.png
 thumbnail: google-firestore-thumb.png
+keywords:
+  - firebase circleci continuous deployment
+  - circleci firebase deploy
+  - firebase ci cd pipeline
+  - circleci config yml firebase
+  - automated firebase hosting deploy
 ---
 
 ### Table of Contents
