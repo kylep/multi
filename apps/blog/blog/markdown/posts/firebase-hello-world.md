@@ -1,11 +1,19 @@
 ---
 title: "Firebase Basics: Hello World"
-summary: Learning the basics of creating web app on Google Firebase
+summary: "Set up Firebase CLI and deploy a Hello World app from Ubuntu. Includes
+  a Vagrant port-forwarding trick for authenticating the Firebase CLI without a
+  desktop browser."
 slug: firebase-basics
 category: development
 tags: Firebase
+keywords:
+  - firebase cli ubuntu
+  - firebase hello world
+  - firebase cli login without browser
+  - firebase cli npm install
+  - firebase deploy tutorial
 date: 2020-01-11
-modified: 2020-01-11
+modified: 2026-04-11
 status: published
 image: google-firestore.png
 thumbnail: google-firestore-thumb.png
