@@ -28,6 +28,8 @@ const PROPS_TIMEOUT = 3000;
 export async function verifyEndpoint(
   rawEndpoint: string,
   timeoutMs = 5000,
+  apiKey?: string,
+  preferredModelId?: string,
 ): Promise<VerifyResult> {
   const endpoint = rawEndpoint.replace(/\/+$/, "");
   if (!/^https?:\/\//i.test(endpoint)) {
@@ -45,6 +47,7 @@ export async function verifyEndpoint(
     | {
         data?: Array<{
           id?: string;
+          context_length?: number;
           meta?: {
             n_ctx_train?: number;
             n_params?: number;
@@ -56,10 +59,12 @@ export async function verifyEndpoint(
     | undefined;
 
   try {
+    const headers: Record<string, string> = { accept: "application/json" };
+    if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
     const res = await fetch(`${endpoint}/v1/models`, {
       method: "GET",
       signal: modelsController.signal,
-      headers: { accept: "application/json" },
+      headers,
     });
     if (!res.ok) {
       return {
@@ -83,9 +88,13 @@ export async function verifyEndpoint(
     clearTimeout(modelsTimer);
   }
 
-  const firstModel = modelsJson?.data?.[0];
+  const allModels = modelsJson?.data ?? [];
+  const preferredModel = preferredModelId
+    ? allModels.find((m) => m.id === preferredModelId)
+    : undefined;
+  const selectedModel = preferredModel ?? allModels[0];
   const fallbackModel = modelsJson?.models?.[0];
-  const modelId = firstModel?.id ?? fallbackModel?.id;
+  const modelId = selectedModel?.id ?? fallbackModel?.id;
   if (!modelId) {
     return {
       ok: false,
@@ -99,9 +108,13 @@ export async function verifyEndpoint(
   const info: ServerInfo = {
     endpoint,
     modelId,
-    nCtxTrain: firstModel?.meta?.n_ctx_train,
-    nParams: firstModel?.meta?.n_params,
-    sizeBytes: firstModel?.meta?.size,
+    nCtxTrain: selectedModel?.meta?.n_ctx_train,
+    nParams: selectedModel?.meta?.n_params,
+    sizeBytes: selectedModel?.meta?.size,
+    // Use context_length from /v1/models (OpenRouter provides this).
+    // Treated as single-slot when /props is unavailable.
+    nCtx: selectedModel?.context_length,
+    totalSlots: selectedModel?.context_length ? 1 : undefined,
     probedProps: false,
   };
 
@@ -141,8 +154,12 @@ export async function verifyEndpoint(
 
 export function perSlotCtx(info: ServerInfo | null | undefined): number {
   if (!info) return 2048;
-  if (!info.nCtx || !info.totalSlots || info.totalSlots < 1) return 2048;
-  return Math.floor(info.nCtx / info.totalSlots);
+  if (info.nCtx && info.totalSlots && info.totalSlots >= 1) {
+    return Math.floor(info.nCtx / info.totalSlots);
+  }
+  // OpenRouter / remote APIs: nCtx without slots means single-slot equivalent
+  if (info.nCtx && info.nCtx > 0) return info.nCtx;
+  return 2048;
 }
 
 /**

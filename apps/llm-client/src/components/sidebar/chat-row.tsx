@@ -63,7 +63,7 @@ export function ChatRow({
   return (
     <div
       className={cn(
-        "group flex items-center overflow-hidden rounded-md transition-colors",
+        "group relative flex items-center rounded-md transition-colors",
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : "hover:bg-sidebar-accent/60",
@@ -81,7 +81,7 @@ export function ChatRow({
       </button>
       <div
         className={cn(
-          "mr-1 flex shrink-0 items-center gap-0.5 transition-opacity",
+          "absolute right-0 top-0 flex h-full items-center gap-0.5 rounded-r-md bg-gradient-to-l from-sidebar-accent from-70% to-transparent pl-4 pr-1 transition-opacity",
           active
             ? "opacity-100"
             : "opacity-0 group-hover:opacity-100",

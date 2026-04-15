@@ -49,7 +49,7 @@ export function SummaryPanel({
 
   return (
     <div
-      className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-6"
+      className="flex w-full flex-col gap-2 px-6 pb-3"
       data-testid="summary-panel"
     >
       {/* Collapsed bar */}

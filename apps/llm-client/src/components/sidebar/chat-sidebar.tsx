@@ -45,7 +45,7 @@ export function ChatSidebar({
   };
 
   return (
-    <aside className="flex h-dvh w-[280px] flex-col border-r border-border bg-sidebar text-sidebar-foreground">
+    <aside className="flex h-dvh w-[280px] shrink-0 flex-col border-r border-border bg-sidebar text-sidebar-foreground">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <div
@@ -98,7 +98,7 @@ export function ChatSidebar({
           type="button"
           onClick={() => setEndpointOpen(true)}
           data-testid="endpoint-open"
-          className="group flex flex-1 items-center gap-2 px-4 py-3 text-left text-[11px] text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+          className="group flex min-w-0 flex-1 items-center gap-2 px-4 py-3 text-left text-[11px] text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
         >
           <span
             aria-hidden
@@ -120,7 +120,7 @@ export function ChatSidebar({
           data-testid="settings-open"
           aria-label="Settings"
           className={cn(
-            "flex items-center justify-center border-l border-border px-3 transition-colors hover:bg-sidebar-accent/60 hover:text-foreground",
+            "flex shrink-0 items-center justify-center border-l border-border px-3 transition-colors hover:bg-sidebar-accent/60 hover:text-foreground",
             settingsActive
               ? "bg-sidebar-accent text-foreground"
               : "text-muted-foreground",

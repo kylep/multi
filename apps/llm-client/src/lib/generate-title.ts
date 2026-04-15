@@ -1,4 +1,5 @@
 import { log } from "./logger";
+import { apiHeaders, apiModel } from "./api-headers";
 
 export async function generateTitle(
   messages: { role: string; content: string }[],
@@ -17,8 +18,9 @@ export async function generateTitle(
       `${endpoint.replace(/\/+$/, "")}/v1/chat/completions`,
       {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: apiHeaders(),
         body: JSON.stringify({
+          model: apiModel(),
           messages: [
             {
               role: "system",

@@ -55,10 +55,21 @@ export interface BuildResult {
   droppedMessages: ChatMessage[];
 }
 
+const COLOR_TAG_RE = /\{[a-z]\}|\{\/[a-z]\}/g;
+
+function stripColorTags(text: string): string {
+  return text.replace(COLOR_TAG_RE, "");
+}
+
 export function buildRequestMessages(
   history: ChatMessage[],
   options: BuildOptions = {},
 ): BuildResult {
+  // Strip color tags from history so the model doesn't learn to output them.
+  history = history.map((m) => ({
+    role: m.role,
+    content: stripColorTags(m.content),
+  }));
   const budget = options.inputBudget ?? INPUT_BUDGET;
   const systemPrompt = options.systemPrompt?.trim();
   const seedPrompt = options.seedPrompt?.trim();

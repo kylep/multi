@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { processColors, COLOR_PROMPT, STYLE_CODES } from "./colors";
+import { processColors, STYLE_CODES, DEFAULT_COLOR_COLORS, applyColorTags } from "./colors";
 
 describe("processColors", () => {
   it("converts color codes to inline-styled spans", () => {
@@ -87,14 +87,43 @@ describe("processColors", () => {
   });
 });
 
-describe("COLOR_PROMPT", () => {
-  it("contains codes, correct example, wrong example, and rules", () => {
-    for (const cat of ["r=", "g=", "b=", "o=", "t="]) {
-      expect(COLOR_PROMPT).toContain(cat);
-    }
-    expect(COLOR_PROMPT).toContain("CORRECT");
-    expect(COLOR_PROMPT).toContain("WRONG");
-    expect(COLOR_PROMPT).toContain("{o}Old Meg{/o}");
-    expect(COLOR_PROMPT).toContain("1-2 words per response");
+describe("DEFAULT_COLOR_COLORS", () => {
+  it("has red, blue, and orange enabled by default", () => {
+    expect(DEFAULT_COLOR_COLORS.r.enabled).toBe(true);
+    expect(DEFAULT_COLOR_COLORS.r.category).toBe("number");
+    expect(DEFAULT_COLOR_COLORS.b.enabled).toBe(true);
+    expect(DEFAULT_COLOR_COLORS.o.enabled).toBe(true);
+    expect(DEFAULT_COLOR_COLORS.o.category).toBe("Capitalized Proper Noun");
+  });
+
+  it("has other colors disabled by default", () => {
+    expect(DEFAULT_COLOR_COLORS.g.enabled).toBe(false);
+    expect(DEFAULT_COLOR_COLORS.y.enabled).toBe(false);
+    expect(DEFAULT_COLOR_COLORS.t.enabled).toBe(false);
+  });
+});
+
+describe("applyColorTags", () => {
+  it("wraps matched phrases with color tags", () => {
+    const result = applyColorTags("Old Meg enters the tavern.", [
+      { code: "o", phrases: ["Old Meg"] },
+    ]);
+    expect(result).toBe("{o}Old Meg{/o} enters the tavern.");
+  });
+
+  it("handles case-insensitive matching", () => {
+    const result = applyColorTags("old meg enters.", [
+      { code: "o", phrases: ["Old Meg"] },
+    ]);
+    expect(result).toBe("{o}old meg{/o} enters.");
+  });
+
+  it("handles multiple colors", () => {
+    const result = applyColorTags("Old Meg deals 15 damage.", [
+      { code: "o", phrases: ["Old Meg"] },
+      { code: "r", phrases: ["15"] },
+    ]);
+    expect(result).toContain("{o}Old Meg{/o}");
+    expect(result).toContain("{r}15{/r}");
   });
 });

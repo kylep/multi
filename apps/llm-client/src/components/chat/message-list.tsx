@@ -3,19 +3,15 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import type { Message } from "@/store/chat-store";
 import { MessageBubble } from "./message-bubble";
-import { SummaryPanel } from "./summary-panel";
 
 interface MessageListProps {
   messages: Message[];
   streamingMessageId: string | null;
   recentStartIndex: number;
   droppedCount: number;
-  summary: string;
-  onSummaryChange: (next: string) => void;
   onRetry?: () => void;
   onRegen?: (messageId: string) => void;
-  summaryTokens: number;
-  inputBudget: number;
+  scrollTrigger?: number;
 }
 
 export function MessageList({
@@ -23,12 +19,9 @@ export function MessageList({
   streamingMessageId,
   recentStartIndex,
   droppedCount,
-  summary,
-  onSummaryChange,
   onRetry,
   onRegen,
-  summaryTokens,
-  inputBudget,
+  scrollTrigger,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isPinnedRef = useRef(true);
@@ -44,7 +37,7 @@ export function MessageList({
     if (isPinnedRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, scrollTrigger]);
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -72,16 +65,6 @@ export function MessageList({
             role={messages[0].role}
             content={messages[0].content}
             streaming={messages[0].id === streamingMessageId}
-          />
-        )}
-
-        {hasTruncation && (
-          <SummaryPanel
-            summary={summary}
-            onSummaryChange={onSummaryChange}
-            droppedCount={droppedCount}
-            summaryTokens={summaryTokens}
-            inputBudget={inputBudget}
           />
         )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useChatStore } from "@/store/chat-store";
 import { useSettingsStore } from "@/store/settings-store";
 import {
@@ -18,11 +18,12 @@ import { summarizeMessages } from "@/lib/summarize";
 import { isDuplicateResponse } from "@/lib/dedup";
 import { generateTitle } from "@/lib/generate-title";
 import { colorizeResponse } from "@/lib/colorize-pass";
-import { extractChoices, type Choice } from "@/lib/extract-choices";
+import { generateChoices, type GeneratedChoice } from "@/lib/generate-choices";
 import { log } from "@/lib/logger";
 import { ChoiceButtons } from "./choice-buttons";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
+import { SummaryPanel } from "./summary-panel";
 
 const MAX_DEDUP_RETRIES = 2;
 const DEDUP_TEMP_BUMP = 0.15;
@@ -51,13 +52,38 @@ export function ChatPane() {
   const deduplicateRetry = useSettingsStore((s) => s.deduplicateRetry);
   const temperature = useSettingsStore((s) => s.temperature);
   const colorSupport = useSettingsStore((s) => s.colorSupport);
-  const colorPrompt = useSettingsStore((s) => s.colorPrompt);
+  const colorColors = useSettingsStore((s) => s.colorColors);
   const minReplyTokens = useSettingsStore((s) => s.minReplyTokens);
-  const extractChoicesEnabled = useSettingsStore((s) => s.extractChoices);
+  const choiceButtonsEnabled = useSettingsStore((s) => s.choiceButtons);
+  const choicePrompt = useSettingsStore((s) => s.choicePrompt);
+  const choiceCount = useSettingsStore((s) => s.choiceCount);
+  const disableTextInput = useSettingsStore((s) => s.disableTextInput);
 
   const [draft, setDraft] = useState("");
   const [compacting, setCompacting] = useState(false);
-  const [activeChoices, setActiveChoices] = useState<Choice[]>([]);
+  const [activeChoices, setActiveChoices] = useState<GeneratedChoice[]>([]);
+  const [generatingChoices, setGeneratingChoices] = useState(false);
+  const [colorizing, setColorizing] = useState(false);
+  const [choiceRefreshCount, setChoiceRefreshCount] = useState(0);
+
+  // Abort controller for the cancellable color pass
+  const colorAbortRef = useRef<AbortController | null>(null);
+
+  // Cache choices per chat so they survive switching
+  const choiceCacheRef = useRef<Record<string, GeneratedChoice[]>>({});
+  const prevChatIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Save current choices before switching away
+    if (prevChatIdRef.current && activeChoices.length > 0) {
+      choiceCacheRef.current[prevChatIdRef.current] = activeChoices;
+    }
+    // Restore cached choices for the new chat, or clear
+    const cached = activeChatId ? choiceCacheRef.current[activeChatId] : undefined;
+    setActiveChoices(cached ?? []);
+    setGeneratingChoices(false);
+    prevChatIdRef.current = activeChatId;
+  }, [activeChatId]);
 
   const effectiveSystemPrompt =
     systemPromptSource === "none" ? undefined : systemPrompt || undefined;
@@ -66,11 +92,6 @@ export function ChatPane() {
   const perSlot = effectivePerSlot(serverInfo, contextOverride);
   const inputBudget = computeInputBudget(perSlot, replyBudgetOverride);
   const replyBudget = computeReplyBudget(perSlot, replyBudgetOverride);
-
-  // Clear choices when switching chats
-  useEffect(() => {
-    setActiveChoices([]);
-  }, [activeChatId]);
 
   const preview = useMemo(() => {
     const history = (chat?.messages ?? []).map((m) => ({
@@ -113,6 +134,9 @@ export function ChatPane() {
 
   const doSend = useCallback(
     async (chatId: string, historyForRequest: ChatMessage[], tempOverride?: number) => {
+      // Cancel any in-flight color pass from a previous turn
+      colorAbortRef.current?.abort();
+
       const currentSummary =
         useChatStore.getState().chats[chatId]?.summary || "";
 
@@ -124,8 +148,6 @@ export function ChatPane() {
         summaryBudgetPct,
       });
 
-      // Auto-summarize: compact dropped messages. Triggers at truncation
-      // OR when context usage exceeds 80% (proactive compaction).
       log.info(`doSend: chatId=${chatId} historyLen=${historyForRequest.length} currentSummaryLen=${currentSummary.length}`);
 
       const shouldCompact =
@@ -142,8 +164,6 @@ export function ChatPane() {
       if (shouldCompact) {
         log.info(`doSend: compaction triggered`);
         setCompacting(true);
-        // For proactive compaction (no drops yet), compact the oldest
-        // 50% of non-seed messages to make room.
         let messagesToCompact = buildResult.droppedMessages;
         if (messagesToCompact.length === 0 && historyForRequest.length > 2) {
           const half = Math.ceil((historyForRequest.length - 1) / 2);
@@ -172,8 +192,6 @@ export function ChatPane() {
               summaryBudgetPct,
             });
 
-            // After compaction, check if reply budget is still too small.
-            // If so, trim the summary to make room.
             const usedAfter = estimateTokens(
               buildResult.messages.map((m) => m.content).join(""),
             );
@@ -227,28 +245,17 @@ export function ChatPane() {
       try {
         const fullResponse = await runStream(requestMessages);
 
+        log.exchange("exchange:chat", {
+          messages: requestMessages,
+          response: fullResponse,
+          responseLength: fullResponse.length,
+          endpoint,
+          temperature: baseTemp,
+        });
         log.info(`doSend: stream complete, ${fullResponse.length} chars`);
         setStreaming(null);
 
-        // Second-pass colorization
-        if (colorSupport && fullResponse && !fullResponse.includes("⚠️")) {
-          const colorized = await colorizeResponse(fullResponse, endpoint, colorPrompt || undefined);
-          if (colorized !== fullResponse) {
-            useChatStore.setState((s) => {
-              const c = s.chats[chatId];
-              if (!c) return s;
-              const msgs = c.messages.slice();
-              msgs[msgs.length - 1] = {
-                ...msgs[msgs.length - 1],
-                content: colorized,
-              };
-              return {
-                chats: { ...s.chats, [chatId]: { ...c, messages: msgs } },
-              };
-            });
-          }
-        }
-
+        // Dedup check
         if (deduplicateRetry && fullResponse) {
           const priorMessages = historyForRequest.map((m) => ({
             role: m.role,
@@ -286,29 +293,34 @@ export function ChatPane() {
           }
         }
 
-        // Choice extraction: parse numbered options from the final response
-        if (extractChoicesEnabled) {
-          const chatNowForChoices = useChatStore.getState().chats[chatId];
-          const lastMsg = chatNowForChoices?.messages[chatNowForChoices.messages.length - 1];
-          if (lastMsg?.role === "assistant" && lastMsg.content) {
-            const { cleanedText, choices } = extractChoices(lastMsg.content);
-            if (choices.length > 0) {
-              log.info(`doSend: extracted ${choices.length} choices`);
-              setActiveChoices(choices);
-              useChatStore.setState((s) => {
-                const c = s.chats[chatId];
-                if (!c) return s;
-                const msgs = c.messages.slice();
-                msgs[msgs.length - 1] = { ...msgs[msgs.length - 1], content: cleanedText };
-                return { chats: { ...s.chats, [chatId]: { ...c, messages: msgs } } };
-              });
-            } else {
-              setActiveChoices([]);
-            }
+        // Generate choice buttons
+        if (choiceButtonsEnabled) {
+          setActiveChoices([]);
+          setGeneratingChoices(true);
+          const TAG_RE = /\{[a-z]\}|\{\/[a-z]\}/g;
+          const allMessages = useChatStore
+            .getState()
+            .chats[chatId]?.messages.map((m) => ({
+              role: m.role,
+              content: m.content.replace(TAG_RE, ""),
+            })) ?? [];
+          try {
+            const choices = await generateChoices(allMessages, {
+              endpoint,
+              count: choiceCount,
+              prompt: choicePrompt,
+            });
+            log.info(`doSend: generated ${choices.length} choice buttons`);
+            setActiveChoices(choices);
+            choiceCacheRef.current[chatId] = choices;
+          } catch (err) {
+            log.warn(`doSend: choice generation failed: ${(err as Error).message}`);
+          } finally {
+            setGeneratingChoices(false);
           }
         }
 
-        // Auto-generate title (runs after all other post-processing)
+        // Auto-generate title
         const chatNowTitle = useChatStore.getState().chats[chatId];
         if (chatNowTitle && chatNowTitle.messages.length >= 2) {
           const firstUserContent = chatNowTitle.messages[0]?.content ?? "";
@@ -328,6 +340,35 @@ export function ChatPane() {
               endpoint,
             );
             if (t) useChatStore.getState().renameChat(chatId, t);
+          }
+        }
+
+        // Colorize — runs LAST, cancellable via colorAbortRef
+        if (colorSupport && fullResponse && !fullResponse.includes("⚠️")) {
+          const colorController = new AbortController();
+          colorAbortRef.current = colorController;
+          setColorizing(true);
+          const colorized = await colorizeResponse(
+            fullResponse,
+            endpoint,
+            colorColors,
+            colorController.signal,
+          );
+          setColorizing(false);
+          colorAbortRef.current = null;
+          if (colorized !== fullResponse && !colorController.signal.aborted) {
+            useChatStore.setState((s) => {
+              const c = s.chats[chatId];
+              if (!c) return s;
+              const msgs = c.messages.slice();
+              msgs[msgs.length - 1] = {
+                ...msgs[msgs.length - 1],
+                content: colorized,
+              };
+              return {
+                chats: { ...s.chats, [chatId]: { ...c, messages: msgs } },
+              };
+            });
           }
         }
       } catch (err) {
@@ -350,6 +391,11 @@ export function ChatPane() {
     [
       appendToLastMessage,
       autoSummarize,
+      choiceButtonsEnabled,
+      choiceCount,
+      choicePrompt,
+      colorColors,
+      colorSupport,
       deduplicateRetry,
       effectiveSeedPrompt,
       effectiveSystemPrompt,
@@ -364,7 +410,13 @@ export function ChatPane() {
 
   const handleSend = useCallback(
     async (text: string) => {
+      // Cancel any in-flight color pass
+      colorAbortRef.current?.abort();
       setActiveChoices([]);
+      setGeneratingChoices(false);
+      setChoiceRefreshCount(0);
+      // Clear cached choices for this chat — new ones will be generated
+      if (activeChatId) delete choiceCacheRef.current[activeChatId];
       let chatId = activeChatId;
       if (!chatId) chatId = newChat();
 
@@ -391,7 +443,6 @@ export function ChatPane() {
     const lastMsg = messages[messages.length - 1];
     if (lastMsg.role !== "assistant") return;
 
-    // Clear the error response
     useChatStore.setState((s) => {
       const c = s.chats[activeChatId];
       if (!c) return s;
@@ -418,7 +469,6 @@ export function ChatPane() {
 
       log.info(`regen: message ${messageId} at index ${idx}, bumping temp +0.15`);
 
-      // Clear the target message
       useChatStore.setState((s) => {
         const c = s.chats[activeChatId];
         if (!c) return s;
@@ -429,7 +479,6 @@ export function ChatPane() {
         };
       });
 
-      // Build history up to (not including) the target message
       const historyForRequest = chat.messages.slice(0, idx).map((m) => ({
         role: m.role,
         content: m.content,
@@ -440,16 +489,57 @@ export function ChatPane() {
     [activeChatId, chat, doSend, temperature],
   );
 
+  const handleRefreshChoices = useCallback(async () => {
+    if (!activeChatId || !chat || generatingChoices) return;
+    const nextRefresh = choiceRefreshCount + 1;
+    setChoiceRefreshCount(nextRefresh);
+    setActiveChoices([]);
+    setGeneratingChoices(true);
+    const TAG_RE = /\{[a-z]\}|\{\/[a-z]\}/g;
+    const allMessages = chat.messages.map((m) => ({
+      role: m.role,
+      content: m.content.replace(TAG_RE, ""),
+    }));
+    try {
+      const choices = await generateChoices(allMessages, {
+        endpoint,
+        count: choiceCount,
+        prompt: choicePrompt,
+        tempOffset: nextRefresh * 0.2,
+      });
+      log.info(`refreshChoices: generated ${choices.length} buttons (tempOffset=${(nextRefresh * 0.2).toFixed(1)})`);
+      setActiveChoices(choices);
+      if (activeChatId) choiceCacheRef.current[activeChatId] = choices;
+    } catch (err) {
+      log.warn(`refreshChoices: failed: ${(err as Error).message}`);
+    } finally {
+      setGeneratingChoices(false);
+    }
+  }, [activeChatId, chat, choiceCount, choicePrompt, choiceRefreshCount, endpoint, generatingChoices]);
+
   const isStreaming = Boolean(
     streaming && chat && streaming.chatId === chat.id,
   );
 
+  const hideTextInput = choiceButtonsEnabled && disableTextInput;
+
   return (
     <section className="flex h-dvh flex-1 flex-col bg-background">
-      <header className="flex h-14 items-center border-b border-border px-6">
-        <h1 className="truncate text-sm font-medium text-muted-foreground">
-          {chat ? chat.title : "llm-client"}
-        </h1>
+      <header className="shrink-0 border-b border-border">
+        <div className="flex h-14 items-center px-6">
+          <h1 className="truncate text-sm font-medium text-muted-foreground">
+            {chat ? chat.title : "llm-client"}
+          </h1>
+        </div>
+        {chat && preview.droppedCount > 0 && (
+          <SummaryPanel
+            summary={chat.summary ?? ""}
+            onSummaryChange={handleSummaryChange}
+            droppedCount={preview.droppedCount}
+            summaryTokens={preview.summaryTokens}
+            inputBudget={preview.inputBudget}
+          />
+        )}
       </header>
       {chat && chat.messages.length > 0 ? (
         <MessageList
@@ -457,12 +547,9 @@ export function ChatPane() {
           streamingMessageId={streamingMessageId}
           recentStartIndex={preview.recentStartIndex}
           droppedCount={preview.droppedCount}
-          summary={chat.summary ?? ""}
-          onSummaryChange={handleSummaryChange}
           onRetry={handleRetry}
           onRegen={handleRegen}
-          summaryTokens={preview.summaryTokens}
-          inputBudget={preview.inputBudget}
+          scrollTrigger={activeChoices.length + (generatingChoices ? 1 : 0) + (colorizing ? 1 : 0)}
         />
       ) : (
         <div className="flex-1 overflow-y-auto">
@@ -477,23 +564,35 @@ export function ChatPane() {
           </div>
         </div>
       )}
-      <ChoiceButtons
-        choices={activeChoices}
-        onSelect={handleSend}
-        disabled={Boolean(isStreaming)}
-      />
-      <Composer
-        value={draft}
-        onValueChange={setDraft}
-        onSend={handleSend}
-        onStop={handleStop}
-        streaming={Boolean(isStreaming)}
-        usedTokens={preview.usedTokens}
-        inputBudget={preview.inputBudget}
-        usedPercent={preview.usedPercent}
-        truncated={preview.truncated}
-        compacting={compacting}
-      />
+      {choiceButtonsEnabled && (
+        <ChoiceButtons
+          choices={activeChoices}
+          loading={generatingChoices}
+          onSelect={handleSend}
+          onRefresh={handleRefreshChoices}
+          disabled={Boolean(isStreaming)}
+        />
+      )}
+      {colorizing && (
+        <div className="mx-auto flex w-full max-w-3xl items-center gap-2 px-4 py-2">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-muted-foreground/40" />
+          <span className="text-xs text-muted-foreground">Adding colour…</span>
+        </div>
+      )}
+      {!hideTextInput && (
+        <Composer
+          value={draft}
+          onValueChange={setDraft}
+          onSend={handleSend}
+          onStop={handleStop}
+          streaming={Boolean(isStreaming)}
+          usedTokens={preview.usedTokens}
+          inputBudget={preview.inputBudget}
+          usedPercent={preview.usedPercent}
+          truncated={preview.truncated}
+          compacting={compacting}
+        />
+      )}
     </section>
   );
 }

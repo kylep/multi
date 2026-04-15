@@ -15,6 +15,8 @@ type GateState =
 
 export function ServerGate({ children }: { children: React.ReactNode }) {
   const endpoint = useSettingsStore((s) => s.endpoint);
+  const apiKey = useSettingsStore((s) => s.apiKey);
+  const modelId = useSettingsStore((s) => s.modelId);
   const setServerInfo = useSettingsStore((s) => s.setServerInfo);
   const [gate, setGate] = useState<GateState>({ kind: "checking" });
   const [retryKey, setRetryKey] = useState(0);
@@ -24,7 +26,7 @@ export function ServerGate({ children }: { children: React.ReactNode }) {
     setGate({ kind: "checking" });
     log.info(`serverGate: verifying ${endpoint}`);
     (async () => {
-      const result = await verifyEndpoint(endpoint);
+      const result = await verifyEndpoint(endpoint, 5000, apiKey || undefined, modelId || undefined);
       if (cancelled) return;
       if (result.ok && result.info) {
         log.info(`serverGate: connected to ${result.info.endpoint}, model=${result.info.modelId}`);
@@ -43,7 +45,7 @@ export function ServerGate({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [endpoint, retryKey, setServerInfo]);
+  }, [endpoint, apiKey, modelId, retryKey, setServerInfo]);
 
   if (gate.kind === "checking") {
     return (

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import { computeReplyBudget } from "@/lib/context-manager";
 import { perSlotCtx } from "@/lib/verify-endpoint";
+import { STYLE_CODES, COLOR_KEYS, type ColorConfig } from "@/lib/colors";
 import { type PromptSource, useSettingsStore } from "@/store/settings-store";
 import { PromptField } from "./prompt-field";
 
@@ -58,14 +59,20 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const setMinReplyTokens = useSettingsStore((s) => s.setMinReplyTokens);
   const setAutoSummarize = useSettingsStore((s) => s.setAutoSummarize);
   const setSummaryBudgetPct = useSettingsStore((s) => s.setSummaryBudgetPct);
-  const storedExtractChoices = useSettingsStore((s) => s.extractChoices);
+  const storedChoiceButtons = useSettingsStore((s) => s.choiceButtons);
+  const storedChoicePrompt = useSettingsStore((s) => s.choicePrompt);
+  const storedChoiceCount = useSettingsStore((s) => s.choiceCount);
+  const storedDisableTextInput = useSettingsStore((s) => s.disableTextInput);
   const storedColorSupport = useSettingsStore((s) => s.colorSupport);
-  const storedColorPrompt = useSettingsStore((s) => s.colorPrompt);
+  const storedColorColors = useSettingsStore((s) => s.colorColors);
   const setDeduplicateRetry = useSettingsStore((s) => s.setDeduplicateRetry);
   const setTemperature = useSettingsStore((s) => s.setTemperature);
-  const setExtractChoices = useSettingsStore((s) => s.setExtractChoices);
+  const setChoiceButtons = useSettingsStore((s) => s.setChoiceButtons);
+  const setChoicePrompt = useSettingsStore((s) => s.setChoicePrompt);
+  const setChoiceCount = useSettingsStore((s) => s.setChoiceCount);
+  const setDisableTextInput = useSettingsStore((s) => s.setDisableTextInput);
   const setColorSupport = useSettingsStore((s) => s.setColorSupport);
-  const setColorPrompt = useSettingsStore((s) => s.setColorPrompt);
+  const setColorColors = useSettingsStore((s) => s.setColorColors);
 
   const [spSrc, setSpSrc] = useState<PromptSource>(storedSpSrc);
   const [spText, setSpText] = useState(storedSp);
@@ -90,11 +97,15 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     useState(storedSummaryBudget);
   const [localDedupRetry, setLocalDedupRetry] = useState(storedDedupRetry);
   const [localTemp, setLocalTemp] = useState(String(storedTemperature));
-  const [localExtractChoices, setLocalExtractChoices] = useState(storedExtractChoices);
+  const [localChoiceButtons, setLocalChoiceButtons] = useState(storedChoiceButtons);
+  const [localChoicePrompt, setLocalChoicePrompt] = useState(storedChoicePrompt);
+  const [localChoiceCount, setLocalChoiceCount] = useState(storedChoiceCount);
+  const [localDisableTextInput, setLocalDisableTextInput] = useState(storedDisableTextInput);
   const [localColorSupport, setLocalColorSupport] = useState(storedColorSupport);
-  const [localColorPrompt, setLocalColorPrompt] = useState(storedColorPrompt);
+  const [localColorColors, setLocalColorColors] = useState<Record<string, ColorConfig>>(storedColorColors);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
 
   // Sync local state from store. Runs on mount and whenever the store
   // rehydrates from localStorage. Uses a ref to avoid overwriting
@@ -102,7 +113,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   // differs from what we last synced.
   const lastSyncRef = useRef("");
   useEffect(() => {
-    const key = [storedSp, storedSpSrc, storedSeed, storedSeedSrc, storedCtxOvr, storedReplyBudget, storedMinReply, storedTemperature, storedColorPrompt].join("|");
+    const key = [storedSp, storedSpSrc, storedSeed, storedSeedSrc, storedCtxOvr, storedReplyBudget, storedMinReply, storedTemperature, storedChoicePrompt, JSON.stringify(storedColorColors)].join("|");
     if (key === lastSyncRef.current) return;
     lastSyncRef.current = key;
     setSpSrc(storedSpSrc);
@@ -120,10 +131,13 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     setLocalSummaryBudget(storedSummaryBudget);
     setLocalDedupRetry(storedDedupRetry);
     setLocalTemp(String(storedTemperature));
-    setLocalExtractChoices(storedExtractChoices);
+    setLocalChoiceButtons(storedChoiceButtons);
+    setLocalChoicePrompt(storedChoicePrompt);
+    setLocalChoiceCount(storedChoiceCount);
+    setLocalDisableTextInput(storedDisableTextInput);
     setLocalColorSupport(storedColorSupport);
-    setLocalColorPrompt(storedColorPrompt);
-  }, [storedSp, storedSpSrc, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedReplyBudget, storedMinReply, storedAutoSummarize, storedSummaryBudget, storedDedupRetry, storedTemperature, storedExtractChoices, storedColorSupport, storedColorPrompt]);
+    setLocalColorColors(storedColorColors);
+  }, [storedSp, storedSpSrc, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedReplyBudget, storedMinReply, storedAutoSummarize, storedSummaryBudget, storedDedupRetry, storedTemperature, storedChoiceButtons, storedChoicePrompt, storedChoiceCount, storedDisableTextInput, storedColorSupport, storedColorColors]);
 
   const serverMax = perSlotCtx(serverInfo);
 
@@ -202,16 +216,19 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     setAutoSummarize(localAutoSummarize);
     setSummaryBudgetPct(localSummaryBudget);
     setDeduplicateRetry(localDedupRetry);
-    setExtractChoices(localExtractChoices);
+    setChoiceButtons(localChoiceButtons);
+    setChoicePrompt(localChoicePrompt);
+    setChoiceCount(localChoiceCount);
+    setDisableTextInput(localDisableTextInput);
     setColorSupport(localColorSupport);
-    setColorPrompt(localColorPrompt);
+    setColorColors(localColorColors);
 
     setSaved(true);
   };
 
   // Auto-save on change (debounced 1s)
   const mountedRef = useRef(false);
-  const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const saveRef = useRef(save);
   saveRef.current = save;
   useEffect(() => {
@@ -224,7 +241,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
       saveRef.current();
     }, 1000);
     return () => clearTimeout(autoSaveTimer.current);
-  }, [spSrc, spText, spFile, seedSrc, seedText, seedFile, overrideStr, replyBudgetStr, localMinReply, localAutoSummarize, localSummaryBudget, localDedupRetry, localTemp, localExtractChoices, localColorSupport, localColorPrompt]);
+  }, [spSrc, spText, spFile, seedSrc, seedText, seedFile, overrideStr, replyBudgetStr, localMinReply, localAutoSummarize, localSummaryBudget, localDedupRetry, localTemp, localChoiceButtons, localChoicePrompt, localChoiceCount, localDisableTextInput, localColorSupport, localColorColors]);
 
   return (
     <section className="flex h-dvh flex-1 flex-col bg-background">
@@ -478,31 +495,81 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
               />
             </label>
 
-            <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
-              <div>
-                <div className="text-sm font-medium">Extract choices</div>
-                <div className="text-[11px] text-muted-foreground">
-                  Detect numbered option lists at the end of responses and
-                  present them as clickable buttons above the composer.
+            <div className="rounded-md border border-border px-3 py-2.5">
+              <label className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-medium">Choice buttons</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    After each response, generate clickable option buttons
+                    via separate LLM calls.
+                  </div>
                 </div>
-              </div>
-              <input
-                type="checkbox"
-                checked={localExtractChoices}
-                onChange={(e) => setLocalExtractChoices(e.target.checked)}
-                className="h-4 w-4 accent-primary"
-                data-testid="toggle-extract-choices"
-              />
-            </label>
+                <input
+                  type="checkbox"
+                  checked={localChoiceButtons}
+                  onChange={(e) => setLocalChoiceButtons(e.target.checked)}
+                  className="h-4 w-4 accent-primary"
+                  data-testid="toggle-choice-buttons"
+                />
+              </label>
+              {localChoiceButtons && (
+                <div className="mt-3 flex flex-col gap-3 border-t border-border/50 pt-3">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Label>Choice prompt</Label>
+                      <HintIcon text="Instructions sent to the model to generate each choice. Keep it short to get concise options." />
+                    </div>
+                    <Textarea
+                      value={localChoicePrompt}
+                      onChange={(e) => setLocalChoicePrompt(e.target.value)}
+                      className="min-h-[60px] font-mono text-xs"
+                      data-testid="choice-prompt-textarea"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                      Number of choices
+                      <HintIcon text="How many option buttons to generate after each response. Each is a separate LLM call." />
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="6"
+                      value={localChoiceCount}
+                      onChange={(e) =>
+                        setLocalChoiceCount(parseInt(e.target.value, 10) || 3)
+                      }
+                      className="h-8 w-16 rounded-md border border-border bg-background px-2 font-mono text-sm outline-none focus:border-ring"
+                      data-testid="choice-count-input"
+                    />
+                  </div>
+                  <label className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-medium">Disable text input</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        Hide the text composer — interact only via choice buttons.
+                      </div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={localDisableTextInput}
+                      onChange={(e) => setLocalDisableTextInput(e.target.checked)}
+                      className="h-4 w-4 accent-primary"
+                      data-testid="toggle-disable-text-input"
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
 
             <div className="rounded-md border border-border px-3 py-2.5">
               <label className="flex items-center justify-between gap-3">
                 <div>
                   <div className="text-sm font-medium">Colour support</div>
                   <div className="text-[11px] text-muted-foreground">
-                    After each response, a second pass annotates text with{" "}
-                    <code className="text-[10px]">{"{r}"}word{"{/r}"}</code>{" "}
-                    colour codes. Rendered inline in the chat.
+                    After each response, ask the model to categorize words
+                    per colour, then highlight them programmatically. Runs
+                    last and is cancellable.
                   </div>
                 </div>
                 <input
@@ -514,17 +581,62 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
                 />
               </label>
               {localColorSupport && (
-                <div className="mt-3 flex flex-col gap-1.5 border-t border-border/50 pt-3">
-                  <div className="flex items-center gap-1.5">
-                    <Label>Colour prompt</Label>
-                    <HintIcon text="Instructions sent to the model in a second pass after each response. Tells it how to annotate the text with colour codes. Edit to change which words get coloured and how." />
+                <div className="mt-3 flex flex-col gap-3 border-t border-border/50 pt-3">
+                  <div className="flex flex-wrap gap-2">
+                    {COLOR_KEYS.map((code) => {
+                      const def = STYLE_CODES[code];
+                      const cfg = localColorColors[code] ?? { enabled: false, category: "" };
+                      return (
+                        <label
+                          key={code}
+                          className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1.5 text-xs"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={cfg.enabled}
+                            onChange={(e) => {
+                              setLocalColorColors({
+                                ...localColorColors,
+                                [code]: { ...cfg, enabled: e.target.checked },
+                              });
+                            }}
+                            className="h-3 w-3 accent-primary"
+                          />
+                          <span
+                            className="inline-block h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: def.css.replace(/^color:/, "").split(";")[0] }}
+                          />
+                          <span>{def.name}</span>
+                        </label>
+                      );
+                    })}
                   </div>
-                  <Textarea
-                    value={localColorPrompt}
-                    onChange={(e) => setLocalColorPrompt(e.target.value)}
-                    className="min-h-[120px] font-mono text-xs"
-                    data-testid="color-prompt-textarea"
-                  />
+                  {COLOR_KEYS.filter((code) => localColorColors[code]?.enabled).map((code) => {
+                    const def = STYLE_CODES[code];
+                    const cfg = localColorColors[code];
+                    return (
+                      <div key={code} className="flex items-center gap-2">
+                        <span
+                          className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: def.css.replace(/^color:/, "").split(";")[0] }}
+                        />
+                        <span className="shrink-0 text-xs font-medium w-8">{def.name}</span>
+                        <input
+                          type="text"
+                          value={cfg.category}
+                          onChange={(e) => {
+                            setLocalColorColors({
+                              ...localColorColors,
+                              [code]: { ...cfg, category: e.target.value },
+                            });
+                          }}
+                          placeholder="category description…"
+                          className="h-7 flex-1 rounded-md border border-border bg-background px-2 text-xs outline-none focus:border-ring"
+                          data-testid={`color-category-${code}`}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -548,6 +660,57 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
               <span className="text-xs text-emerald-500">Saved</span>
             )}
           </div>
+
+          {/* Export / Import */}
+          <section className="flex flex-col gap-3 border-t border-border pt-6">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Export / Import
+            </h2>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                data-testid="export-settings"
+                onClick={() => {
+                  const raw = localStorage.getItem("llm-client/settings/v1");
+                  if (!raw) return;
+                  const parsed = JSON.parse(raw);
+                  const { serverInfo: _si, ...rest } = parsed.state ?? {};
+                  const b64 = btoa(JSON.stringify(rest));
+                  navigator.clipboard.writeText(b64).then(() => {
+                    setExportStatus("Copied!");
+                    setTimeout(() => setExportStatus(null), 2000);
+                  });
+                }}
+              >
+                Save to clipboard
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                data-testid="import-settings"
+                onClick={async () => {
+                  try {
+                    const b64 = await navigator.clipboard.readText();
+                    const parsed = JSON.parse(atob(b64));
+                    const raw = localStorage.getItem("llm-client/settings/v1");
+                    const existing = raw ? JSON.parse(raw) : { state: {}, version: 0 };
+                    existing.state = { ...existing.state, ...parsed };
+                    localStorage.setItem("llm-client/settings/v1", JSON.stringify(existing));
+                    setExportStatus("Loaded! Reload to apply.");
+                  } catch {
+                    setExportStatus("Invalid settings data.");
+                    setTimeout(() => setExportStatus(null), 3000);
+                  }
+                }}
+              >
+                Load from clipboard
+              </Button>
+              {exportStatus && (
+                <span className="text-xs text-muted-foreground">{exportStatus}</span>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </section>

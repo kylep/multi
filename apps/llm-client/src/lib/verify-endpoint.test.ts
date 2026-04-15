@@ -139,15 +139,18 @@ describe("perSlotCtx", () => {
     expect(perSlotCtx(null)).toBe(2048);
   });
 
-  it("returns 2048 when nCtx or totalSlots is missing", () => {
+  it("returns nCtx directly when totalSlots is missing (remote API)", () => {
     expect(
       perSlotCtx({
         endpoint: "x",
         modelId: "m",
-        probedProps: true,
+        probedProps: false,
         nCtx: 8192,
       }),
-    ).toBe(2048);
+    ).toBe(8192);
+  });
+
+  it("returns 2048 when only totalSlots is set without nCtx", () => {
     expect(
       perSlotCtx({
         endpoint: "x",
