@@ -5,7 +5,7 @@ import { DEFAULT_COLOR_COLORS, type ColorConfig } from "@/lib/colors";
 import type { ServerInfo } from "@/lib/verify-endpoint";
 
 export const DEFAULT_ENDPOINT = "http://127.0.0.1:8080";
-export const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1";
+export const OPENROUTER_ENDPOINT = "https://openrouter.ai/api";
 
 export type PromptSource = "none" | "text" | "file";
 export type ServerType = "local" | "openrouter";

@@ -63,6 +63,7 @@ export function EndpointDialog({
   const [draft, setDraft] = useState(endpoint || DEFAULT_ENDPOINT);
   const [localApiKey, setLocalApiKey] = useState(storedApiKey);
   const [localModelId, setLocalModelId] = useState(storedModelId);
+  const [localModelCtx, setLocalModelCtx] = useState<number | undefined>(undefined);
   const [probe, setProbe] = useState<ProbeState>(
     initialError ? { kind: "error", error: initialError } : { kind: "idle" },
   );
@@ -104,7 +105,12 @@ export function EndpointDialog({
       ? localModelId
       : probe.info.modelId;
     setModelId(effectiveModel);
-    setServerInfo(probe.info);
+    const savedInfo = { ...probe.info, modelId: effectiveModel };
+    if (localServerType === "openrouter" && localModelCtx) {
+      savedInfo.nCtx = localModelCtx;
+      savedInfo.totalSlots = 1;
+    }
+    setServerInfo(savedInfo);
     onVerified?.({ ok: true, endpoint: probe.info.endpoint, info: probe.info });
     onOpenChange(false);
   };
@@ -135,7 +141,7 @@ export function EndpointDialog({
       }}
     >
       <DialogContent
-        className="sm:max-w-md"
+        className="sm:max-w-md max-h-[90dvh] overflow-y-auto"
         showCloseButton={!blocking}
         onEscapeKeyDown={(e) => {
           if (blocking) e.preventDefault();
@@ -274,7 +280,10 @@ export function EndpointDialog({
               endpoint={normalizeEndpoint(draft)}
               apiKey={localApiKey}
               selected={localModelId}
-              onSelect={setLocalModelId}
+              onSelect={(id, ctx) => {
+                setLocalModelId(id);
+                setLocalModelCtx(ctx);
+              }}
             />
           )}
 

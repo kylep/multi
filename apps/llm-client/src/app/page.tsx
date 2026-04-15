@@ -31,10 +31,10 @@ export default function Home() {
           onChatSelect={handleChatSelect}
           settingsActive={view === "settings"}
         />
-        <div className={view === "settings" ? "hidden" : "flex flex-1"}>
+        <div className={view === "settings" ? "hidden" : "flex min-w-0 flex-1"}>
           <ChatPane />
         </div>
-        <div className={view === "chat" ? "hidden" : "flex flex-1"}>
+        <div className={view === "chat" ? "hidden" : "flex min-w-0 flex-1"}>
           <SettingsPane onClose={() => setView("chat")} />
         </div>
       </main>

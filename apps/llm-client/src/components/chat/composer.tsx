@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { ArrowUp, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useSettingsStore } from "@/store/settings-store";
 
 interface ComposerProps {
   value: string;
@@ -32,6 +33,9 @@ export function Composer({
   truncated,
   compacting,
 }: ComposerProps) {
+  const serverType = useSettingsStore((s) => s.serverType);
+  const endpoint = useSettingsStore((s) => s.endpoint);
+  const modelId = useSettingsStore((s) => s.modelId);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -114,8 +118,10 @@ export function Composer({
         )}
       </div>
       <div className="mt-2 flex items-center justify-between text-[11px]">
-        <p className="text-muted-foreground">
-          Local model — data stays on your network.
+        <p className="truncate text-muted-foreground">
+          {serverType === "local"
+            ? "Local model — data stays on your network."
+            : `${endpoint.replace(/^https?:\/\//, "")}/${modelId}`}
         </p>
         <div className="flex items-center gap-3">
           {compacting && (

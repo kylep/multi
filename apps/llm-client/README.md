@@ -1,8 +1,10 @@
 # llm-client
 
-A local, browser-based chat UI for [`llama-server`](https://github.com/ggerganov/llama.cpp/tree/master/tools/server)
-or any OpenAI-compatible endpoint. Next.js 16 + Tailwind v4 + shadcn/ui +
-zustand. Everything runs on `127.0.0.1` — nothing leaves your machine.
+A browser-based chat UI for [`llama-server`](https://github.com/ggerganov/llama.cpp/tree/master/tools/server),
+[OpenRouter](https://openrouter.ai), or any OpenAI-compatible endpoint.
+Next.js 16 + Tailwind v4 + shadcn/ui + zustand.
+
+**Live:** [kyle.pericak.com/apps/llm-client](https://kyle.pericak.com/apps/llm-client/)
 
 ## Quick start
 

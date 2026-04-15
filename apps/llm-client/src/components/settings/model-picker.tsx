@@ -14,7 +14,7 @@ interface ModelPickerProps {
   endpoint: string;
   apiKey: string;
   selected: string;
-  onSelect: (modelId: string) => void;
+  onSelect: (modelId: string, contextLength?: number) => void;
 }
 
 export function ModelPicker({
@@ -83,12 +83,19 @@ export function ModelPicker({
   }, [endpoint, apiKey]);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return models;
-    const q = search.toLowerCase();
-    return models.filter(
-      (m) =>
-        m.id.toLowerCase().includes(q) || m.name.toLowerCase().includes(q),
-    );
+    let list = models;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (m) =>
+          m.id.toLowerCase().includes(q) || m.name.toLowerCase().includes(q),
+      );
+    }
+    return list.slice().sort((a, b) => {
+      const priceA = parseFloat(a.pricing?.prompt ?? "999");
+      const priceB = parseFloat(b.pricing?.prompt ?? "999");
+      return priceA - priceB;
+    });
   }, [models, search]);
 
   if (loading) {
@@ -137,44 +144,35 @@ export function ModelPicker({
           data-testid="model-search"
         />
       </div>
-      <div className="max-h-48 overflow-y-auto rounded-md border border-border">
+      <div className="max-h-64 overflow-y-auto rounded-md border border-border">
         {filtered.length === 0 ? (
           <p className="px-3 py-2 text-xs text-muted-foreground">
             No models match "{search}"
           </p>
         ) : (
-          filtered.slice(0, 50).map((m) => (
+          filtered.map((m) => (
             <button
               key={m.id}
               type="button"
-              onClick={() => onSelect(m.id)}
-              className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs transition-colors hover:bg-muted/60 ${
+              onClick={() => onSelect(m.id, m.contextLength)}
+              className={`grid w-full grid-cols-[1fr_auto_auto] items-center gap-1 px-3 py-1.5 text-left text-xs transition-colors hover:bg-muted/60 ${
                 m.id === selected
                   ? "bg-primary/10 text-primary"
                   : ""
               }`}
               data-testid={`model-${m.id}`}
             >
-              <span className="min-w-0 flex-1 truncate font-mono">
+              <span className="truncate font-mono">
                 {m.id}
               </span>
-              {m.contextLength && (
-                <span className="shrink-0 text-muted-foreground">
-                  {Math.round(m.contextLength / 1000)}k
-                </span>
-              )}
-              {m.pricing && (
-                <span className="shrink-0 text-muted-foreground">
-                  {formatPrice(m.pricing.prompt)}
-                </span>
-              )}
+              <span className="w-10 text-right text-muted-foreground">
+                {m.contextLength ? `${Math.round(m.contextLength / 1000)}k` : ""}
+              </span>
+              <span className="w-16 text-right text-muted-foreground">
+                {m.pricing ? formatPrice(m.pricing.prompt) : ""}
+              </span>
             </button>
           ))
-        )}
-        {filtered.length > 50 && (
-          <p className="px-3 py-1.5 text-[10px] text-muted-foreground">
-            Showing 50 of {filtered.length} — type to narrow
-          </p>
         )}
       </div>
       {selected && (

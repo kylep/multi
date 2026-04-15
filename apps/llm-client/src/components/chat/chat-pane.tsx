@@ -23,6 +23,7 @@ import { log } from "@/lib/logger";
 import { ChoiceButtons } from "./choice-buttons";
 import { Composer } from "./composer";
 import { MessageList } from "./message-list";
+import { SummaryPanel } from "./summary-panel";
 
 const MAX_DEDUP_RETRIES = 2;
 const DEDUP_TEMP_BUMP = 0.15;
@@ -296,11 +297,12 @@ export function ChatPane() {
         if (choiceButtonsEnabled) {
           setActiveChoices([]);
           setGeneratingChoices(true);
+          const TAG_RE = /\{[a-z]\}|\{\/[a-z]\}/g;
           const allMessages = useChatStore
             .getState()
             .chats[chatId]?.messages.map((m) => ({
               role: m.role,
-              content: m.content,
+              content: m.content.replace(TAG_RE, ""),
             })) ?? [];
           try {
             const choices = await generateChoices(allMessages, {
@@ -493,9 +495,10 @@ export function ChatPane() {
     setChoiceRefreshCount(nextRefresh);
     setActiveChoices([]);
     setGeneratingChoices(true);
+    const TAG_RE = /\{[a-z]\}|\{\/[a-z]\}/g;
     const allMessages = chat.messages.map((m) => ({
       role: m.role,
-      content: m.content,
+      content: m.content.replace(TAG_RE, ""),
     }));
     try {
       const choices = await generateChoices(allMessages, {
@@ -522,10 +525,21 @@ export function ChatPane() {
 
   return (
     <section className="flex h-dvh flex-1 flex-col bg-background">
-      <header className="flex h-14 items-center border-b border-border px-6">
-        <h1 className="truncate text-sm font-medium text-muted-foreground">
-          {chat ? chat.title : "llm-client"}
-        </h1>
+      <header className="shrink-0 border-b border-border">
+        <div className="flex h-14 items-center px-6">
+          <h1 className="truncate text-sm font-medium text-muted-foreground">
+            {chat ? chat.title : "llm-client"}
+          </h1>
+        </div>
+        {chat && preview.droppedCount > 0 && (
+          <SummaryPanel
+            summary={chat.summary ?? ""}
+            onSummaryChange={handleSummaryChange}
+            droppedCount={preview.droppedCount}
+            summaryTokens={preview.summaryTokens}
+            inputBudget={preview.inputBudget}
+          />
+        )}
       </header>
       {chat && chat.messages.length > 0 ? (
         <MessageList
@@ -533,12 +547,8 @@ export function ChatPane() {
           streamingMessageId={streamingMessageId}
           recentStartIndex={preview.recentStartIndex}
           droppedCount={preview.droppedCount}
-          summary={chat.summary ?? ""}
-          onSummaryChange={handleSummaryChange}
           onRetry={handleRetry}
           onRegen={handleRegen}
-          summaryTokens={preview.summaryTokens}
-          inputBudget={preview.inputBudget}
           scrollTrigger={activeChoices.length + (generatingChoices ? 1 : 0) + (colorizing ? 1 : 0)}
         />
       ) : (
