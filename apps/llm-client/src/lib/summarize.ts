@@ -1,4 +1,5 @@
 import type { ChatMessage } from "./context-manager";
+import { apiHeaders } from "./api-headers";
 import { log } from "./logger";
 import { estimateTokens } from "./tokens";
 
@@ -32,7 +33,7 @@ async function callModel(
       `${endpoint.replace(/\/+$/, "")}/v1/chat/completions`,
       {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: apiHeaders(),
         body: JSON.stringify({
           messages: [
             { role: "system", content: systemContent },

@@ -5,11 +5,15 @@ import { DEFAULT_COLOR_COLORS, type ColorConfig } from "@/lib/colors";
 import type { ServerInfo } from "@/lib/verify-endpoint";
 
 export const DEFAULT_ENDPOINT = "http://127.0.0.1:8080";
+export const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1";
 
 export type PromptSource = "none" | "text" | "file";
+export type ServerType = "local" | "openrouter";
 
 export interface SettingsStore {
+  serverType: ServerType;
   endpoint: string;
+  apiKey: string;
   serverInfo: ServerInfo | null;
   systemPrompt: string;
   systemPromptSource: PromptSource;
@@ -30,7 +34,9 @@ export interface SettingsStore {
   choicePrompt: string;
   choiceCount: number;
   disableTextInput: boolean;
+  setServerType(v: ServerType): void;
   setEndpoint(next: string): void;
+  setApiKey(v: string): void;
   setServerInfo(info: ServerInfo | null): void;
   setSystemPrompt(
     source: PromptSource,
@@ -67,7 +73,9 @@ function normalizeEndpoint(raw: string): string {
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set) => ({
+      serverType: "local" as ServerType,
       endpoint: DEFAULT_ENDPOINT,
+      apiKey: "",
       serverInfo: null,
       systemPrompt: "",
       systemPromptSource: "none",
@@ -88,8 +96,14 @@ export const useSettingsStore = create<SettingsStore>()(
       choicePrompt: DEFAULT_CHOICE_PROMPT,
       choiceCount: 3,
       disableTextInput: false,
+      setServerType(v) {
+        set({ serverType: v });
+      },
       setEndpoint(next) {
         set({ endpoint: normalizeEndpoint(next) });
+      },
+      setApiKey(v) {
+        set({ apiKey: v });
       },
       setServerInfo(info) {
         set({ serverInfo: info });

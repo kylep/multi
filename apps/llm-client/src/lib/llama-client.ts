@@ -1,4 +1,5 @@
 import type { ChatMessage } from "./context-manager";
+import { apiHeaders } from "./api-headers";
 import { log } from "./logger";
 
 export const DEFAULT_ENDPOINT = "http://127.0.0.1:8080";
@@ -33,7 +34,7 @@ export async function* streamChat(
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      "content-type": "application/json",
+      ...apiHeaders(),
       accept: "text/event-stream",
     },
     body: JSON.stringify({
@@ -106,7 +107,7 @@ export async function fetchAvailableModel(
   try {
     const res = await fetch(
       `${endpoint.replace(/\/$/, "")}/v1/models`,
-      { method: "GET" },
+      { method: "GET", headers: apiHeaders() },
     );
     if (!res.ok) return null;
     const json = await res.json();

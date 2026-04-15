@@ -1,4 +1,5 @@
 import { log } from "./logger";
+import { apiHeaders } from "./api-headers";
 import type { ChatMessage } from "./context-manager";
 
 export const DEFAULT_CHOICE_PROMPT =
@@ -48,7 +49,7 @@ export async function generateChoices(
     try {
       const res = await fetch(url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: apiHeaders(),
         body: JSON.stringify({
           messages,
           max_tokens: 60,

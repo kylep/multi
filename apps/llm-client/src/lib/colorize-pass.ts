@@ -1,4 +1,5 @@
 import { log } from "./logger";
+import { apiHeaders } from "./api-headers";
 import { applyColorTags, type ColorConfig, type ColorMatch } from "./colors";
 
 const CATEGORIZE_SYSTEM =
@@ -39,7 +40,7 @@ export async function colorizeResponse(
     try {
       const res = await fetch(url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: apiHeaders(),
         body: JSON.stringify({
           messages: [
             { role: "system", content: systemPrompt },

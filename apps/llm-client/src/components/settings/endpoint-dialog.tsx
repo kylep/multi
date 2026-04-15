@@ -14,8 +14,10 @@ import {
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_ENDPOINT,
+  OPENROUTER_ENDPOINT,
   normalizeEndpoint,
   useSettingsStore,
+  type ServerType,
 } from "@/store/settings-store";
 import {
   verifyEndpoint,
@@ -46,19 +48,27 @@ export function EndpointDialog({
   initialError,
   onVerified,
 }: EndpointDialogProps) {
+  const storedServerType = useSettingsStore((s) => s.serverType);
   const endpoint = useSettingsStore((s) => s.endpoint);
+  const storedApiKey = useSettingsStore((s) => s.apiKey);
   const cachedInfo = useSettingsStore((s) => s.serverInfo);
+  const setServerType = useSettingsStore((s) => s.setServerType);
   const setEndpoint = useSettingsStore((s) => s.setEndpoint);
+  const setApiKey = useSettingsStore((s) => s.setApiKey);
   const setServerInfo = useSettingsStore((s) => s.setServerInfo);
+  const [localServerType, setLocalServerType] = useState<ServerType>(storedServerType);
   const [draft, setDraft] = useState(endpoint || DEFAULT_ENDPOINT);
+  const [localApiKey, setLocalApiKey] = useState(storedApiKey);
   const [probe, setProbe] = useState<ProbeState>(
     initialError ? { kind: "error", error: initialError } : { kind: "idle" },
   );
 
   useEffect(() => {
     if (open) {
-      const effective = endpoint || DEFAULT_ENDPOINT;
+      setLocalServerType(storedServerType);
+      const effective = endpoint || (storedServerType === "openrouter" ? OPENROUTER_ENDPOINT : DEFAULT_ENDPOINT);
       setDraft(effective);
+      setLocalApiKey(storedApiKey);
       if (initialError) {
         setProbe({ kind: "error", error: initialError });
       } else if (cachedInfo && cachedInfo.endpoint === effective) {
@@ -67,12 +77,12 @@ export function EndpointDialog({
         setProbe({ kind: "idle" });
       }
     }
-  }, [open, endpoint, cachedInfo, initialError]);
+  }, [open, endpoint, cachedInfo, initialError, storedServerType, storedApiKey]);
 
   const runCheck = async () => {
     setProbe({ kind: "checking" });
     const normalized = normalizeEndpoint(draft);
-    const result = await verifyEndpoint(normalized);
+    const result = await verifyEndpoint(normalized, 5000, localApiKey || undefined);
     if (result.ok && result.info) {
       setProbe({ kind: "ok", info: result.info });
     } else {
@@ -82,16 +92,26 @@ export function EndpointDialog({
 
   const save = () => {
     if (probe.kind !== "ok") return;
+    setServerType(localServerType);
     setEndpoint(probe.info.endpoint);
+    setApiKey(localApiKey);
     setServerInfo(probe.info);
     onVerified?.({ ok: true, endpoint: probe.info.endpoint, info: probe.info });
     onOpenChange(false);
   };
 
+  const handleServerTypeChange = (next: ServerType) => {
+    setLocalServerType(next);
+    if (next === "openrouter") {
+      setDraft(OPENROUTER_ENDPOINT);
+    } else {
+      setDraft(DEFAULT_ENDPOINT);
+    }
+    setProbe({ kind: "idle" });
+  };
+
   const handleDraftChange = (next: string) => {
     setDraft(next);
-    // If we were showing cached data, invalidate it as soon as the user
-    // edits the input — the info no longer corresponds to what's typed.
     if (probe.kind === "cached" || probe.kind === "ok") {
       setProbe({ kind: "idle" });
     }
@@ -126,26 +146,69 @@ export function EndpointDialog({
               : "Point llm-client at any OpenAI-compatible server. The endpoint is verified before it's saved."}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="endpoint-url" className="text-xs font-medium text-muted-foreground">
-            Base URL
-          </label>
-          <input
-            id="endpoint-url"
-            value={draft}
-            onChange={(e) => handleDraftChange(e.target.value)}
-            placeholder={DEFAULT_ENDPOINT}
-            className="h-9 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-ring"
-            data-testid="endpoint-input"
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === "Enter") runCheck();
-            }}
-          />
-          <p className="text-[11px] text-muted-foreground">
-            e.g. <code>http://127.0.0.1:8080</code>,{" "}
-            <code>http://localhost:11434</code>
-          </p>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="server-type" className="text-xs font-medium text-muted-foreground">
+              Server type
+            </label>
+            <select
+              id="server-type"
+              value={localServerType}
+              onChange={(e) => handleServerTypeChange(e.target.value as ServerType)}
+              className="h-9 rounded-md border border-border bg-background px-2 text-sm outline-none focus:border-ring"
+              data-testid="server-type-select"
+            >
+              <option value="local">Local (llama-server, Ollama, etc.)</option>
+              <option value="openrouter">OpenRouter</option>
+            </select>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="endpoint-url" className="text-xs font-medium text-muted-foreground">
+              Base URL
+            </label>
+            <input
+              id="endpoint-url"
+              value={draft}
+              onChange={(e) => handleDraftChange(e.target.value)}
+              placeholder={localServerType === "openrouter" ? OPENROUTER_ENDPOINT : DEFAULT_ENDPOINT}
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-ring"
+              data-testid="endpoint-input"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") runCheck();
+              }}
+            />
+            {localServerType === "local" && (
+              <p className="text-[11px] text-muted-foreground">
+                e.g. <code>http://127.0.0.1:8080</code>,{" "}
+                <code>http://localhost:11434</code>
+              </p>
+            )}
+          </div>
+          {localServerType === "openrouter" && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="api-key" className="text-xs font-medium text-muted-foreground">
+                API Key
+              </label>
+              <input
+                id="api-key"
+                type="password"
+                value={localApiKey}
+                onChange={(e) => {
+                  setLocalApiKey(e.target.value);
+                  if (probe.kind === "cached" || probe.kind === "ok") {
+                    setProbe({ kind: "idle" });
+                  }
+                }}
+                placeholder="sk-or-..."
+                className="h-9 rounded-md border border-border bg-background px-3 font-mono text-sm outline-none focus:border-ring"
+                data-testid="api-key-input"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                From <code>openrouter.ai/settings/keys</code>. Stored in browser localStorage only.
+              </p>
+            </div>
+          )}
         </div>
 
         <div

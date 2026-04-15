@@ -28,6 +28,7 @@ const PROPS_TIMEOUT = 3000;
 export async function verifyEndpoint(
   rawEndpoint: string,
   timeoutMs = 5000,
+  apiKey?: string,
 ): Promise<VerifyResult> {
   const endpoint = rawEndpoint.replace(/\/+$/, "");
   if (!/^https?:\/\//i.test(endpoint)) {
@@ -56,10 +57,12 @@ export async function verifyEndpoint(
     | undefined;
 
   try {
+    const headers: Record<string, string> = { accept: "application/json" };
+    if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
     const res = await fetch(`${endpoint}/v1/models`, {
       method: "GET",
       signal: modelsController.signal,
-      headers: { accept: "application/json" },
+      headers,
     });
     if (!res.ok) {
       return {
