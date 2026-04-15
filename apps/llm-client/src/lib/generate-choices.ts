@@ -1,5 +1,5 @@
 import { log } from "./logger";
-import { apiHeaders } from "./api-headers";
+import { apiHeaders, apiModel } from "./api-headers";
 import type { ChatMessage } from "./context-manager";
 
 export const DEFAULT_CHOICE_PROMPT =
@@ -51,6 +51,7 @@ export async function generateChoices(
         method: "POST",
         headers: apiHeaders(),
         body: JSON.stringify({
+          model: apiModel(),
           messages,
           max_tokens: 60,
           temperature: Math.min(2, 0.9 + i * 0.1 + tempOffset),

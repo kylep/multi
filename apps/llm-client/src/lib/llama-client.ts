@@ -1,5 +1,5 @@
 import type { ChatMessage } from "./context-manager";
-import { apiHeaders } from "./api-headers";
+import { apiHeaders, apiModel } from "./api-headers";
 import { log } from "./logger";
 
 export const DEFAULT_ENDPOINT = "http://127.0.0.1:8080";
@@ -38,7 +38,7 @@ export async function* streamChat(
       accept: "text/event-stream",
     },
     body: JSON.stringify({
-      model: options.model ?? DEFAULT_MODEL,
+      model: options.model ?? apiModel(),
       messages: options.messages,
       stream: true,
       max_tokens: options.maxTokens,

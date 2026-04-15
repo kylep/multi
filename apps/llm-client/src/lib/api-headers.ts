@@ -11,3 +11,8 @@ export function apiHeaders(): Record<string, string> {
   }
   return headers;
 }
+
+/** Get the configured model ID, falling back to "local-model". */
+export function apiModel(): string {
+  return useSettingsStore.getState().modelId || "local-model";
+}

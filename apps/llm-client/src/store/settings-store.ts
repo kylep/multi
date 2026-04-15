@@ -14,6 +14,7 @@ export interface SettingsStore {
   serverType: ServerType;
   endpoint: string;
   apiKey: string;
+  modelId: string;
   serverInfo: ServerInfo | null;
   systemPrompt: string;
   systemPromptSource: PromptSource;
@@ -37,6 +38,7 @@ export interface SettingsStore {
   setServerType(v: ServerType): void;
   setEndpoint(next: string): void;
   setApiKey(v: string): void;
+  setModelId(v: string): void;
   setServerInfo(info: ServerInfo | null): void;
   setSystemPrompt(
     source: PromptSource,
@@ -76,6 +78,7 @@ export const useSettingsStore = create<SettingsStore>()(
       serverType: "local" as ServerType,
       endpoint: DEFAULT_ENDPOINT,
       apiKey: "",
+      modelId: "",
       serverInfo: null,
       systemPrompt: "",
       systemPromptSource: "none",
@@ -104,6 +107,9 @@ export const useSettingsStore = create<SettingsStore>()(
       },
       setApiKey(v) {
         set({ apiKey: v });
+      },
+      setModelId(v) {
+        set({ modelId: v });
       },
       setServerInfo(info) {
         set({ serverInfo: info });

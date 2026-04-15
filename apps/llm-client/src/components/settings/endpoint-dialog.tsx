@@ -25,6 +25,7 @@ import {
   type VerifyResult,
 } from "@/lib/verify-endpoint";
 import { ServerInfoCard } from "./server-info-card";
+import { ModelPicker } from "./model-picker";
 
 interface EndpointDialogProps {
   open: boolean;
@@ -51,14 +52,17 @@ export function EndpointDialog({
   const storedServerType = useSettingsStore((s) => s.serverType);
   const endpoint = useSettingsStore((s) => s.endpoint);
   const storedApiKey = useSettingsStore((s) => s.apiKey);
+  const storedModelId = useSettingsStore((s) => s.modelId);
   const cachedInfo = useSettingsStore((s) => s.serverInfo);
   const setServerType = useSettingsStore((s) => s.setServerType);
   const setEndpoint = useSettingsStore((s) => s.setEndpoint);
   const setApiKey = useSettingsStore((s) => s.setApiKey);
+  const setModelId = useSettingsStore((s) => s.setModelId);
   const setServerInfo = useSettingsStore((s) => s.setServerInfo);
   const [localServerType, setLocalServerType] = useState<ServerType>(storedServerType);
   const [draft, setDraft] = useState(endpoint || DEFAULT_ENDPOINT);
   const [localApiKey, setLocalApiKey] = useState(storedApiKey);
+  const [localModelId, setLocalModelId] = useState(storedModelId);
   const [probe, setProbe] = useState<ProbeState>(
     initialError ? { kind: "error", error: initialError } : { kind: "idle" },
   );
@@ -69,6 +73,7 @@ export function EndpointDialog({
       const effective = endpoint || (storedServerType === "openrouter" ? OPENROUTER_ENDPOINT : DEFAULT_ENDPOINT);
       setDraft(effective);
       setLocalApiKey(storedApiKey);
+      setLocalModelId(storedModelId);
       if (initialError) {
         setProbe({ kind: "error", error: initialError });
       } else if (cachedInfo && cachedInfo.endpoint === effective) {
@@ -77,7 +82,7 @@ export function EndpointDialog({
         setProbe({ kind: "idle" });
       }
     }
-  }, [open, endpoint, cachedInfo, initialError, storedServerType, storedApiKey]);
+  }, [open, endpoint, cachedInfo, initialError, storedServerType, storedApiKey, storedModelId]);
 
   const runCheck = async () => {
     setProbe({ kind: "checking" });
@@ -95,6 +100,10 @@ export function EndpointDialog({
     setServerType(localServerType);
     setEndpoint(probe.info.endpoint);
     setApiKey(localApiKey);
+    const effectiveModel = localServerType === "openrouter"
+      ? localModelId
+      : probe.info.modelId;
+    setModelId(effectiveModel);
     setServerInfo(probe.info);
     onVerified?.({ ok: true, endpoint: probe.info.endpoint, info: probe.info });
     onOpenChange(false);
@@ -258,6 +267,17 @@ export function EndpointDialog({
           <ServerInfoCard info={probe.info} className="mt-1" />
         )}
 
+        {localServerType === "openrouter" &&
+          (probe.kind === "ok" || probe.kind === "cached") &&
+          localApiKey && (
+            <ModelPicker
+              endpoint={normalizeEndpoint(draft)}
+              apiKey={localApiKey}
+              selected={localModelId}
+              onSelect={setLocalModelId}
+            />
+          )}
+
         <DialogFooter className="gap-2 sm:gap-2">
           <Button
             variant="secondary"
@@ -269,7 +289,7 @@ export function EndpointDialog({
           </Button>
           <Button
             onClick={save}
-            disabled={probe.kind !== "ok"}
+            disabled={probe.kind !== "ok" || (localServerType === "openrouter" && !localModelId)}
             data-testid="endpoint-save"
           >
             Save

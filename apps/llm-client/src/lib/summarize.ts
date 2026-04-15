@@ -1,5 +1,5 @@
 import type { ChatMessage } from "./context-manager";
-import { apiHeaders } from "./api-headers";
+import { apiHeaders, apiModel } from "./api-headers";
 import { log } from "./logger";
 import { estimateTokens } from "./tokens";
 
@@ -35,6 +35,7 @@ async function callModel(
         method: "POST",
         headers: apiHeaders(),
         body: JSON.stringify({
+          model: apiModel(),
           messages: [
             { role: "system", content: systemContent },
             { role: "user", content: userContent },

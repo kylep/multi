@@ -1,5 +1,5 @@
 import { log } from "./logger";
-import { apiHeaders } from "./api-headers";
+import { apiHeaders, apiModel } from "./api-headers";
 
 export async function generateTitle(
   messages: { role: string; content: string }[],
@@ -20,6 +20,7 @@ export async function generateTitle(
         method: "POST",
         headers: apiHeaders(),
         body: JSON.stringify({
+          model: apiModel(),
           messages: [
             {
               role: "system",
