@@ -14,8 +14,7 @@ src_url="$OUT_DIR"
 dst_url="gs://kyle.pericak.com/apps/llm-client"
 
 echo "Checking for changes..."
-dry_run_output=$(gsutil -m rsync -r -c -n "$src_url" "$dst_url")
-if [ $? -ne 0 ]; then
+if ! dry_run_output=$(gsutil -m rsync -r -c -n "$src_url" "$dst_url"); then
   echo "Dry-run failed, aborting."
   exit 1
 fi
