@@ -16,6 +16,7 @@ interface MessageListProps {
   onRegen?: (messageId: string) => void;
   summaryTokens: number;
   inputBudget: number;
+  scrollTrigger?: number;
 }
 
 export function MessageList({
@@ -29,6 +30,7 @@ export function MessageList({
   onRegen,
   summaryTokens,
   inputBudget,
+  scrollTrigger,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isPinnedRef = useRef(true);
@@ -44,7 +46,7 @@ export function MessageList({
     if (isPinnedRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, scrollTrigger]);
 
   useEffect(() => {
     if (!scrollRef.current) return;

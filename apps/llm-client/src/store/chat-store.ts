@@ -183,6 +183,23 @@ export const useChatStore = create<ChatStore>()(
       name: "llm-client/chat-store/v1",
       storage: createJSONStorage(() => localStorage),
       partialize: partializeChatStore,
+      merge: (persisted, current) => {
+        const p = persisted as Record<string, unknown> | null;
+        if (p?.chats) {
+          // Strip stale {X}...{/X} color tags from persisted messages
+          // so the model doesn't mimic them in new responses.
+          const TAG_RE = /\{[a-z]\}|\{\/[a-z]\}/g;
+          const chats = p.chats as Record<string, Chat>;
+          for (const chat of Object.values(chats)) {
+            for (const msg of chat.messages) {
+              if (TAG_RE.test(msg.content)) {
+                msg.content = msg.content.replace(TAG_RE, "");
+              }
+            }
+          }
+        }
+        return { ...current, ...(p as Partial<ChatStore>) };
+      },
     },
   ),
 );

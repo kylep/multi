@@ -26,12 +26,19 @@ export const log = {
     if (shouldLog("debug")) console.debug("%s %s DBG %s", PREFIX, ts(), msg, ...args);
   },
   info(msg: string, ...args: unknown[]) {
-    if (shouldLog("info")) console.info("%s %s INF %s", PREFIX, ts(), msg, ...args);
+    if (shouldLog("info")) console.log("%s %s INF %s", PREFIX, ts(), msg, ...args);
   },
   warn(msg: string, ...args: unknown[]) {
     if (shouldLog("warn")) console.warn("%s %s WRN %s", PREFIX, ts(), msg, ...args);
   },
   error(msg: string, ...args: unknown[]) {
     if (shouldLog("error")) console.error("%s %s ERR %s", PREFIX, ts(), msg, ...args);
+  },
+  /** Collapsible structured log for API exchanges. */
+  exchange(label: string, data: Record<string, unknown>) {
+    if (!shouldLog("info")) return;
+    console.groupCollapsed(`%s %s INF %s`, PREFIX, ts(), label);
+    console.log(data);
+    console.groupEnd();
   },
 };

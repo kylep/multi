@@ -54,6 +54,17 @@ async function callModel(
     };
     const content = json.choices?.[0]?.message?.content?.trim() ?? null;
     if (!content) log.warn("summarize: model returned empty content");
+    log.exchange("exchange:compaction", {
+      messages: [
+        { role: "system", content: systemContent },
+        { role: "user", content: userContent },
+      ],
+      response: content,
+      responseLength: content?.length ?? 0,
+      endpoint,
+      maxTokens,
+      temperature: 0.3,
+    });
     return content;
   } catch (err) {
     log.warn(`summarize: ${(err as Error)?.message ?? "unknown error"}`);
