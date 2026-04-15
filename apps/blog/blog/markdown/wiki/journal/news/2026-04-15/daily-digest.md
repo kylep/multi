@@ -39,3 +39,25 @@ last_verified: 2026-04-15
 ## Just for You
 
 - [Cursor Blog](https://cursor.com/changelog/3-0) Cursor 3.1 (released April 13) adds the ability to split the Agents Window into panes and run multiple agents in parallel — local, worktree, cloud sandbox, and SSH environments simultaneously. Design Mode for annotating browser UI elements was introduced in 3.0 (April 2).
+
+---
+
+## Update — 19:30 UTC
+
+## AI Tooling
+
+- [Anthropic Blog](https://claude.com/blog/claude-code-desktop-redesign) Anthropic shipped a full redesign of the Claude Code desktop app centered on parallel sessions. A new sidebar manages multiple agent sessions simultaneously, each in its own Git worktree so changes stay isolated until committed. The update also adds a side-chat shortcut for mid-task questions, an integrated terminal, an in-app file editor, and a rebuilt diff viewer. Available to Pro, Max, Team, and Enterprise subscribers.
+
+- [Anthropic Blog](https://claude.com/blog/introducing-routines-in-claude-code) Claude Code Routines lets users bundle a prompt, a repo, and connectors into a single automation that runs on a schedule, fires from an API call, or triggers on a GitHub event such as a new pull request. Pro users get 5 runs per day; Max users 15; Team and Enterprise users 25.
+
+## Open Source
+
+- [GitHub](https://github.com/strimzi/strimzi-kafka-operator/releases/tag/0.51.0) Strimzi Kafka Operator 0.51.0 adds support for Kafka 4.2.0 (and removes Kafka 4.0.x support), enables per-listener connection settings, and moves server-side apply to beta on by default. Requires Kubernetes 1.30 or newer. Also patches CVE-2026-27133 and CVE-2026-27134.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/cisa-adds-6-known-exploited-flaws-in.html) CISA added CVE-2026-21643 — an unauthenticated SQL injection (CVSS 9.1) in Fortinet FortiClient EMS — to the Known Exploited Vulnerabilities catalog, citing active exploitation since at least March 24. Federal civilian agencies must patch by April 16. The flaw was exploited as a zero-day before a patch was available.
+
+## Just for You
+
+- [CyberScoop](https://cyberscoop.com/openai-expands-trusted-access-for-cyber-to-thousands-for-cybersecurity/) OpenAI is expanding its Trusted Access for Cyber program — which provides access to GPT-5.4-Cyber for defensive security work — from a small pilot to thousands of vetted individuals and organizations. The model is purpose-built for reverse engineering, vulnerability discovery, and malware analysis.
