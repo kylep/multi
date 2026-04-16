@@ -13,7 +13,7 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      backoffLimit: 0
+      backoffLimit: 1
       activeDeadlineSeconds: 3600
       ttlSecondsAfterFinished: 7200
       template:
@@ -119,6 +119,11 @@ spec:
                     }
                   }
                   MCPEOF
+
+                  # Pre-flight: verify MCP server deps and env before launching Claude.
+                  if [ -z "$DISCORD_BOT_TOKEN" ]; then echo "MCP preflight FAILED: DISCORD_BOT_TOKEN not set" >&2; exit 1; fi
+                  python3 -c "import httpx, mcp.server.fastmcp" || { echo "MCP preflight FAILED: python import error" >&2; exit 1; }
+                  echo "MCP preflight OK" >&2
 
                   discord_post "▶ ${RUN_ID} | agent=${AGENT_NAME} | started"
 

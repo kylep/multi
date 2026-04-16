@@ -26,7 +26,7 @@ spec:
   failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
-      backoffLimit: 0
+      backoffLimit: 1
       activeDeadlineSeconds: 120
       ttlSecondsAfterFinished: 3600
       template:
