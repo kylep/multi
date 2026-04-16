@@ -1,8 +1,8 @@
 ---
 title: "Google Cloud Build: Basics"
-summary: Intro to Google Cloud Build with real cloudbuild.yaml examples — push
-  Docker images to GCR and rsync a static site to Cloud Storage on every Git
-  commit.
+summary: Intro to Google Cloud Build with real cloudbuild.yaml examples for
+  pushing Docker images to GCR and rsyncing a static site to Cloud Storage on
+  every Git commit.
 slug: google-cloud-build
 tags: GCP,Docker,CI/CD
 category: cloud

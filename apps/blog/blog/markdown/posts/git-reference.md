@@ -1,6 +1,6 @@
 ---
 title: Git Reference Page
-summary: Practical Git recipes — renaming branches, rolling back a merge,
+summary: Practical Git recipes for renaming branches, rolling back a merge,
   switching the commit editor to Vim, and scrubbing a file out of history with
   filter-branch.
 slug: git reference
