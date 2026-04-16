@@ -45,3 +45,15 @@ last_verified: 2026-04-16
 - [Cloudflare Blog](https://blog.cloudflare.com/code-mode-mcp/) Cloudflare released Code Mode for MCP server portals during Agents Week (late March 2026), reducing MCP tool description token usage by up to 99.9% by having the model write typed SDK code rather than listing individual tools. A companion release, [Managed OAuth for Access](https://blog.cloudflare.com/managed-oauth-for-access/), lets AI agents authenticate against internal apps via RFC 9728 without service accounts. Shadow MCP detection is also available in Cloudflare Gateway via DLP-based body inspection.
 
 - [GitHub](https://github.com/addyosmani/agent-skills) addyosmani/agent-skills entered GitHub weekly trending at #6 with 6,693 stars this week (16.2k total). The project is a collection of production-grade engineering skills for AI coding agents, curated by Google's Addy Osmani.
+
+---
+
+## Update — 14:00 UTC
+
+## AI Industry
+
+- [Google DeepMind](https://deepmind.google/blog/gemini-robotics-er-1-6/) Google DeepMind released Gemini Robotics-ER 1.6 on April 14, an upgrade to its embodied reasoning model for physical robots. New capabilities include instrument reading (analog gauges, level indicators, digital readouts) and improved multi-view reasoning across camera streams. Boston Dynamics integrated the model into its Spot AIVI-Learning inspection platform. Available to developers via the Gemini API and AI Studio.
+
+## Local
+
+- [Ontario.ca](https://news.ontario.ca/en/release/1006310/province-breaks-ground-on-second-ontario-line-tunnel) Premier Doug Ford and Toronto Mayor Olivia Chow announced April 16 that tunnelling has officially begun on the Ontario Line downtown segment. Two tunnel boring machines named Libby and Corkie will dig six kilometres beneath downtown Toronto between Exhibition Station and the Don River, reaching up to 40 metres deep. The 15.6-kilometre, 15-station line is projected to cut cross-city commute times by 40 minutes.
