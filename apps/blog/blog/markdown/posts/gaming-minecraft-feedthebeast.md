@@ -1,6 +1,6 @@
 ---
 title: Private Minecraft Feed-The-Beast Server & Client Setup
-summary: Hosting a private modded Minecraft server and connecting to it using various clients.
+summary: Run a private FTB Ultimate Reloaded modded Minecraft server on an Ubuntu 16.04 VM with 12GB RAM, and connect using MultiMC or the Feed The Beast launcher.
 slug: gaming-minecraft-feedthebeast
 category: gaming
 tags: minecraft

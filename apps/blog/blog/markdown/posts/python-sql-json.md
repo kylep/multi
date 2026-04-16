@@ -1,6 +1,7 @@
 ---
 title: Working with JSON SQL values in Python
-summary: Using raw SQL queries to manage JSON values in databases
+summary: Pull a JSON blob out of a MariaDB column into a file, edit it, and write it
+  back using raw SQL in Python with the mysql-connector library.
 slug: python-raw-sql-json
 category: development
 tags: python

@@ -1,6 +1,6 @@
 ---
 title: "Bot-Wiki: A Knowledge Base for Robots"
-summary: Building a structured wiki designed for RAG retrieval and AI agents, right alongside the blog.
+summary: Adding a structured wiki to the blog designed for AI agents and RAG pipelines, with machine-readable frontmatter, keyword lists, and cross-references.
 slug: bot-wiki
 category: ai
 tags: AI, RAG, wiki, Bot-Wiki, knowledge-base

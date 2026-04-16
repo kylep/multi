@@ -1,6 +1,7 @@
 ---
 title: Vim Spell-Check
-summary: How to enable, disable, and use spell check in Vim (version >=7).
+summary: Enable Vim's built-in spell checker with :set spell spelllang=en_ca, jump
+  between misspellings with ]s and [s, and fix, add, or flag words using z=, zg, zw.
 slug: vim-spellcheck
 category: development
 tags: Vim

@@ -1,6 +1,6 @@
 ---
 title: "AI Image Generator Bakeoff"
-summary: Comparing GPT Image 1.5, Nano Banana, and Flux 2 Max for blog image generation
+summary: "Head-to-head comparison of GPT Image 1.5, Nano Banana Pro, and Flux 2 Max APIs for blog image generation: setup, pricing, and real output quality."
 slug: ai-image-gen-bakeoff
 category: ai
 tags: AI, Images, OpenAI, Flux, Nano Banana

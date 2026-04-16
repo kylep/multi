@@ -1,6 +1,6 @@
 ---
 title: Authenticating with AWS IAM in AWS API Gateway
-summary: Enabling IAM authentication on API Gateway and building a client
+summary: Lock down an AWS API Gateway endpoint with IAM auth, wire it to a Python Lambda, and call it from a signed client using policies and access keys.
 slug: aws-api-gateway-iam
 category: cloud
 tags: AWS, API Gateway, Python

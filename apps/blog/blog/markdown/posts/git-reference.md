@@ -1,6 +1,8 @@
 ---
 title: Git Reference Page
-summary: Deleting a file after it's been pushed to to a remote git repository
+summary: Practical Git recipes for renaming branches, rolling back a merge,
+  switching the commit editor to Vim, and scrubbing a file out of history with
+  filter-branch.
 slug: git reference
 tags: Git
 category: reference pages

@@ -1,6 +1,7 @@
 ---
 title: Modifying OpenStack Kolla Docker Images
-summary: Creating a custom Cinder Docker image without modifying the Kolla code.
+summary: Add the Pure Storage Cinder plugin to a Kolla OpenStack image with a Jinja2
+  template override, keeping the upstream Kolla source untouched.
 slug: openstack-kolla-custom-plugin
 category: cloud
 tags: OpenStack

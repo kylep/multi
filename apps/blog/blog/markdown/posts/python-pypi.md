@@ -1,6 +1,7 @@
 ---
 title: Upload a Python Package to PyPi
-summary: Sharing a custom python package on PyPi so it can be pulled with pip
+summary: Publish a pip-installable Python package to PyPI. Walks through setup.py,
+  setup.cfg, a GitHub release for download_url, and uploading with twine.
 slug: python-pypi
 category: development
 tags: python,pypi

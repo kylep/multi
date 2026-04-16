@@ -1,6 +1,6 @@
 ---
 title: Postfix Send-Only Mail Service
-summary: Deploy and configure Postfix as a local send-only mail server.
+summary: Install and configure Postfix on Ubuntu as a local send-only SMTP server for alert emails, including hostname setup, main.cf tuning, and the mailutils tools.
 slug: emails-postfix-ubuntu
 category: systems administration
 tags: email,postfix

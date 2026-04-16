@@ -1,6 +1,8 @@
 ---
 title: "Project: GCP Deep Dive"
-summary: An ongoing in-depth exploration of Google Cloud Platform
+summary: An ongoing deep dive into Google Cloud Platform, with hands-on posts
+  covering Cloud Build, Cloud Storage website hosting, Container Registry, and
+  Firestore.
 slug: gcp
 tags: GCP
 category: projects

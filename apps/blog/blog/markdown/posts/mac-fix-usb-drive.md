@@ -1,6 +1,8 @@
 ---
 title: Fix shrunken USB drive after using as boot disk
-summary: How to fix formatting USB sticks after they shrink for burning .iso's to them.
+summary: Restoring a USB drive's full size on macOS after dd or Etcher shrank
+  it for a boot disk, using diskutil eraseDisk and, if needed, zeroing the
+  partition with dd.
 slug: mac-fix-usb-drive
 category: systems administration
 tags: Mac OS

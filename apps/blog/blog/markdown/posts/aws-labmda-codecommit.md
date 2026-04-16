@@ -1,6 +1,6 @@
 ---
 title: AWS CodeBuild CICD - Deploy to Lambda
-summary: Testing and automatically deploying lambda functions using CodeBuild
+summary: Build a CI/CD pipeline for Python Lambda functions using CodeCommit, CodeBuild, and AWS SAM templates to test and auto-deploy on every commit.
 slug: aws-labmda-cicd
 category: cloud
 tags: AWS, Lambda, Python, CodeBuild

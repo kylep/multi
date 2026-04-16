@@ -1,6 +1,6 @@
 ---
 title: Create & Terminate EC2 Instances from Python
-summary: Creating and destroying VMs on EC2 from Python
+summary: Launch and terminate EC2 instances from Python using boto3, with a working example covering Ubuntu AMIs, security groups, tags, and wait_until_running.
 slug: aws-ec2-python
 category: cloud
 tags: AWS, EC2, Python

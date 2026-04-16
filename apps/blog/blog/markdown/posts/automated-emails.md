@@ -1,6 +1,6 @@
 ---
 title: Project - Automated Emails
-summary: Sending emails from automated systems without having them marked as SPAM.
+summary: A project exploring how to send emails from automated systems without hitting spam filters, covering Postfix send-only servers, cron alerts, and SPF setup.
 slug: project-email
 tags: email
 category: projects

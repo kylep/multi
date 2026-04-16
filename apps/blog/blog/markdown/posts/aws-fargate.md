@@ -1,6 +1,6 @@
 ---
 title: AWS Fargate - Basics
-summary: How to run a docker container on AWS Fargate from the web console
+summary: Step-by-step for launching a Docker container on AWS ECS Fargate from the web console, including task definitions, load balancer setup, and ECR image URLs.
 slug: aws-fargate
 category: cloud
 tags: AWS, Docker
