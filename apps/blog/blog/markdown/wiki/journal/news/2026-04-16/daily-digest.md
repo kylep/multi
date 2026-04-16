@@ -57,3 +57,31 @@ last_verified: 2026-04-16
 ## Local
 
 - [Ontario.ca](https://news.ontario.ca/en/release/1006310/province-breaks-ground-on-second-ontario-line-tunnel) Premier Doug Ford and Toronto Mayor Olivia Chow announced April 16 that tunnelling has officially begun on the Ontario Line downtown segment. Two tunnel boring machines named Libby and Corkie will dig six kilometres beneath downtown Toronto between Exhibition Station and the Don River, reaching up to 40 metres deep. The 15.6-kilometre, 15-station line is projected to cut cross-city commute times by 40 minutes.
+
+---
+
+## Update — 19:00 UTC
+
+## AI Industry
+
+- [The Information](https://www.streetinsider.com/General+News/Google+in+talks+with+Pentagon+over+Gemini+AI+deployment+-+Information/26322457.html) Google is in substantive talks with the US Department of Defense to deploy Gemini models in classified military environments, per The Information. Google is proposing contract language barring domestic mass surveillance and fully autonomous weapons targeting without human oversight. No official statements from either party; negotiations follow tensions stemming from the Pentagon's dispute with Anthropic over AI safety restrictions.
+
+## AI Tooling
+
+- [GitHub Changelog](https://github.blog/changelog/2026-04-16-claude-opus-4-7-is-generally-available/) Claude Opus 4.7 is now available on GitHub Copilot for Pro+, Business, and Enterprise subscribers across VS Code, JetBrains, Xcode, and github.com. The model improves multi-step task performance and long-horizon reasoning; it carries a 7.5× premium request multiplier through April 30. Over the coming weeks it will replace Opus 4.5 and 4.6 in the model picker.
+
+- [TechCrunch](https://techcrunch.com/2026/04/16/google-adds-nano-banana-powered-image-generation-to-geminis-personal-intelligence/) Google is adding personalized image generation to Gemini's Personal Intelligence feature, powered by Nano Banana 2. Images are generated from Gemini's knowledge of the user's interests without explicit prompting. Rolling out to Plus, Pro, and Ultra subscribers in the US in the coming days.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/fortinet-patches-actively-exploited-cve.html) Fortinet patched CVE-2026-35616 (CVSS 9.1) in FortiClient EMS 7.4.5–7.4.6 — an improper access control flaw that lets unauthenticated attackers bypass authentication and execute arbitrary code. Active exploitation confirmed since March 31; this is the second critical unauthenticated vulnerability in FortiClient EMS within weeks.
+
+## Geopolitics
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/4/16/hopes-grow-for-a-breakthrough-in-us-iran-talks-as-pakistan-mediates) Pakistan's Army Chief Asim Munir arrived in Tehran with a message from the US, and Pakistani officials signaled a "major breakthrough" on Iran's nuclear program is within reach. Talks are narrowing on enrichment duration (5 vs. 20 years) and disposition of Iran's 440 kg highly-enriched uranium stockpile. Hormuz and war compensation remain unresolved.
+
+- [CNN](https://edition.cnn.com/2026/04/16/world/live-news/iran-war-trump-us-israel) Trump announced a 10-day ceasefire between Israel and Lebanon beginning at 5 p.m. ET on April 16. The announcement marks the first formal pause in Israeli-Lebanese hostilities since the October 2026 cross-border exchanges began.
+
+## Local
+
+- [City of Toronto](https://www.toronto.ca/news/) The City of Toronto and Councillor Brad Bradford joined Cannect Homes on April 16 to mark the start of construction on 90 new affordable and market rental homes in the Beaches neighbourhood.
