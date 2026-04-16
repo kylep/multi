@@ -1,5 +1,5 @@
 ---
-summary: Ceph reference page
+summary: "Quick reference for Ceph storage commands: pool replica management, RBD volume create/map/delete, snapshot rollback, and exporting RBD images to files."
 title: Ceph Reference Page
 slug: ceph-reference
 tags: Ceph
