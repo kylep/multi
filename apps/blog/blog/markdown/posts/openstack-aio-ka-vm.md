@@ -1,6 +1,7 @@
 ---
 title: Install OpenStack with Kolla-Ansible in a VM
-summary: Installing OpenStack on a cloud VM with Kolla-Ansible for dev and testing
+summary: Build a throwaway OpenStack Rocky dev cloud inside a single Ubuntu 18.04
+  VM using Kolla-Ansible, Cinder LVM, and a VLAN provider network.
 slug: openstack-aio-ka-vm
 category: cloud
 tags: OpenStack

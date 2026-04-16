@@ -1,6 +1,6 @@
 ---
 title: "CircleCI: Continuous Delivery for Firebase"
-summary: A very simple CD setup for a basic hosting Firebase app.
+summary: "Set up continuous deployment for a Firebase Hosting app using CircleCI, a firebase login:ci token, and a minimal config.yml that runs firebase deploy."
 slug: firebase-circleci-cd
 category: development
 tags: Firebase

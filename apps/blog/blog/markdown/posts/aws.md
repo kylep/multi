@@ -1,6 +1,6 @@
 ---
 title: "Project: AWS Deep Dive"
-summary: An ongoing in-depth exploration of Amazon Web Services
+summary: An ongoing deep-dive project exploring AWS services hands-on, covering EC2, Lambda, S3, ECR, Fargate, API Gateway, and CodePipeline with working examples.
 slug: aws
 tags: AWS
 category: projects

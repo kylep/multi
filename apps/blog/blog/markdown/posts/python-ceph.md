@@ -1,6 +1,7 @@
 ---
 title: Python Ceph Examples
-summary: Some examples of using Ceph from Python with the rbd library
+summary: Use Ceph's rados and rbd Python libraries to check cluster health, list and
+  create pools, and manage RBD block-device images with real code samples.
 slug: python-ceph
 category: development
 tags: Python, Ceph

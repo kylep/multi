@@ -1,6 +1,7 @@
 ---
 title: Injecting KVM Drivers to Windows 10 for OpenStack
-summary: How to inject KVM drivers into a Windows 10 image for use in OpenStack Glance
+summary: Inject VirtIO KVM drivers (viostor, Balloon, NetKVM) into a Windows 10
+  VHDX image with Dism so it can boot on OpenStack Glance after qcow2 conversion.
 slug: windows-kvm-drivers
 category: cloud
 tags: OpenStack, Windows

@@ -1,6 +1,6 @@
 ---
 title: Free HTTPS Certs with LetsEncrypt's Certbot
-summary: Installing and using certbot from LestEncrypt to get a free HTTPS cert
+summary: Install LetsEncrypt's certbot on Ubuntu and issue a free HTTPS certificate using the standalone HTTP challenge, then convert the files for HAProxy use.
 slug: certbot
 category: systems administration
 tags: HTTPS

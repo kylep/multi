@@ -1,6 +1,6 @@
 ---
 title: CodePipeline - Continuous Delivery to AWS ECR
-summary: Automatically rebuild and deploy docker images on AWS
+summary: Wire up AWS CodeCommit, CodePipeline, and CodeBuild with a buildspec.yml to auto-build Docker images and push them to ECR on every commit.
 slug: aws-codepipeline-ecr
 category: cloud
 tags: AWS, Docker, CICD, CodePipeline, CodeCommit, CodeBuild

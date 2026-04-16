@@ -1,7 +1,7 @@
 ---
 title: "RAG on the Bot-Wiki"
-summary: Building a FAISS retrieval pipeline over the wiki
-  using OpenRouter embeddings.
+summary: Build a tiny RAG pipeline over a 21-page wiki using FAISS flat index,
+  OpenRouter embeddings, and whole-page chunks enriched with frontmatter context.
 slug: wiki-rag
 category: ai
 tags: RAG, FAISS, OpenRouter, embeddings, Bot-Wiki, Python

@@ -1,6 +1,7 @@
 ---
 title: Python Reference Page
-summary: Useful code patterns, notes, and ideas about python code
+summary: Python snippets I reach for often. Pylint disable comments, list comprehensions,
+  Jinja2 templating, MySQL queries, stdin pipes, and file string replacement.
 slug: python
 category: reference pages
 tags: python

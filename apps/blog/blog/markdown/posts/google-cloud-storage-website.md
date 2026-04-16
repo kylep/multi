@@ -1,6 +1,8 @@
 ---
 title: "Google Cloud Storage: Website Hosting"
-summary: How to host a static website using Google Cloud Storage buckets.
+summary: Hosting a static site on Google Cloud Storage — Search Console domain
+  verification, bucket setup, a CNAME to c.storage.googleapis.com, and real
+  pricing numbers.
 slug: google-cloud-storage-website
 tags: GCP
 category: cloud

@@ -1,6 +1,8 @@
 ---
 title: "Linear MCP: Planning with Robots"
-summary: Connecting AI coding tools directly to Linear so AI can pull tasks in
+summary: Wiring Linear's official MCP server into Claude Code via OAuth, then
+  designing a nightly ideation agent that files Backlog suggestions gated by
+  issue status.
 slug: linear-mcp
 category: ai
 tags: Linear, MCP, Claude-Code, Cursor, AI

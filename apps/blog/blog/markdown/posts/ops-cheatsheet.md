@@ -1,6 +1,7 @@
 ---
 title: Operations Reference Page
-summary: Mini-posts and notes that are generally related to operations
+summary: Grab-bag of Linux ops recipes. tcpdump, vim find and replace, passwordless
+  sudo, loopback volumes, journalctl, bash exit traps, MTU tests, and more.
 slug: ops
 category: reference pages
 tags: Mac OS, Ubuntu, Vim, Docker, Ansible, Bash

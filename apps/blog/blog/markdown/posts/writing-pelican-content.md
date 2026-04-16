@@ -1,6 +1,7 @@
 ---
 title: Writing Blog Content for Pelican
-summary: Steps and examples for writing web content to be consumed by Pelican
+summary: Set up a Pelican static site project with pelicanconf.py, structure posts
+  and pages under content/, and write markdown with the metadata fields Pelican uses.
 slug: writing-pelican-content
 category: development
 tags: Pelican

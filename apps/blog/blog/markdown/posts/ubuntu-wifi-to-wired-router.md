@@ -1,6 +1,7 @@
 ---
 title: Creating a Wireless Router for Wired Servers With Ubuntu Server
-summary: Connecting wired servers, through a switch, to an ubuntu server with a wireless card.
+summary: Turn an Ubuntu Server into a WiFi-to-wired NAT gateway using netplan,
+  IP forwarding, and iptables MASQUERADE so switched servers can reach the internet.
 slug: ubuntu-wifi-to-wired-router
 tags: WiFi, Ubuntu
 category: systems administration

@@ -1,6 +1,7 @@
 ---
 title: Create Windows KVM VM from Command Line
-summary: Creating a Windows KVM VM without OpenStack using the command line on Ubuntu 18.04
+summary: Create a Windows KVM virtual machine on Ubuntu 18.04 from the command line
+  with qemu-kvm, libvirt, virt-install, and a netplan bridge. No OpenStack required.
 slug: windows-kvm-command-line
 category: systems administration
 tags: Ubuntu, KVM

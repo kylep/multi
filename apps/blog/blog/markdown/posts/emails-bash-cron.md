@@ -1,6 +1,6 @@
 ---
 title: Scheduled Availability Email Alerts
-summary: Sending cron-scheduled ping failure alerts using a bash script
+summary: Write a cron-driven bash script that pings a host every minute and sends a throttled email alert on failure, using the mail command and a token file.
 slug: emails-bash-cron
 category: systems administration
 tags: email, bash

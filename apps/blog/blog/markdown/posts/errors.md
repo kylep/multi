@@ -1,6 +1,6 @@
 ---
 title: Error Messages, Codes, & Stack Traces
-summary: Error's I've seen and how I fixed them, if I fixed them.
+summary: A running reference of error messages I've hit and the fixes that worked. Includes Docker D-Bus login, Ceph OSD memory, Chrome cert errors, and AWS ECR NTP.
 slug: errors
 category: reference pages
 tags: AWS, Pure Storage, Mac OS

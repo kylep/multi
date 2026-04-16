@@ -1,6 +1,6 @@
 ---
 title: Using AWS S3 from Python
-summary: Saving and reading files from S3 using python and a dedicated IAM user.
+summary: Upload and download files to AWS S3 from Python using boto3, with IAM policies, user groups, and a dedicated service account for programmatic access.
 slug: aws-s3-python
 category: cloud
 tags: AWS,python,S3

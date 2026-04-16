@@ -1,6 +1,6 @@
 ---
 title: IAM Auth for Lambda
-summary: Authenticating specific Lambda functions for use from Python
+summary: Restrict access to a specific AWS Lambda function using an IAM policy scoped to its ARN, then invoke it from Python with boto3 and access keys.
 slug: aws-lambda-iam
 category: cloud
 tags: AWS, Lambda, Python

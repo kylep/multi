@@ -1,6 +1,8 @@
 ---
 title: "Google Container Registry: Basics"
-summary: "An introduction to the Google Container Registry: pricing and how to store images."
+summary: Getting started with Google Container Registry — why GCR beats a
+  self-hosted Docker registry, setting up service accounts, and Docker auth via
+  gcloud.
 slug: google-container-registry
 tags: GCP,Docker
 category: cloud
