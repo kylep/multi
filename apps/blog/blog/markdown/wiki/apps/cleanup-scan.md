@@ -47,6 +47,7 @@ clear it — but running that command is left to you.
 
 ## Safety
 
-`cleanup-scan.py` has no delete path. It runs `du`, `os.walk`, and
-`shutil.disk_usage`; it invokes external tools (`docker system df`,
-`brew --cache`) only in read-only mode. Re-running it is free.
+`cleanup-scan.py` has no delete path. It calculates sizes via `os.walk`
+and `os.path.getsize`; `shutil` is only used for `shutil.which`. External
+tools (`docker system df`, `brew --cache`) are invoked in read-only mode.
+Re-running it is free.

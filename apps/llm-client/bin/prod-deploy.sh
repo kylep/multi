@@ -15,12 +15,12 @@ dst_url="gs://kyle.pericak.com/apps/llm-client"
 GSUTIL="gsutil -o GSUtil:parallel_process_count=1"
 
 echo "Checking for changes..."
-if ! dry_run_output=$($GSUTIL -m rsync -r -c -n "$src_url" "$dst_url"); then
+if ! dry_run_output=$($GSUTIL -m rsync -r -c -d -n "$src_url" "$dst_url"); then
   echo "Dry-run failed, aborting."
   exit 1
 fi
 
-$GSUTIL -m rsync -r -c "$src_url" "$dst_url"
+$GSUTIL -m rsync -r -c -d "$src_url" "$dst_url"
 
 changed_urls=()
 while IFS= read -r url; do
