@@ -226,6 +226,17 @@ done
 [ -n "${GA4_CREDENTIALS_B64:-}" ] && [ -n "$GA4_CREDS_FILE" ] && rm -f "$GA4_CREDS_FILE"
 
 echo ""
+echo "=== Bluesky ==="
+EXISTING_BLUESKY=$(get_existing bluesky)
+prompt_or_env BLUESKY_HANDLE "Bluesky handle$(already_set "$EXISTING_BLUESKY" handle)"
+prompt_or_env BLUESKY_APP_PASS "Bluesky app password$(already_set "$EXISTING_BLUESKY" app_password)" secret
+BLUESKY_ARGS=""
+[ -n "${BLUESKY_HANDLE:-}" ]   && BLUESKY_ARGS="$BLUESKY_ARGS handle=$BLUESKY_HANDLE"
+[ -n "${BLUESKY_APP_PASS:-}" ] && BLUESKY_ARGS="$BLUESKY_ARGS app_password=$BLUESKY_APP_PASS"
+# shellcheck disable=SC2086
+[ -n "$BLUESKY_ARGS" ]         && kv_store bluesky $BLUESKY_ARGS
+
+echo ""
 echo "=== Webhook ==="
 EXISTING_WEBHOOK=$(get_existing webhook)
 prompt_or_env WEBHOOK_TOKEN "Webhook bearer token$(already_set "$EXISTING_WEBHOOK" webhook_token)" secret
@@ -249,7 +260,7 @@ OPENOBSERVE_ARGS=""
 [ -n "$OPENOBSERVE_ARGS" ] && kv_store openobserve $OPENOBSERVE_ARGS
 
 echo ""
-echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,google,webhook,cloudflare,openobserve}"
+echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,google,bluesky,webhook,cloudflare,openobserve}"
 echo "  pai: discord_bot_token, claude_oauth_token, linear_api_key"
 echo "  cloudflare: tunnel_token"
 echo "  openobserve: root_user_email, root_user_password"

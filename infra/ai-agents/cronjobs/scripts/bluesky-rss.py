@@ -11,6 +11,7 @@ Passwords). Do NOT use the account password.
 import datetime as dt
 import os
 import sys
+from html.parser import HTMLParser
 
 import requests
 
@@ -109,44 +110,75 @@ def ensure_bot_label(session):
     return False
 
 
-def format_post_text(item):
-    """Build the post body. The external embed carries the link,
-    so don't repeat the URL in the text."""
-    title = item["title"]
-    desc = item["description"]
+def fetch_og_image_url(page_url):
+    """Return the og:image URL from a page, or None on any failure."""
+    class _Parser(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.og_image = None
+        def handle_starttag(self, tag, attrs):
+            if tag != "meta" or self.og_image:
+                return
+            d = dict(attrs)
+            if d.get("property") == "og:image":
+                self.og_image = d.get("content")
+    try:
+        resp = requests.get(page_url, timeout=10)
+        resp.raise_for_status()
+        p = _Parser()
+        p.feed(resp.text)
+        return p.og_image
+    except Exception:
+        return None
 
-    parts = [title]
-    if desc:
-        # Reserve room: title + 2 newlines + ellipsis headroom.
-        overhead = len(title) + 4
-        max_desc = POST_CHAR_LIMIT - overhead
-        if max_desc > 30:
-            if len(desc) > max_desc:
-                desc = desc[: max_desc - 1] + "\u2026"
-            parts.append(desc)
-    text = "\n\n".join(parts)
-    # Final safety clamp.
+
+def upload_thumb(session, image_url):
+    """Download image_url and upload it as a Bluesky blob. Returns blob dict or None."""
+    try:
+        img = requests.get(image_url, timeout=15)
+        img.raise_for_status()
+        mime = img.headers.get("Content-Type", "image/jpeg").split(";")[0].strip()
+        resp = requests.post(
+            f"{PDS_URL}/xrpc/com.atproto.repo.uploadBlob",
+            headers={"Authorization": f"Bearer {session['access_jwt']}", "Content-Type": mime},
+            data=img.content,
+            timeout=30,
+        )
+        resp.raise_for_status()
+        return resp.json().get("blob")
+    except Exception as e:
+        print(f"  Thumbnail upload failed: {e}", file=sys.stderr)
+        return None
+
+
+def format_post_text(item):
+    """Title only — description lives in the embed card."""
+    text = item["title"]
     if len(text) > POST_CHAR_LIMIT:
         text = text[: POST_CHAR_LIMIT - 1] + "\u2026"
     return text
 
 
-def build_record(item, text):
+def build_record(item, text, session):
     """Construct an app.bsky.feed.post record with an external-link embed."""
     link = add_utm(item["link"], UTM_PARAMS)
-    # Bluesky's external embed shows: domain, title, description, optional thumb.
-    # Skipping thumb here — would require a separate image upload round-trip.
+    external = {
+        "uri": link,
+        "title": item["title"],
+        "description": item["description"] or item["title"],
+    }
+    og_url = fetch_og_image_url(item["link"])
+    if og_url and session:
+        blob = upload_thumb(session, og_url)
+        if blob:
+            external["thumb"] = blob
     return {
         "$type": "app.bsky.feed.post",
         "text": text,
         "createdAt": dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
         "embed": {
             "$type": "app.bsky.embed.external",
-            "external": {
-                "uri": link,
-                "title": item["title"],
-                "description": item["description"] or item["title"],
-            },
+            "external": external,
         },
     }
 
@@ -190,7 +222,7 @@ def main():
 
     for item in new_items:
         text = format_post_text(item)
-        record = build_record(item, text)
+        record = build_record(item, text, session)
         print(f"\n--- {item['title']} ---")
         print(text)
         print(f"  [embed] {record['embed']['external']['uri']}")
