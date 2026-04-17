@@ -73,3 +73,29 @@ last_verified: 2026-04-17
 ## Just for You
 
 - [Releasebot](https://releasebot.io/updates/github/copilot-cli) GitHub Copilot CLI v1.0.25 (April 13) adds guided MCP server installation from the new GitHub MCP Registry, remote session control, and richer session/environment tooling — a meaningful workflow change for developers building with MCP.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Reuters](https://www.reuters.com/technology/artificial-intelligence/openai-versus-anthropic-what-revenue-race-means-their-ipos-2026-04-08/) Anthropic crossed $30B ARR in April, overtaking OpenAI at $25B. The company grew from $14B in February to $30B in April — a trajectory Saastr called "the fastest-growing software business of all time." Over 1,000 enterprise customers now spend $1M+ annually, up from 500 in February.
+
+- [Anthropic](https://www.anthropic.com/news/claude-opus-4-7) Claude Opus 4.7 is generally available across the API, Amazon Bedrock, Google Vertex AI, and Microsoft Foundry. Pricing holds at $5/$25 per million input/output tokens. The model improves agentic coding benchmark scores by 13% over Opus 4.6; a new tokenizer increases input token counts by 1.0–1.35x relative to 4.6.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/apache-activemq-cve-2026-34197-added-to.html) Apache ActiveMQ CVE-2026-34197 added to CISA KEV on April 16 — a 13-year-old RCE via the Jolokia API affecting Classic before 5.19.4 and 6.0.0–6.2.2. Active exploitation peaked April 14. Patch to 5.19.4 or 6.2.3; federal deadline April 30.
+
+## Geopolitics
+
+- [Reuters](https://www.reuters.com/world/asia-pacific/iran-us-narrow-differences-after-pakistani-mediation-splits-remain-senior-2026-04-16/) Iran opened the Strait of Hormuz to commercial vessels as part of the Israel-Lebanon truce. Trump announced Iran agreed to relinquish its enriched uranium stockpile. Talks on a 20-year nuclear suspension continue; Iran's counter-proposal is 3–5 years.
+
+## Local
+
+- [City of Toronto](https://www.toronto.ca/news/) Tempo and the City of Toronto announced a new high-performance athlete training facility and community recreation hub at 701 Fleet St, outside Princes' Gates. Plans include public programming alongside elite training space.
+
+## Weather
+
+- Whitby: 16°C high, 6°C low, sunny clearing to a few clouds overnight. Special Weather Statement in effect for Saturday: 10–20 mm of rain expected; ground already saturated, road pooling risk in low-lying areas.
