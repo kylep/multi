@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Poll RSS feed and post new entries to Bluesky.
+
+Dedup via GUID file on persistent storage. Adds UTM params for GA4.
+Uses AT Protocol XRPC API directly (no SDK) so the runtime image
+doesn't need a new pinned dependency.
+
+Auth: Bluesky App Password (Settings > Privacy and Security > App
+Passwords). Do NOT use the account password.
+"""
+import datetime as dt
+import os
+import sys
+
+import requests
+
+from crosspost_common import add_utm, load_posted, parse_feed, save_posted
+
+# --- Config ---
+RSS_URL = os.environ.get("RSS_URL", "https://kyle.pericak.com/feed.xml")
+STATE_FILE = os.environ.get("STATE_FILE", "/cache/posted-guids")
+PDS_URL = os.environ.get("BLUESKY_PDS_URL", "https://bsky.social")
+DRY_RUN = "--dry-run" in sys.argv
+
+UTM_PARAMS = {
+    "utm_source": "bluesky",
+    "utm_medium": "social",
+    "utm_campaign": "blog_post",
+}
+
+# Bluesky post character limit is 300 graphemes. Using a slightly
+# conservative byte-ish budget since we're not grapheme-counting.
+POST_CHAR_LIMIT = 300
+
+
+def login(handle, app_password):
+    """Exchange handle + app password for accessJwt + did."""
+    resp = requests.post(
+        f"{PDS_URL}/xrpc/com.atproto.server.createSession",
+        json={"identifier": handle, "password": app_password},
+        timeout=15,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    return {"access_jwt": data["accessJwt"], "did": data["did"]}
+
+
+def format_post_text(item):
+    """Build the post body. The external embed carries the link,
+    so don't repeat the URL in the text."""
+    title = item["title"]
+    desc = item["description"]
+
+    parts = [title]
+    if desc:
+        # Reserve room: title + 2 newlines + ellipsis headroom.
+        overhead = len(title) + 4
+        max_desc = POST_CHAR_LIMIT - overhead
+        if max_desc > 30:
+            if len(desc) > max_desc:
+                desc = desc[: max_desc - 1] + "\u2026"
+            parts.append(desc)
+    text = "\n\n".join(parts)
+    # Final safety clamp.
+    if len(text) > POST_CHAR_LIMIT:
+        text = text[: POST_CHAR_LIMIT - 1] + "\u2026"
+    return text
+
+
+def build_record(item, text):
+    """Construct an app.bsky.feed.post record with an external-link embed."""
+    link = add_utm(item["link"], UTM_PARAMS)
+    # Bluesky's external embed shows: domain, title, description, optional thumb.
+    # Skipping thumb here — would require a separate image upload round-trip.
+    return {
+        "$type": "app.bsky.feed.post",
+        "text": text,
+        "createdAt": dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
+        "embed": {
+            "$type": "app.bsky.embed.external",
+            "external": {
+                "uri": link,
+                "title": item["title"],
+                "description": item["description"] or item["title"],
+            },
+        },
+    }
+
+
+def post_to_bluesky(session, record):
+    resp = requests.post(
+        f"{PDS_URL}/xrpc/com.atproto.repo.createRecord",
+        headers={"Authorization": f"Bearer {session['access_jwt']}"},
+        json={
+            "repo": session["did"],
+            "collection": "app.bsky.feed.post",
+            "record": record,
+        },
+        timeout=15,
+    )
+    if resp.status_code == 200:
+        data = resp.json()
+        print(f"  Posted {data.get('uri', '(no uri)')}")
+        return True
+    print(f"  Failed: {resp.status_code} {resp.text}", file=sys.stderr)
+    return False
+
+
+def main():
+    posted = load_posted(STATE_FILE)
+    items = parse_feed(RSS_URL)
+    new_items = [i for i in items if i["guid"] not in posted]
+
+    if not new_items:
+        print("No new posts.")
+        return
+
+    print(f"Found {len(new_items)} new post(s)")
+
+    session = None
+    if not DRY_RUN:
+        handle = os.environ["BLUESKY_HANDLE"]
+        app_password = os.environ["BLUESKY_APP_PASSWORD"]
+        session = login(handle, app_password)
+
+    for item in new_items:
+        text = format_post_text(item)
+        record = build_record(item, text)
+        print(f"\n--- {item['title']} ---")
+        print(text)
+        print(f"  [embed] {record['embed']['external']['uri']}")
+
+        if DRY_RUN:
+            print("  [dry run — not posting]")
+            posted.add(item["guid"])
+        else:
+            if post_to_bluesky(session, record):
+                posted.add(item["guid"])
+
+    save_posted(STATE_FILE, posted)
+    print(f"\nDone. {len(posted)} total posts tracked.")
+
+
+if __name__ == "__main__":
+    main()
