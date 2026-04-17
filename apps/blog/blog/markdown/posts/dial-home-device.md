@@ -1,6 +1,6 @@
 ---
 title: "Remote Access: Build a Dial-Home Device"
-summary: Building a remote jump-box that dials home to establish a session
+summary: Build a persistent reverse SSH tunnel from an Ubuntu box at a customer site to your own pivot VPS, so you can remote in without a VPN.
 slug: dial-home-device
 category: systems administration
 tags: remote access, Ubuntu
@@ -9,6 +9,12 @@ modified: 2019-09-17
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - reverse ssh tunnel remote access
+  - dial home device ssh
+  - persistent reverse ssh tunnel cron
+  - remote server access without vpn
+  - ssh jump box setup
 ---
 
 

@@ -1,6 +1,6 @@
 ---
 title: SPF for Trusted Emails
-summary: Configuring which hosts are trusted to send emails for any domain using SPF.
+summary: Configure a Sender Policy Framework DNS record so mail servers trust emails from your domain. Covers finding your external IP and setting the TXT record.
 slug: email-spf
 category: systems administration
 tags: email
@@ -9,6 +9,12 @@ modified: 2019-08-20
 status: published
 image: project-email.png
 thumbnail: project-email-thumb.png
+keywords:
+  - spf record setup
+  - email spf dns configuration
+  - sender policy framework tutorial
+  - spf txt record example
+  - prevent email spoofing spf
 ---
 
 

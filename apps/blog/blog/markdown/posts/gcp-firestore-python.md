@@ -1,6 +1,6 @@
 ---
 title: Google Cloud Firestore Basics - Python
-summary: Reading and writing Firestore entries from local python, and some comparisons with Datastore
+summary: Read and write Google Cloud Firestore documents from Python, with pricing comparisons against Datastore mode and a walk through collections and references.
 slug: gcp-firestore-python
 category: cloud
 tags: GCP, python
@@ -9,6 +9,13 @@ modified: 2019-10-14
 status: published
 image: google-firestore.png
 thumbnail: google-firestore-thumb.png
+keywords:
+  - google cloud firestore python
+  - firestore vs datastore
+  - firestore python tutorial
+  - gcp firestore read write python
+  - google cloud nosql database python
+  - firestore service account setup
 ---
 
 

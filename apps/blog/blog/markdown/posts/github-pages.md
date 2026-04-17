@@ -1,6 +1,8 @@
 ---
 title: "Github Pages: Basics"
-summary: Building a simple page for your Git project using GitHub Pages
+summary: Spinning up a GitHub Pages site from the docs folder on master, with
+  a custom domain via Cloudflare CNAME, a Jekyll theme, and Markdown-based
+  sub-pages.
 slug: github-pages
 category: development
 tags: Git
@@ -9,6 +11,12 @@ modified: 2019-10-25
 status: published
 image: git.png
 thumbnail: git-thumb.png
+keywords:
+  - github pages setup tutorial
+  - github pages custom domain
+  - github pages jekyll configuration
+  - host website on github pages
+  - github pages docs folder
 ---
 
 

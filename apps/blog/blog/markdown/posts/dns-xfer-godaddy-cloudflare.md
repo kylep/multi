@@ -1,6 +1,6 @@
 ---
 title: Transfer Domain from GoDaddy to Cloudflare
-summary: How I moved my main domain from GoDaddy to Cloudflare, making life easier.
+summary: Transfer a domain from GoDaddy to Cloudflare for faster DNS propagation and cheaper registration. Covers unlocking, auth codes, and finalizing the move.
 slug: dns-xfer-godaddy-cloudflare
 category: systems administration
 date: 2019-08-8
@@ -9,6 +9,12 @@ modified: 2019-08-8
 status: published
 image: Cloudflare.png
 thumbnail: Cloudflare-thumb.png
+keywords:
+  - transfer domain godaddy to cloudflare
+  - godaddy to cloudflare migration
+  - domain registrar transfer steps
+  - cloudflare domain registration
+  - move dns to cloudflare
 ---
 
 

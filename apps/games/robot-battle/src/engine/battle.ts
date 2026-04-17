@@ -20,6 +20,7 @@ import {
   getEffectiveHands,
   getEffectiveMaxEnergy,
   getEffectiveMaxHealth,
+  getLevelStatBonus,
   getRestEnergyBonus,
   hasItem,
   isAlive,
@@ -78,7 +79,10 @@ export function calculateDamage(
 ): number {
   const attackPercent = getEffectiveAttack(attacker.robot) + attacker.tempAttack;
   const defence = battleDefence(defender);
-  const modified = weapon.damage * (1 + attackPercent / 100);
+  // Flat per-level damage bonus (cancels cleanly with the defender's flat
+  // per-level defence bonus at same level).
+  const levelDamageBonus = getLevelStatBonus(attacker.robot);
+  const modified = weapon.damage * (1 + attackPercent / 100) + levelDamageBonus;
   return Math.max(0, Math.floor(modified) - defence);
 }
 
@@ -241,9 +245,11 @@ export function useConsumable(
       if (r.random() < dodgeChance) {
         effects.push(`enemy dodged ${consumable.name}!`);
       } else {
-        // Defence reduces consumable damage
+        // Defence reduces consumable damage; flat level bonus adds to it
+        // so same-level throws still net the same damage as before scaling.
         const defence = battleDefence(defender);
-        let dmg = Math.max(0, consumable.damage - defence);
+        const levelDamageBonus = getLevelStatBonus(attacker.robot);
+        let dmg = Math.max(0, consumable.damage + levelDamageBonus - defence);
         if (defender.damageBlock > 0) {
           const blocked = Math.min(dmg, defender.damageBlock);
           defender.damageBlock -= blocked;

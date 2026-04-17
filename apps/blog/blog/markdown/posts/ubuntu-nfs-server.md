@@ -1,6 +1,7 @@
 ---
 title: Ubuntu NFS Server Setup
-summary: Installing, configuring, and testing NFS server on Ubuntu 18.04
+summary: Install and configure an NFS server on Ubuntu 18.04 with nfs-kernel-server,
+  set up /etc/exports for a subnet, apply with exportfs, and mount from a client.
 slug: ubuntu-nfs-server
 category: systems administration
 tags: ubuntu, NFS
@@ -9,6 +10,12 @@ modified: 2020-03-09
 status: published
 image: ubuntu.png
 thumbnail: ubuntu-thumb.png
+keywords:
+  - ubuntu nfs server setup
+  - nfs server ubuntu 18.04
+  - install nfs kernel server
+  - nfs client mount ubuntu
+  - linux nfs exports configuration
 ---
 
 

@@ -1,7 +1,8 @@
 ---
 title: "OpenClaw MVP"
-summary: Setting up OpenClaw as a self-hosted AI agent on
-  macOS, connected to Telegram.
+summary: Installing OpenClaw on macOS, picking a model between Gemini 2.5
+  Flash's free tier and paid Claude or GPT, and wiring it up to a Telegram bot
+  via BotFather.
 slug: openclaw-mvp
 category: dev
 tags: openclaw, telegram, linear, ai, self-hosted
@@ -13,6 +14,13 @@ thumbnail: openclaw-mvp-thumb.png
 imgprompt: A cute cartoon lobster wearing headphones, sitting
   at a small desk with a phone showing chat bubbles, cozy home
   office vibe, flat illustration style
+keywords:
+  - openclaw setup macos
+  - self-hosted ai telegram bot
+  - openclaw gemini free tier
+  - ai chatbot telegram setup
+  - openclaw install guide
+  - personal ai assistant self-hosted
 ---
 
 

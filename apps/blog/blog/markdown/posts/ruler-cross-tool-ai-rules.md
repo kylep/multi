@@ -12,6 +12,13 @@ status: published
 image: ruler-cross-tool-ai-rules.png
 thumbnail: ruler-cross-tool-ai-rules-thumb.png
 imgprompt: A tiny robot holding a ruler standing in front of multiple computer screens each showing a different code editor
+keywords:
+  - ruler ai coding rules
+  - share rules across cursor claude code
+  - agents.md vs claude.md
+  - monorepo ai assistant config
+  - cross tool ai instructions
+  - ruler setup tutorial
 ---
 
 I use Cursor and Claude Code, sometimes Codex, and I'm about to try OpenCode.

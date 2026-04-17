@@ -11,6 +11,13 @@ status: published
 image: ai-security-toolkit.png
 thumbnail: ai-security-toolkit-thumb.png
 imgprompt: The Docker whale wearing a black fedora hat like a hacker
+keywords:
+  - docker security scanning toolkit
+  - semgrep trivy gitleaks
+  - ai agent security scanning
+  - pre-commit security hooks
+  - container vulnerability scanning
+  - secret detection git history
 ---
 
 

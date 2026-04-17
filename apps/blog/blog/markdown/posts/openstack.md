@@ -1,6 +1,7 @@
 ---
 title: "Project: OpenStack Deep Dive"
-summary: An ongoing in-depth exploration of the various projects and features of OpenStack.
+summary: A deep-dive index of OpenStack posts covering Kolla-Ansible installs on metal
+  and VMs, custom Kolla images, Ansible automation, and why run a private cloud.
 slug: openstack
 tags: OpenStack
 category: projects
@@ -9,6 +10,13 @@ modified: 2019-11-25
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - openstack private cloud
+  - openstack vs vmware
+  - install openstack kolla ansible
+  - why use openstack
+  - openstack deep dive
+  - private cloud on premises
 ---
 
 

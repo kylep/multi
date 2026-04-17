@@ -1,6 +1,8 @@
 ---
 title: Packet Tracing Reference
-summary: Watching traffic using Ubuntu Server
+summary: "Quick reference for capturing and filtering network traffic on Ubuntu
+  using tcpdump and tshark. Covers port filters, host filters, combined
+  expressions, and tshark HTTP capture."
 slug: packet-tracing-reference
 category: systems administration
 tags: Ubuntu, HTTP, API, tshark, tcpdump
@@ -9,6 +11,12 @@ modified: 2020-06-04
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - tcpdump filter examples
+  - tshark capture http traffic
+  - packet capture ubuntu
+  - tcpdump filter by port and host
+  - wireshark command line tshark
 ---
 
 

@@ -1,6 +1,7 @@
 ---
 title: Adding Virtio drivers for KVM to RHEL's initrd
-summary: RHEL images won't boot on OpenStack without KVM's Virtio drivers
+summary: Fix a RHEL VM that drops to the dracut prompt after migrating to KVM or OpenStack
+  by chrooting in and injecting virtio drivers into the initrd with dracut.
 slug: rhel-virtio-initrd
 category: cloud
 tags: OpenStack
@@ -9,6 +10,12 @@ modified: 2020-10-21
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - rhel virtio drivers initrd
+  - openstack vm dracut prompt
+  - inject kvm drivers rhel
+  - migrate vmware to openstack rhel
+  - dracut add virtio drivers
 ---
 
 

@@ -1,6 +1,7 @@
 ---
 title: Connecting Ubuntu 18.04 to WPA WiFi from CLI
-summary: Using the CLI on Ubuntu Server to connect a to a WPA wireless network.
+summary: Connect Ubuntu Server 18.04 to a WPA2 WiFi network from the command line
+  using wpa_supplicant, iwlist, and netplan, including offline package install steps.
 slug: ubuntu-bionic-wifi
 category: systems administration
 tags: ubuntu, WiFi
@@ -9,6 +10,12 @@ modified: 2020-03-09
 status: published
 image: wifi.png
 thumbnail: wifi-thumb.png
+keywords:
+  - ubuntu 18.04 connect wifi command line
+  - ubuntu server wpa supplicant
+  - netplan wifi configuration
+  - ubuntu bionic wireless setup
+  - connect ubuntu server to wifi
 ---
 
 # Setup

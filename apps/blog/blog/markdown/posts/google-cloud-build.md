@@ -1,6 +1,8 @@
 ---
 title: "Google Cloud Build: Basics"
-summary: An introduction to the Google Cloud Build, showing how its used for this site.
+summary: Intro to Google Cloud Build with real cloudbuild.yaml examples for
+  pushing Docker images to GCR and rsyncing a static site to Cloud Storage on
+  every Git commit.
 slug: google-cloud-build
 tags: GCP,Docker,CI/CD
 category: cloud
@@ -9,6 +11,12 @@ modified: 2019-12-05
 status: published
 image: google-cloud-build.png
 thumbnail: google-cloud-build-thumb.png
+keywords:
+  - google cloud build tutorial
+  - cloudbuild yaml example
+  - cloud build docker image
+  - gcp ci cd pipeline
+  - cloud build trigger github
 ---
 
 ### Table of Contents

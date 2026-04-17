@@ -1,6 +1,6 @@
 ---
 title: Building a Docker Pelican Image
-summary: Create a Docker image for Pelican, to convert markdown content into static website files.
+summary: Build a reusable Docker image that runs Pelican to convert markdown into a static site, bundling a theme from GitHub and the series plugin in one layer.
 slug: docker-pelican-image
 category: development
 tags: docker, Pelican
@@ -9,6 +9,12 @@ modified: 2019-08-01
 status: published
 image: Docker.png
 thumbnail: docker-thumb.png
+keywords:
+  - docker pelican image
+  - pelican static site generator docker
+  - containerize pelican blog
+  - pelican dockerfile example
+  - docker static website generator
 ---
 
 

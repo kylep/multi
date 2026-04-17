@@ -14,6 +14,13 @@ thumbnail: cron-event-triggered-ai-agents-k8s-thumb.png
 imgprompt: A cute robot crab with clocks for eyes and the
   Kubernetes logo on its stomach, flat vector illustration,
   pastel colors, clean geometric shapes on a plain background
+keywords:
+  - ai agents on kubernetes
+  - cron triggered claude code agent
+  - kubernetes custom controller ai
+  - autonomous ai agent k8s
+  - claude code allowedtools
+  - agenttask crd kubernetes
 ---
 
 

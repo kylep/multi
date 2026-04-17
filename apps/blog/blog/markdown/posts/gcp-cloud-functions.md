@@ -1,6 +1,6 @@
 ---
 title: "Google Cloud Functions: Basics"
-summary: Building a simple servless API on Google Cloud Platform's Cloud Functions
+summary: Deploy a Python 3.7 HTTP-triggered Google Cloud Function that returns the caller's IP, with notes on pricing, invocation costs, and testing from the console.
 slug: gcp-cloud-functions
 category: cloud
 tags: gcp, api
@@ -9,6 +9,12 @@ modified: 2019-10-11
 status: published
 image: google-cloud-functions.png
 thumbnail: google-cloud-functions-thumb.png
+keywords:
+  - google cloud functions tutorial
+  - gcp serverless api python
+  - cloud functions hello world
+  - google cloud functions pricing
+  - deploy cloud function python
 ---
 
 

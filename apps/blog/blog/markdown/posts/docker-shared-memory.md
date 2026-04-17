@@ -1,6 +1,6 @@
 ---
 title: Docker Shared Memory (/dev/sdh)
-summary: Using a high-performance shared memory volume in Docker containers
+summary: "Docker's 64MB /dev/shm default is tiny. Raise it per-container with --shm-size, set a daemon-wide default in daemon.json, or remount /dev/shm on the host."
 slug: docker-shared-memory
 category: development
 tags: Docker
@@ -9,6 +9,12 @@ modified: 2019-09-06
 status: published
 image: Docker.png
 thumbnail: docker-thumb.png
+keywords:
+  - docker shared memory size
+  - docker shm-size increase
+  - docker dev shm too small
+  - change docker default shared memory
+  - docker container shared memory configuration
 ---
 
 

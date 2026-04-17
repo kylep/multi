@@ -1,6 +1,7 @@
 ---
 title: Install Non-Prod OpenStack on a Physical Server
-summary: Installing all-in-one OpenStack with Kolla-Ansible metal as a test cloud
+summary: Step-by-step Kolla-Ansible install of OpenStack Rocky on a single Ubuntu 18.04
+  server with Keystone, Nova, Neutron, Cinder LVM, Heat, and Magnum.
 slug: openstack-aio-ka-metal
 category: cloud
 tags: OpenStack
@@ -9,6 +10,12 @@ modified: 2019-08-13
 status: published
 image: openstack-kolla.png
 thumbnail: openstack-kolla-thumb.png
+keywords:
+  - openstack all in one bare metal
+  - kolla-ansible single server install
+  - openstack rocky install guide
+  - openstack on intel nuc
+  - kolla-ansible vlan provider network
 ---
 
 This guide installs OpenStack on a single metal server.

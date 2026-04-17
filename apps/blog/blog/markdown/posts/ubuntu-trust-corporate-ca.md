@@ -1,6 +1,7 @@
 ---
 title: "Ubuntu: Blindly Trusting the Corporate CA"
-summary: Trusting a CA-signed certificate from a companies firewall on Ubuntu
+summary: Extract a corporate CA certificate with openssl s_client and install it
+  on Ubuntu via /usr/local/share/ca-certificates and update-ca-certificates.
 slug: ubuntu-trust-corporate-ca
 category: systems administration
 tags: Ubuntu, HTTPS
@@ -9,6 +10,12 @@ modified: 2020-01-08
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - ubuntu trust corporate ca certificate
+  - add custom ca certificate ubuntu
+  - update-ca-certificates ubuntu
+  - trust self signed certificate linux
+  - corporate ssl certificate ubuntu
 ---
 
 

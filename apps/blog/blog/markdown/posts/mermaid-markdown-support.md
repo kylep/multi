@@ -1,6 +1,8 @@
 ---
 title: Mermaid Diagrams in Markdown
-summary: Rendering Mermaid diagrams alongside the existing markdown and grey matter pipeline.
+summary: Adding Mermaid diagram rendering to a Next.js blog via a custom remark
+  plugin, with syntax examples for flowcharts, sequence diagrams, and state
+  diagrams.
 slug: mermaid-markdown-support
 tags: markdown, mermaid, diagram, ai
 category: development
@@ -10,6 +12,12 @@ status: published
 image: mermaid-markdown-support.png
 thumbnail: mermaid-markdown-support-thumb.png
 imgprompt: A minimalist flowchart with 1 black box pointing to 2 boxes
+keywords:
+  - mermaid diagrams in markdown
+  - mermaid next.js blog
+  - render mermaid in remark pipeline
+  - mermaid syntax reference
+  - flowchart sequence diagram markdown
 ---
 
 # (Aside) Leveraging AI for Blog Content

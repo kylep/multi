@@ -21,20 +21,31 @@ export function getConsumables(robot: Robot): Consumable[] {
   return robot.inventory.filter((i): i is Consumable => i.itemType === "consumable");
 }
 
+/** Per-level stat bonus for accuracy/dodge/defence/attack.
+ *  Base is +1 per level, plus +1 per New Game+ round. */
+export function getLevelStatBonus(robot: Robot): number {
+  return robot.level * (1 + (robot.newGamePlusLevel ?? 0));
+}
+
+/** Per-level HP bonus. Base is +2 per level, plus +1 per New Game+ round. */
+export function getLevelHealthBonus(robot: Robot): number {
+  return robot.level * (2 + (robot.newGamePlusLevel ?? 0));
+}
+
 export function getEffectiveHands(robot: Robot): number {
   return robot.hands + getGear(robot).reduce((s, g) => s + g.handsBonus, 0);
 }
 
 export function getEffectiveDodge(robot: Robot): number {
-  return robot.dodge + getGear(robot).reduce((s, g) => s + g.dodgeBonus, 0);
+  return robot.dodge + getLevelStatBonus(robot) + getGear(robot).reduce((s, g) => s + g.dodgeBonus, 0);
 }
 
 export function getEffectiveDefence(robot: Robot): number {
-  return robot.defence + getGear(robot).reduce((s, g) => s + g.defenceBonus, 0);
+  return robot.defence + getLevelStatBonus(robot) + getGear(robot).reduce((s, g) => s + g.defenceBonus, 0);
 }
 
 export function getEffectiveMaxHealth(robot: Robot): number {
-  return robot.maxHealth + robot.level * 2 + getGear(robot).reduce((s, g) => s + g.healthBonus, 0);
+  return robot.maxHealth + getLevelHealthBonus(robot) + getGear(robot).reduce((s, g) => s + g.healthBonus, 0);
 }
 
 export function getEffectiveMaxEnergy(robot: Robot): number {
@@ -42,6 +53,8 @@ export function getEffectiveMaxEnergy(robot: Robot): number {
 }
 
 export function getEffectiveAttack(robot: Robot): number {
+  // Attack is a % multiplier stat. Level scaling contributes flat damage
+  // per attack instead (see calculateDamage), so it's not folded in here.
   return robot.attack + getGear(robot).reduce((s, g) => s + g.attackBonus, 0);
 }
 
@@ -50,7 +63,7 @@ export function getRestEnergyBonus(robot: Robot): number {
 }
 
 export function getEffectiveAccuracy(robot: Robot): number {
-  return robot.accuracy + getGear(robot).reduce((s, g) => s + g.accuracyBonus, 0);
+  return robot.accuracy + getLevelStatBonus(robot) + getGear(robot).reduce((s, g) => s + g.accuracyBonus, 0);
 }
 
 export function getMoneyBonusPercent(robot: Robot): number {

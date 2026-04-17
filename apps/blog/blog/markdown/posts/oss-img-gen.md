@@ -11,6 +11,13 @@ status: published
 image: oss-img-gen-knight.png
 thumbnail: oss-img-gen-knight-thumb.png
 imgprompt: A tiny robot dungeon master painting miniature fantasy character portraits at a glowing desk
+keywords:
+  - comfyui apple silicon setup
+  - comfyui rest api local
+  - ip adapter character consistency
+  - sdxl on macbook m2
+  - comfyui image generation api
+  - tabletop rpg ai art
 ---
 
 I'm building a tabletop RPG game that generates images on the fly: character portraits,

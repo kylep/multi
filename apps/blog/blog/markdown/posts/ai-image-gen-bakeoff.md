@@ -1,6 +1,6 @@
 ---
 title: "AI Image Generator Bakeoff"
-summary: Comparing GPT Image 1.5, Nano Banana, and Flux 2 Max for blog image generation
+summary: "Head-to-head comparison of GPT Image 1.5, Nano Banana Pro, and Flux 2 Max APIs for blog image generation: setup, pricing, and real output quality."
 slug: ai-image-gen-bakeoff
 category: ai
 tags: AI, Images, OpenAI, Flux, Nano Banana
@@ -10,6 +10,12 @@ status: published
 image: ai-image-gen-bakeoff.png
 thumbnail: ai-image-gen-bakeoff-thumb.png
 imgprompt: A cute robot wearing a short chefs hat and holding a paint brush
+keywords:
+  - ai image generator comparison
+  - gpt image vs gemini vs flux
+  - best ai image generation api
+  - dall-e alternative 2026
+  - ai image generation cost comparison
 ---
 
 I wrote about this blog's [automated image generation](/ai-generate-blog-images.html) previously. The short version: `generate-images.mjs` runs before each build, finds posts with missing images, builds a prompt from the `imgprompt` front matter field (or has `gpt-4o-mini` summarize the post), then calls DALL-E 3 to produce a 1024x1024 image.

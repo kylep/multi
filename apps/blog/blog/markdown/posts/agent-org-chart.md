@@ -13,6 +13,13 @@ thumbnail: agent-org-chart-thumb.png
 imgprompt: A simple flat vector slice of pie with the Greek
   letter pi on it, minimal lines, solid pastel colors, no
   shading, clean geometric shapes on a plain background
+keywords:
+  - ai agent orchestration
+  - multi agent architecture
+  - claude code agents
+  - ai agent org chart
+  - agent coordination wiki
+  - mcp server agents
 ---
 
 

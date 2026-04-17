@@ -11,6 +11,13 @@ thumbnail: secure-my-laptop-thumb.png
 imgprompt: cartoon boy with messy hair and gap-toothed grin
   sitting at a laptop surrounded by security padlocks, flat
   vector illustration style, warm pastel colors
+keywords:
+  - autonomous ai agent security
+  - claude code laptop security ansible
+  - ralph loop ai agent
+  - macos security hardening ansible
+  - lynis macos security audit
+  - ai agent autonomous loop
 ---
 
 I had Claude credits left in my week and wanted to secure my agent-dediced macbook. It

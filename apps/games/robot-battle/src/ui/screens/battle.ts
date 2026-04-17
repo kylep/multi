@@ -3,6 +3,7 @@
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
 import type { BattleState, Enemy, Rng, Weapon } from "../../engine/types";
+import { bossAsEnemy, createBossRobot, generateEndGameBossSpec } from "../../engine/boss";
 import {
   createBattle,
   endTurn,
@@ -113,12 +114,29 @@ export async function battleScreen(
   storage?: SaveStorage,
 ): Promise<"continue" | "fight-again" | "shop"> {
   const player = state.player!;
-  const enemyDef = state.registry.enemies.get(enemyName)!;
-  const enemyRobot = state.registry.createEnemyRobot(enemyName);
+  // Boss path — end-game boss is generated dynamically, not in registry
+  const isBoss = player.endGameBoss !== null && enemyName === player.endGameBoss.name;
+  let enemyDef: Enemy;
+  let enemyRobot: ReturnType<typeof state.registry.createEnemyRobot>;
+  if (isBoss) {
+    enemyDef = bossAsEnemy(player.endGameBoss!);
+    enemyRobot = createBossRobot(state.registry, player.endGameBoss!, player.newGamePlusLevel);
+  } else {
+    const regEnemy = state.registry.enemies.get(enemyName);
+    if (!regEnemy) {
+      terminal.print("Error: enemy not found!", "t-red");
+      return "continue";
+    }
+    enemyDef = regEnemy;
+    enemyRobot = state.registry.createEnemyRobot(enemyName);
+  }
   if (!enemyRobot) {
     terminal.print("Error creating enemy!", "t-red");
     return "continue";
   }
+
+  // Scale enemy level bonuses to the player's NG+ round
+  enemyRobot.newGamePlusLevel = player.newGamePlusLevel;
 
   // Oliver's EXTRA CHALLENGE: enemies get 3x HP per level
   const isChallenge = player.settings.oliverChallenge;
@@ -127,8 +145,16 @@ export async function battleScreen(
   }
 
   // Use challenge name during combat if available
-  const displayName = isChallenge && enemyDef.challengeName ? enemyDef.challengeName : enemyName;
-  const nameClass = isChallenge && enemyDef.challengeName ? "t-purple" : "t-magenta";
+  const displayName = isBoss
+    ? enemyName
+    : isChallenge && enemyDef.challengeName
+    ? enemyDef.challengeName
+    : enemyName;
+  const nameClass = isBoss
+    ? "t-red"
+    : isChallenge && enemyDef.challengeName
+    ? "t-purple"
+    : "t-magenta";
   enemyRobot.name = displayName;
 
   const fightNumber = player.fights + 1;
@@ -216,7 +242,8 @@ export async function battleScreen(
     const restocked = restockConsumables(state, battle.player.consumablesUsed);
 
     // Track defeated enemies (not in sandbox — badges are a normal-mode reward)
-    if (player.settings.mode !== "sandbox") {
+    // Boss doesn't count toward defeated-enemies totals
+    if (player.settings.mode !== "sandbox" && !isBoss) {
       if (!player.defeatedEnemies.includes(enemyName)) {
         player.defeatedEnemies.push(enemyName);
       }
@@ -243,6 +270,8 @@ export async function battleScreen(
           cheatsUsed: player.cheatsUsed,
         });
       }
+      // Generate an end-game boss for this run — replaces any prior boss
+      player.endGameBoss = generateEndGameBossSpec(state.registry, player);
       terminal.clear();
       terminal.printHTML(`
         <div class="title-center" style="min-height:0;margin:24px 0">

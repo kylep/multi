@@ -14,6 +14,13 @@ imgprompt: "a telescope on the left zooming into a star, connected
   by a dotted line to a microscope on the right examining a circuit
   board, flat minimal vector style, dark charcoal background with
   bright accent colors"
+keywords:
+  - ai native sdlc
+  - prd writer agent
+  - design doc for ai agents
+  - ai product development lifecycle
+  - claude code agent pipeline
+  - automated design documents
 ---
 
 I want to go from "vague idea of something neat to build" to

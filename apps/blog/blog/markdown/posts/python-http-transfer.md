@@ -1,6 +1,7 @@
 ---
 title: Transferring files to Windows through Python's SimpleHTTPServer
-summary: Using SimpleHTTPServer to transfer files to Windows without a file-share or SCP
+summary: Push a one-off file to a locked-down Windows box from Linux by hosting it
+  with `python -m SimpleHTTPServer` and grabbing it in Internet Explorer.
 slug: python-http-transfer
 category: systems administration
 tags: Python
@@ -9,6 +10,11 @@ modified: 2020-01-13
 status: published
 image: python.png
 thumbnail: python-thumb.png
+keywords:
+  - python simplehttpserver file transfer
+  - transfer files linux to windows
+  - python http server share files
+  - windows download from linux server
 ---
 
 

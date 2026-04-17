@@ -1,6 +1,7 @@
 ---
 title: Operating OpenStack from Ansible
-summary: Creating instances, volumes, and networks in OpenStack using Ansible
+summary: Automate OpenStack workloads with Ansible os_ modules. Covers auth, projects,
+  users, quotas, networks, volumes, and launching VMs on an existing cloud.
 slug: openstack-ansible
 category: cloud
 tags: OpenStack, Ansible
@@ -9,6 +10,12 @@ modified: 2019-12-03
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - openstack ansible modules tutorial
+  - ansible create openstack instance
+  - openstack automation with ansible
+  - os_server ansible example
+  - openstack networking ansible playbook
 ---
 
 **Assumption:** To avoid dealing with varying OpenStack policy configuration,

@@ -1,6 +1,7 @@
 ---
 title: "OpenStack: Fixing the CLI (python2) error: No module named queue"
-summary: pip install python-openstack does not work without this fix
+summary: "Fix the broken python-openstackclient install on Ubuntu 18.04 by swapping
+  `import queue` for `from multiprocessing import Queue as queue` in the SDK files."
 slug: openstack-fix-cli
 category: cloud
 tags: OpenStack
@@ -9,6 +10,11 @@ modified: 2020-06-25
 status: published
 image: openstack.png
 thumbnail: openstack-thumb.png
+keywords:
+  - openstack cli no module named queue
+  - python-openstackclient import error fix
+  - openstack cli python2 broken
+  - importerror no module named queue openstack
 ---
 
 

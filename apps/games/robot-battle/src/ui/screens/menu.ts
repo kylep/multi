@@ -18,6 +18,7 @@ import {
 } from "../../engine/robot";
 import { createPlayer, getXpToLevel } from "../../engine/state";
 import { applyAllUpgrades } from "../../engine/upgrades";
+import { bossAsEnemy, createBossRobot, generateEndGameBossSpec } from "../../engine/boss";
 import { shopScreen } from "./shop";
 import { upgradesScreen } from "./upgrades";
 import { bankScreen } from "./bank";
@@ -109,6 +110,10 @@ export async function mainMenu(
         newPlayer.settings = oldPlayer.settings;
         newPlayer.repeatableUpgrades = { ...oldPlayer.repeatableUpgrades };
         applyAllUpgrades(newPlayer);
+        // Regenerate end-game boss for the new run if one existed (fresh random name + loadout)
+        if (oldPlayer.endGameBoss) {
+          newPlayer.endGameBoss = generateEndGameBossSpec(state.registry, newPlayer);
+        }
         save?.();
       }
     }
@@ -240,6 +245,15 @@ async function cheatCodeScreen(
       const fact = factsData.cheat_godmode[Math.floor(Math.random() * factsData.cheat_godmode.length)];
       terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Divine Knowledge:</span> <span class="t-dim">${esc(fact)}</span></div>`);
       await terminal.promptContinue(0);
+    } else if (trimmed === "treasure") {
+      player.cheatsUsed = true;
+      const amount = 1_000_000;
+      player.money += amount;
+      terminal.clear();
+      terminal.printHTML(`<div class="t-yellow t-bold" style="font-size:20px;margin:16px 0">✦ TREASURE! ✦</div>`);
+      terminal.printHTML(`<div class="t-green t-bold" style="font-size:18px">+$${amount.toLocaleString()} added to your wallet!</div>`);
+      terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Treasure tip:</span> <span class="t-dim">Spending money is much more fun than saving it.</span></div>`);
+      await terminal.promptContinue(0);
     } else if (trimmed === "nuclear fission") {
       player.cheatsUsed = true;
       terminal.clear();
@@ -344,15 +358,30 @@ async function fightMenu(terminal: Terminal, state: GameState, sound?: SoundPlay
         labelClass: challengeOn && enemy.challengeName ? "t-purple" : undefined,
       });
     }
+    // End-game boss — only shown once every other enemy has been defeated
+    const allDefeated = player.defeatedEnemies.length >= enemies.length;
+    if (allDefeated && player.endGameBoss) {
+      const boss = player.endGameBoss;
+      choices.push({
+        label: `${boss.name} (Lv.${boss.level})`,
+        value: `__boss__${boss.name}`,
+        subtitle: `[End-Game Boss] Defeat the reckoning.`,
+        labelClass: "t-red",
+      });
+    }
     choices.push({ label: "Back", value: "back", subtitle: "Return to menu" });
 
     const choice = await terminal.promptChoice("", choices, "grid");
 
     if (choice === "back") return;
 
-    const shouldFight = await enemyDetailScreen(terminal, state, choice);
+    let targetEnemyName = choice;
+    if (choice.startsWith("__boss__")) {
+      targetEnemyName = choice.slice("__boss__".length);
+    }
+    const shouldFight = await enemyDetailScreen(terminal, state, targetEnemyName);
     if (shouldFight) {
-      let opponent = choice;
+      let opponent = targetEnemyName;
       while (true) {
         const result = await battleScreen(terminal, state, opponent, sound, storage);
         if (result === "shop") {
@@ -371,13 +400,21 @@ async function enemyDetailScreen(
   enemyName: string,
 ): Promise<boolean> {
   const player = state.player!;
-  const enemyDef = state.registry.enemies.get(enemyName)!;
+  const isBoss = player.endGameBoss !== null && enemyName === player.endGameBoss.name;
+  const enemyDef: Enemy = isBoss
+    ? bossAsEnemy(player.endGameBoss!)
+    : state.registry.enemies.get(enemyName)!;
 
   while (true) {
-    const bot = state.registry.createEnemyRobot(enemyName);
+    const bot = isBoss
+      ? createBossRobot(state.registry, player.endGameBoss!, player.newGamePlusLevel)
+      : state.registry.createEnemyRobot(enemyName);
     if (!bot) return false;
 
-    if (player.settings.oliverChallenge) {
+    // Scale enemy level bonuses to player NG+ for preview
+    bot.newGamePlusLevel = player.newGamePlusLevel;
+
+    if (player.settings.oliverChallenge && !isBoss) {
       bot.maxHealth += bot.level * 4;
     }
 
@@ -400,8 +437,16 @@ async function enemyDetailScreen(
 
     const challengeLabel = player.settings.oliverChallenge ? "Challenge: ON" : "Challenge: OFF";
     const isChallenge = player.settings.oliverChallenge;
-    const displayName = isChallenge && enemyDef.challengeName ? enemyDef.challengeName : enemyName;
-    const nameClass = isChallenge && enemyDef.challengeName ? "t-purple" : "t-yellow";
+    const displayName = isBoss
+      ? enemyName
+      : isChallenge && enemyDef.challengeName
+      ? enemyDef.challengeName
+      : enemyName;
+    const nameClass = isBoss
+      ? "t-red"
+      : isChallenge && enemyDef.challengeName
+      ? "t-purple"
+      : "t-yellow";
 
     terminal.clear();
     terminal.printHTML(`
@@ -441,6 +486,20 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.13.0", date: "2026-04-10", notes: [
+      "Level scaling: every level grants +1 Accuracy, +1 Dodge, +1 Defence, +1 Attack, +2 HP",
+      "New Game + bonus: +1 to every level bonus (incl. HP) per NG+ round — applies to enemies too",
+      "Repeatable upgrades: new '+5 Max Energy' repeatable",
+      "Repeatable upgrades: new '+3 Attack II' premium repeatable at 10× cost",
+      "Repeatable upgrades now buy in bulk — choose the quantity, up to what you can afford",
+      "Repeatable upgrade costs: added +2% compounding per level on top of the flat increase",
+      "End-Game Boss: on every 100% Challenge completion, a random boss is generated — sum of your net worth × 1.25 in repeatables, best items, red name, goofy random names",
+      "Boss regenerates on New Game + (fresh name, fresh loadout)",
+      "Boss only appears in the Fight menu once every other enemy is defeated",
+      "New cheat code: 'treasure' grants +$1,000,000",
+    ],
+  },
   {
     version: "0.12.0", date: "2026-04-08", notes: [
       "Victory facts: random 'Did you know?' after every win (154 facts)",

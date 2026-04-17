@@ -1,6 +1,7 @@
 ---
 title: Local Pelican Development Environment
-summary: How to set up a Docker-based local development environment for Pelican static sites.
+summary: Preview Pelican markdown changes live in a persistent Docker container with
+  content, config, and theme mounts plus auto-regeneration on save.
 slug: pelican-dev-environment
 category: development
 tags: Pelican, Docker
@@ -9,6 +10,11 @@ modified: 2019-08-04
 status: published
 image: gear.png
 thumbnail: gear-thumb.png
+keywords:
+  - pelican local development docker
+  - pelican static site preview
+  - pelican autoreload dev server
+  - pelican docker container setup
 ---
 
 

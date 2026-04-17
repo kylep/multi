@@ -49,6 +49,7 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     godMode: false,
     newGamePlusLevel: 0,
     titanDefeated: false,
+    endGameBoss: null,
     ...overrides,
   };
 }

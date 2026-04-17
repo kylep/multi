@@ -1,6 +1,6 @@
 ---
 title: AWS Lambda - Basics
-summary: Basics of creating a simple API-driven AWS Lambda function
+summary: Create your first AWS Lambda function in Python, define a test event, and understand pricing per request and per GB-second of execution duration.
 slug: aws-lambda
 category: cloud
 tags: AWS, Lambda
@@ -9,6 +9,12 @@ modified: 2020-01-08
 status: published
 image: aws-lambda.png
 thumbnail: aws-lambda-thumb.png
+keywords:
+  - aws lambda tutorial python
+  - create lambda function hello world
+  - aws lambda api gateway setup
+  - lambda function basics
+  - aws serverless function example
 ---
 
 This post covers the basics of using AWS Lambda functions.

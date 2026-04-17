@@ -1,7 +1,8 @@
 ---
 title: "Writing My Own OpenClaw Skill for Linear"
-summary: Building a custom Linear skill for OpenClaw instead
-  of trusting the public skill marketplace.
+summary: Writing an auditable Linear skill for OpenClaw after the ClawHavoc
+  attack poisoned ClawHub, using curl and Linear's GraphQL API instead of a
+  marketplace skill.
 slug: openclaw-linear-skill
 category: dev
 tags: openclaw, Linear, security, AI, self-hosted
@@ -13,6 +14,13 @@ thumbnail: openclaw-linear-skill-thumb.png
 imgprompt: A cute cartoon lobster holding a clipboard with
   checkboxes, standing next to a small kanban board with
   colorful sticky notes, cozy flat illustration style
+keywords:
+  - openclaw custom skill tutorial
+  - linear graphql api skill
+  - clawhavoc malicious skills
+  - build your own openclaw skill
+  - ai agent linear integration
+  - self-hosted ai agent security
 ---
 
 

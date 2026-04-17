@@ -1,6 +1,8 @@
 ---
 title: "OpenRouter for Claude Code, OpenCode, and OpenClaw"
-summary: Configuring OpenRouter to be where all my tools go for tokens and making a custom MCP server for it
+summary: Routing Claude Code, OpenCode, and OpenClaw through one OpenRouter API
+  key for unified billing, swapping in Gemini via env vars, plus a custom MCP
+  server.
 slug: openrouter-ai-tools
 category: dev
 tags: openrouter, Claude-Code, opencode, openclaw, AI, mcp
@@ -13,6 +15,14 @@ imgprompt: A friendly cartoon octopus wearing glasses,
   each tentacle holding a different glowing tool or cable,
   plugging them all into a single glowing hub, cozy flat
   illustration style with a soft gradient background
+keywords:
+  - openrouter claude code setup
+  - openrouter api key configuration
+  - unified ai billing openrouter
+  - openrouter opencode openclaw
+  - claude code through openrouter
+  - ai model pricing comparison
+  - custom mcp server openrouter
 ---
 
 

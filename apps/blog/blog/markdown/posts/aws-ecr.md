@@ -1,6 +1,6 @@
 ---
 title: AWS ECR - Elastic Container Registry - Basics
-summary: Creating and operating a Docker registry on AWS with custom users
+summary: Set up an AWS Elastic Container Registry repo, create least-privilege IAM groups for push and pull access, and connect Docker using the AWS CLI.
 slug: aws-ecr
 category: cloud
 tags: AWS, Docker
@@ -9,6 +9,12 @@ modified: 2019-09-19
 status: published
 image: aws-ecr.png
 thumbnail: aws-ecr-thumb.png
+keywords:
+  - aws ecr setup guide
+  - elastic container registry docker
+  - push docker image to ecr
+  - aws ecr iam permissions
+  - docker login ecr cli
 ---
 
 

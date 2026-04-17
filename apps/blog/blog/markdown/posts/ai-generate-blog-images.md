@@ -1,6 +1,6 @@
 ---
 title: Automating Blog Images with OpenAI
-summary: Using Codex and DALL·E to create blog title art on the fly
+summary: How this blog auto-generates post thumbnails at build time using OpenAI's DALL-E 3 API, gpt-4o-mini for prompts, and Sharp for 70x70 resizing.
 slug: ai-generated-blog-images
 category: ai
 tags: AI, OpenAI, Blog
@@ -9,6 +9,12 @@ modified: 2026-01-01
 status: published
 image: ai-generated-blog-images.png
 thumbnail: ai-generated-blog-images-thumb.png
+keywords:
+  - automate blog images with ai
+  - dall-e api blog images
+  - openai image generation
+  - automated thumbnail generation
+  - next.js build pipeline images
 ---
 
 Making blog thumbnails and images is tedious. I don't want to fight with Gimp or whatever and I don't think anyone cares what the image really is. 

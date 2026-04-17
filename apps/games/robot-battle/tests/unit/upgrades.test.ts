@@ -41,6 +41,7 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     godMode: false,
     newGamePlusLevel: 0,
     titanDefeated: false,
+    endGameBoss: null,
     ...overrides,
   };
 }
@@ -185,11 +186,13 @@ describe("repeatable upgrades", () => {
     expect(allNormalUpgradesPurchased(player)).toBe(true);
   });
 
-  it("cost increases linearly per level", () => {
+  it("cost increases non-linearly per level (flat + 2% compounding)", () => {
     const repHp = listRepeatableUpgrades().find((r) => r.id === "rep-hp")!;
     expect(getRepeatableUpgradeCost(repHp, 0)).toBe(2000);
-    expect(getRepeatableUpgradeCost(repHp, 1)).toBe(3000);
-    expect(getRepeatableUpgradeCost(repHp, 10)).toBe(12000);
+    // Level 1: (2000 + 1000) * 1.02 = 3060
+    expect(getRepeatableUpgradeCost(repHp, 1)).toBe(3060);
+    // Level 10: (2000 + 10000) * 1.02^10 ≈ 14627
+    expect(getRepeatableUpgradeCost(repHp, 10)).toBe(Math.floor(12000 * Math.pow(1.02, 10)));
   });
 
   it("cannot buy repeatable without all normal upgrades (non-sandbox)", () => {

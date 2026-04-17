@@ -1,6 +1,8 @@
 ---
 title: "Linear MCP: Planning with Robots"
-summary: Connecting AI coding tools directly to Linear so AI can pull tasks in
+summary: Wiring Linear's official MCP server into Claude Code via OAuth, then
+  designing a nightly ideation agent that files Backlog suggestions gated by
+  issue status.
 slug: linear-mcp
 category: ai
 tags: Linear, MCP, Claude-Code, Cursor, AI
@@ -10,6 +12,13 @@ status: published
 image: linear-mcp.png
 thumbnail: linear-mcp-thumb.png
 imgprompt: The Linear Logo; a blue circle, top-right-half solid blue, bott-left-half the same blue but striped with 3 black diagonal lines along the lower left half oriented from top-left to bottom-right
+keywords:
+  - linear mcp server setup
+  - ai agent project management
+  - claude code linear integration
+  - nightly ai agent automation
+  - linear api ai workflow
+  - mcp server oauth
 ---
 
 

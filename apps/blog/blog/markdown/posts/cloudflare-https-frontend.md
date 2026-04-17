@@ -1,6 +1,6 @@
 ---
 title: CloudFlare HTTPS CDN
-summary: Using Cloudflare to provide HTTPS to an HTTP static site
+summary: Put HTTPS in front of an HTTP-only static site like Google Cloud Storage using Cloudflare's Flexible SSL mode and the Always Use HTTPS redirect.
 slug: cloudflare-https
 category: development
 tags: cloudflare
@@ -9,6 +9,12 @@ modified: 2019-12-02
 status: published
 image: Cloudflare.png
 thumbnail: Cloudflare-thumb.png
+keywords:
+  - cloudflare free https
+  - add https to static site
+  - cloudflare flexible ssl setup
+  - cloudflare always use https
+  - https for google cloud storage site
 ---
 
 

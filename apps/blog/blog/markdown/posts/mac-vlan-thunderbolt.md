@@ -1,6 +1,8 @@
 ---
 title: VLAN Tagging Mac Thunderbolt NIC IP Traffic
-summary: Configuring the external Thunderbolt MAC NIC to encapsulate its traffic in a VLAN
+summary: Click-by-click steps for adding an 802.1Q VLAN tag to a Thunderbolt
+  Ethernet adapter on macOS so you can plug a MacBook into a switch's trunk
+  port for testing.
 slug: mac-vlan-thunderbolt
 category: systems administration
 tags: Mac OS
@@ -9,6 +11,12 @@ modified: 2020-07-23
 status: published
 image: mac.png
 thumbnail: mac-thumb.png
+keywords:
+  - mac vlan tagging thunderbolt ethernet
+  - macos vlan configuration
+  - trunk port macbook testing
+  - virtual interface mac network
+  - 802.1q vlan tag macos
 ---
 
 

@@ -1,6 +1,6 @@
 ---
 title: Error Messages, Codes, & Stack Traces
-summary: Error's I've seen and how I fixed them, if I fixed them.
+summary: A running reference of error messages I've hit and the fixes that worked. Includes Docker D-Bus login, Ceph OSD memory, Chrome cert errors, and AWS ECR NTP.
 slug: errors
 category: reference pages
 tags: AWS, Pure Storage, Mac OS
@@ -9,6 +9,12 @@ modified: 2020-08-13
 status: published
 image: error.png
 thumbnail: error-thumb.png
+keywords:
+  - docker login error dbus
+  - ceph osd memory leak
+  - chrome err cert revoked localhost
+  - aws ecr get-login ntp error
+  - mac paste weird characters fix
 ---
 
 

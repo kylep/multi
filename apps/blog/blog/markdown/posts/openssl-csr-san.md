@@ -1,6 +1,8 @@
 ---
 title: Creating a CSR with a SAN - openssl
-summary: Certs aren't valid without SubjectAltName (SANs) now, openssl makes it hard
+summary: Fixing ERR_CERT_COMMON_NAME_INVALID by generating an openssl CSR with
+  Subject Alternative Names, using a reusable san.ini config file and openssl
+  req.
 slug: openssl-csr-san
 category: systems administration
 tags: https, openssl
@@ -9,6 +11,12 @@ modified: 2020-10-20
 status: published
 image: openssl-csr-san.png
 thumbnail: openssl-csr-san-thumb.png
+keywords:
+  - openssl csr with san
+  - subject alternative name certificate
+  - err_cert_common_name_invalid fix
+  - openssl san config file
+  - generate csr with subjectaltname
 ---
 
 
