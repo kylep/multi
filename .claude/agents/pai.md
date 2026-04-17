@@ -4,7 +4,7 @@ description: >-
   Pai -- Executive assistant and orchestration agent. Use for Discord
   communication, wiki coordination entries, and delegating work to
   other agents via the pai branch.
-model: haiku
+model: sonnet
 tools:
   - Read
   - Glob

@@ -18,7 +18,7 @@ repos:
     - id: semgrep
       name: Semgrep
       description: Static analysis on changed files (1 min timeout).
-      entry: bash -c 'FAIL=0; for f in "$@"; do docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-security-toolkit-1:0.2 -c "timeout 60 semgrep scan --config auto --error -j 1 /workspace/$f"; rc=$?; if [ $rc -eq 1 ]; then FAIL=1; fi; done; exit $FAIL' --
+      entry: bash -c 'FAIL=0; for f in "$@"; do timeout 60 semgrep scan --config auto --error -j 1 "$f"; rc=$?; if [ $rc -eq 1 ]; then FAIL=1; fi; done; exit $FAIL' --
       language: system
       stages: ["pre-commit", "pre-push"]
       types_or: [javascript, ts, jsx, tsx, python]

@@ -29,6 +29,7 @@
       - helmfile
       - argocd
       - pre-commit
+      - semgrep
       - shellcheck
       - ansible  # keep ansible managed by brew for upgrades
       - cliclick  # native macOS click automation for screenshot MCP
