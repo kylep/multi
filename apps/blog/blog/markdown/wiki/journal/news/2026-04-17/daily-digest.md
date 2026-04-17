@@ -43,3 +43,33 @@ last_verified: 2026-04-17
 ## Just for You
 
 - [Engadget](https://www.engadget.com/ai/openais-latest-codex-update-builds-the-groundwork-for-its-upcoming-super-app-170000019.html) The Codex update's computer-use and memory features are framed internally as groundwork for an upcoming OpenAI "super app" combining coding, browsing, and personal context in one agent shell.
+
+---
+
+## Update — 19:00 UTC
+
+## AI Industry
+
+- [The Decoder](https://the-decoder.com/openais-leaked-memo-says-new-spud-model-will-make-all-its-products-significantly-better/) An internal OpenAI memo leaked describing a new model codenamed "Spud" — likely GPT-5.5 — as a major architectural step. President Greg Brockman described it publicly as "two years of research" with frontier-class performance across reasoning and agentic tasks. Pretraining completed around March 24; release expected before end of April.
+
+- [PBS NewsHour](https://www.pbs.org/newshour/nation/openai-focuses-on-business-users-amid-competition-with-rival-anthropic) OpenAI is pivoting sharply toward enterprise: business customers have grown from 20% of revenue when CFO Sarah Friar was hired in 2024 to 40% now, with a target of 50% by end of 2026. The shift is framed as a direct response to Anthropic's enterprise gains.
+
+## AI Tooling
+
+- [GitHub Blog](https://github.blog/ai-and-ml/github-copilot/meet-the-github-mcp-registry-the-fastest-way-to-discover-mcp-servers/) GitHub launched the MCP Registry in public preview — a curated index of MCP servers discoverable directly from Copilot Chat and Copilot CLI. Copilot CLI v1.0.25 adds guided MCP server installation from the registry with in-CLI configuration.
+
+- [Microsoft AI](https://microsoft.ai/news/introducing-copilot-health/) Microsoft launched Copilot Health — a separate, secure space within Microsoft Copilot that surfaces personalized health insights from user data, targeting preventive care and medical context management.
+
+## Open Source
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/nvidia-debuts-nemotron-3-family-of-open-models) NVIDIA released Nemotron 3 Super, a 120B-parameter open-weight model with 12B active parameters targeting agentic AI workloads. Trained on 10 trillion tokens of published open data; available on Hugging Face, OpenRouter, and build.nvidia.com. Integrations ship day one for CodeRabbit, Factory, and Greptile.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/three-microsoft-defender-zero-days.html) Three Windows Defender zero-days disclosed in April — BlueHammer, RedSun, and UnDefend — are now actively exploited. BlueHammer (CVE-2026-33825, LPE via TOCTOU race) was patched in April Patch Tuesday; RedSun and UnDefend remain unpatched with public PoC available since April 16.
+
+- [The Hacker News](https://thehackernews.com/2026/04/nist-limits-cve-enrichment-after-263.html) NIST announced NVD will now enrich only CVEs in CISA's KEV catalog, federally-used software, or software critical under EO 14028. All backlogged CVEs predating March 1, 2026 move to "Not Scheduled." CVE submissions rose 263% between 2020 and 2025.
+
+## Just for You
+
+- [Releasebot](https://releasebot.io/updates/github/copilot-cli) GitHub Copilot CLI v1.0.25 (April 13) adds guided MCP server installation from the new GitHub MCP Registry, remote session control, and richer session/environment tooling — a meaningful workflow change for developers building with MCP.
