@@ -79,6 +79,15 @@ The script posts to `com.atproto.server.createSession` once per run
 to exchange handle + app-password for a short-lived `accessJwt`, then
 to `com.atproto.repo.createRecord` for each new post. No SDK needed.
 
+### Bot self-label
+
+On every run, after login and before posting, the script ensures the
+account profile carries the `bot` self-label via `getRecord` +
+`putRecord` on `app.bsky.actor.profile`. Idempotent — if the label
+is already there, it's a single GET and no writes. If the profile
+doesn't exist yet, it's created with just the label. Bluesky's UI
+does not expose a toggle for this; it's a profile record write.
+
 ### Vault secrets
 
 Store at `secret/ai-agents/bluesky`:
@@ -101,10 +110,10 @@ Every 15 minutes, matching the Twitter job. RSS polling is cheap.
    ```
    vault kv put secret/ai-agents/bluesky handle=... app_password=...
    ```
-4. Mark the bot account as automated in its Bluesky profile bio, and
-   consider adding a self-label so moderation tools can see it's a
-   bot (Bluesky's "Labels" → "Bot").
-5. Enable in `infra/ai-agents/environments/pai-m1.yaml`:
+   (The helm template exports these as `BLUESKY_HANDLE` and
+   `BLUESKY_APP_PASS`.) The bot self-label is applied automatically
+   on every run — no UI step needed.
+4. Enable in `infra/ai-agents/environments/pai-m1.yaml`:
    ```yaml
    cronjobs:
      blueskyRss:

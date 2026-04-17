@@ -45,6 +45,70 @@ def login(handle, app_password):
     return {"access_jwt": data["accessJwt"], "did": data["did"]}
 
 
+def ensure_bot_label(session):
+    """Idempotent: make sure the account profile carries the `bot` self-label.
+
+    Runs on every invocation; if the label is already present it's a no-op
+    (one GET, no writes). If the profile doesn't exist yet (404), creates a
+    minimal profile with just the label.
+    """
+    auth = {"Authorization": f"Bearer {session['access_jwt']}"}
+    params = {
+        "repo": session["did"],
+        "collection": "app.bsky.actor.profile",
+        "rkey": "self",
+    }
+    r = requests.get(
+        f"{PDS_URL}/xrpc/com.atproto.repo.getRecord",
+        params=params,
+        headers=auth,
+        timeout=15,
+    )
+    if r.status_code == 404:
+        record = {}
+        existing_cid = None
+    elif r.status_code == 200:
+        data = r.json()
+        record = dict(data.get("value") or {})
+        existing_cid = data.get("cid")
+    else:
+        print(f"  Profile fetch failed: {r.status_code} {r.text}", file=sys.stderr)
+        return False
+
+    labels = record.get("labels") or {}
+    values = list(labels.get("values") or []) if isinstance(labels, dict) else []
+    if any(isinstance(v, dict) and v.get("val") == "bot" for v in values):
+        return True
+
+    values.append({"val": "bot"})
+    record["$type"] = "app.bsky.actor.profile"
+    record["labels"] = {
+        "$type": "com.atproto.label.defs#selfLabels",
+        "values": values,
+    }
+
+    body = {
+        "repo": session["did"],
+        "collection": "app.bsky.actor.profile",
+        "rkey": "self",
+        "record": record,
+    }
+    if existing_cid:
+        body["swapRecord"] = existing_cid
+
+    r = requests.post(
+        f"{PDS_URL}/xrpc/com.atproto.repo.putRecord",
+        headers=auth,
+        json=body,
+        timeout=15,
+    )
+    if r.status_code == 200:
+        print("  Set `bot` self-label on profile")
+        return True
+    print(f"  putRecord (self-label) failed: {r.status_code} {r.text}", file=sys.stderr)
+    return False
+
+
 def format_post_text(item):
     """Build the post body. The external embed carries the link,
     so don't repeat the URL in the text."""
@@ -120,8 +184,9 @@ def main():
     session = None
     if not DRY_RUN:
         handle = os.environ["BLUESKY_HANDLE"]
-        app_password = os.environ["BLUESKY_APP_PASSWORD"]
+        app_password = os.environ["BLUESKY_APP_PASS"]
         session = login(handle, app_password)
+        ensure_bot_label(session)
 
     for item in new_items:
         text = format_post_text(item)
