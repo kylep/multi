@@ -33,6 +33,9 @@ cronjobs:
   autolearn:
     enabled: false
     schedule: "*/10 * * * *"  # every 10 min (suspended — was starving other cronjobs)
+  blueskyRss:
+    enabled: true
+    schedule: "*/15 * * * *"  # every 15 min
   seoBot:
     enabled: true
     schedule: "0 3 * * *"   # 11:00 PM EDT (03:00 UTC)

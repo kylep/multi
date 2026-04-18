@@ -6,16 +6,15 @@ Uses OAuth 1.0a for X API v2.
 """
 import os
 import sys
-import xml.etree.ElementTree as ET
-from pathlib import Path
-from urllib.parse import urlencode, urlparse, urlunparse, parse_qs
 
 import requests
 from requests_oauthlib import OAuth1
 
+from crosspost_common import add_utm, load_posted, parse_feed, save_posted
+
 # --- Config ---
 RSS_URL = os.environ.get("RSS_URL", "https://kyle.pericak.com/feed.xml")
-STATE_FILE = Path(os.environ.get("STATE_FILE", "/cache/posted-guids"))
+STATE_FILE = os.environ.get("STATE_FILE", "/cache/posted-guids")
 DRY_RUN = "--dry-run" in sys.argv
 
 UTM_PARAMS = {
@@ -39,53 +38,12 @@ def get_oauth():
     )
 
 
-def add_utm(url):
-    parsed = urlparse(url)
-    params = parse_qs(parsed.query)
-    params.update(UTM_PARAMS)
-    new_query = urlencode(params, doseq=True)
-    return urlunparse(parsed._replace(query=new_query))
-
-
-def load_posted():
-    if STATE_FILE.exists():
-        return set(STATE_FILE.read_text().strip().splitlines())
-    return set()
-
-
-def save_posted(guids):
-    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    STATE_FILE.write_text("\n".join(sorted(guids)) + "\n")
-
-
-def parse_feed(url):
-    resp = requests.get(url, timeout=15)
-    resp.raise_for_status()
-    root = ET.fromstring(resp.text)
-    items = []
-    for item in root.findall(".//item"):
-        guid = item.findtext("guid", "").strip()
-        title = item.findtext("title", "").strip()
-        link = item.findtext("link", "").strip()
-        desc = item.findtext("description", "").strip()
-        tags = [c.text.strip() for c in item.findall("category") if c.text]
-        if guid and title and link:
-            items.append({
-                "guid": guid,
-                "title": title,
-                "link": link,
-                "description": desc,
-                "tags": tags,
-            })
-    return items
-
-
 def format_tweet(item):
     title = item["title"]
     # Strip @ from titles — tweets starting with @ are hidden as replies
     title = title.replace("@", "")
     desc = item["description"]
-    link = add_utm(item["link"])
+    link = add_utm(item["link"], UTM_PARAMS)
 
     # Use post tags as hashtags (skip generic category like "dev", "cloud")
     skip = {"dev", "cloud", "development", "systems administration", "reference pages"}
@@ -127,7 +85,7 @@ def post_tweet(text, auth):
 
 
 def main():
-    posted = load_posted()
+    posted = load_posted(STATE_FILE)
     items = parse_feed(RSS_URL)
     new_items = [i for i in items if i["guid"] not in posted]
 
@@ -151,7 +109,7 @@ def main():
             if post_tweet(tweet, auth):
                 posted.add(item["guid"])
 
-    save_posted(posted)
+    save_posted(STATE_FILE, posted)
     print(f"\nDone. {len(posted)} total posts tracked.")
 
 

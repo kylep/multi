@@ -5,8 +5,10 @@ kyle.pericak.com to external platforms.
 
 ## Channels
 
-- [X/Twitter Auto-Post (PER-26)](x-twitter-auto-post.md) — planned
-- Dev.to RSS Syndication (PER-24) — backlog
+- [X/Twitter Auto-Post (PER-26)](x-twitter-auto-post.md) — built, disabled
+- [Bluesky Auto-Post (PER-67)](bluesky-auto-post.md) — built, disabled
+- Mastodon Auto-Post (PER-68) — backlog
+- Dev.to Crosspost w/ canonical URL (PER-69) — backlog
 - Hashnode Cross-Post (PER-25) — backlog
 - Substack Cross-Post (PER-23) — backlog
 - Reddit / Subreddit (PER-28) — backlog

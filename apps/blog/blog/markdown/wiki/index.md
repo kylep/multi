@@ -33,3 +33,4 @@ git history.
 - [Design Docs](/wiki/design-docs.html) — Technical design documents for system architecture decisions
 - [PRDs](/wiki/prds.html) — Product requirement documents for planned features
 - [Games](/wiki/games.html) — Browser games built by Kyle and kids
+- [Apps](/wiki/apps.html) — Blog, llm-client, cleanup-scan
