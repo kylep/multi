@@ -59,6 +59,12 @@ const About = () => {
                             <Typography variant="body1">Reddit</Typography>
                         </a>
                     </Grid>
+                    <Grid item>
+                        <a href="https://bsky.app/profile/pericak.bsky.social" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <img src="/images/Bluesky.png" alt="Bluesky" className="social-button" />
+                            <Typography variant="body1">Bluesky</Typography>
+                        </a>
+                    </Grid>
                 </Grid>
             </Box>
             <hr />
