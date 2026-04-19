@@ -9,6 +9,7 @@ modified: 2020-01-13
 status: published
 image: LetsEncrypt.png
 thumbnail: LetsEncrypt-thumb.png
+description: "Install certbot on Ubuntu and get a free LetsEncrypt SSL certificate. Uses the standalone HTTP challenge and includes HAProxy certificate formatting."
 keywords:
   - letsencrypt certbot tutorial
   - free https certificate
