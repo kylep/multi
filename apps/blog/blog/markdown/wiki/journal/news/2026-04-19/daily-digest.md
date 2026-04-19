@@ -35,3 +35,25 @@ last_verified: 2026-04-19
 ## Just for You
 
 - [GitHub Security Advisory](https://github.com/advisories/GHSA-v38x-c887-992f) A remote code execution vulnerability was disclosed April 18 in Flowise, the popular open-source AI agent and workflow builder. The Airtable Agent component is vulnerable to code injection via unsanitized user input. No patch version cited in initial disclosure; Flowise users should check the advisory and monitor for an update.
+
+---
+
+## Update — 14:30 UTC
+
+## AI Tooling
+
+- [Lushbinary / Cloudflare Blog](https://lushbinary.com/blog/cloudflare-agents-week-2026-everything-released/) Cloudflare Agents Week 2026 shipped a broad set of releases: Dynamic Workers for millisecond code execution (100× faster than containers, open beta), Sandboxes GA with identity-aware authentication, Browser Run with Human-in-the-Loop support, AI Gateway providing unified access to 70+ models across 12+ providers, MCP Code Mode cutting token use by 81% versus standard MCP server implementations, and Shadow MCP Detection to identify unauthorized MCP server connections.
+
+- [Releasebot](https://releasebot.io/updates/openai/chatgpt) OpenAI began rolling out ads on April 16 to Free and Go tier users in Australia, New Zealand, and Canada. Pro, Business, Enterprise, and Education plan subscribers remain ad-free.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/microsoft-issues-patches-for-sharepoint.html) Microsoft's April 2026 Patch Tuesday patched 169 vulnerabilities, the second-largest monthly release on record. CVE-2026-32201, a SharePoint spoofing flaw already exploited in the wild, was added to CISA's Known Exploited Vulnerabilities catalog with a federal patch deadline of April 28. A separate Windows IKE Service Extensions flaw (CVE-2026-33824, CVSS 9.8) allows unauthenticated remote code execution via crafted packets.
+
+## Geopolitics
+
+- [Euronews](https://www.euronews.com/my-europe/2026/04/19/bulgaria-exit-polls-former-president-rumen-radev-set-to-win-parliamentary-vote) Bulgaria held its eighth snap election in five years. Exit polls give former President Radev's Progressive Bulgaria coalition 43–45%, far ahead of incumbent GERB at 13%. Radev has opposed military aid to Ukraine and has said Crimea is Russian; official results are expected April 21.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/hamilton/ontario-governance-structure-announcement-9.7151746) Ontario's Better Regional Governance Act grants the province power to appoint regional chairs in Durham, Halton, Peel, Waterloo, York, and Muskoka rather than holding direct elections, reversing Durham residents' 2010 referendum result on the matter.
