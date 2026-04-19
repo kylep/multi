@@ -7,6 +7,11 @@ export interface Message {
   role: ChatRole;
   content: string;
   createdAt: number;
+  /** Real input token count for the request that produced this message
+   *  (assistant only — the server's prompt_tokens). */
+  promptTokens?: number;
+  /** Real output token count for this message (assistant only). */
+  completionTokens?: number;
 }
 
 export interface Chat {
@@ -38,6 +43,15 @@ export interface ChatStore {
     msg: Omit<Message, "id" | "createdAt">,
   ): string;
   appendToLastMessage(chatId: string, delta: string): void;
+  setMessageUsage(
+    chatId: string,
+    messageId: string,
+    promptTokens: number,
+    completionTokens: number,
+  ): void;
+  /** Remove messages[fromIdx..toIdx] inclusive. Used by compaction to delete
+   *  the messages that were folded into the story-so-far. */
+  dropMessagesInRange(chatId: string, fromIdx: number, toIdx: number): void;
   setSummary(chatId: string, summary: string): void;
   setStreaming(streaming: StreamingState | null): void;
 }
@@ -141,6 +155,50 @@ export const useChatStore = create<ChatStore>()(
           };
         });
         return id;
+      },
+
+      dropMessagesInRange(chatId, fromIdx, toIdx) {
+        set((s) => {
+          const chat = s.chats[chatId];
+          if (!chat) return s;
+          if (
+            fromIdx < 0 ||
+            toIdx < fromIdx ||
+            toIdx >= chat.messages.length
+          ) {
+            return s;
+          }
+          const before = chat.messages.slice(0, fromIdx);
+          const after = chat.messages.slice(toIdx + 1);
+          const messages = [...before, ...after];
+          return {
+            chats: {
+              ...s.chats,
+              [chatId]: { ...chat, messages, updatedAt: Date.now() },
+            },
+          };
+        });
+      },
+
+      setMessageUsage(chatId, messageId, promptTokens, completionTokens) {
+        set((s) => {
+          const chat = s.chats[chatId];
+          if (!chat) return s;
+          const idx = chat.messages.findIndex((m) => m.id === messageId);
+          if (idx < 0) return s;
+          const messages = chat.messages.slice();
+          messages[idx] = {
+            ...messages[idx],
+            promptTokens,
+            completionTokens,
+          };
+          return {
+            chats: {
+              ...s.chats,
+              [chatId]: { ...chat, messages, updatedAt: Date.now() },
+            },
+          };
+        });
       },
 
       appendToLastMessage(chatId, delta) {

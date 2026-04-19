@@ -7,6 +7,7 @@ import {
   effectiveMaxTokens,
   INPUT_BUDGET,
   PER_SLOT_CTX,
+  planCompaction,
   previewContext,
   REPLY_BUDGET,
   SAFETY,
@@ -220,13 +221,83 @@ describe("previewContext", () => {
     expect(preview.usedPercent).toBeLessThanOrEqual(100);
   });
 
-  it("respects summaryBudgetPct cap", () => {
-    const history = makeHistory(3);
-    const preview = previewContext(history, "", {
-      inputBudget: 1000,
-      summary: "x".repeat(4000),
-      summaryBudgetPct: 10,
+});
+
+describe("planCompaction", () => {
+  it("targets half of current usage", () => {
+    const history = makeHistory(30, (i) => `msg ${i} ` + "x".repeat(200));
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    // target should be ~= currentUsedTokens / 2
+    expect(plan.targetTokens).toBeGreaterThan(0);
+    expect(plan.targetTokens).toBeLessThanOrEqual(plan.currentUsedTokens);
+    expect(Math.abs(plan.targetTokens - Math.floor(plan.currentUsedTokens / 2))).toBeLessThanOrEqual(200);
+  });
+
+  it("compacts oldest non-anchored messages, leaves recent ones kept", () => {
+    const history = makeHistory(30, (i) => `msg ${i} ` + "x".repeat(200));
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    expect(plan.messagesToCompact.length).toBeGreaterThan(0);
+    // First compacted item is the earliest non-anchor, i.e. index 1.
+    expect(plan.messagesToCompact[0].content).toContain("msg 1");
+    // First user message (anchor) is never compacted.
+    for (const m of plan.messagesToCompact) {
+      expect(m.content).not.toBe(history[0].content);
+    }
+  });
+
+  it("no-ops when there is nothing older than the anchor to compact", () => {
+    const history = makeHistory(1);
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    expect(plan.messagesToCompact).toHaveLength(0);
+  });
+
+  it("summary token budget is at least 64", () => {
+    const history = makeHistory(4);
+    const plan = planCompaction(history, { inputBudget: 200 });
+    expect(plan.summaryTokenBudget).toBeGreaterThanOrEqual(64);
+  });
+
+  it("estimated usage after compaction is ≤ target", () => {
+    const history = makeHistory(40, (i) => `msg ${i} ` + "x".repeat(100));
+    const plan = planCompaction(history, { inputBudget: 8000 });
+    expect(plan.estimatedUsedAfter).toBeLessThanOrEqual(plan.targetTokens + 8);
+  });
+
+  it("returns a compactThroughIndex and compacts an even number of messages", () => {
+    const history = makeHistory(30, (i) => `msg ${i} ` + "x".repeat(150));
+    const plan = planCompaction(history, { inputBudget: 3000 });
+    expect(plan.messagesToCompact.length % 2).toBe(0);
+    expect(plan.compactThroughIndex).toBe(plan.messagesToCompact.length);
+  });
+
+  it("removing the compacted block + applying summary actually shrinks the request", () => {
+    // 20 chunky messages simulating a chat near 80% of the input budget.
+    const history = makeHistory(20, (i) => `msg ${i} ` + "x".repeat(200));
+    const before = buildRequestMessages(history, { inputBudget: 10000 });
+    const beforeTokens = estimateMessagesJoined(before.messages);
+
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    expect(plan.messagesToCompact.length).toBeGreaterThan(0);
+
+    // Simulate what runCompaction does: drop history[1..compactThroughIndex],
+    // then build with a summary that fits the summarizer's budget.
+    const remaining = [
+      history[0],
+      ...history.slice(plan.compactThroughIndex + 1),
+    ];
+    const summary = "x".repeat(plan.summaryTokenBudget * 3); // ~0.75 of budget
+    const after = buildRequestMessages(remaining, {
+      inputBudget: 10000,
+      summary,
     });
-    expect(preview.summaryTokens).toBeLessThanOrEqual(100 + 4);
+    const afterTokens = estimateMessagesJoined(after.messages);
+
+    expect(afterTokens).toBeLessThan(beforeTokens);
   });
 });
+
+function estimateMessagesJoined(messages: ChatMessage[]): number {
+  // Rough token count matching the in-app heuristic (chars/4).
+  const joined = messages.map((m) => m.content).join("");
+  return Math.ceil(joined.length / 4);
+}

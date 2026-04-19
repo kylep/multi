@@ -45,7 +45,6 @@ export interface BuildOptions {
   systemPrompt?: string;
   seedPrompt?: string;
   summary?: string;
-  summaryBudgetPct?: number;
 }
 
 export interface BuildResult {
@@ -74,29 +73,16 @@ export function buildRequestMessages(
   const systemPrompt = options.systemPrompt?.trim();
   const seedPrompt = options.seedPrompt?.trim();
   const summary = options.summary?.trim();
-  const summaryBudgetPct = options.summaryBudgetPct ?? 25;
-  const summaryBudgetTokens = Math.floor(
-    (budget * summaryBudgetPct) / 100,
-  );
 
   const systemMsg: ChatMessage | null = systemPrompt
     ? { role: "system", content: systemPrompt }
     : null;
   const systemCost = systemMsg ? estimateTokens(systemMsg.content) + 4 : 0;
 
-  // Summary: truncated to fit within the summary budget.
-  let effectiveSummary = "";
-  let summaryCost = 0;
-  if (summary) {
-    const rawCost = estimateTokens(summary);
-    if (rawCost <= summaryBudgetTokens) {
-      effectiveSummary = summary;
-      summaryCost = rawCost;
-    } else {
-      effectiveSummary = summary.slice(0, summaryBudgetTokens * 4);
-      summaryCost = summaryBudgetTokens;
-    }
-  }
+  // Summary is trusted at face value; it was sized by the summarizer at
+  // compaction time. If it still overshoots budget, tail-drop trims older
+  // chat messages to make room.
+  const effectiveSummary = summary ?? "";
 
   // Seed + summary: both prepended to first user message content.
   // This avoids breaking chat templates that require strict role alternation.
@@ -205,6 +191,121 @@ export function totalTokenEstimate(messages: ChatMessage[]): number {
   return estimateMessagesTokens(messages);
 }
 
+export interface CompactionPlan {
+  messagesToCompact: ChatMessage[];
+  /** Inclusive index of the last message that should be removed from history
+   *  after the summary is written. -1 when nothing is compacted. Caller should
+   *  splice history[1..compactThroughIndex] out of the chat. */
+  compactThroughIndex: number;
+  summaryTokenBudget: number;
+  targetTokens: number;
+  currentUsedTokens: number;
+  estimatedUsedAfter: number;
+}
+
+export interface CompactionPlanOptions {
+  inputBudget: number;
+  systemPrompt?: string;
+  seedPrompt?: string;
+  existingSummary?: string;
+}
+
+/**
+ * Plan compaction: target tokens = current-used / 2. Picks oldest
+ * non-anchored messages to fold into the story-so-far so the rebuilt
+ * request lands near the target. Summary gets up to half of the target
+ * room; the rest is reserved for the most recent messages.
+ */
+export function planCompaction(
+  history: ChatMessage[],
+  options: CompactionPlanOptions,
+): CompactionPlan {
+  const { inputBudget, systemPrompt, seedPrompt, existingSummary } = options;
+
+  const systemCost = systemPrompt?.trim()
+    ? estimateTokens(systemPrompt) + 4
+    : 0;
+  const firstUser =
+    history.length > 0 && history[0].role === "user" ? history[0] : null;
+  const summaryTrimmed = existingSummary?.trim() ?? "";
+  const seedTrimmed = seedPrompt?.trim() ?? "";
+  const firstPrefix =
+    (seedTrimmed ? seedTrimmed + "\n\n" : "") +
+    (summaryTrimmed ? `[Story so far]: ${summaryTrimmed}\n\n` : "");
+  const firstFullContent = firstPrefix + (firstUser?.content ?? "");
+  const firstUserCost = firstUser ? estimateTokens(firstFullContent) + 4 : 0;
+  const baseFixed = systemCost + firstUserCost + 2;
+
+  // Current used tokens = the whole request if sent as-is (no compaction).
+  let recentCost = 0;
+  for (let i = 1; i < history.length; i++) {
+    recentCost += estimateTokens(history[i].content) + 4;
+  }
+  const currentUsedTokens = Math.min(
+    inputBudget,
+    baseFixed + recentCost,
+  );
+
+  // Target: half of current usage, floored so we don't undershoot room for
+  // the model's reply plus the always-anchored first message.
+  const targetTokens = Math.max(baseFixed + 128, Math.floor(currentUsedTokens / 2));
+
+  // Summary gets at most half of the room above baseFixed. The remaining
+  // half is budget for recent messages.
+  const targetRoom = Math.max(0, targetTokens - baseFixed);
+  const summaryTokenBudget = Math.max(64, Math.floor(targetRoom * 0.5));
+  const recentBudget = Math.max(0, targetRoom - summaryTokenBudget);
+
+  const startIdx = firstUser ? 1 : 0;
+  const keptReverse: ChatMessage[] = [];
+  const compactReverse: ChatMessage[] = [];
+  let used = 0;
+  for (let i = history.length - 1; i >= startIdx; i--) {
+    const cost = estimateTokens(history[i].content) + 4;
+    if (used + cost <= recentBudget) {
+      keptReverse.push(history[i]);
+      used += cost;
+    } else {
+      compactReverse.push(history[i]);
+    }
+  }
+  // compactReverse is newest→oldest; the oldest-first ordering is what the
+  // summarizer expects.
+  const compactOldestFirst = compactReverse.slice().reverse();
+
+  // The compacted block is history[startIdx..startIdx + N - 1]. Removing it
+  // must preserve role alternation — msg 0 is a user; the next message left
+  // over after removal also alternates, so the count we remove must be even
+  // (each pair is user+assistant). If we landed on an odd count, leave the
+  // newest-of-compact in history and shorten the block by one.
+  if (compactOldestFirst.length % 2 === 1) {
+    const spared = compactOldestFirst.pop();
+    if (spared) {
+      used += estimateTokens(spared.content) + 4;
+    }
+  }
+
+  const messagesToCompact = compactOldestFirst;
+  const compactThroughIndex =
+    messagesToCompact.length === 0
+      ? -1
+      : startIdx + messagesToCompact.length - 1;
+  const estimatedUsedAfter = baseFixed + summaryTokenBudget + used;
+
+  log.info(
+    `planCompaction: currentUsed=${currentUsedTokens} target=${targetTokens} baseFixed=${baseFixed} summaryBudget=${summaryTokenBudget} recentBudget=${recentBudget} toCompact=${messagesToCompact.length} compactThroughIdx=${compactThroughIndex} kept=${keptReverse.length} estAfter=${estimatedUsedAfter}`,
+  );
+
+  return {
+    messagesToCompact,
+    compactThroughIndex,
+    summaryTokenBudget,
+    targetTokens,
+    currentUsedTokens,
+    estimatedUsedAfter,
+  };
+}
+
 export interface ContextPreview {
   inputBudget: number;
   usedTokens: number;
@@ -223,20 +324,13 @@ export function previewContext(
     systemPrompt?: string;
     seedPrompt?: string;
     summary?: string;
-    summaryBudgetPct?: number;
   },
 ): ContextPreview {
   const systemCost = opts.systemPrompt
     ? estimateTokens(opts.systemPrompt) + 4
     : 0;
   const draftCost = draft ? estimateTokens(draft) + 4 : 0;
-  const summaryBudgetPct = opts.summaryBudgetPct ?? 25;
-  const summaryBudgetTokens = Math.floor(
-    (opts.inputBudget * summaryBudgetPct) / 100,
-  );
-  const summaryTokens = opts.summary
-    ? Math.min(estimateTokens(opts.summary), summaryBudgetTokens)
-    : 0;
+  const summaryTokens = opts.summary ? estimateTokens(opts.summary) : 0;
 
   // Build the combined first-message content (seed + summary + first user msg)
   const hasFirstUser = history.length > 0 && history[0].role === "user";
@@ -245,17 +339,13 @@ export function previewContext(
     firstMsgContent = opts.seedPrompt + "\n\n" + firstMsgContent;
   }
   if (opts.summary && hasFirstUser) {
-    const effectiveSummary =
-      estimateTokens(opts.summary) <= summaryBudgetTokens
-        ? opts.summary
-        : opts.summary.slice(0, summaryBudgetTokens * 4);
     const sep = opts.seedPrompt ? "\n\n" : "";
     firstMsgContent = firstMsgContent.replace(
       history[0].content,
-      `${sep}[Story so far]: ${effectiveSummary}\n\n${history[0].content}`,
+      `${sep}[Story so far]: ${opts.summary}\n\n${history[0].content}`,
     );
     if (!opts.seedPrompt) {
-      firstMsgContent = `[Story so far]: ${effectiveSummary}\n\n${history[0].content}`;
+      firstMsgContent = `[Story so far]: ${opts.summary}\n\n${history[0].content}`;
     }
   }
   const seedCost = hasFirstUser

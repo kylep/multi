@@ -9,6 +9,7 @@ import {
   computeInputBudget,
   computeReplyBudget,
   effectiveMaxTokens,
+  planCompaction,
   previewContext,
 } from "@/lib/context-manager";
 import { estimateTokens } from "@/lib/tokens";
@@ -48,7 +49,7 @@ export function ChatPane() {
   const contextOverride = useSettingsStore((s) => s.contextOverride);
   const replyBudgetOverride = useSettingsStore((s) => s.replyBudgetOverride);
   const autoSummarize = useSettingsStore((s) => s.autoSummarize);
-  const summaryBudgetPct = useSettingsStore((s) => s.summaryBudgetPct);
+  const showTokenCount = useSettingsStore((s) => s.showTokenCount);
   const deduplicateRetry = useSettingsStore((s) => s.deduplicateRetry);
   const temperature = useSettingsStore((s) => s.temperature);
   const colorSupport = useSettingsStore((s) => s.colorSupport);
@@ -103,7 +104,6 @@ export function ChatPane() {
       systemPrompt: effectiveSystemPrompt,
       seedPrompt: effectiveSeedPrompt,
       summary: chat?.summary,
-      summaryBudgetPct,
     });
   }, [
     chat?.messages,
@@ -112,8 +112,25 @@ export function ChatPane() {
     inputBudget,
     effectiveSystemPrompt,
     effectiveSeedPrompt,
-    summaryBudgetPct,
   ]);
+
+  const lastUsage = useMemo(() => {
+    const msgs = chat?.messages ?? [];
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      const m = msgs[i];
+      if (
+        m.role === "assistant" &&
+        typeof m.promptTokens === "number" &&
+        typeof m.completionTokens === "number"
+      ) {
+        return {
+          promptTokens: m.promptTokens,
+          completionTokens: m.completionTokens,
+        };
+      }
+    }
+    return null;
+  }, [chat?.messages]);
 
   const streamingMessageId = useMemo(() => {
     if (!chat || !streaming || streaming.chatId !== chat.id) return null;
@@ -132,6 +149,111 @@ export function ChatPane() {
     [activeChatId, setSummary],
   );
 
+  // Core compaction routine: plan → summarize → (optionally) trim to protect
+  // minReplyTokens. Returns the summary that was written (or null on no-op).
+  const runCompaction = useCallback(
+    async (chatId: string, historyForRequest: ChatMessage[]): Promise<string | null> => {
+      const currentSummary =
+        useChatStore.getState().chats[chatId]?.summary || "";
+
+      const plan = planCompaction(historyForRequest, {
+        inputBudget,
+        systemPrompt: effectiveSystemPrompt,
+        seedPrompt: effectiveSeedPrompt,
+        existingSummary: currentSummary,
+      });
+
+      if (plan.messagesToCompact.length === 0) {
+        log.info("runCompaction: nothing to compact (already at/under target)");
+        return null;
+      }
+
+      log.info(
+        `runCompaction: compacting ${plan.messagesToCompact.length} messages, budget=${plan.summaryTokenBudget}, target=${plan.targetTokens}`,
+      );
+      const newSummary = await summarizeMessages(plan.messagesToCompact, {
+        endpoint,
+        existingSummary: currentSummary || undefined,
+        maxTokens: plan.summaryTokenBudget,
+        tokenBudget: plan.summaryTokenBudget,
+      });
+      if (!newSummary) {
+        log.warn("runCompaction: summarizer returned null");
+        return null;
+      }
+
+      setSummary(chatId, newSummary);
+
+      // Remove the compacted messages from the chat — they've been folded
+      // into the summary, so keeping them in history would double-count.
+      if (plan.compactThroughIndex >= 1) {
+        useChatStore
+          .getState()
+          .dropMessagesInRange(chatId, 1, plan.compactThroughIndex);
+        log.info(
+          `runCompaction: removed history[1..${plan.compactThroughIndex}] from chat`,
+        );
+      }
+
+      // Safety: if the post-compaction build leaves less than minReplyTokens
+      // of reply room, trim the summary so the model can still answer.
+      const latestMessages =
+        useChatStore.getState().chats[chatId]?.messages ?? [];
+      const build = buildRequestMessages(
+        latestMessages.map((m) => ({ role: m.role, content: m.content })),
+        {
+          inputBudget,
+          systemPrompt: effectiveSystemPrompt,
+          seedPrompt: effectiveSeedPrompt,
+          summary: newSummary,
+        },
+      );
+      const usedAfter = estimateTokens(
+        build.messages.map((m) => m.content).join(""),
+      );
+      const replyRoom = effectiveMaxTokens(replyBudget, perSlot, usedAfter);
+      if (replyRoom < minReplyTokens) {
+        const trimmed = newSummary.slice(
+          0,
+          Math.floor(newSummary.length * 0.5),
+        );
+        log.warn(
+          `runCompaction: reply room ${replyRoom} < ${minReplyTokens}, trimming summary to ${trimmed.length} chars`,
+        );
+        setSummary(chatId, trimmed);
+        return trimmed;
+      }
+
+      return newSummary;
+    },
+    [
+      effectiveSeedPrompt,
+      effectiveSystemPrompt,
+      endpoint,
+      inputBudget,
+      minReplyTokens,
+      perSlot,
+      replyBudget,
+      setSummary,
+    ],
+  );
+
+  const handleCompact = useCallback(async () => {
+    if (!activeChatId || compacting || streaming) return;
+    const messages = useChatStore.getState().chats[activeChatId]?.messages;
+    if (!messages || messages.length === 0) return;
+    const historyForRequest = messages.map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+    setCompacting(true);
+    try {
+      await runCompaction(activeChatId, historyForRequest);
+    } finally {
+      setCompacting(false);
+    }
+  }, [activeChatId, compacting, runCompaction, streaming]);
+
   const doSend = useCallback(
     async (chatId: string, historyForRequest: ChatMessage[], tempOverride?: number) => {
       // Cancel any in-flight color pass from a previous turn
@@ -140,78 +262,55 @@ export function ChatPane() {
       const currentSummary =
         useChatStore.getState().chats[chatId]?.summary || "";
 
-      let buildResult = buildRequestMessages(historyForRequest, {
+      let activeHistory = historyForRequest;
+      let buildResult = buildRequestMessages(activeHistory, {
         inputBudget,
         systemPrompt: effectiveSystemPrompt,
         seedPrompt: effectiveSeedPrompt,
         summary: currentSummary,
-        summaryBudgetPct,
       });
 
-      log.info(`doSend: chatId=${chatId} historyLen=${historyForRequest.length} currentSummaryLen=${currentSummary.length}`);
+      log.info(`doSend: chatId=${chatId} historyLen=${activeHistory.length} currentSummaryLen=${currentSummary.length}`);
 
+      const rawTotalTokens = estimateTokens(
+        activeHistory.map((m) => m.content).join(""),
+      );
       const shouldCompact =
         autoSummarize &&
         (buildResult.truncated ||
-          (buildResult.droppedMessages.length === 0 &&
-            historyForRequest.length > 2 &&
-            estimateTokens(
-              historyForRequest.map((m) => m.content).join(""),
-            ) >
-              inputBudget * 0.8));
+          (activeHistory.length > 2 &&
+            rawTotalTokens > inputBudget * 0.8));
 
       log.info(`doSend: shouldCompact=${shouldCompact} truncated=${buildResult.truncated} droppedMsgs=${buildResult.droppedMessages.length}`);
       if (shouldCompact) {
         log.info(`doSend: compaction triggered`);
         setCompacting(true);
-        let messagesToCompact = buildResult.droppedMessages;
-        if (messagesToCompact.length === 0 && historyForRequest.length > 2) {
-          const half = Math.ceil((historyForRequest.length - 1) / 2);
-          messagesToCompact = historyForRequest.slice(1, 1 + half);
-        }
-
-        log.info(`doSend: compacting ${messagesToCompact.length} messages`);
-        if (messagesToCompact.length > 0) {
-          const summaryTokenBudget = Math.floor(
-            (inputBudget * summaryBudgetPct) / 100,
-          );
-          const newSummary = await summarizeMessages(messagesToCompact, {
-            endpoint,
-            existingSummary: currentSummary || undefined,
-            maxTokens: summaryTokenBudget,
-            tokenBudget: summaryTokenBudget,
-          });
-          if (newSummary) {
-            log.info(`doSend: summary updated (${newSummary.length} chars)`);
-            setSummary(chatId, newSummary);
-            buildResult = buildRequestMessages(historyForRequest, {
-              inputBudget,
-              systemPrompt: effectiveSystemPrompt,
-              seedPrompt: effectiveSeedPrompt,
-              summary: newSummary,
-              summaryBudgetPct,
-            });
-
-            const usedAfter = estimateTokens(
-              buildResult.messages.map((m) => m.content).join(""),
-            );
-            const replyRoom = effectiveMaxTokens(replyBudget, perSlot, usedAfter);
-            if (replyRoom < minReplyTokens) {
-              const trimTarget = Math.floor(newSummary.length * 0.5);
-              const trimmed = newSummary.slice(0, trimTarget);
-              log.warn(`doSend: reply room only ${replyRoom} tokens after compaction, trimming summary from ${newSummary.length} to ${trimmed.length} chars`);
-              setSummary(chatId, trimmed);
-              buildResult = buildRequestMessages(historyForRequest, {
-                inputBudget,
-                systemPrompt: effectiveSystemPrompt,
-                seedPrompt: effectiveSeedPrompt,
-                summary: trimmed,
-                summaryBudgetPct,
-              });
-            }
-          }
-        }
+        const updated = await runCompaction(chatId, activeHistory);
         setCompacting(false);
+        if (updated !== null) {
+          // runCompaction removed the compacted messages from the store and
+          // wrote a new summary. Refresh our working history from the store
+          // (skipping the trailing empty assistant placeholder appended by
+          // handleSend so we don't send it as an input message).
+          const storeMsgs =
+            useChatStore.getState().chats[chatId]?.messages ?? [];
+          const trailing = storeMsgs[storeMsgs.length - 1];
+          const usable =
+            trailing?.role === "assistant" && trailing.content === ""
+              ? storeMsgs.slice(0, -1)
+              : storeMsgs;
+          activeHistory = usable.map((m) => ({
+            role: m.role,
+            content: m.content,
+          }));
+          const latest = useChatStore.getState().chats[chatId]?.summary ?? "";
+          buildResult = buildRequestMessages(activeHistory, {
+            inputBudget,
+            systemPrompt: effectiveSystemPrompt,
+            seedPrompt: effectiveSeedPrompt,
+            summary: latest,
+          });
+        }
       }
 
       const requestMessages = buildResult.messages;
@@ -229,15 +328,33 @@ export function ChatPane() {
         const maxTok = effectiveMaxTokens(replyBudget, perSlot, usedInput);
         log.info(`runStream: replyBudget=${replyBudget} usedInput≈${usedInput} effectiveMax=${maxTok}`);
         let accumulated = "";
-        for await (const delta of streamChat({
+        for await (const event of streamChat({
           endpoint,
           messages: msgs,
           signal: controller.signal,
           maxTokens: maxTok,
           temperature: streamTempOverride ?? baseTemp,
         })) {
-          accumulated += delta;
-          appendToLastMessage(chatId, delta);
+          if (event.type === "delta") {
+            accumulated += event.content;
+            appendToLastMessage(chatId, event.content);
+          } else if (event.type === "usage") {
+            log.info(
+              `runStream: real usage prompt=${event.usage.promptTokens} completion=${event.usage.completionTokens} (estInput=${usedInput})`,
+            );
+            const chat = useChatStore.getState().chats[chatId];
+            const last = chat?.messages[chat.messages.length - 1];
+            if (last && last.role === "assistant") {
+              useChatStore
+                .getState()
+                .setMessageUsage(
+                  chatId,
+                  last.id,
+                  event.usage.promptTokens,
+                  event.usage.completionTokens,
+                );
+            }
+          }
         }
         return accumulated;
       };
@@ -257,7 +374,7 @@ export function ChatPane() {
 
         // Dedup check
         if (deduplicateRetry && fullResponse) {
-          const priorMessages = historyForRequest.map((m) => ({
+          const priorMessages = activeHistory.map((m) => ({
             role: m.role,
             content: m.content,
           }));
@@ -401,9 +518,10 @@ export function ChatPane() {
       effectiveSystemPrompt,
       endpoint,
       inputBudget,
-      setSummary,
+      perSlot,
+      replyBudget,
+      runCompaction,
       setStreaming,
-      summaryBudgetPct,
       temperature,
     ],
   );
@@ -531,7 +649,7 @@ export function ChatPane() {
             {chat ? chat.title : "llm-client"}
           </h1>
         </div>
-        {chat && preview.droppedCount > 0 && (
+        {chat && (chat.summary || preview.droppedCount > 0) && (
           <SummaryPanel
             summary={chat.summary ?? ""}
             onSummaryChange={handleSummaryChange}
@@ -550,6 +668,7 @@ export function ChatPane() {
           onRetry={handleRetry}
           onRegen={handleRegen}
           scrollTrigger={activeChoices.length + (generatingChoices ? 1 : 0) + (colorizing ? 1 : 0)}
+          showTokenCount={showTokenCount}
         />
       ) : (
         <div className="flex-1 overflow-y-auto">
@@ -591,6 +710,15 @@ export function ChatPane() {
           usedPercent={preview.usedPercent}
           truncated={preview.truncated}
           compacting={compacting}
+          onCompact={handleCompact}
+          compactDisabled={
+            !chat ||
+            chat.messages.length < 2 ||
+            Boolean(isStreaming) ||
+            compacting
+          }
+          lastRealPromptTokens={lastUsage?.promptTokens}
+          lastRealCompletionTokens={lastUsage?.completionTokens}
         />
       )}
     </section>

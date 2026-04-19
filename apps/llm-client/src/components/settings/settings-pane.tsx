@@ -49,7 +49,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const storedReplyBudget = useSettingsStore((s) => s.replyBudgetOverride);
   const storedMinReply = useSettingsStore((s) => s.minReplyTokens);
   const storedAutoSummarize = useSettingsStore((s) => s.autoSummarize);
-  const storedSummaryBudget = useSettingsStore((s) => s.summaryBudgetPct);
+  const storedShowTokenCount = useSettingsStore((s) => s.showTokenCount);
   const storedDedupRetry = useSettingsStore((s) => s.deduplicateRetry);
   const storedTemperature = useSettingsStore((s) => s.temperature);
   const setSystemPrompt = useSettingsStore((s) => s.setSystemPrompt);
@@ -58,7 +58,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const setReplyBudgetOverride = useSettingsStore((s) => s.setReplyBudgetOverride);
   const setMinReplyTokens = useSettingsStore((s) => s.setMinReplyTokens);
   const setAutoSummarize = useSettingsStore((s) => s.setAutoSummarize);
-  const setSummaryBudgetPct = useSettingsStore((s) => s.setSummaryBudgetPct);
+  const setShowTokenCount = useSettingsStore((s) => s.setShowTokenCount);
   const storedChoiceButtons = useSettingsStore((s) => s.choiceButtons);
   const storedChoicePrompt = useSettingsStore((s) => s.choicePrompt);
   const storedChoiceCount = useSettingsStore((s) => s.choiceCount);
@@ -93,8 +93,9 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
   const [localMinReply, setLocalMinReply] = useState(String(storedMinReply));
   const [localAutoSummarize, setLocalAutoSummarize] =
     useState(storedAutoSummarize);
-  const [localSummaryBudget, setLocalSummaryBudget] =
-    useState(storedSummaryBudget);
+  const [localShowTokenCount, setLocalShowTokenCount] = useState(
+    storedShowTokenCount,
+  );
   const [localDedupRetry, setLocalDedupRetry] = useState(storedDedupRetry);
   const [localTemp, setLocalTemp] = useState(String(storedTemperature));
   const [localChoiceButtons, setLocalChoiceButtons] = useState(storedChoiceButtons);
@@ -128,7 +129,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     setReplyBudgetStr(storedReplyBudget === null ? "" : String(storedReplyBudget));
     setLocalMinReply(String(storedMinReply));
     setLocalAutoSummarize(storedAutoSummarize);
-    setLocalSummaryBudget(storedSummaryBudget);
+    setLocalShowTokenCount(storedShowTokenCount);
     setLocalDedupRetry(storedDedupRetry);
     setLocalTemp(String(storedTemperature));
     setLocalChoiceButtons(storedChoiceButtons);
@@ -137,7 +138,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     setLocalDisableTextInput(storedDisableTextInput);
     setLocalColorSupport(storedColorSupport);
     setLocalColorColors(storedColorColors);
-  }, [storedSp, storedSpSrc, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedReplyBudget, storedMinReply, storedAutoSummarize, storedSummaryBudget, storedDedupRetry, storedTemperature, storedChoiceButtons, storedChoicePrompt, storedChoiceCount, storedDisableTextInput, storedColorSupport, storedColorColors]);
+  }, [storedSp, storedSpSrc, storedSpFile, storedSeed, storedSeedSrc, storedSeedFile, storedCtxOvr, storedReplyBudget, storedMinReply, storedAutoSummarize, storedShowTokenCount, storedDedupRetry, storedTemperature, storedChoiceButtons, storedChoicePrompt, storedChoiceCount, storedDisableTextInput, storedColorSupport, storedColorColors]);
 
   const serverMax = perSlotCtx(serverInfo);
 
@@ -214,7 +215,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
     setTemperature(parsedTemp);
 
     setAutoSummarize(localAutoSummarize);
-    setSummaryBudgetPct(localSummaryBudget);
+    setShowTokenCount(localShowTokenCount);
     setDeduplicateRetry(localDedupRetry);
     setChoiceButtons(localChoiceButtons);
     setChoicePrompt(localChoicePrompt);
@@ -241,7 +242,7 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
       saveRef.current();
     }, 1000);
     return () => clearTimeout(autoSaveTimer.current);
-  }, [spSrc, spText, spFile, seedSrc, seedText, seedFile, overrideStr, replyBudgetStr, localMinReply, localAutoSummarize, localSummaryBudget, localDedupRetry, localTemp, localChoiceButtons, localChoicePrompt, localChoiceCount, localDisableTextInput, localColorSupport, localColorColors]);
+  }, [spSrc, spText, spFile, seedSrc, seedText, seedFile, overrideStr, replyBudgetStr, localMinReply, localAutoSummarize, localShowTokenCount, localDedupRetry, localTemp, localChoiceButtons, localChoicePrompt, localChoiceCount, localDisableTextInput, localColorSupport, localColorColors]);
 
   return (
     <section className="flex h-dvh flex-1 flex-col bg-background">
@@ -429,47 +430,42 @@ export function SettingsPane({ onClose }: SettingsPaneProps) {
               Behavior
             </h2>
 
-            <div className="rounded-md border border-border px-3 py-2.5">
-              <label className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-sm font-medium">Auto-summarize</div>
-                  <div className="text-[11px] text-muted-foreground">
-                    When old messages are dropped, generate a rolling "Story
-                    so far" summary. Editable in the chat transcript.
-                  </div>
+            <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
+              <div>
+                <div className="text-sm font-medium">Auto-summarize</div>
+                <div className="text-[11px] text-muted-foreground">
+                  When context hits 80%, fold older messages into a rolling
+                  "Story so far" summary, targeting half the current usage.
+                  Editable in the chat transcript. You can also trigger this
+                  manually via the `compact` link by the context meter.
                 </div>
-                <input
-                  type="checkbox"
-                  checked={localAutoSummarize}
-                  onChange={(e) => setLocalAutoSummarize(e.target.checked)}
-                  className="h-4 w-4 accent-primary"
-                  data-testid="toggle-auto-summarize"
-                />
-              </label>
-              {localAutoSummarize && (
-                <div className="mt-3 flex items-center gap-3 border-t border-border/50 pt-3">
-                  <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                    Summary budget
-                    <HintIcon text="Max % of the context window the 'Story so far' summary can use. Higher = more memory of old conversation but less room for recent messages. Lower = more room for recent turns but the summary gets truncated." />
-                  </span>
-                  <input
-                    type="range"
-                    min="5"
-                    max="50"
-                    step="5"
-                    value={localSummaryBudget}
-                    onChange={(e) =>
-                      setLocalSummaryBudget(parseInt(e.target.value, 10))
-                    }
-                    className="flex-1"
-                    data-testid="summary-budget-slider"
-                  />
-                  <span className="w-10 text-right font-mono text-xs text-muted-foreground">
-                    {localSummaryBudget}%
-                  </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={localAutoSummarize}
+                onChange={(e) => setLocalAutoSummarize(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+                data-testid="toggle-auto-summarize"
+              />
+            </label>
+
+            <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
+              <div>
+                <div className="text-sm font-medium">Show token count</div>
+                <div className="text-[11px] text-muted-foreground">
+                  Display a small "N tok" label under each message. Uses the
+                  server's real `usage` counts when available, falls back to
+                  local estimates otherwise.
                 </div>
-              )}
-            </div>
+              </div>
+              <input
+                type="checkbox"
+                checked={localShowTokenCount}
+                onChange={(e) => setLocalShowTokenCount(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+                data-testid="toggle-show-token-count"
+              />
+            </label>
           </section>
 
           {/* Post-processing */}
