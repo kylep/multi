@@ -62,9 +62,15 @@ async function callModel(
     }
     const json = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
     };
     const content = json.choices?.[0]?.message?.content?.trim() ?? null;
     if (!content) log.warn("summarize: model returned empty content");
+    if (json.usage) {
+      log.info(
+        `summarize: usage prompt=${json.usage.prompt_tokens} completion=${json.usage.completion_tokens}`,
+      );
+    }
     log.exchange("exchange:compaction", {
       messages: [
         { role: "system", content: systemContent },

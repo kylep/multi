@@ -67,8 +67,14 @@ export async function generateChoices(
 
       const json = (await res.json()) as {
         choices?: Array<{ message?: { content?: string } }>;
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
       };
       const text = json.choices?.[0]?.message?.content?.trim();
+      if (json.usage) {
+        log.info(
+          `generateChoices: call ${i + 1} usage prompt=${json.usage.prompt_tokens} completion=${json.usage.completion_tokens}`,
+        );
+      }
       if (text) {
         // Strip numbering prefix and wrapping quotes the model might add
         const cleaned = text

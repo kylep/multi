@@ -12,6 +12,7 @@ interface MessageListProps {
   onRetry?: () => void;
   onRegen?: (messageId: string) => void;
   scrollTrigger?: number;
+  showTokenCount?: boolean;
 }
 
 export function MessageList({
@@ -22,6 +23,7 @@ export function MessageList({
   onRetry,
   onRegen,
   scrollTrigger,
+  showTokenCount,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isPinnedRef = useRef(true);
@@ -65,6 +67,8 @@ export function MessageList({
             role={messages[0].role}
             content={messages[0].content}
             streaming={messages[0].id === streamingMessageId}
+            showTokenCount={showTokenCount}
+            completionTokens={messages[0].completionTokens}
           />
         )}
 
@@ -84,6 +88,8 @@ export function MessageList({
                   ? () => onRegen(msg.id)
                   : undefined
               }
+              showTokenCount={showTokenCount}
+              completionTokens={msg.completionTokens}
             />
           );
         })}

@@ -40,11 +40,18 @@ export async function generateTitle(
     if (!res.ok) return null;
     const json = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
     };
     const raw = json.choices?.[0]?.message?.content?.trim();
     if (!raw) return null;
     const title = raw.replace(/^["']|["']$/g, "").slice(0, 60);
-    log.info(`generateTitle: "${title}"`);
+    if (json.usage) {
+      log.info(
+        `generateTitle: "${title}" (prompt=${json.usage.prompt_tokens} completion=${json.usage.completion_tokens})`,
+      );
+    } else {
+      log.info(`generateTitle: "${title}"`);
+    }
     return title;
   } catch {
     return null;

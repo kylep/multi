@@ -7,6 +7,7 @@ import {
   effectiveMaxTokens,
   INPUT_BUDGET,
   PER_SLOT_CTX,
+  planCompaction,
   previewContext,
   REPLY_BUDGET,
   SAFETY,
@@ -220,13 +221,131 @@ describe("previewContext", () => {
     expect(preview.usedPercent).toBeLessThanOrEqual(100);
   });
 
-  it("respects summaryBudgetPct cap", () => {
-    const history = makeHistory(3);
-    const preview = previewContext(history, "", {
-      inputBudget: 1000,
-      summary: "x".repeat(4000),
-      summaryBudgetPct: 10,
+});
+
+describe("planCompaction", () => {
+  it("targets half of current usage", () => {
+    const history = makeHistory(30, (i) => `msg ${i} ` + "x".repeat(200));
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    // target should be ~= currentUsedTokens / 2
+    expect(plan.targetTokens).toBeGreaterThan(0);
+    expect(plan.targetTokens).toBeLessThanOrEqual(plan.currentUsedTokens);
+    expect(Math.abs(plan.targetTokens - Math.floor(plan.currentUsedTokens / 2))).toBeLessThanOrEqual(200);
+  });
+
+  it("compacts oldest non-anchored messages, leaves recent ones kept", () => {
+    const history = makeHistory(30, (i) => `msg ${i} ` + "x".repeat(200));
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    expect(plan.messagesToCompact.length).toBeGreaterThan(0);
+    // First compacted item is the earliest non-anchor, i.e. index 1.
+    expect(plan.messagesToCompact[0].content).toContain("msg 1");
+    // First user message (anchor) is never compacted.
+    for (const m of plan.messagesToCompact) {
+      expect(m.content).not.toBe(history[0].content);
+    }
+  });
+
+  it("no-ops when there is nothing older than the anchor to compact", () => {
+    const history = makeHistory(1);
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    expect(plan.messagesToCompact).toHaveLength(0);
+  });
+
+  it("summary token budget is at least 64", () => {
+    const history = makeHistory(4);
+    const plan = planCompaction(history, { inputBudget: 200 });
+    expect(plan.summaryTokenBudget).toBeGreaterThanOrEqual(64);
+  });
+
+  it("estimated usage after compaction is ≤ target", () => {
+    const history = makeHistory(40, (i) => `msg ${i} ` + "x".repeat(100));
+    const plan = planCompaction(history, { inputBudget: 8000 });
+    // Allow up to one kept message worth of overshoot — the even-count
+    // invariant can spare one message back into history.
+    const tolerance = Math.max(100, Math.floor(plan.targetTokens * 0.1));
+    expect(plan.estimatedUsedAfter).toBeLessThanOrEqual(
+      plan.targetTokens + tolerance,
+    );
+  });
+
+  it("returns a compactThroughIndex and compacts an even number of messages", () => {
+    const history = makeHistory(30, (i) => `msg ${i} ` + "x".repeat(150));
+    const plan = planCompaction(history, { inputBudget: 3000 });
+    expect(plan.messagesToCompact.length % 2).toBe(0);
+    expect(plan.compactThroughIndex).toBe(plan.messagesToCompact.length);
+  });
+
+  it("kept set is a contiguous newest suffix even with variable message sizes", () => {
+    // Alternating big/small messages: 200-char msg, 20-char msg, 200, 20, …
+    const history: ChatMessage[] = [];
+    for (let i = 0; i < 30; i++) {
+      history.push({
+        role: i % 2 === 0 ? "user" : "assistant",
+        content: `msg ${i} ` + (i % 2 === 0 ? "x".repeat(200) : "x".repeat(20)),
+      });
+    }
+    const plan = planCompaction(history, { inputBudget: 3000 });
+    // Messages-to-compact should be a contiguous block history[1..K].
+    // Verify every index in messagesToCompact is consecutive starting at 1.
+    const compactIndices = plan.messagesToCompact.map((m) =>
+      history.findIndex((h) => h.content === m.content),
+    );
+    for (let i = 0; i < compactIndices.length; i++) {
+      expect(compactIndices[i]).toBe(i + 1);
+    }
+    // And compactThroughIndex matches.
+    expect(plan.compactThroughIndex).toBe(compactIndices[compactIndices.length - 1]);
+  });
+
+  it("estimated post-compaction usage lands near target regardless of existing summary", () => {
+    // baseFixed uses only the anchor (system + seed + firstUser content),
+    // NOT the existing summary. So post-compaction estimates should fit
+    // under target whether or not there is an existing summary to replace.
+    const history = makeHistory(20, (i) => `msg ${i} ` + "x".repeat(200));
+    const bare = planCompaction(history, { inputBudget: 6000 });
+    const withOldSummary = planCompaction(history, {
+      inputBudget: 6000,
+      existingSummary: "x".repeat(2000),
     });
-    expect(preview.summaryTokens).toBeLessThanOrEqual(100 + 4);
+    // Tolerance covers one kept message's cost — the even-count invariant
+    // can spare one message back into history, nudging usage above target.
+    const tolerance = Math.max(100, Math.floor(bare.targetTokens * 0.1));
+    expect(bare.estimatedUsedAfter).toBeLessThanOrEqual(
+      bare.targetTokens + tolerance,
+    );
+    expect(withOldSummary.estimatedUsedAfter).toBeLessThanOrEqual(
+      withOldSummary.targetTokens + tolerance,
+    );
+  });
+
+  it("removing the compacted block + applying summary actually shrinks the request", () => {
+    // 20 chunky messages simulating a chat near 80% of the input budget.
+    const history = makeHistory(20, (i) => `msg ${i} ` + "x".repeat(200));
+    const before = buildRequestMessages(history, { inputBudget: 10000 });
+    const beforeTokens = estimateMessagesJoined(before.messages);
+
+    const plan = planCompaction(history, { inputBudget: 10000 });
+    expect(plan.messagesToCompact.length).toBeGreaterThan(0);
+
+    // Simulate what runCompaction does: drop history[1..compactThroughIndex],
+    // then build with a summary that fits the summarizer's budget.
+    const remaining = [
+      history[0],
+      ...history.slice(plan.compactThroughIndex + 1),
+    ];
+    const summary = "x".repeat(plan.summaryTokenBudget * 3); // ~0.75 of budget
+    const after = buildRequestMessages(remaining, {
+      inputBudget: 10000,
+      summary,
+    });
+    const afterTokens = estimateMessagesJoined(after.messages);
+
+    expect(afterTokens).toBeLessThan(beforeTokens);
   });
 });
+
+function estimateMessagesJoined(messages: ChatMessage[]): number {
+  // Rough token count matching the in-app heuristic (chars/4).
+  const joined = messages.map((m) => m.content).join("");
+  return Math.ceil(joined.length / 4);
+}

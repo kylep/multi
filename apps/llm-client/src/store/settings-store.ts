@@ -25,7 +25,7 @@ export interface SettingsStore {
   contextOverride: number | null;
   replyBudgetOverride: number | null;
   autoSummarize: boolean;
-  summaryBudgetPct: number;
+  showTokenCount: boolean;
   deduplicateRetry: boolean;
   temperature: number;
   colorSupport: boolean;
@@ -53,7 +53,7 @@ export interface SettingsStore {
   setContextOverride(next: number | null): void;
   setReplyBudgetOverride(next: number | null): void;
   setAutoSummarize(v: boolean): void;
-  setSummaryBudgetPct(v: number): void;
+  setShowTokenCount(v: boolean): void;
   setDeduplicateRetry(v: boolean): void;
   setTemperature(v: number): void;
   setColorSupport(v: boolean): void;
@@ -89,7 +89,7 @@ export const useSettingsStore = create<SettingsStore>()(
       contextOverride: null,
       replyBudgetOverride: null,
       autoSummarize: true,
-      summaryBudgetPct: 25,
+      showTokenCount: true,
       deduplicateRetry: true,
       temperature: 0.7,
       colorSupport: false,
@@ -143,8 +143,8 @@ export const useSettingsStore = create<SettingsStore>()(
       setAutoSummarize(v) {
         set({ autoSummarize: v });
       },
-      setSummaryBudgetPct(v) {
-        set({ summaryBudgetPct: Math.max(5, Math.min(50, v)) });
+      setShowTokenCount(v) {
+        set({ showTokenCount: v });
       },
       setDeduplicateRetry(v) {
         set({ deduplicateRetry: v });
@@ -183,6 +183,8 @@ export const useSettingsStore = create<SettingsStore>()(
           // Remove stale keys from older versions
           delete p.colorPrompt;
           delete p.extractChoices;
+          delete p.summaryBudgetPct;
+          delete p.compactionTargetPct;
         }
         return {
           ...current,

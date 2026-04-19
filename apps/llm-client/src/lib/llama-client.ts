@@ -23,9 +23,19 @@ export class LlamaClientError extends Error {
   }
 }
 
+export interface ChatUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}
+
+export type StreamEvent =
+  | { type: "delta"; content: string }
+  | { type: "usage"; usage: ChatUsage };
+
 export async function* streamChat(
   options: StreamChatOptions,
-): AsyncGenerator<string> {
+): AsyncGenerator<StreamEvent> {
   const endpoint = options.endpoint ?? DEFAULT_ENDPOINT;
   const url = `${endpoint.replace(/\/$/, "")}/v1/chat/completions`;
 
@@ -41,6 +51,7 @@ export async function* streamChat(
       model: options.model ?? apiModel(),
       messages: options.messages,
       stream: true,
+      stream_options: { include_usage: true },
       max_tokens: options.maxTokens,
       temperature: options.temperature ?? 0.7,
     }),
@@ -85,7 +96,25 @@ export async function* streamChat(
             const parsed = JSON.parse(data);
             const delta: string | undefined =
               parsed?.choices?.[0]?.delta?.content;
-            if (delta) yield delta;
+            if (delta) yield { type: "delta", content: delta };
+            const usage = parsed?.usage;
+            if (
+              usage &&
+              typeof usage.prompt_tokens === "number" &&
+              typeof usage.completion_tokens === "number"
+            ) {
+              yield {
+                type: "usage",
+                usage: {
+                  promptTokens: usage.prompt_tokens,
+                  completionTokens: usage.completion_tokens,
+                  totalTokens:
+                    typeof usage.total_tokens === "number"
+                      ? usage.total_tokens
+                      : usage.prompt_tokens + usage.completion_tokens,
+                },
+              };
+            }
           } catch {
             // Ignore malformed JSON chunks.
           }

@@ -58,14 +58,19 @@ context that shouldn't repeat.
   (`min(1024, 50% of per-slot)`, configurable in Settings).
 - **Tail-drop truncation** — oldest messages are dropped first. The
   seed-augmented first message is always kept.
-- **Rolling compaction** (on by default) — when context hits 80%, the
-  oldest 50% of non-seed messages are summarized into a persistent
-  "Story so far" that grows across compaction events. Editable in the
-  chat transcript. Summary budget capped at a configurable % (default 25%).
-  If the summary overshoots its budget, retries up to 2x with a "shorten"
-  prompt. After compaction, if reply room would be below the min reply
-  tokens threshold (default 500, configurable), the summary is trimmed
-  to guarantee the model has room to respond.
+- **Rolling compaction** (on by default) — when context hits 80%, older
+  messages are summarized into a persistent "Story so far" that grows
+  across compaction events. Editable in the chat transcript. Each run
+  **targets half of the current context usage**: drops enough oldest
+  messages and sizes the summary budget so the rebuilt request lands
+  near 50% of what it was. Halving again on the next run keeps context
+  from monotonically creeping up. If the summary overshoots its budget,
+  the summarizer retries up to 2x with a "shorten" prompt. After
+  compaction, if reply room would be below the min reply tokens
+  threshold (default 500, configurable), the summary is trimmed to
+  guarantee the model has room to respond.
+- **Manual compact** — click the `compact` link beside the context meter
+  to halve the current context usage on demand.
 - **Context meter** — bottom-right shows live `X% ctx` usage. Amber at
   80%, red at 100%. "compacting..." indicator during summarization.
 - **Context override** — cap per-slot tokens in Settings for testing or
@@ -126,7 +131,7 @@ Full-pane settings (replaces chat area, sidebar stays). Sections:
 
 - **Prompts** — system prompt, seed prompt (text or file picker)
 - **Model** — temperature (0-2), context override, reply budget, min reply tokens
-- **Behavior** — auto-summarize + summary budget slider
+- **Behavior** — auto-summarize toggle (halves context on each compaction)
 - **Post-processing** — duplicate retry, choice extraction, colour support
   + editable colour prompt
 

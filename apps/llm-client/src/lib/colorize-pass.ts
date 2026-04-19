@@ -61,8 +61,14 @@ export async function colorizeResponse(
 
       const json = (await res.json()) as {
         choices?: Array<{ message?: { content?: string } }>;
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
       };
       const content = json.choices?.[0]?.message?.content?.trim() ?? "";
+      if (json.usage) {
+        log.info(
+          `colorize(${code}): usage prompt=${json.usage.prompt_tokens} completion=${json.usage.completion_tokens}`,
+        );
+      }
 
       log.exchange(`exchange:colorize-${code}`, {
         messages: [

@@ -27,6 +27,13 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+function deltaText(evts: { type: string }[]): string {
+  return evts
+    .filter((e): e is { type: "delta"; content: string } => e.type === "delta")
+    .map((e) => e.content)
+    .join("");
+}
+
 describe("streamChat", () => {
   it("yields deltas in order and stops on [DONE]", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
@@ -40,15 +47,47 @@ describe("streamChat", () => {
     );
 
     const controller = new AbortController();
-    const out: string[] = [];
-    for await (const token of streamChat({
+    const out: Awaited<ReturnType<typeof streamChat>> extends AsyncGenerator<infer T>
+      ? T[]
+      : never = [];
+    for await (const event of streamChat({
       messages: [{ role: "user", content: "hi" }],
       signal: controller.signal,
       maxTokens: 128,
     })) {
-      out.push(token);
+      out.push(event);
     }
-    expect(out.join("")).toBe("Hello world");
+    expect(deltaText(out)).toBe("Hello world");
+  });
+
+  it("yields a usage event when the server sends it", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockSSEResponse([
+        dataEvent(delta("hi")),
+        dataEvent({
+          choices: [],
+          usage: { prompt_tokens: 42, completion_tokens: 7, total_tokens: 49 },
+        }),
+        "data: [DONE]\n\n",
+      ]),
+    );
+    const events: Awaited<ReturnType<typeof streamChat>> extends AsyncGenerator<infer T>
+      ? T[]
+      : never = [];
+    for await (const e of streamChat({
+      messages: [{ role: "user", content: "hi" }],
+      signal: new AbortController().signal,
+      maxTokens: 16,
+    })) {
+      events.push(e);
+    }
+    const usage = events.find((e) => e.type === "usage");
+    expect(usage).toBeTruthy();
+    if (usage && usage.type === "usage") {
+      expect(usage.usage.promptTokens).toBe(42);
+      expect(usage.usage.completionTokens).toBe(7);
+      expect(usage.usage.totalTokens).toBe(49);
+    }
   });
 
   it("ignores malformed JSON data lines", async () => {
@@ -59,15 +98,15 @@ describe("streamChat", () => {
         "data: [DONE]\n\n",
       ]),
     );
-    const out: string[] = [];
-    for await (const tok of streamChat({
+    const out: { type: string }[] = [];
+    for await (const e of streamChat({
       messages: [{ role: "user", content: "hi" }],
       signal: new AbortController().signal,
       maxTokens: 16,
     })) {
-      out.push(tok);
+      out.push(e);
     }
-    expect(out.join("")).toBe("ok");
+    expect(deltaText(out)).toBe("ok");
   });
 
   it("handles events split across chunks", async () => {
@@ -80,15 +119,15 @@ describe("streamChat", () => {
         "data: [DONE]\n\n",
       ]),
     );
-    const out: string[] = [];
-    for await (const tok of streamChat({
+    const out: { type: string }[] = [];
+    for await (const e of streamChat({
       messages: [{ role: "user", content: "hi" }],
       signal: new AbortController().signal,
       maxTokens: 16,
     })) {
-      out.push(tok);
+      out.push(e);
     }
-    expect(out.join("")).toBe("hello");
+    expect(deltaText(out)).toBe("hello");
   });
 
   it("throws LlamaClientError on non-ok response", async () => {

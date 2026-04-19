@@ -8,6 +8,7 @@ import { RefreshCw } from "lucide-react";
 import { processColors } from "@/lib/colors";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { estimateTokens } from "@/lib/tokens";
 import type { ChatRole } from "@/lib/context-manager";
 
 interface MessageBubbleProps {
@@ -17,6 +18,9 @@ interface MessageBubbleProps {
   hasError?: boolean;
   onRetry?: () => void;
   onRegen?: () => void;
+  showTokenCount?: boolean;
+  /** Real completion_tokens for assistant messages, when known. */
+  completionTokens?: number;
 }
 
 export function MessageBubble({
@@ -26,9 +30,23 @@ export function MessageBubble({
   hasError,
   onRetry,
   onRegen,
+  showTokenCount,
+  completionTokens,
 }: MessageBubbleProps) {
   const isUser = role === "user";
   const label = isUser ? "User:" : role === "assistant" ? "Bot:" : "System:";
+
+  const hasRealCount =
+    !isUser && typeof completionTokens === "number" && !streaming;
+  const tokenCount = hasRealCount
+    ? completionTokens
+    : streaming
+      ? null
+      : estimateTokens(content || "");
+  const tokenLabel =
+    tokenCount === null
+      ? null
+      : `${tokenCount} tok${hasRealCount ? "" : "~"}`;
 
   return (
     <div
@@ -75,6 +93,19 @@ export function MessageBubble({
             </>
           )}
         </div>
+        {showTokenCount && tokenLabel && (
+          <span
+            className="px-1 font-mono text-[10px] text-muted-foreground/60"
+            title={
+              hasRealCount
+                ? `Server-reported completion tokens`
+                : `Local estimate (server didn't report usage)`
+            }
+            data-testid={`msg-tokens-${role}`}
+          >
+            {tokenLabel}
+          </span>
+        )}
         {!isUser && !streaming && (
           <div className="mt-1 flex gap-1">
             {hasError && onRetry && (

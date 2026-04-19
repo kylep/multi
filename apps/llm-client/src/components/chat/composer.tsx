@@ -18,6 +18,12 @@ interface ComposerProps {
   usedPercent: number;
   truncated: boolean;
   compacting?: boolean;
+  onCompact?: () => void;
+  compactDisabled?: boolean;
+  /** Real prompt_tokens from the last completed request, if known. */
+  lastRealPromptTokens?: number;
+  /** Real completion_tokens from the last completed request, if known. */
+  lastRealCompletionTokens?: number;
 }
 
 export function Composer({
@@ -32,6 +38,10 @@ export function Composer({
   usedPercent,
   truncated,
   compacting,
+  onCompact,
+  compactDisabled,
+  lastRealPromptTokens,
+  lastRealCompletionTokens,
 }: ComposerProps) {
   const serverType = useSettingsStore((s) => s.serverType);
   const endpoint = useSettingsStore((s) => s.endpoint);
@@ -124,19 +134,42 @@ export function Composer({
             : `${endpoint.replace(/^https?:\/\//, "")}/${modelId}`}
         </p>
         <div className="flex items-center gap-3">
-          {compacting && (
+          {compacting ? (
             <span
               className="animate-pulse text-amber-500"
               data-testid="compacting-indicator"
             >
               compacting…
             </span>
+          ) : (
+            onCompact && (
+              <button
+                type="button"
+                onClick={onCompact}
+                disabled={compactDisabled}
+                className={cn(
+                  "underline-offset-2 transition-colors",
+                  compactDisabled
+                    ? "cursor-not-allowed text-muted-foreground/40"
+                    : "text-muted-foreground hover:text-foreground hover:underline",
+                )}
+                data-testid="compact-link"
+                title="Summarize older messages and halve the current context usage"
+              >
+                compact
+              </button>
+            )
           )}
         </div>
         <p
           className={cn("font-mono", meterColor)}
           data-testid="context-meter"
-          title={`${usedTokens.toLocaleString()} / ${inputBudget.toLocaleString()} tokens`}
+          title={
+            `${usedTokens.toLocaleString()} / ${inputBudget.toLocaleString()} tokens (estimate)` +
+            (typeof lastRealPromptTokens === "number"
+              ? `\nLast request (real): prompt=${lastRealPromptTokens.toLocaleString()}, completion=${(lastRealCompletionTokens ?? 0).toLocaleString()}`
+              : "")
+          }
         >
           {truncated ? "⚠ " : ""}
           {usedPercent}% ctx
