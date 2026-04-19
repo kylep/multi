@@ -8,7 +8,9 @@ metadata:
 spec:
   schedule: {{ .Values.cronjobs.seoBot.schedule | quote }}
   timeZone: "UTC"
-  startingDeadlineSeconds: 3600
+  # 24h deadline so a scheduled run still fires after the rancher-desktop
+  # VM resumes from laptop sleep. Safe: at most 1 run/day is missed.
+  startingDeadlineSeconds: 86400
   suspend: {{ not .Values.cronjobs.seoBot.enabled }}
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
