@@ -25,10 +25,9 @@ const About = () => {
             <h1>About</h1>
             <img src = "/images/kyle-school-computers.png" alt="Me" className="me" />
             <hr />
-            <pre className={"language-python"}>
-                <code className={"language-python"}>
-                    "Find a job you enjoy doing, and you will never have to work a day in your life." <br />
-                    - Mark Twain
+            <pre>
+                <code>
+                    {`"Find a job you enjoy doing, and you will never have to work a day in your life."\n- Mark Twain`}
                 </code>
             </pre>
             <hr />
@@ -57,6 +56,12 @@ const About = () => {
                         <a href="https://www.reddit.com/user/kepper/" style={{ textDecoration: 'none', color: 'inherit' }}>
                             <img src="/images/Reddit.png" alt="Reddit" className="social-button" />
                             <Typography variant="body1">Reddit</Typography>
+                        </a>
+                    </Grid>
+                    <Grid item>
+                        <a href="https://bsky.app/profile/pericak.bsky.social" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <img src="/images/Bluesky.png" alt="Bluesky" className="social-button" />
+                            <Typography variant="body1">Bluesky</Typography>
                         </a>
                     </Grid>
                 </Grid>
