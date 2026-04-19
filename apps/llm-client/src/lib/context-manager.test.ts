@@ -260,7 +260,12 @@ describe("planCompaction", () => {
   it("estimated usage after compaction is ≤ target", () => {
     const history = makeHistory(40, (i) => `msg ${i} ` + "x".repeat(100));
     const plan = planCompaction(history, { inputBudget: 8000 });
-    expect(plan.estimatedUsedAfter).toBeLessThanOrEqual(plan.targetTokens + 8);
+    // Allow up to one kept message worth of overshoot — the even-count
+    // invariant can spare one message back into history.
+    const tolerance = Math.max(100, Math.floor(plan.targetTokens * 0.1));
+    expect(plan.estimatedUsedAfter).toBeLessThanOrEqual(
+      plan.targetTokens + tolerance,
+    );
   });
 
   it("returns a compactThroughIndex and compacts an even number of messages", () => {
@@ -268,6 +273,49 @@ describe("planCompaction", () => {
     const plan = planCompaction(history, { inputBudget: 3000 });
     expect(plan.messagesToCompact.length % 2).toBe(0);
     expect(plan.compactThroughIndex).toBe(plan.messagesToCompact.length);
+  });
+
+  it("kept set is a contiguous newest suffix even with variable message sizes", () => {
+    // Alternating big/small messages: 200-char msg, 20-char msg, 200, 20, …
+    const history: ChatMessage[] = [];
+    for (let i = 0; i < 30; i++) {
+      history.push({
+        role: i % 2 === 0 ? "user" : "assistant",
+        content: `msg ${i} ` + (i % 2 === 0 ? "x".repeat(200) : "x".repeat(20)),
+      });
+    }
+    const plan = planCompaction(history, { inputBudget: 3000 });
+    // Messages-to-compact should be a contiguous block history[1..K].
+    // Verify every index in messagesToCompact is consecutive starting at 1.
+    const compactIndices = plan.messagesToCompact.map((m) =>
+      history.findIndex((h) => h.content === m.content),
+    );
+    for (let i = 0; i < compactIndices.length; i++) {
+      expect(compactIndices[i]).toBe(i + 1);
+    }
+    // And compactThroughIndex matches.
+    expect(plan.compactThroughIndex).toBe(compactIndices[compactIndices.length - 1]);
+  });
+
+  it("estimated post-compaction usage lands near target regardless of existing summary", () => {
+    // baseFixed uses only the anchor (system + seed + firstUser content),
+    // NOT the existing summary. So post-compaction estimates should fit
+    // under target whether or not there is an existing summary to replace.
+    const history = makeHistory(20, (i) => `msg ${i} ` + "x".repeat(200));
+    const bare = planCompaction(history, { inputBudget: 6000 });
+    const withOldSummary = planCompaction(history, {
+      inputBudget: 6000,
+      existingSummary: "x".repeat(2000),
+    });
+    // Tolerance covers one kept message's cost — the even-count invariant
+    // can spare one message back into history, nudging usage above target.
+    const tolerance = Math.max(100, Math.floor(bare.targetTokens * 0.1));
+    expect(bare.estimatedUsedAfter).toBeLessThanOrEqual(
+      bare.targetTokens + tolerance,
+    );
+    expect(withOldSummary.estimatedUsedAfter).toBeLessThanOrEqual(
+      withOldSummary.targetTokens + tolerance,
+    );
   });
 
   it("removing the compacted block + applying summary actually shrinks the request", () => {

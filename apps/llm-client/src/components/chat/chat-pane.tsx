@@ -285,8 +285,12 @@ export function ChatPane() {
       if (shouldCompact) {
         log.info(`doSend: compaction triggered`);
         setCompacting(true);
-        const updated = await runCompaction(chatId, activeHistory);
-        setCompacting(false);
+        let updated: string | null = null;
+        try {
+          updated = await runCompaction(chatId, activeHistory);
+        } finally {
+          setCompacting(false);
+        }
         if (updated !== null) {
           // runCompaction removed the compacted messages from the store and
           // wrote a new summary. Refresh our working history from the store
@@ -342,8 +346,9 @@ export function ChatPane() {
             log.info(
               `runStream: real usage prompt=${event.usage.promptTokens} completion=${event.usage.completionTokens} (estInput=${usedInput})`,
             );
-            const chat = useChatStore.getState().chats[chatId];
-            const last = chat?.messages[chat.messages.length - 1];
+            const snapshot = useChatStore.getState().chats[chatId];
+            const last =
+              snapshot?.messages[snapshot.messages.length - 1];
             if (last && last.role === "assistant") {
               useChatStore
                 .getState()

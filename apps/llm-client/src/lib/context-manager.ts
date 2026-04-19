@@ -79,10 +79,18 @@ export function buildRequestMessages(
     : null;
   const systemCost = systemMsg ? estimateTokens(systemMsg.content) + 4 : 0;
 
-  // Summary is trusted at face value; it was sized by the summarizer at
-  // compaction time. If it still overshoots budget, tail-drop trims older
-  // chat messages to make room.
-  const effectiveSummary = summary ?? "";
+  // Summary is trusted at face value from the summarizer, but we still
+  // clamp to half the input budget as a hard safety net — if an upstream
+  // bug produced a runaway summary we don't want to blow past ctx.
+  const summaryCap = Math.max(128, Math.floor(budget * 0.5));
+  let effectiveSummary = summary ?? "";
+  if (effectiveSummary && estimateTokens(effectiveSummary) > summaryCap) {
+    const before = estimateTokens(effectiveSummary);
+    effectiveSummary = effectiveSummary.slice(0, summaryCap * 4);
+    log.warn(
+      `buildRequestMessages: summary over cap (${before} > ${summaryCap}), truncating`,
+    );
+  }
 
   // Seed + summary: both prepended to first user message content.
   // This avoids breaking chat templates that require strict role alternation.
@@ -229,71 +237,80 @@ export function planCompaction(
     history.length > 0 && history[0].role === "user" ? history[0] : null;
   const summaryTrimmed = existingSummary?.trim() ?? "";
   const seedTrimmed = seedPrompt?.trim() ?? "";
-  const firstPrefix =
-    (seedTrimmed ? seedTrimmed + "\n\n" : "") +
-    (summaryTrimmed ? `[Story so far]: ${summaryTrimmed}\n\n` : "");
-  const firstFullContent = firstPrefix + (firstUser?.content ?? "");
-  const firstUserCost = firstUser ? estimateTokens(firstFullContent) + 4 : 0;
-  const baseFixed = systemCost + firstUserCost + 2;
 
-  // Current used tokens = the whole request if sent as-is (no compaction).
+  // Anchor = system + (seed + firstUser content), no summary. This is the
+  // floor that every request — pre- or post-compaction — carries.
+  const firstAnchorContent =
+    (seedTrimmed ? seedTrimmed + "\n\n" : "") + (firstUser?.content ?? "");
+  const firstUserAnchorCost = firstUser
+    ? estimateTokens(firstAnchorContent) + 4
+    : 0;
+  const baseFixedAnchor = systemCost + firstUserAnchorCost + 2;
+
+  // The existing summary (if any) is currently embedded in the first user
+  // message. Account for it so currentUsedTokens matches the real request
+  // size, but do NOT use it when sizing the NEW summary + kept messages —
+  // the new summary replaces the old one.
+  const existingSummaryCost = summaryTrimmed
+    ? estimateTokens(`[Story so far]: ${summaryTrimmed}\n\n`)
+    : 0;
+
   let recentCost = 0;
   for (let i = 1; i < history.length; i++) {
     recentCost += estimateTokens(history[i].content) + 4;
   }
   const currentUsedTokens = Math.min(
     inputBudget,
-    baseFixed + recentCost,
+    baseFixedAnchor + existingSummaryCost + recentCost,
   );
 
-  // Target: half of current usage, floored so we don't undershoot room for
-  // the model's reply plus the always-anchored first message.
-  const targetTokens = Math.max(baseFixed + 128, Math.floor(currentUsedTokens / 2));
+  // Target: half of current usage, floored so we leave at least 128 tokens
+  // for something other than the anchor.
+  const targetTokens = Math.max(
+    baseFixedAnchor + 128,
+    Math.floor(currentUsedTokens / 2),
+  );
 
-  // Summary gets at most half of the room above baseFixed. The remaining
-  // half is budget for recent messages.
-  const targetRoom = Math.max(0, targetTokens - baseFixed);
+  // Split the post-compaction room evenly between the new summary and
+  // recent kept messages.
+  const targetRoom = Math.max(0, targetTokens - baseFixedAnchor);
   const summaryTokenBudget = Math.max(64, Math.floor(targetRoom * 0.5));
   const recentBudget = Math.max(0, targetRoom - summaryTokenBudget);
 
+  // Find the contiguous newest-suffix that fits recentBudget. Walk forward
+  // from the end; stop when adding one more message would overflow.
   const startIdx = firstUser ? 1 : 0;
-  const keptReverse: ChatMessage[] = [];
-  const compactReverse: ChatMessage[] = [];
-  let used = 0;
+  let suffixStart = history.length;
+  let suffixUsed = 0;
   for (let i = history.length - 1; i >= startIdx; i--) {
     const cost = estimateTokens(history[i].content) + 4;
-    if (used + cost <= recentBudget) {
-      keptReverse.push(history[i]);
-      used += cost;
-    } else {
-      compactReverse.push(history[i]);
-    }
+    if (suffixUsed + cost > recentBudget) break;
+    suffixUsed += cost;
+    suffixStart = i;
   }
-  // compactReverse is newest→oldest; the oldest-first ordering is what the
-  // summarizer expects.
-  const compactOldestFirst = compactReverse.slice().reverse();
 
-  // The compacted block is history[startIdx..startIdx + N - 1]. Removing it
-  // must preserve role alternation — msg 0 is a user; the next message left
-  // over after removal also alternates, so the count we remove must be even
-  // (each pair is user+assistant). If we landed on an odd count, leave the
-  // newest-of-compact in history and shorten the block by one.
-  if (compactOldestFirst.length % 2 === 1) {
-    const spared = compactOldestFirst.pop();
+  // The compacted block is history[startIdx..suffixStart - 1]. Its length
+  // must be even to preserve role alternation after removal (msg 0 is user;
+  // each user+assistant pair we drop keeps alternation intact). If odd,
+  // spare the newest-of-compact by bumping suffixStart up by one.
+  let compactLength = suffixStart - startIdx;
+  if (compactLength % 2 === 1) {
+    const spared = history[suffixStart - 1];
+    suffixStart -= 1;
+    compactLength -= 1;
     if (spared) {
-      used += estimateTokens(spared.content) + 4;
+      suffixUsed += estimateTokens(spared.content) + 4;
     }
   }
 
-  const messagesToCompact = compactOldestFirst;
+  const messagesToCompact = history.slice(startIdx, suffixStart);
   const compactThroughIndex =
-    messagesToCompact.length === 0
-      ? -1
-      : startIdx + messagesToCompact.length - 1;
-  const estimatedUsedAfter = baseFixed + summaryTokenBudget + used;
+    compactLength === 0 ? -1 : suffixStart - 1;
+  const estimatedUsedAfter =
+    baseFixedAnchor + summaryTokenBudget + suffixUsed;
 
   log.info(
-    `planCompaction: currentUsed=${currentUsedTokens} target=${targetTokens} baseFixed=${baseFixed} summaryBudget=${summaryTokenBudget} recentBudget=${recentBudget} toCompact=${messagesToCompact.length} compactThroughIdx=${compactThroughIndex} kept=${keptReverse.length} estAfter=${estimatedUsedAfter}`,
+    `planCompaction: currentUsed=${currentUsedTokens} target=${targetTokens} anchor=${baseFixedAnchor} existingSummary=${existingSummaryCost} summaryBudget=${summaryTokenBudget} recentBudget=${recentBudget} toCompact=${messagesToCompact.length} compactThroughIdx=${compactThroughIndex} kept=${history.length - suffixStart} estAfter=${estimatedUsedAfter}`,
   );
 
   return {

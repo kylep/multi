@@ -154,7 +154,7 @@ export function Composer({
                     : "text-muted-foreground hover:text-foreground hover:underline",
                 )}
                 data-testid="compact-link"
-                title="Summarize older messages to shrink context to the Compaction target"
+                title="Summarize older messages and halve the current context usage"
               >
                 compact
               </button>
