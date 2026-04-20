@@ -32,6 +32,8 @@ afterwards was less fun.
 
 - `2026-03-11`: this is a "Hey this is neat" thing, not a  "this works really well!" one.
 - `2026-03-15`: I've deleted basically all these agents and am down to 7.
+  The [research-driven rebuild](/using-agents-better.html) applied Anthropic's
+  published agent design guidance to produce a leaner, better-spec'd roster.
 - I haven't given up on this idea but this approach was too ambitious and didn't have
 the other infra in place it'd need to succeed.
 
