@@ -45,3 +45,17 @@ last_verified: 2026-04-20
 ## Just for You
 
 - [Microsoft Copilot Blog](https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-multi-agent-orchestration-connected-experiences-and-faster-prompt-iteration/) The Copilot Studio A2A update is built on the same Agent-to-Agent open protocol Microsoft co-developed with Google, enabling cross-vendor agent coordination — relevant for anyone building MCP or agent orchestration workflows.
+
+---
+
+## Update — 18:00 UTC
+
+## Open Source
+
+- [GitHub](https://github.com/strimzi/strimzi-kafka-operator/releases/tag/0.51.0) Strimzi 0.51.0 ships with Kafka 4.2.0 support and enables server-side applies by default for PersistentVolumeClaims, Services, Ingress, and ConfigMaps. Kubernetes 1.27–1.29 are no longer supported (requires 1.30+); the ingress listener type is deprecated following the March 2026 archival of the Ingress NGINX Controller. Patches CVE-2026-27133 and CVE-2026-27134.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-municipalities-funding-gap-9.7150596) The Association of Municipalities of Ontario says all 444 municipalities have reached a "critical" point, calling on the province to fill a $4B annual funding gap caused by provincial services — social services, health care, homelessness response — being downloaded onto local property tax bases. Ontario's 2026 budget did not address the structural gap.
+
+- [Town of Whitby](https://www.whitby.ca/news/posts/green-quarterly-april-2026-updates/) Whitby formally recognized 113.28 hectares of town-owned natural heritage lands under Canada's 30×30 conservation target, making them part of national and provincial conservation reporting without requiring new acquisition or policy change.
