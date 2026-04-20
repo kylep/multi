@@ -23,8 +23,9 @@ END_MARK="# BW_SYNC_END"
 # Manifest: "Bitwarden item name | shell env var | field"
 # field is one of: password, username, or the name of a custom field on the item.
 MANIFEST=(
-  "Bluesky App Password (Blog Crosspost Bot) | BLUESKY_APP_PASS | password"
-  "Bluesky App Password (Blog Crosspost Bot) | BLUESKY_HANDLE   | username"
+  "Bluesky App Password (Blog Crosspost Bot)  | BLUESKY_APP_PASS       | password"
+  "Bluesky App Password (Blog Crosspost Bot)  | BLUESKY_HANDLE         | username"
+  "Mastodon Access Token (Blog Crosspost Bot) | MASTODON_ACCESS_TOKEN  | password"
 )
 
 # ---------------------------------------------------------------------------

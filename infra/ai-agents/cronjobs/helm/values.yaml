@@ -21,10 +21,13 @@ cronjobs:
     schedule: "*/10 * * * *"  # every 10 min
   tweetRss:
     enabled: false
-    schedule: "*/15 * * * *"  # every 15 min
+    schedule: "0 */2 * * *"   # every 2h
   blueskyRss:
     enabled: false
-    schedule: "*/15 * * * *"  # every 15 min
+    schedule: "0 */2 * * *"   # every 2h
+  mastodonRss:
+    enabled: false
+    schedule: "0 */2 * * *"   # every 2h
   seoBot:
     enabled: false
     schedule: "0 3 * * *"   # 11:00 PM EDT (03:00 UTC)
