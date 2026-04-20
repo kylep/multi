@@ -59,3 +59,19 @@ last_verified: 2026-04-20
 - [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-municipalities-funding-gap-9.7150596) The Association of Municipalities of Ontario says all 444 municipalities have reached a "critical" point, calling on the province to fill a $4B annual funding gap caused by provincial services — social services, health care, homelessness response — being downloaded onto local property tax bases. Ontario's 2026 budget did not address the structural gap.
 
 - [Town of Whitby](https://www.whitby.ca/news/posts/green-quarterly-april-2026-updates/) Whitby formally recognized 113.28 hectares of town-owned natural heritage lands under Canada's 30×30 conservation target, making them part of national and provincial conservation reporting without requiring new acquisition or policy change.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/features/2026-04-20/google-eyes-new-chips-to-speed-up-ai-results-challenging-nvidia) Google plans to announce new inference-focused TPUs at Google Cloud Next in Las Vegas this week, developed in partnership with Marvell Technology. The initiative includes a next-generation TPU optimized for serving AI models and a companion memory processing unit designed to work alongside existing TPUs; the MPU is expected at design stage by 2027.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-design-anthropic-labs) Anthropic launched Claude Design on April 17 — a research preview under Anthropic Labs for creating prototypes, slides, and one-pagers from text prompts. Powered by Opus 4.7, available to Pro, Max, Team, and Enterprise subscribers. Output can be exported as PDF, URL, PPTX, or sent directly to Canva.
+
+## Geopolitics
+
+- [CNN](https://edition.cnn.com/2026/04/20/world/live-news/iran-war-us-trump-israel) Trump confirmed the Iran ceasefire ends Wednesday evening and called a further extension "highly unlikely." Reports of vessel attacks in the Gulf alongside the seized Iranian cargo ship are pushing the truce to the brink with no deal reached on enrichment, Hormuz access, or war damages.
