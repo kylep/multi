@@ -3,22 +3,22 @@ repos:
   hooks:
     - id: ruff
       name: Ruff
-      description: Python linter using the lint toolkit image.
-      entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-lint-toolkit:0.1 -c "ruff check /workspace --no-cache"'
+      description: Python linter (local binary).
+      entry: ruff check
       language: system
       stages: ["pre-commit"]
       types: [python]
     - id: biome
       name: Biome
-      description: JS/TS linter using the lint toolkit image.
-      entry: bash -c 'docker run -v "$(pwd):/workspace:ro" --rm kpericak/ai-lint-toolkit:0.1 -c "biome lint /workspace/apps/blog/blog/pages /workspace/apps/blog/blog/components /workspace/apps/blog/blog/utils"'
+      description: JS/TS linter (local binary, scoped to apps/blog).
+      entry: bash -c 'biome lint apps/blog/blog/pages apps/blog/blog/components apps/blog/blog/utils'
       language: system
       stages: ["pre-commit"]
       types_or: [javascript, ts, jsx, tsx]
     - id: semgrep
       name: Semgrep
-      description: Static analysis on changed files (1 min timeout).
-      entry: bash -c 'FAIL=0; for f in "$@"; do timeout 60 semgrep scan --config auto --error -j 1 "$f"; rc=$?; if [ $rc -eq 1 ]; then FAIL=1; fi; done; exit $FAIL' --
+      description: Static analysis on changed files (local binary, 1 min timeout).
+      entry: bash -c 'semgrep scan --config auto --error --timeout 60 -j 4 --no-git-ignore "$@"' --
       language: system
       stages: ["pre-commit", "pre-push"]
       types_or: [javascript, ts, jsx, tsx, python]
