@@ -59,3 +59,23 @@ last_verified: 2026-04-21
 ## Just for You
 
 - [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/meta-builds-ai-infrastructure-with-nvidia) NVIDIA unveiled Ising, a family of open-source AI models purpose-built to accelerate quantum computing error-correction decoding, claiming up to 2.5x faster and 3x more accurate results than classical approaches.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [Axios](https://www.axios.com/2026/04/21/openai-anthropic-enterprise-rivalry-heats-up) OpenAI is actively engaging consulting partners to steer enterprises toward Codex after Claude Code's mass adoption drove more business spending to Anthropic than OpenAI. Both companies are strengthening their enterprise positions ahead of potential IPOs expected later in 2026.
+
+## AI Tooling
+
+- [TechCrunch](https://techcrunch.com/2026/04/16/openai-takes-aim-at-anthropic-with-beefed-up-codex-that-gives-it-more-power-over-your-desktop/) OpenAI updated Codex on April 16 with the ability to control desktop applications on macOS, letting multiple agents run background tasks while the user works. The update also adds persistent memory in preview, schedule-based execution, and over 90 plugin integrations with CI/CD and project management tools.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/sglang-cve-2026-5760-cvss-98-enables.html) CVE-2026-5760 (CVSS 9.8) in SGLang, the open-source LLM inference framework, allows arbitrary code execution on inference servers by loading a crafted GGUF model file. The flaw stems from an unsandboxed Jinja2 template renderer in the reranking endpoint; a malicious chat_template in the model triggers it on first use.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-municipalities-funding-gap-9.7150596) Ontario municipalities are pressing the Ford government to fill a $4 billion funding shortfall from downloaded provincial responsibilities. Whitby's mayor is part of a big-city mayors caucus meeting with the provincial finance minister to make the case.
