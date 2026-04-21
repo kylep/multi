@@ -13,6 +13,15 @@ imgprompt: A friendly cartoon robot librarian with round glasses,
   carefully organizing glowing books on wooden shelves in a cozy
   library, warm lighting, flat illustration style with soft gradients,
   books have circuit-board patterns on their spines
+keywords:
+  - ai knowledge base
+  - rag pipeline wiki
+  - structured knowledge base for ai agents
+  - bot wiki
+  - machine-readable wiki
+  - ai agent rag
+  - knowledge graph for llm
+  - wiki for ai robots
 ---
 
 I added a new top-level section to this site: the
