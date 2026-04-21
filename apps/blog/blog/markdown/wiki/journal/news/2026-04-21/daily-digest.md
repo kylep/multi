@@ -79,3 +79,25 @@ last_verified: 2026-04-21
 ## Local
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-municipalities-funding-gap-9.7150596) Ontario municipalities are pressing the Ford government to fill a $4 billion funding shortfall from downloaded provincial responsibilities. Whitby's mayor is part of a big-city mayors caucus meeting with the provincial finance minister to make the case.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Axios](https://www.axios.com/2026/04/21/anthropic-outspends-openai-biggest-lobbying-quarter) Anthropic spent $1.6 million on federal lobbying in Q1 2026, more than four times its Q1 2025 spend of $360,000. OpenAI spent $1 million in the same quarter. Both companies posted their biggest-ever lobbying quarters as they compete for enterprise contracts and regulatory positioning ahead of expected IPOs.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/new-chrome-zero-day-cve-2026-5281-under.html) Google confirmed active exploitation of CVE-2026-5281 in Chrome — a memory corruption flaw enabling arbitrary code execution within the browser. A patch is available; users should update Chrome immediately.
+
+- [The Cyber Express](https://thecyberexpress.com/cisa-kev-catalog-vulnerabilities/) CISA added eight more flaws to its Known Exploited Vulnerabilities catalog, including CVE-2025-32975 (CVSS 10.0) — an improper authentication flaw in Quest KACE Systems Management Appliance that lets attackers impersonate any user without credentials. Federal deadline is April 27.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/04/21/world/live-news/iran-war-us-trump-israel) Trump announced April 21 that the US-Israel ceasefire with Iran is extended until Iran submits a unified peace proposal, reversing his earlier statement that extension was "highly unlikely." Iran's government said it will not send a delegation to Islamabad for talks on April 22; the Strait of Hormuz blockade remains in place.
+
+## Local
+
+- [Toronto Today](https://www.torontotoday.ca/) Anthony Furey dropped out of the Toronto mayoral race on April 21, narrowing the field ahead of the scheduled municipal vote.
