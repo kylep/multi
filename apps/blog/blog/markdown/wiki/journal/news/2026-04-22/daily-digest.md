@@ -71,3 +71,27 @@ last_verified: 2026-04-22
 - [Anthropic Release Notes](https://releasebot.io/updates/anthropic/claude-code) Claude Code April 2026 changelog includes a /recap command for returning to sessions, ENABLE_PROMPT_CACHING_1H env var for 1-hour cache TTL, OS CA certificate trust by default for enterprise TLS proxies, and the Skill tool now discovers and invokes built-in slash commands like /review and /security-review.
 
 - [InfoQ](https://www.infoq.com/news/2026/02/argocd-33/) ArgoCD 3.3 adds PreDelete hooks (completing the full PreSync/Sync/PostSync/PreDelete lifecycle), first-class support for KEDA ScaledObjects, and the ability to pause and resume KEDA jobs from the UI.
+
+---
+
+## Update — 15:00 UTC
+
+Google Cloud Next opens in Las Vegas, Iran's IRGC seizes two ships, and Eurail quietly disclosed a 308k-person breach two weeks ago.
+
+## AI Industry
+
+- [Google Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/) Google launched Deep Research and Deep Research Max on April 21, two autonomous AI research agents powered by Gemini 3.1 Pro. Deep Research Max scored 93.3% on DeepSearchQA (up from 66.1% in December) and 54.6% on Humanity's Last Exam. Both support MCP, native charts in reports, and blending web data with private enterprise sources via API. Available in public preview on the paid Gemini API tier.
+
+- [Motley Fool](https://www.fool.com/investing/2026/04/22/anthropic-just-announced-huge-news-for-alphabet-an/) Anthropic announced it will deploy multiple gigawatts of next-generation TPUs starting in 2027, using chips built through a Broadcom and Alphabet joint venture. The deal is a significant win for Broadcom's custom AI chip business, which posted $8.4B in AI revenue last quarter (up 106% year-over-year).
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/300000-people-impacted-by-eurail-data-breach/) Eurail disclosed a breach affecting 308,777 travelers. Attackers copied files on December 26, 2025, including names and passport numbers; a hacker separately claimed 1.3 TB stolen including database backups and support tickets. The company disclosed publicly on April 9 and notified US regulators. Some data has appeared for sale on the dark web.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/04/22/world/live-news/iran-war-us-trump-blockade-ceasefire) Iran's IRGC seized two vessels in the Strait of Hormuz on April 22, claiming they were attempting to exit covertly. Trump extended the ceasefire but the US naval blockade remains in place. Iran says it will not negotiate while the blockade continues; VP Vance's planned Islamabad trip was canceled.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898,-78.939) Whitby: 20°C high, 4°C low, mainly sunny. No alerts in effect.
