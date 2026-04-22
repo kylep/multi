@@ -95,3 +95,29 @@ Google Cloud Next opens in Las Vegas, Iran's IRGC seizes two ships, and Eurail q
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898,-78.939) Whitby: 20°C high, 4°C low, mainly sunny. No alerts in effect.
+
+---
+
+## Update — 22:00 UTC
+
+Kubernetes 1.36 ships, Google doubles down with two new TPUs and a $750M partner fund, and Microsoft issues an emergency ASP.NET patch that Patch Tuesday accidentally broke.
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/04/22/google-cloud-next-new-tpu-ai-chips-compete-with-nvidia/) Google announced two new eighth-generation TPU chips at Cloud Next 2026 in Las Vegas — the TPU 8t (training-focused, scales to 9,600 units with 2 petabytes of shared HBM in a single superpod) and a companion inference-focused chip built with Marvell. Both target direct competition with NVIDIA at the datacenter level.
+
+- [Google Cloud Press Corner](https://www.googlecloudpresscorner.com/2026-04-22-Google-Cloud-Commits-750-Million-to-Accelerate-Partners-Agentic-AI-Development) Google Cloud committed $750 million to help its 120,000-member partner ecosystem deploy agentic AI, including new tooling incentives and the Gemini Enterprise Agent Platform. Google also launched Workspace Studio, a no-code builder for AI agents across Gmail, Docs, Sheets, Drive, Meet, and Chat.
+
+- [Financial Times via PYMNTS](https://www.pymnts.com/artificial-intelligence-2/2026/openai-pledges-1-5-billion-to-pe-enterprise-ai-project/) OpenAI launched a $10B joint venture targeting enterprise AI deployment — $500M in OpenAI equity (with an option for $1B more) plus $4B from TPG, Bain Capital, Advent International, Brookfield, and Goanna Capital. PE backers were promised at least 17.5% annual returns. The round is expected to close in early May.
+
+## Open Source
+
+- [Kubernetes Blog](https://kubernetes.io/blog/) Kubernetes v1.36 released April 22. Key changes: HPA scale-to-zero support moves idle workloads from error state to valid state; MutatingAdmissionPolicy reaches GA, eliminating external webhook dependencies for mutation logic; User Namespaces reaches GA, mapping container root to non-root host users; OCI Artifact Volumes let teams mount registry artifacts directly without embedding in images. The `gitRepo` volume type is permanently removed. Ingress-NGINX retirement (end-of-life in early 2026) means teams must evaluate alternatives.
+
+## Security
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-emergency-security-updates-for-critical-aspnet-flaw/) Microsoft released an out-of-band emergency patch (.NET 10.0.7) for CVE-2026-40372 (CVSS 9.1) — a privilege escalation flaw in ASP.NET Core Data Protection introduced by the April 14 Patch Tuesday update itself. The bug causes the ManagedAuthenticatedEncryptor to compute HMAC validation over the wrong payload bytes, allowing attackers to forge authentication cookies and gain SYSTEM-level access. All .NET 10.0.0–10.0.6 deployments using ASP.NET Core are affected; update to 10.0.7 immediately.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/04/22/world/live-news/iran-war-us-trump-blockade-ceasefire) Trump gave Iran a 3–5 day window to unify its negotiating position before military operations resume. The White House said the IRGC seizure of two ships is not a ceasefire violation because the vessels were neither US nor Israeli. Iran's parliamentary speaker responded that the US naval blockade itself is a ceasefire violation, and Tehran will not send a delegation to Islamabad while the blockade continues.
