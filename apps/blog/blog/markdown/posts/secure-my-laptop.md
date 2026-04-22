@@ -1,6 +1,7 @@
 ---
-title: "@Ralph Secure My Laptop"
-summary: I went on vacation while Claude had bonus tokens. Made my first Ralph-like loop to improve laptop security IaC.
+title: "Autonomous Claude Code Agent for macOS Security Hardening"
+summary: Running Claude Code in an autonomous loop to audit and harden a Mac M1
+  workstation using Ansible, Lynis, rkhunter, and mSCP CIS Level 1 checks.
 slug: ralph-secure-my-laptop
 category: ai
 tags: AI, OpenClaw, Ralph, security, macOS, Ansible, Claude-Code, CIS
