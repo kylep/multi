@@ -37,3 +37,27 @@ last_verified: 2026-04-23
 ## Just for You
 
 - [GeekWire](https://www.geekwire.com/2026/microsoft-releases-new-ai-models-to-further-expand-beyond-openai/) Microsoft released a new speech-to-text model and made two additional proprietary AI models available to developers for the first time, continuing its push to diversify its AI portfolio beyond the OpenAI partnership ahead of Azure quarterly earnings on April 29.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/anthropic-reaches-1-trillion-valuation-134440611.html) Anthropic's private shares are trading at roughly $1 trillion on secondary markets such as Forge Global and Augment, overtaking OpenAI whose secondary-market valuation stands near $850–880B. Anthropic closed its Series G at a $380B primary valuation in February; the surge is driven by a 233% ARR increase in one quarter to $30B, fueled by Claude Code enterprise adoption.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-23/google-faces-eu-pressure-to-open-up-android-to-gemini-rivals) EU regulators are finalizing requirements ordering Google to grant rival AI assistants — including Claude and ChatGPT — access to the same Android capabilities available to Gemini. The European Commission is expected to issue preliminary findings this month and conclude proceedings by July 2026, with potential fines for non-compliance.
+
+## AI Tooling
+
+- [OpenAI](https://openai.com/index/introducing-gpt-5-3-codex/) OpenAI released GPT-5.3-Codex-Spark in research preview — a smaller, faster variant of GPT-5.3-Codex delivering over 1,000 tokens per second and optimized for real-time coding. Available to ChatGPT Pro users in the Codex app, CLI, and IDE extension; text-only with a 128k context window at launch.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/cisa-adds-8-exploited-flaws-to-kev-sets.html) CISA added three Cisco Catalyst SD-WAN Manager vulnerabilities (CVE-2026-20122, CVE-2026-20128, CVE-2026-20133) to its KEV catalog alongside PaperCut NG/MF CVE-2023-27351 and Zimbra ZCS CVE-2025-48700. Federal remediation deadlines span April 23–May 4, 2026.
+
+## Local
+
+- [CP24](https://www.cp24.com) Ontario's NDP and Liberal parties are pushing back after the Ford government scheduled a rare late-night legislative session on April 23 to advance changes to Freedom of Information legislation, limiting public access to government records.
+
+- [CTV News](https://www.ctvnews.ca/toronto/) Portions of the Gardiner Expressway and Don Valley Parkway will close this weekend for infrastructure maintenance tied to FIFA World Cup 2026 preparations. Motorists should expect significant detours through Monday morning.
