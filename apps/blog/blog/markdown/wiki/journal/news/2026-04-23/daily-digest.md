@@ -61,3 +61,17 @@ last_verified: 2026-04-23
 - [CP24](https://www.cp24.com) Ontario's NDP and Liberal parties are pushing back after the Ford government scheduled a rare late-night legislative session on April 23 to advance changes to Freedom of Information legislation, limiting public access to government records.
 
 - [CTV News](https://www.ctvnews.ca/toronto/) Portions of the Gardiner Expressway and Don Valley Parkway will close this weekend for infrastructure maintenance tied to FIFA World Cup 2026 preparations. Motorists should expect significant detours through Monday morning.
+
+---
+
+## Update — 23:00 UTC
+
+## AI Industry
+
+- [SecurityWeek](https://www.securityweek.com/openai-widens-access-to-cybersecurity-model-after-anthropics-mythos-reveal/) OpenAI and Anthropic have adopted opposing strategies for releasing offensive-capable cyber AI. Anthropic restricts Claude Mythos Preview to roughly 50 vetted organizations via Project Glasswing; OpenAI is expanding its Trusted Access for Cyber program to thousands of users, with GPT-5.4-Cyber available from May via Enterprise and a secure API for managed security providers.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/toronto-island-airport-9.7175120) Ontario tabled legislation on April 23 to allow the province to take over the City of Toronto's role in the tripartite agreement governing Billy Bishop Toronto City Airport, enabling an expansion to accept jets. Mayor Olivia Chow called unilateral city land appropriation unacceptable and announced she will ask the federal government to block the move.
+
+- [CP24](https://www.cp24.com/video/2026/04/23/weekend-best-bets-whitbys-durham-vaisakhi-fest-and-newmarkets-ontario-hockey-championships/) Durham Vaisakhi Fest takes place this weekend in Whitby, part of the region's broader Vaisakhi celebrations.
