@@ -151,7 +151,9 @@ command execution.
 
 # OpenCode
 
-OpenCode has native OpenRouter support.
+[OpenCode](/local-opencode-setup.html) is an open-source terminal-based
+alternative to Claude Code with native multi-model and multi-agent support.
+It has native OpenRouter support.
 
 ## What didn't work
 
