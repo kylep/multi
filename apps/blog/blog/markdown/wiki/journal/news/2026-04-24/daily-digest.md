@@ -87,3 +87,25 @@ last_verified: 2026-04-24
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898,-78.939) Whitby: 10°C high, 4°C low, cloudy with a 40% chance of showers early afternoon then a mix of sun and cloud. No alerts.
+
+---
+
+## Update — 22:02 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-24/google-plans-to-invest-up-to-40-billion-in-anthropic) Google will invest up to $40 billion in Anthropic — $10 billion now at a $350 billion valuation, with $30 billion more conditional on performance targets, plus five gigawatts of cloud compute delivered over five years. Anthropic's annual revenue run rate hit $30 billion this month, up from $9 billion at end of 2025.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news) Anthropic launched consumer app connectors for Claude, linking the assistant directly to Spotify, Uber, Uber Eats, Instacart, TurboTax, TripAdvisor, Booking.com, StubHub, AllTrails, Audible, Resy, Taskrabbit, Thumbtack, and Viator. Connectors are available on all Claude plans; data from connected apps is not used for model training.
+
+- [InfoQ](https://www.infoq.com/news/2026/04/anthropic-managed-agents/) Anthropic Managed Agents launched April 8 — a hosted execution layer for long-running Claude agent workflows with built-in session state, sandboxing, credential handling, and error recovery. Early adopters include Notion, Rakuten, and Asana; Anthropic claims 10x faster agent deployment versus self-hosted.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/adobe-patches-actively-exploited.html) CVE-2026-34621 (CVSS 8.6) is a prototype pollution flaw in Adobe Acrobat Reader enabling arbitrary code execution when a user opens a malicious PDF. Adobe patched it on April 13 after confirming active exploitation; CISA added it to the KEV catalog the same day. The flaw had been exploited undetected since at least December 2025.
+
+## Geopolitics
+
+- [NBC News](https://www.nbcnews.com/world/iran/live-blog/live-updates-trump-iran-hormuz-blockade-ceasefire-talks-lebanon-israel-rcna341571) Trump ordered the US military to shoot and kill Iranian boats laying mines in the Strait of Hormuz. Iran seized three commercial ships on April 24; the US has separately boarded a tanker smuggling Iranian oil. Both sides maintain blockades, and no new peace talks are scheduled.
