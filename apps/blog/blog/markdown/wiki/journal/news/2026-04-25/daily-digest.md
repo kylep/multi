@@ -69,3 +69,41 @@ last_verified: 2026-04-25
 ## Geopolitics
 
 - [Al Jazeera](https://www.aljazeera.com/news/2026/3/15/us-china-hold-trade-talks-in-paris-to-clear-path-to-trump-xi-summit) The Trump-Xi summit was pushed from early April to May 14–15 after Trump delayed the Beijing trip citing the Iran conflict. US and Chinese negotiators held trade talks in Paris this week to prepare for the rescheduled meeting, with tariff reductions, rare earth access, and export controls on the agenda.
+
+---
+
+## Update — 22:03 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/04/20/amazon-invest-up-to-25-billion-in-anthropic-part-of-ai-infrastructure.html) Amazon committed up to $25 billion in additional Anthropic investment — $5 billion immediately at a $380 billion valuation, with up to $20 billion more tied to commercial milestones. Anthropic in return committed over $100 billion in AWS spending over the next decade and will bring nearly 1 gigawatt of Trainium2 and Trainium3 capacity online by year-end.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-21/spacex-says-has-agreement-to-acquire-cursor-for-60-billion) SpaceX struck a deal giving it the option to acquire AI coding tool Cursor for $60 billion later this year, pre-empting a $2 billion fundraising round. The agreement includes a $10 billion collaboration fee for joint work combining Cursor's product with SpaceX's Colossus supercomputer cluster. SpaceX recently merged with xAI and is delaying the full acquisition until after its IPO this summer.
+
+- [US News](https://www.usnews.com/news/top-news/articles/2026-04-25/openai-chief-apologizes-for-not-reporting-shooting-suspect-to-police) OpenAI CEO Sam Altman apologized for not alerting Canadian police to a ChatGPT account linked to Jesse Van Rootselaar, who killed eight people at a Tumbler Ridge school in February before dying. The account had been banned in June; Altman's letter dated April 23 acknowledged law enforcement should have been notified.
+
+## AI Tooling
+
+- [SiliconANGLE](https://siliconangle.com/2026/04/08/anthropic-launches-claude-managed-agents-speed-ai-agent-development/) Anthropic launched Claude Managed Agents in public beta on April 8 — a hosted API service that handles orchestration, sandboxing, session state, and credential management for long-running agentic workflows. Pricing is standard Claude token rates plus $0.08 per session-hour; Notion, Rakuten, and Sentry are already in production.
+
+- [Fortune](https://fortune.com/2026/04/24/anthropic-engineering-missteps-claude-code-performance-decline-user-backlash/) Anthropic acknowledged that engineering missteps caused a monthlong decline in Claude Code performance. The company fixed the issues, repaired a caching bug, restored higher default reasoning effort, and reset usage limits for subscribers.
+
+- [Anthropic](https://releasebot.io/updates/anthropic) Anthropic shipped a Rate Limits API on April 25 that lets API administrators programmatically query rate limits configured for their organization and individual workspaces.
+
+- [GitHub Blog](https://github.blog/news-insights/company-news/changes-to-github-copilot-individual-plans/) GitHub paused new Copilot Pro, Pro+, and Student plan signups on April 20 after compute costs nearly doubled week-over-week since January. The company plans to shift users to token-based billing based on actual token consumption. Opus 4.7 access was restricted from the Pro tier to Pro+ only.
+
+- [InfoQ](https://www.infoq.com/news/2026/04/github-copilot-training-data/) GitHub announced on April 24 that interaction data from Copilot Free, Pro, and Pro+ users will be used to train its AI models, with users opted in by default. The setting can be manually disabled in account preferences.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/cisa-adds-4-exploited-flaws-to-kev-sets.html) CISA added four actively exploited vulnerabilities to its Known Exploited Vulnerabilities catalog on April 25, with a May 8 federal remediation deadline. The flaws affect SimpleHelp (CVE-2024-57726 privilege escalation, CVE-2024-57728 path traversal), Samsung MagicINFO 9 Server (CVE-2024-7399 arbitrary file write with system privileges), and D-Link DIR-823X routers (CVE-2025-29635 command injection).
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/microsoft-april-2026-patch-tuesday-fixes-167-flaws-2-zero-days/) Microsoft's April 2026 Patch Tuesday addressed 167 vulnerabilities including two zero-days. CVE-2026-32201, a SharePoint Server spoofing flaw, was actively exploited before the patch shipped. CVE-2026-33825, a Microsoft Defender privilege escalation to SYSTEM, was publicly disclosed before a fix was available.
+
+## Geopolitics
+
+- [IMF](https://www.imf.org/en/publications/weo/issues/2026/04/14/world-economic-outlook-april-2026) The IMF's April 2026 World Economic Outlook cut global growth projections to 3.1% for 2026, attributing the downgrade to ongoing Middle East hostilities and the risk of Strait of Hormuz closure disrupting global energy supply. US-Iran ceasefire negotiations remain active.
+
+## Local
+
+- [CP24](https://www.cp24.com) Toronto is closing portions of the Gardiner Expressway and Don Valley Parkway this weekend for infrastructure maintenance and FIFA World Cup 2026 preparation. Drivers should expect significant detours across major routes.
