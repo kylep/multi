@@ -71,3 +71,21 @@ last_verified: 2026-04-26
 - [Kubernetes Blog](https://kubernetes.io/blog/2026/04/22/kubernetes-v1-36-release/) Kubernetes v1.36 "Haru" released April 22 — HPA scale-to-zero is now GA (scaling deployments to zero replicas when idle), rootless user namespaces are stable, and SELinux mount-option labeling is GA. 70 enhancements from 106 companies across the 15-week release cycle.
 
 - [InfoQ](https://www.infoq.com/news/2026/04/cloudflare-mcp/) Cloudflare published an enterprise reference architecture for MCP deployments: remote MCP servers on Cloudflare's developer platform, Cloudflare Access for SSO/MFA, AI Gateway for per-user token caps, and a "Code Mode" feature reducing token usage by up to 99.9% by collapsing tool interfaces to dynamic entry points.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/making-chatgpt-better-for-clinicians/) OpenAI launched ChatGPT for Clinicians on April 23 — a free product for verified US physicians, nurse practitioners, and pharmacists. It runs on GPT-5.4, provides cited answers from peer-reviewed medical sources, and includes reusable workflow templates for referral letters and prior authorizations.
+
+- [Google AI Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/) Google launched Deep Research and Deep Research Max in Gemini API public preview on April 21, built on Gemini 3.1 Pro. Both agents support MCP to connect to private data sources; Deep Research Max scored 93.3% on DeepSearchQA and generates native charts inside reports. Available on paid Gemini API tiers.
+
+## Security
+
+- [TechCrunch](https://techcrunch.com/2026/04/21/unauthorized-group-has-gained-access-to-anthropics-exclusive-cyber-tool-mythos-report-claims/) An unauthorized group gained access to Claude Mythos Preview — Anthropic's restricted offensive-security model — on the day it launched in April. A contractor at a third-party vendor used internal access plus information from an earlier Mercor data breach to locate and open the model to colleagues. Anthropic is investigating; no cybersecurity-related prompts have been confirmed run through it yet.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-municipalities-funding-gap-9.7150596) Ontario municipalities, led by a motion from Whitby Mayor Elizabeth Roy, are calling on the province to address a $4B annual funding gap created by provincial responsibilities downloaded to municipal governments. Whitby has deferred park development and road repairs as a result.
