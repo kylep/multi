@@ -288,3 +288,9 @@ development itself (writing the script, iterating on the
 blog post) ran through Claude Code on an Anthropic Max
 subscription, so that cost isn't on the OpenRouter bill.
 
+The wiki is also a write target, not just a read one. I have
+a journalist agent that runs on a K8s CronJob every morning,
+searches for AI news, and commits a digest to the wiki automatically.
+[Cron/event-triggered AI agents on K8s](/cron-event-triggered-ai-agents-k8s.html)
+covers how that side works.
+
