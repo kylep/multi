@@ -51,3 +51,23 @@ last_verified: 2026-04-26
 ## Just for You
 
 - [GitHub](https://github.com/multica-ai/multica) multica-ai/multica (5,118 stars/week, 21,233 total) is an open-source managed agents platform for coordinating coding agents as teammates — task assignment, progress tracking, and compounding skill trees. Directly competes with Anthropic's Managed Agents offering.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [MacRumors](https://www.macrumors.com/2026/04/22/google-gemini-powered-siri-2026/) Google Cloud CEO Thomas Kurian confirmed at Cloud Next '26 that Gemini models will power a more personalized Siri coming later in 2026, with Apple naming Google Cloud as its preferred cloud provider for future Apple Intelligence features.
+
+- [TechCrunch](https://techcrunch.com/2026/04/25/anthropic-created-a-test-marketplace-for-agent-on-agent-commerce/) Anthropic ran an internal agent commerce experiment called "Project Deal" in December 2025 — 69 employees each got $100, AI agents handled all buying and selling. Opus agents closed 186 deals totaling $4,000+, averaging two more deals than Haiku agents and earning $3.64 more per matched sale.
+
+## Open Source
+
+- [GitHub](https://github.com/huggingface/ml-intern) Hugging Face ml-intern (6.6k stars) is an open-source ML engineer agent that automates the full LLM post-training loop: reads arXiv papers, finds datasets on the Hub, runs training scripts, and iterates on evaluation. In the launch demo it raised Qwen3-1.7B from ~10% to 32% on GPQA in under 10 hours.
+
+## Just for You
+
+- [Kubernetes Blog](https://kubernetes.io/blog/2026/04/22/kubernetes-v1-36-release/) Kubernetes v1.36 "Haru" released April 22 — HPA scale-to-zero is now GA (scaling deployments to zero replicas when idle), rootless user namespaces are stable, and SELinux mount-option labeling is GA. 70 enhancements from 106 companies across the 15-week release cycle.
+
+- [InfoQ](https://www.infoq.com/news/2026/04/cloudflare-mcp/) Cloudflare published an enterprise reference architecture for MCP deployments: remote MCP servers on Cloudflare's developer platform, Cloudflare Access for SSO/MFA, AI Gateway for per-user token caps, and a "Code Mode" feature reducing token usage by up to 99.9% by collapsing tool interfaces to dynamic entry points.
