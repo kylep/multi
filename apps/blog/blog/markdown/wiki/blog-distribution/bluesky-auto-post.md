@@ -47,7 +47,7 @@ Persistent file on a PVC tracking posted item GUIDs
 ## Architecture
 
 ```
-CronJob (every 15 min)
+CronJob (every 2h)
   → GET /feed.xml
   → diff against /cache/posted-guids
   → for each new item:
@@ -99,7 +99,8 @@ app_password   # xxxx-xxxx-xxxx-xxxx (NOT the account password)
 
 ### CronJob schedule
 
-Every 15 minutes, matching the Twitter job. RSS polling is cheap.
+Every 2 hours (`0 */2 * * *`). Blog posts publish infrequently, so
+sub-hour latency buys nothing.
 
 ## Enabling
 
@@ -118,7 +119,7 @@ Every 15 minutes, matching the Twitter job. RSS polling is cheap.
    cronjobs:
      blueskyRss:
        enabled: true
-       schedule: "*/15 * * * *"
+       schedule: "0 */2 * * *"
    ```
 6. ArgoCD will create the CronJob automatically.
 

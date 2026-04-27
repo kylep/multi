@@ -73,7 +73,7 @@ This is more robust than timestamp-based filtering because:
 ## Architecture
 
 ```
-CronJob (every 15 min)
+CronJob (every 2h)
   → curl RSS feed
   → diff against /cache/posted-guids
   → for new items:
@@ -116,8 +116,8 @@ twitter_access_token_secret
 
 ### CronJob schedule
 
-Every 15 minutes. The RSS feed is small, the check is fast, and
-15 min is a reasonable delay between publishing and tweeting.
+Every 2 hours (`0 */2 * * *`). Blog posts publish infrequently,
+so sub-hour latency buys nothing and every run burns a pod cold-start.
 
 ## X API setup
 
@@ -167,7 +167,7 @@ and in K8s pod). Disabled by default until X API credentials exist.
    cronjobs:
      tweetRss:
        enabled: true
-       schedule: "*/15 * * * *"
+       schedule: "0 */2 * * *"
    ```
 4. ArgoCD will deploy the CronJob automatically
 

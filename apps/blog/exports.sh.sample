@@ -61,3 +61,7 @@ export TWITTER_ACCESS_TOKEN_SECRET=""
 # Bluesky — bsky.app → Settings → Privacy and Security → App Passwords
 export BLUESKY_HANDLE=""   # e.g. kylep.bsky.social
 export BLUESKY_APP_PASS="" # xxxx-xxxx-xxxx-xxxx (App Password, NOT account password)
+
+# Mastodon — mastodon.social → Settings → Development → New application
+# Scope: write:statuses. Paste the "Your access token" value.
+export MASTODON_ACCESS_TOKEN=""
