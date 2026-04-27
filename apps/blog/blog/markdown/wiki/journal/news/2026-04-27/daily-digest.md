@@ -57,3 +57,21 @@ last_verified: 2026-04-27
 ## GitHub Trending
 
 See [github-trending.md](./github-trending.md) for the full weekly trending list. Claude Code tooling and agent infrastructure dominate the top spots this week — Karpathy's CLAUDE.md skills guide hit 92k total stars, and free-claude-code, claude-context, and multica (managed coding agents) all appear in the top 8. First trending snapshot — no comparison available.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/introducing-gpt-5-5/) OpenAI released GPT-5.5 on April 23, now available in ChatGPT for Plus, Pro, Business, and Enterprise users and in the API at $5/$30 per 1M input/output tokens with a 1M context window. The model targets agentic coding, computer use, and knowledge work, and matches GPT-5.4 latency in production serving.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-design-anthropic-labs) Anthropic Labs launched Claude Design on April 17 — a research-preview tool that generates designs, prototypes, slides, and one-pagers from text prompts, powered by Opus 4.7. Available to Pro, Max, Team, and Enterprise subscribers. Handoff bundles connect directly to Claude Code for moving from prototype to production. Figma's stock fell roughly 7% on the day of announcement.
+
+- [Google Workspace Blog](https://workspace.google.com/blog/product-announcements/more-personalized-and-proactive-assistance-in-gmail-coming-to-business-customers) Gmail AI Overviews began rolling out today for Business, Enterprise, and Education accounts. Users can ask natural-language questions in Gmail search and get answers summarized from across their inbox without opening individual emails.
+
+## Just for You
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/nvidia-launches-ising-the-worlds-first-open-ai-models-to-accelerate-the-path-to-useful-quantum-computers) NVIDIA released Ising on April 14 — an open-source family of quantum AI models including a 35B vision-language model for automated qubit calibration and a 3D CNN for real-time error correction. Error-correction decoding runs 2.5x faster and 3x more accurately than traditional methods; early adopters include Fermilab, Harvard, and Lawrence Berkeley National Laboratory.
