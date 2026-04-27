@@ -260,3 +260,7 @@ Nemo was the pretty clear winner. I'm not sure if that's because of the size of 
 model or something else, but it was a significant step up in its ability to stick to
 the prompt's instructions, and the writing style was better too.
 
+The same M2 hardware handles local image generation too.
+[ComfyUI on M2](/oss-img-gen.html) covers SDXL with IP-Adapter for generating
+character portraits with visual consistency across scenes.
+
