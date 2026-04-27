@@ -57,3 +57,45 @@ last_verified: 2026-04-27
 ## GitHub Trending
 
 See [github-trending.md](./github-trending.md) for the full weekly trending list. Claude Code tooling and agent infrastructure dominate the top spots this week — Karpathy's CLAUDE.md skills guide hit 92k total stars, and free-claude-code, claude-context, and multica (managed coding agents) all appear in the top 8. First trending snapshot — no comparison available.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/introducing-gpt-5-5/) OpenAI released GPT-5.5 on April 23, now available in ChatGPT for Plus, Pro, Business, and Enterprise users and in the API at $5/$30 per 1M input/output tokens with a 1M context window. The model targets agentic coding, computer use, and knowledge work, and matches GPT-5.4 latency in production serving.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-design-anthropic-labs) Anthropic Labs launched Claude Design on April 17 — a research-preview tool that generates designs, prototypes, slides, and one-pagers from text prompts, powered by Opus 4.7. Available to Pro, Max, Team, and Enterprise subscribers. Handoff bundles connect directly to Claude Code for moving from prototype to production. Figma's stock fell roughly 7% on the day of announcement.
+
+- [Google Workspace Blog](https://workspace.google.com/blog/product-announcements/more-personalized-and-proactive-assistance-in-gmail-coming-to-business-customers) Gmail AI Overviews began rolling out today for Business, Enterprise, and Education accounts. Users can ask natural-language questions in Gmail search and get answers summarized from across their inbox without opening individual emails.
+
+## Just for You
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/nvidia-launches-ising-the-worlds-first-open-ai-models-to-accelerate-the-path-to-useful-quantum-computers) NVIDIA released Ising on April 14 — an open-source family of quantum AI models including a 35B vision-language model for automated qubit calibration and a 3D CNN for real-time error correction. Error-correction decoding runs 2.5x faster and 3x more accurately than traditional methods; early adopters include Fermilab, Harvard, and Lawrence Berkeley National Laboratory.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [US News](https://www.usnews.com/news/top-news/articles/2026-04-27/google-gets-pointers-from-eu-regulators-on-helping-ai-rivals-access-services) EU antitrust regulators issued guidance today requiring Google to open Android capabilities — currently exclusive to Gemini — to competing AI services. The directive targets app interaction access that Google presently restricts to its own assistant on Android devices.
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/innovation-and-ai/products/gemini-app/gemini-drop-april-2026/) Google's 10th Gemini Drops update ships a native macOS desktop app for the Gemini assistant and music creation via Lyria 3 Pro, which generates tracks up to three minutes long from text prompts. The update also adds Gemini integration into Google Photos for natural-language search across a user's photo library.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/lmdeploy-cve-2026-33626-flaw-exploited.html) CVE-2026-33626 (CVSS 7.5) in LMDeploy, a widely-used LLM inference toolkit, was actively exploited within 13 hours of public disclosure. The SSRF flaw in the vision-language image loader lets attackers probe internal networks, reach cloud metadata services, and exfiltrate credentials. All versions prior to 0.12.0 with VL support are affected; patched in 0.12.3.
+
+- [NVD](https://nvd.nist.gov/vuln/detail/CVE-2026-40050) CVE-2026-40050 (CVSS 9.8) is a critical unauthenticated path-traversal flaw in CrowdStrike LogScale Self-Hosted affecting versions 1.224.0–1.234.0. An unauthenticated remote attacker can read arbitrary files from the server filesystem. CrowdStrike says SaaS clusters were mitigated April 7 with no evidence of exploitation; self-hosted deployments should upgrade to 1.235.1 or 1.228.2 LTS.
+
+## Geopolitics
+
+- [CNBC](https://www.cnbc.com/2026/04/27/us-iran-peace-talks-stall-global-markets-stocks-oil-treasurys.html) Iran proposed reopening the Strait of Hormuz and returning to pre-war status as the first stage of a deal, with nuclear talks deferred to a later phase. Trump canceled plans to send envoys Witkoff and Kushner to Islamabad over the weekend, citing leadership confusion in Tehran. Goldman Sachs raised its Brent crude forecast to $90/barrel by late 2026, citing a record 11–12 million bpd global inventory draw in April.
+
+- [CNN](https://www.cnn.com/2026/04/27/world/live-news/iran-war-trump-israel) Israeli forces struck Hezbollah infrastructure in the Beqaa Valley and southern Lebanon on Monday, testing the existing ceasefire agreement. The IDF confirmed strikes across multiple locations.
