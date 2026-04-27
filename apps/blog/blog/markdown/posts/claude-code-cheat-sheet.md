@@ -305,11 +305,14 @@ claude --session-id $SESSION
 
 
 
+---
 
+# Slash commands reference
 
-# Slash commands
-
-There are a lot of these, here's some good ones. Special shout-out to `btw`.
+There are a lot of these, here's some good ones.
+- `/btw` is great, use it when you think claude is stuck
+- I pretty much only use xhigh effort currently
+- I personally use `/coderabbit` for PR reviews but `/review` is nice too. It figures out your current PR itself.
 
 
 | Command | What it does |
@@ -336,21 +339,6 @@ There are a lot of these, here's some good ones. Special shout-out to `btw`.
 | `/usage` | Plan usage limits and rate-limit status. |
 | `/doctor` | Diagnose the installation. |
 
-## Setup and environment
-
-| Command | What it does |
-|---------|--------------|
-| `/init` | Initialize the project with a CLAUDE.md. |
-| `/config` (alias `/settings`) | Open the Settings TUI. |
-| `/status` | Settings Status tab: version, model, account, connectivity. |
-| `/add-dir <path>` | Add a working directory mid-session. |
-| `/keybindings` | Open or create the keybindings config file. |
-| `/statusline` | Configure the status line. |
-| `/terminal-setup` | Install Shift+Enter binding for VS Code / Alacritty / Zed / Warp. |
-| `/theme` | Switch theme (auto, light, dark, colorblind, ANSI). |
-| `/tui [default\|fullscreen]` | Terminal UI renderer. |
-| `/login`, `/logout` | Auth. |
-| `/release-notes` | Changelog picker. |
 
 ## Session management and viewing
 
@@ -367,21 +355,12 @@ There are a lot of these, here's some good ones. Special shout-out to `btw`.
 | `/focus` | Toggle focus view (fullscreen renderer only). |
 | `/color <name>` | Prompt bar color: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan`. |
 
-## Skills that ship in the box
-
-These are bundled skills, not hard-coded commands. They're prompt-driven
-and you can see the source via `/skills`.
-
-| Command | What it does |
-|---------|--------------|
-| `/simplify [focus]` | Review changed files and fix quality/efficiency issues. |
-| `/batch <instruction>` | Orchestrate large-scale parallel changes across the codebase. |
-| `/debug [description]` | Enable debug logging and troubleshoot. |
-| `/loop [interval] [prompt]` (alias `/proactive`) | Run a prompt repeatedly. |
-| `/claude-api` | Load Claude API reference for the session's language. |
-| `/fewer-permission-prompts` | Scan transcripts and propose allowlist entries. |
 
 ## Integrations and misc
+
+Some notes from my testing of these:
+- `/voice` is novel but way worse than ChatGPT at recognizing what you said. I don't find it very usable.
+- `/install-github-app` is neat in that you don't need other infra. See [instructions](https://code.claude.com/docs/en/github-actions).
 
 | Command | What it does |
 |---------|--------------|
@@ -400,6 +379,26 @@ and you can see the source via `/skills`.
 | `/plugin`, `/reload-plugins` | Plugin management. |
 | `/sandbox` | Toggle sandbox mode (supported platforms only). |
 | `/voice` | Push-to-talk voice dictation. |
+
+---
+
+
+# Skills & Plugins
+
+## Skills that ship in the box
+
+These are bundled skills, not hard-coded commands. They're prompt-driven
+and you can see the source via `/skills`.
+
+| Command | What it does |
+|---------|--------------|
+| `/simplify [focus]` | Review changed files and fix quality/efficiency issues. |
+| `/batch <instruction>` | Orchestrate large-scale parallel changes across the codebase. |
+| `/debug [description]` | Enable debug logging and troubleshoot. |
+| `/loop [interval] [prompt]` (alias `/proactive`) | Run a prompt repeatedly. |
+| `/claude-api` | Load Claude API reference for the session's language. |
+| `/fewer-permission-prompts` | Scan transcripts and propose allowlist entries. |
+
 
 ## MCP prompts
 
