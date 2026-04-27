@@ -42,9 +42,17 @@ Useful to know what these are
 
 
 
-# Launch headless Claude, ex for Docker/Kubernetes
+# Launch headless Claude, ex in Kubernetes cron jobs
 
-Install it in a Dockerfile.
+Install it in a Dockerfile. I like to launch it from k8s in a CronJob from there.
+
+
+`vi Dockerfile`
+```dockerfile
+FROM node:22-slim
+RUN npm i -g @anthropic-ai/claude-code
+```
+
 
 Collect the value for `CLAUDE_CODE_OAUTH_TOKEN`.
 ```bash
@@ -59,7 +67,6 @@ claude \
   --output-format json \
   --m opus \
   -p $CLAUDE_PROMPT
-
 ```
 
 You'll probably also want to use `--permission-mode auto` or `--dangerously-skip-permissions`
@@ -87,17 +94,9 @@ too so it doesn't freeze on permission requests. Consider some of these launch f
 Note: `--system-prompt` and `--system-prompt-file` are mutually exclusive;
 `--append-*` variants compose with either.
 
-Then run it. A complete example, with the token sourced from a secret
-and the run capped on turns and spend:
+Then run it. Another example:
 
 ```bash
-# One-time, on a dev box. Copy the printed token into your secret store
-# (Vault, k8s Secret, GitHub Actions secret, whatever you use).
-claude setup-token
-
-# At runtime, in the container or job:
-export CLAUDE_CODE_OAUTH_TOKEN="$(cat /vault/secrets/claude_oauth_token)"
-
 claude \
   -p "$CLAUDE_PROMPT" \
   --model sonnet \
@@ -108,7 +107,7 @@ claude \
   --no-session-persistence
 ```
 
-That gives you JSON output for downstream parsing, a hard cap on agentic
+This'd give you JSON output for parsing (datadog etc), a hard cap on agentic
 turns, a dollar ceiling so a runaway job can't drain your account, and
 no session file written to disk. Drop the `--max-*` flags if you trust
 the prompt, swap `bypassPermissions` for `auto` if you want the
