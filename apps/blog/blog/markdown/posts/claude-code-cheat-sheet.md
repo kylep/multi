@@ -4,8 +4,8 @@ summary: A deeper look into CLI flags, slash commands, keyboard shortcuts, hooks
 slug: claude-code-cheat-sheet
 category: ai
 tags: Claude-Code, AI, reference, CLI
-date: 2026-04-19
-modified: 2026-04-19
+date: 2026-04-27
+modified: 2026-04-27
 status: published
 image: claude-code-cheat-sheet.png
 thumbnail: claude-code-cheat-sheet-thumb.png
