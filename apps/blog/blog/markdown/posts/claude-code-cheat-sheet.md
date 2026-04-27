@@ -87,7 +87,32 @@ too so it doesn't freeze on permission requests. Consider some of these launch f
 Note: `--system-prompt` and `--system-prompt-file` are mutually exclusive;
 `--append-*` variants compose with either.
 
-Then run it, for example
+Then run it. A complete example, with the token sourced from a secret
+and the run capped on turns and spend:
+
+```bash
+# One-time, on a dev box. Copy the printed token into your secret store
+# (Vault, k8s Secret, GitHub Actions secret, whatever you use).
+claude setup-token
+
+# At runtime, in the container or job:
+export CLAUDE_CODE_OAUTH_TOKEN="$(cat /vault/secrets/claude_oauth_token)"
+
+claude \
+  -p "$CLAUDE_PROMPT" \
+  --model sonnet \
+  --output-format json \
+  --permission-mode bypassPermissions \
+  --max-turns 10 \
+  --max-budget-usd 2.00 \
+  --no-session-persistence
+```
+
+That gives you JSON output for downstream parsing, a hard cap on agentic
+turns, a dollar ceiling so a runaway job can't drain your account, and
+no session file written to disk. Drop the `--max-*` flags if you trust
+the prompt, swap `bypassPermissions` for `auto` if you want the
+auto-mode classifier to gate risky calls.
 
 ---
 
