@@ -1,5 +1,5 @@
 ---
-title: "Autonomous Claude Code Agent for macOS Security Hardening"
+title: "Ralph Secure My Laptop"
 summary: Running Claude Code in an autonomous loop to audit and harden a Mac M1
   workstation using Ansible, Lynis, rkhunter, and mSCP CIS Level 1 checks.
 slug: ralph-secure-my-laptop
