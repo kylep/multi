@@ -62,3 +62,9 @@ tshark -i eno1 -Y "ip.src == 10.1.0.76"
 # Capture HTTP to and from a given source
 tshark -i eno1 -Y "ip.addr == 10.1.0.76 and http"
 ```
+
+---
+
+**See also:** [Operations Reference Page](/ops.html) for more Linux ops
+recipes: vim find-and-replace, passwordless sudo, loopback volumes,
+journalctl, and bash exit traps.

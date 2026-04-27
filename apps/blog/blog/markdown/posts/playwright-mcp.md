@@ -1,8 +1,6 @@
 ---
 title: "Playwright MCP: Claude Code Verifying Its Own Work"
-summary: Using the Playwright MCP server to give Claude Code live browser access,
-  writing Gherkin-driven tests for a Next.js blog, and exploring what it means
-  for an agent to verify the changes it just made.
+summary: "Playwright MCP setup for Claude Code: browser tools reference, Gherkin test generation, and letting agents verify their own changes."
 slug: playwright-mcp
 category: ai
 tags: AI, Claude-Code, Playwright, MCP, Testing, Gherkin
