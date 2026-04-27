@@ -1,6 +1,6 @@
 ---
 title: "Claude Code CLI Cheat-Sheet"
-summary: A depper look into CLI flags, slash commands, keyboard shortcuts, hooks, custom agents and skills.
+summary: A deeper look into CLI flags, slash commands, keyboard shortcuts, hooks, custom agents and skills.
 slug: claude-code-cheat-sheet
 category: ai
 tags: Claude-Code, AI, reference, CLI
@@ -452,7 +452,7 @@ claude --continue
 ## Forking sessions
 It's like starting claude twice in the same directory, but without using worktrees.
 The changes all go to the same branches and locations on the filesystem.
-You resume from where the most recent session lefto off.
+You resume from where the most recent session left off.
 
 ```bash
 claude # or if you plan ahead, "claude --name foobarbaz"
