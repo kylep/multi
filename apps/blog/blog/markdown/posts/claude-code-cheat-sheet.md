@@ -42,9 +42,17 @@ Useful to know what these are
 
 
 
-# Launch headless Claude, ex for Docker/Kubernetes
+# Launch headless Claude, ex in Kubernetes cron jobs
 
-Install it in a Dockerfile.
+Install it in a Dockerfile. I like to launch it from k8s in a CronJob from there.
+
+
+`vi Dockerfile`
+```dockerfile
+FROM node:22-slim
+RUN npm i -g @anthropic-ai/claude-code
+```
+
 
 Collect the value for `CLAUDE_CODE_OAUTH_TOKEN`.
 ```bash
@@ -59,7 +67,6 @@ claude \
   --output-format json \
   --m opus \
   -p $CLAUDE_PROMPT
-
 ```
 
 You'll probably also want to use `--permission-mode auto` or `--dangerously-skip-permissions`
@@ -87,7 +94,24 @@ too so it doesn't freeze on permission requests. Consider some of these launch f
 Note: `--system-prompt` and `--system-prompt-file` are mutually exclusive;
 `--append-*` variants compose with either.
 
-Then run it, for example
+Then run it. Another example:
+
+```bash
+claude \
+  -p "$CLAUDE_PROMPT" \
+  --model sonnet \
+  --output-format json \
+  --permission-mode bypassPermissions \
+  --max-turns 10 \
+  --max-budget-usd 2.00 \
+  --no-session-persistence
+```
+
+This'd give you JSON output for parsing (datadog etc), a hard cap on agentic
+turns, a dollar ceiling so a runaway job can't drain your account, and
+no session file written to disk. Drop the `--max-*` flags if you trust
+the prompt, swap `bypassPermissions` for `auto` if you want the
+auto-mode classifier to gate risky calls.
 
 ---
 
