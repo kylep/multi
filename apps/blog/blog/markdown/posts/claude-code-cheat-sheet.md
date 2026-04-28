@@ -553,7 +553,9 @@ The `/hooks` slash command shows what's registered and where each rule
 came from (user, project, managed, or plugin).
 
 I'd originally done like a whole write-up on how to make hooks, but honestly just
-ask Claude to make them for you. I might give Hooks their own post.
+ask Claude to make them for you. I did write a dedicated
+[safety hooks post](/claude-hooks.html) with three ready-made scripts if you
+want something concrete to start from.
 
 
 
