@@ -39,3 +39,25 @@ last_verified: 2026-04-28
 ## Just for You
 
 - [Eastern Herald](https://easternherald.com/2026/04/28/google-gemini-signals-end-of-passive-ai-assistants/) The latest Gemini app beta exposes a Proactive Assistance feature that would let Gemini monitor selected apps (Gmail, Calendar), analyze notifications, and interpret on-screen content to generate real-time suggestions — without user prompting.
+
+---
+
+## Update — 22:04 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/04/28/google-expands-pentagons-access-to-its-ai-after-anthropics-refusal/) Google signed a new contract expanding the Department of Defense's access to its AI systems after Anthropic declined to permit DoD use for domestic mass surveillance and autonomous weapons. OpenAI and xAI also signed comparable DoD agreements.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-27/china-blocks-meta-s-2-billion-acquisition-of-ai-startup-manus) China's state planner ordered Meta to unwind its completed $2B acquisition of Manus, a Singapore-based AI agent startup with Chinese roots. Beijing cited technology export controls and national industrial security concerns; the order targets a deal that closed four months ago.
+
+## AI Tooling
+
+- [GM Newsroom](https://news.gm.com/home.detail.html/Pages/news/us/en/2026/apr/0428-Google-Gemini.html) Google Gemini is rolling out to approximately 4 million eligible model year 2022 and newer Cadillac, Chevrolet, Buick, and GMC vehicles via software update, replacing the Google Assistant experience with a conversational interface that supports follow-up questions mid-drive.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/cisa-adds-6-known-exploited-flaws-in.html) CISA added six actively exploited flaws to KEV, with federal patch deadlines of April 27. The most critical: CVE-2026-21643 (CVSS 9.1) in Fortinet FortiClient EMS allows unauthenticated SQL injection leading to arbitrary code execution; active exploitation confirmed since March 24.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto) Ontario Education Minister Paul Calandra said the province is considering an outright ban on cellphones in schools and potential social media age restrictions for minors, with a formal announcement expected later this spring.
