@@ -50,19 +50,34 @@ specific posts drive traffic.
 
 ## Deduplication (critical)
 
-Use a persistent file on a PVC tracking posted item GUIDs:
+Use a persistent file on a PVC tracking *fingerprints* — both the
+post URL and the post title — for every item we've already posted:
 
 ```
 # /cache/posted-guids
 https://kyle.pericak.com/agent-org-chart.html
 https://kyle.pericak.com/ai-security-toolkit.html
+Attempting an AI Agent Org Chart
+Security Toolkit for AI Agents
 ```
 
+URLs are easy to spot (start with `http`), titles are everything
+else. Both are checked against new feed items: a post is skipped
+if either its URL or its title matches a stored fingerprint.
+
 On each run:
-1. Parse RSS feed, extract all item GUIDs (usually the post URL)
-2. Load posted-guids from PVC
-3. For each item not in posted-guids: post tweet, append GUID
-4. Save updated posted-guids
+1. Parse RSS feed
+2. Load fingerprints from PVC
+3. Backfill — for any feed item whose URL is already stored,
+   add its title too (self-heals legacy URL-only state files)
+4. For each item whose URL *and* title are both new: post, then
+   record both URL and title
+5. Save updated fingerprints
+
+Storing both is what catches slug renames: if you change a post's
+URL, its title is unchanged, so the title fingerprint still
+matches and we don't repost. Same in the other direction for
+title rewrites where the URL didn't change.
 
 This is more robust than timestamp-based filtering because:
 - Survives RSS feed regeneration (timestamps can shift)
