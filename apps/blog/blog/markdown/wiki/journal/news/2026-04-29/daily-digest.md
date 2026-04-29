@@ -53,3 +53,19 @@ last_verified: 2026-04-29
 - [GitHub Copilot Docs](https://docs.github.com/en/copilot/tutorials/enhance-agent-mode-with-mcp) GitHub Copilot Agent Mode now supports MCP servers configured in VS Code, with local MCP servers optionally running in a sandboxed environment limiting file and network access on macOS and Linux.
 
 - [Kubernetes Blog](https://kubernetes.io/blog/2026/04/28/kubernetes-staleness-controllers/) A Kubernetes blog post from April 28 covers staleness in controllers — a subtle issue affecting many controller implementations and potentially causing incorrect behavior in reconciliation loops.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Axios](https://www.axios.com/2026/04/28/openai-anthropic-congress-cyber-briefings) OpenAI and Anthropic held separate classified briefings with House Homeland Security Committee staffers on April 28 covering their cyber-capable AI models — GPT-5.4-Cyber and Mythos Preview respectively — and implications for critical infrastructure. Both companies also attended a White House meeting with the national cyber director the same day.
+
+## AI Tooling
+
+- [Droid-Life](https://www.droid-life.com/2026/04/29/google-tv-gemini-tools-upgrade/) Google announced Gemini creative tools are coming to Google TV on select devices, starting with TCL televisions in the US. Features include Nano Banana for voice-driven image creation and Veo for video clip generation.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/researchers-discover-critical-github.html) CVE-2026-3854 (CVSS 8.7) is a command injection flaw in GitHub's git push pipeline that allows any authenticated user to execute arbitrary code on GitHub's backend servers with a single push. Wiz discovered and reported it March 4; GitHub deployed a patch to GitHub.com within two hours. GitHub Enterprise Server versions 3.14.25 and later are patched. No evidence of exploitation in the wild.
