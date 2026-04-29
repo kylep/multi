@@ -69,3 +69,31 @@ last_verified: 2026-04-29
 ## Security
 
 - [The Hacker News](https://thehackernews.com/2026/04/researchers-discover-critical-github.html) CVE-2026-3854 (CVSS 8.7) is a command injection flaw in GitHub's git push pipeline that allows any authenticated user to execute arbitrary code on GitHub's backend servers with a single push. Wiz discovered and reported it March 4; GitHub deployed a patch to GitHub.com within two hours. GitHub Enterprise Server versions 3.14.25 and later are patched. No evidence of exploitation in the wild.
+
+---
+
+## Update — 23:30 UTC
+
+## AI Industry
+
+- [Microsoft](https://news.microsoft.com/source/2026/04/29/microsoft-cloud-and-ai-strength-fuels-third-quarter-results/) Microsoft Q3 FY2026 earnings beat on all lines: $82.9B revenue (+18% YoY), EPS $4.27 vs $4.04 expected, Azure up 40% YoY, and AI revenue hit a $37B annualized run rate, up 123% YoY. Copilot for Microsoft 365 grew to 20 million paid commercial seats, up from 15 million the prior quarter.
+
+- [Winbuzzer](https://winbuzzer.com/2026/04/29/openai-misses-targets-as-anthropic-and-google-gain-ground-xcxwbn/) OpenAI reportedly missed internal Q1 2026 revenue and user targets while Anthropic and Google expanded cloud capacity. The company faces a projected $25B cash burn in 2026 as it broadens enterprise distribution beyond Azure following the restructured Microsoft partnership.
+
+- [NVIDIA Blog](https://blogs.nvidia.com/blog/nemotron-3-nano-omni-multimodal-ai-agents/) NVIDIA released Nemotron 3 Nano Omni on April 28 — a 30B-A3B mixture-of-experts model combining vision, audio, and language processing in one system. It claims 9x higher throughput than comparable open omni models, a 256K context window, and tops six leaderboards for document intelligence and audio-video understanding. Available on Hugging Face, OpenRouter, and 25+ partner platforms.
+
+## AI Tooling
+
+- [Medium](https://medium.com/activated-thinker/the-flat-rate-ai-coding-subscription-era-is-ending-what-github-copilot-claude-code-and-cursor-9763e043a63a) GitHub Copilot paused new signups on some tiers in April, Anthropic cut Claude Code's server-side prompt cache TTL from 1 hour to 5 minutes without announcement (raising effective costs), and Cursor moved frontier models behind Max Mode for legacy plans. All three vendors shifted toward metered consumption pricing in the same month.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/04/29/g-s1-119165/south-korean-court-sentences-ex-president-yoon) A Seoul appeals court sentenced former South Korean President Yoon Suk Yeol to 7 years in prison today for resisting arrest and bypassing Cabinet procedures before his December 2024 martial law declaration. The conviction adds to his existing life sentence for rebellion; his legal team will appeal to the Supreme Court.
+
+## Local
+
+- [Global News](https://globalnews.ca/tag/whitby-ontario/) Ontario's Special Investigations Unit said its probe into the fatal April Highway 401 crash in Whitby — which killed an infant and his grandparents — requires additional time due to the volume of evidence. No suspect information has been released.
+
+## Just for You
+
+- [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare Resource Tagging entered public beta — custom key-value metadata can now be attached to Workers scripts, D1 databases, R2 buckets, and Queues, with AND/OR filtering and full CRUD API support across an account. Queues also gained real-time backlog metrics including unacknowledged message count and oldest message timestamp.
