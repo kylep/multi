@@ -308,7 +308,7 @@ auto now.
 There are a lot of these, here's some good ones.
 - `/btw` is great, use it when you think claude is stuck
 - I pretty much only use xhigh effort currently
-- I personally use `/coderabbit` for PR reviews but `/review` is nice too. It figures out your current PR itself.
+- I personally use `/coderabbit` for PR reviews but `/review` is nice too. It figures out your current PR itself. See the [CodeRabbit + Claude Code setup post](/claude-code-coderabbit.html) if you haven't configured it yet.
 
 
 | Command | What it does |
