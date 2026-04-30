@@ -81,3 +81,33 @@ last_verified: 2026-04-30
 ## Local
 
 - [Toronto Police Service](https://www.tps.ca/media-centre/news-releases/) Toronto police warn that scammers have been affixing counterfeit QR codes to parking meters across the city to redirect payment to fraudulent sites. Drivers are advised to verify meter URLs before paying or use the official PayByPhone app.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/scaling-trusted-access-for-cyber-defense/) OpenAI launched GPT-5.5-Cyber under a restricted Trusted Access for Cyber program, available only to vetted government agencies, critical infrastructure operators, and security vendors. The model is designed for threat detection, vulnerability analysis, and incident response. TechCrunch noted that after Altman criticized Anthropic for restricting Mythos access, OpenAI applied the same restriction to its own offensive-capable model.
+
+- [Meta / CNBC](https://www.cnbc.com/2026/04/29/meta-q1-earnings-report-2026.html) Meta Q1 2026 revenue came in at $56.31B (+33% year over year), beating analyst estimates of $55.45B. The company raised its 2026 capital expenditure guidance from $115–135B to $125–145B, citing higher memory component costs. Shares fell roughly 7% after hours on the capex increase.
+
+## AI Tooling
+
+- [Volvo Cars / The Weekly Driver](https://theweeklydriver.com/2026/04/volvo-google-gemini-2026-rollout/) Volvo began rolling Google Gemini to 16 models built from 2020 onward starting April 30, covering vehicles in the US first with other markets to follow. The update replaces Google Assistant with Gemini's multi-turn conversation interface and arrives over Wi-Fi or cellular at no cost.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/04/30/cpanel-zero-day-vulnerability-cve-2026-41940-exploited/) CVE-2026-41940 (CVSS 9.8) is a critical authentication bypass in cPanel and WHM affecting all versions after v11.40. Attackers have been exploiting the flaw since at least February 23 — before the patch existed. Successful exploitation grants full control of the cPanel host, its databases, and any websites it manages. A PoC is now public; administrators should patch immediately or block ports 2083, 2087, 2095, and 2096.
+
+## Geopolitics
+
+- [CNBC](https://www.cnbc.com/2026/04/30/oil-prices-today-brent-wti-us-iran-war-trump.html) Brent crude surged to a wartime high of $126/barrel during today's session before settling at $114.01 after Iran's April 30 enrichment deadline passed without agreement. Iran insists on retaining enrichment rights; the US requires verifiable halts and IAEA access before any sanctions relief.
+
+## Local
+
+- [City of Toronto](https://www.toronto.ca/news/) Toronto 2026 municipal election candidate nominations open May 1 at 8:30 a.m. and close August 21. The city confirmed the schedule on April 30.
+
+## Just for You
+
+- [Kubernetes Blog](https://kubernetes.io/blog/2026/04/22/kubernetes-v1-36-release/) Kubernetes v1.36 "Haru" shipped April 22 with 70 enhancements. Notable additions: HPA scale-to-zero reaches stable (deployments can now scale down to zero replicas natively), rootless containers via user namespaces graduate to stable, and SELinux volume label enforcement is now GA.
