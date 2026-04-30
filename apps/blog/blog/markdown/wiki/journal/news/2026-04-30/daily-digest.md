@@ -51,3 +51,33 @@ last_verified: 2026-04-30
 - [OpenAI Blog](https://openai.com/index/openai-on-aws/) Codex is now available in limited preview on Amazon Bedrock, bringing the OpenAI coding agent into AWS-native CI/CD and Lambda workflows. General availability expected within weeks.
 
 - [zilliztech/claude-context](https://github.com/zilliztech/claude-context) claude-context holds its spot in the weekly top 8 (3,151 stars this week, 10,357 total) — a code-search MCP server that feeds an entire codebase as context to Claude Code or any MCP-compatible agent.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [The Register](https://www.theregister.com/2026/04/30/openai_anthropic_top_lines_research_counterpoint/) Counterpoint Research ranks Anthropic first in global LLM revenue share for Q1 2026 at 31.4%, narrowly ahead of OpenAI at 29%. The gap is driven by revenue per active user: Anthropic averages $16.20 per monthly user versus OpenAI's $2.20.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-04-30/nsa-testing-anthropic-s-mythos-to-find-flaws-in-microsoft-tech) The NSA is testing Anthropic's Mythos model — which Anthropic has withheld from public release due to its ability to chain zero-day exploits — to find vulnerabilities in Microsoft software. Mythos was deployed to roughly 40 vetted organizations under Project Glasswing; unauthorized access via a third-party vendor was discovered on launch day.
+
+## AI Tooling
+
+- [TechSpot](https://www.techspot.com/news/112242-gm-pushing-google-gemini-ai-4-million-vehicles.html) GM is deploying Google Gemini to approximately 4 million US vehicles via over-the-air update, covering 2022-and-newer Cadillac, Chevrolet, Buick, and GMC models with Google built-in. Polestar began a parallel US rollout of Gemini to replace Google Assistant today.
+
+## Open Source
+
+- [Warp Blog](https://www.warp.dev/blog/warp-is-now-open-source) Warp open-sourced its terminal client under AGPL-3.0 on GitHub. The Oz cloud agent orchestration layer remains proprietary; the client-side UI framework crates ship under MIT. OpenAI is the founding repository sponsor.
+
+## Security
+
+- [GitHub Blog](https://github.blog/security/securing-the-git-push-pipeline-responding-to-a-critical-remote-code-execution-vulnerability/) Wiz Research disclosed CVE-2026-3854 (CVSS 8.7), a critical RCE in GitHub's git push pipeline allowing any authenticated user to execute commands on GitHub's backend servers and read across millions of repositories on the same storage node. GitHub.com was patched within two hours of disclosure; GitHub Enterprise Server users must upgrade to GHES 3.19.3.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/04/29/world/live-news/iran-war-peace-proposal-trump) Trump confirmed the US is reviewing troop levels in Germany after Chancellor Merz publicly criticized US handling of the Iran conflict. The review covers roughly 35,000 US personnel and is the most direct transatlantic friction since the conflict began.
+
+## Local
+
+- [Toronto Police Service](https://www.tps.ca/media-centre/news-releases/) Toronto police warn that scammers have been affixing counterfeit QR codes to parking meters across the city to redirect payment to fraudulent sites. Drivers are advised to verify meter URLs before paying or use the official PayByPhone app.
