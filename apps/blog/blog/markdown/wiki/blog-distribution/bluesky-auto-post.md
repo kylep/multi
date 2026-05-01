@@ -40,9 +40,13 @@ so GA4 attributes it to "bluesky / social".
 
 ## Deduplication
 
-Persistent file on a PVC tracking posted item GUIDs
-(`/cache/posted-guids`). See `x-twitter-auto-post.md` for the rationale
-— timestamp filtering is brittle, GUIDs are stable.
+Persistent file on a PVC tracking *fingerprints* — both URL and
+title — for every posted item (`/cache/posted-guids`). A new
+feed item is skipped if either its URL or its title matches a
+stored fingerprint, so slug renames and title rewrites of the
+same post don't trigger dupe crossposts. See
+`x-twitter-auto-post.md` for the full rationale — timestamps are
+brittle, fingerprints are stable.
 
 ## Architecture
 

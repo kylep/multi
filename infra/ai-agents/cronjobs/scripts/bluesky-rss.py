@@ -15,7 +15,15 @@ from html.parser import HTMLParser
 
 import requests
 
-from crosspost_common import add_utm, load_posted, parse_feed, save_posted
+from crosspost_common import (
+    add_utm,
+    already_posted,
+    backfill_titles,
+    load_posted,
+    mark_posted,
+    parse_feed,
+    save_posted,
+)
 
 # --- Config ---
 RSS_URL = os.environ.get("RSS_URL", "https://kyle.pericak.com/feed.xml")
@@ -205,7 +213,13 @@ def post_to_bluesky(session, record):
 def main():
     posted = load_posted(STATE_FILE)
     items = parse_feed(RSS_URL)
-    new_items = [i for i in items if i["guid"] not in posted]
+
+    backfilled = backfill_titles(items, posted)
+    if backfilled:
+        save_posted(STATE_FILE, posted)
+        print(f"Backfilled {backfilled} title fingerprint(s) into state file")
+
+    new_items = [i for i in items if not already_posted(i, posted)]
 
     if not new_items:
         print("No new posts.")
@@ -220,7 +234,9 @@ def main():
         session = login(handle, app_password)
         ensure_bot_label(session)
 
-    for item in new_items:
+    # RSS feeds are reverse-chronological; post oldest-first so the
+    # destination timeline reads naturally top-down.
+    for item in reversed(new_items):
         text = format_post_text(item)
         record = build_record(item, text, session)
         print(f"\n--- {item['title']} ---")
@@ -229,13 +245,13 @@ def main():
 
         if DRY_RUN:
             print("  [dry run — not posting]")
-            posted.add(item["guid"])
+            mark_posted(item, posted)
         else:
             if post_to_bluesky(session, record):
-                posted.add(item["guid"])
+                mark_posted(item, posted)
 
     save_posted(STATE_FILE, posted)
-    print(f"\nDone. {len(posted)} total posts tracked.")
+    print(f"\nDone. {len(posted)} fingerprint(s) tracked.")
 
 
 if __name__ == "__main__":
