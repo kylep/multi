@@ -87,3 +87,23 @@ last_verified: 2026-05-01
 ## Local
 
 - [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) A suspect fired gunshots at a used car dealership in Whitby earlier this week. Durham Region Police are investigating; no injuries were reported in initial coverage.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [CNN Business](https://edition.cnn.com/2026/05/01/tech/pentagon-ai-anthropic) The Pentagon signed classified AI agreements with seven companies — SpaceX, OpenAI, Google, NVIDIA, Microsoft, AWS, and Reflection — granting access to Impact Levels 6 and 7 networks. Anthropic was excluded; the Pentagon previously designated it a supply-chain risk over its refusal to allow Claude to be used for "all lawful purposes" including autonomous weapons. President Trump said Anthropic is "shaping up," leaving open a future path back.
+
+- [TechCrunch](https://techcrunch.com/2026/04/30/anthropic-potential-900b-valuation-round-could-happen-within-two-weeks/) Anthropic is seeking to raise approximately $50 billion at a valuation above $900 billion, which would surpass OpenAI's $852 billion post-money valuation. The company gave investors a 48-hour window to submit allocations and expects the round to close within two weeks. Anthropic's annual revenue run rate has surpassed $30 billion.
+
+## AI Tooling
+
+- [GitHub Blog](https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/) GitHub Copilot transitions to usage-based billing on June 1, 2026. All plans shift from a premium-request counter to a monthly AI Credits allotment based on token consumption at each model's API rate (1 credit = $0.01 USD). Plan prices are unchanged; unused credits reset monthly and do not roll over.
+
+- [Anthropic Docs](https://docs.anthropic.com/en/release-notes/overview) Anthropic launched Claude Managed Agents in public beta — a fully managed agent harness for running Claude as an autonomous agent with secure sandboxing, built-in tools, and server-sent event streaming. All endpoints require the `managed-agents-2026-04-01` beta header.
+
+## Just for You
+
+- [Anthropic Docs](https://docs.anthropic.com/en/release-notes/overview) Anthropic released the `ant` CLI, a command-line client for the Claude API with native Claude Code integration and YAML-based versioning of API resources.
