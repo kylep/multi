@@ -107,3 +107,11 @@ last_verified: 2026-05-01
 ## Just for You
 
 - [Anthropic Docs](https://docs.anthropic.com/en/release-notes/overview) Anthropic released the `ant` CLI, a command-line client for the Claude API with native Claude Code integration and YAML-based versioning of API resources.
+
+---
+
+## Update — 23:30 UTC
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/pytorch-lightning-compromised-in-pypi.html) The `lightning` PyPI package was compromised in a supply chain attack: versions 2.6.2 and 2.6.3, published April 30, silently exfiltrate developer credentials, cloud secrets, and cryptocurrency wallets via an obfuscated JavaScript downloader. The package receives millions of downloads per month. Malicious versions were live for 42 minutes before PyPI quarantined them; version 2.6.1 is the last safe release.
