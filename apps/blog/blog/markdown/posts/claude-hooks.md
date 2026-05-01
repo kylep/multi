@@ -308,6 +308,11 @@ The `async: true` on the audit hook means Claude doesn't
 wait for it to finish before moving on. Logging shouldn't
 slow down the workflow.
 
+For a full reference of `settings.json` options, slash
+commands, and CLI flags, the
+[Claude Code CLI Cheat-Sheet](/claude-code-cheat-sheet.html)
+covers all of it.
+
 
 # Prompt injection defense
 
