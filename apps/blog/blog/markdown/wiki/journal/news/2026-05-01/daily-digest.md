@@ -65,3 +65,25 @@ last_verified: 2026-05-01
 - [Google Open Source Blog](https://opensource.googleblog.com/2026/04/kubernetes-goes-ai-first-unpacking-the-new-ai-conformance-program.html) The Kubernetes project launched a new AI conformance program, establishing certification standards for clusters running AI and GPU workloads.
 
 - [GitHub Blog](https://github.blog/open-source/maintainers/what-to-expect-for-open-source-in-2026/) GitHub's annual open source outlook notes that AI-related repositories on the platform now exceed 4.3 million, a 178% year-over-year increase in LLM-focused projects.
+
+---
+
+## Update — 15:00 UTC
+
+## AI Industry
+
+- [Axios](https://www.axios.com/2026/05/01/washington-new-anthropic-problem) The White House is working to bring Anthropic back into active government AI collaboration after friction over the Mythos model's restricted access. Anthropic confirmed it is working closely with the US government on cybersecurity priorities following earlier Pentagon opposition.
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/products-and-platforms/products/gmail/gmail-is-entering-the-gemini-era/) Gmail launched AI Overviews powered by Gemini 3, automatically summarizing email threads and responding to natural-language questions. Rolling out in the US to standard Gmail users and Google AI Pro/Ultra subscribers.
+
+## Open Source
+
+- [GitHub Trending](https://www.ngjoo.com/en/trending/) OpenClaw surpassed 300,000 GitHub stars, making it one of the most-starred local AI gateway projects on the platform. The project supports over 50 integrations including WhatsApp, Telegram, Slack, and Discord.
+
+- [GitHub Trending](https://www.ngjoo.com/en/trending/) n8n crossed 180,000 GitHub stars. The open-source workflow automation platform combines no-code visual building with code-based customization and continues to grow rapidly in the agent tooling ecosystem.
+
+## Local
+
+- [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) A suspect fired gunshots at a used car dealership in Whitby earlier this week. Durham Region Police are investigating; no injuries were reported in initial coverage.
