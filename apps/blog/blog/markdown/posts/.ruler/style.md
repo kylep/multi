@@ -216,6 +216,11 @@ Don't force a diagram when prose or a table is clearer.
 Use tables for comparisons with multiple attributes (model vs. cost vs.
 provider, etc.). Keep them tight. Don't add columns that don't add information.
 
+Don't reach for a table when a sentence does the job. A two-column
+"thing → short description" list is prose, not a table. Tables earn the
+formatting when there are at least three meaningful columns, or enough rows
+that scanning beats reading.
+
 
 ## Line Length
 
