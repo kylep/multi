@@ -118,16 +118,37 @@ spec:
                   python3 -c "import httpx, mcp.server.fastmcp" || { echo "MCP preflight FAILED: python import error" >&2; exit 1; }
                   echo "MCP preflight OK" >&2
 
+                  # --- Pre-create today's wiki dir so the agent can Write into it ---
+                  mkdir -p "apps/blog/blog/markdown/wiki/journal/news/${TODAY}"
+
+                  # --- GitHub trending (morning runs only) ---
+                  # The agent has no Bash, so capture the JSON here and drop
+                  # it at /tmp/trending.json for the agent to Read.
+                  if [ ! -f "apps/blog/blog/markdown/wiki/journal/news/${TODAY}/daily-digest.md" ]; then
+                    python3 bin/github-trending.py --json > /tmp/trending.json 2>/dev/null || rm -f /tmp/trending.json
+                  fi
+
                   # --- Run journalist agent ---
+                  # The agent has no Bash tool; it only writes files. The shell
+                  # script below handles git add/commit/push after Claude exits.
                   claude --agent journalist \
-                    -p "Run a news update. Today is ${TODAY}. Write to the wiki at apps/blog/blog/markdown/wiki/journal/news/${TODAY}/daily-digest.md — create the file if it does not exist, or append new sections if it does. Check both Discord #news (last 15 messages) and the existing wiki file for stories already covered so you do not post duplicates. Collect the news, write to the wiki, commit, then post to Discord #news. If you encounter any errors with git, file I/O, or other non-news problems, post a short error summary to Discord #news so the operator can fix it. Commit message: 'journal: AI news digest for ${TODAY}'." \
+                    -p "Run a news update. Today is ${TODAY}. Write to the wiki at apps/blog/blog/markdown/wiki/journal/news/${TODAY}/daily-digest.md — create the file if it does not exist, or append new sections if it does. Check both Discord #news (last 15 messages) and the existing wiki file for stories already covered so you do not post duplicates. Collect the news, write to the wiki, then post the digest to Discord #news. If you encounter file I/O, network, or other non-news problems, post a short error summary to Discord #news so the operator can fix it." \
                     --mcp-config /tmp/mcp.json \
-                    --allowedTools "WebSearch,WebFetch,Read,Glob,Grep,Write,Bash(mkdir -p apps/blog/blog/markdown/wiki/journal/news/*),Bash(git add apps/blog/blog/markdown/wiki/journal/*),Bash(git config user.name *),Bash(git config user.email *),Bash(git commit --no-verify *),Bash(date *),Bash(python3 bin/github-trending.py *),mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \
+                    --allowedTools "WebSearch,WebFetch,Read,Glob,Grep,Write,mcp__discord__send_message,mcp__discord__list_channels,mcp__discord__read_messages" \
                     --verbose \
                     --output-format stream-json
                   STATUS=$?
 
                   if [ $STATUS -eq 0 ]; then
+                    # --- Stage and commit anything the agent wrote ---
+                    git add "apps/blog/blog/markdown/wiki/journal/news/${TODAY}/" || true
+                    if git diff --cached --quiet; then
+                      echo "No wiki changes to commit; skipping push and PR."
+                      discord_post "✓ ${RUN_ID} | agent=${AGENT_NAME} | done (no changes)"
+                      exit 0
+                    fi
+                    git commit --no-verify -m "journal: AI news digest for ${TODAY}"
+
                     GITHUB_TOKEN=$(gen_token)
                     git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/kylep/multi.git"
                     git push origin "${BRANCH}" || git push --force-with-lease origin "${BRANCH}"

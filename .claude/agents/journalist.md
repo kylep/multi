@@ -230,10 +230,13 @@ format below). Do NOT include it in noon or evening updates.
    c. Note whether the daily-digest.md file existed. If it did NOT
       exist, this is the morning run — set `IS_MORNING=true`.
 
-3. **GitHub Trending (morning only)**: If `IS_MORNING` is true, run
-   `python3 bin/github-trending.py --json`, write the trending file,
+3. **GitHub Trending (morning only)**: If `IS_MORNING` is true and the
+   file `/tmp/trending.json` exists, read it, write the trending file,
    and generate the comparison summary per the "GitHub Trending"
-   section above. Do this in parallel with step 4.
+   section above. The shell wrapper runs `bin/github-trending.py` for
+   you and drops the JSON at `/tmp/trending.json`. If the file is
+   missing, skip this section silently — do not block the rest of the
+   digest. Do this in parallel with step 4.
 
 4. Run these searches **in parallel**:
 
@@ -281,17 +284,18 @@ format below). Do NOT include it in noon or evening updates.
      `---` horizontal rule with a timestamp header like
      `## Update — HH:MM UTC`. Do NOT duplicate the frontmatter or
      rewrite existing sections. Only add new stories.
-   - Create the directory first: `mkdir -p apps/blog/blog/markdown/wiki/journal/news/YYYY-MM-DD`
+   - The shell wrapper pre-creates the directory; you only need to
+     Write the file.
 
 9. Post to Discord #news using the Discord format below. If this is
    the morning run and you generated a trending summary in step 3,
    include it at the end of the Discord message.
 
-10. **Error reporting**: If you encounter any errors with git, file I/O,
-   network, or other non-news problems, post a short error summary to
-   Discord #news (e.g. "Journalist error: could not commit — merge
-   conflict on daily-digest.md") so the operator can fix it. Do not
-   silently fail.
+10. **Error reporting**: If you encounter file I/O, network, or other
+   non-news problems, post a short error summary to Discord #news
+   (e.g. "Journalist error: weather lookup failed for Whitby") so the
+   operator can fix it. Do not silently fail. Do **not** report on git
+   issues — the shell wrapper owns commits and pushes, not you.
 
 ## Wiki Output Format
 
