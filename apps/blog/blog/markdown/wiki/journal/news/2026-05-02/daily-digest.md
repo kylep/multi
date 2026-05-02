@@ -79,3 +79,19 @@ last_verified: 2026-05-02
 ## Security
 
 - [The Hacker News](https://thehackernews.com/2026/04/cisa-adds-actively-exploited.html) CISA added two actively exploited CVEs to the KEV catalog with a federal remediation deadline of May 12, 2026. CVE-2024-1708 is a path traversal flaw in ConnectWise ScreenConnect (CVSS 8.4) enabling remote code execution when chained with a prior authentication bypass. CVE-2026-32202 is a Windows Shell spoofing flaw allowing content forgery over a network.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Techmeme / The Information](https://www.techmeme.com/260502/p6) Anthropic is in early talks to purchase AI inference chips from UK-based Fractile when they become available in 2027. The discussions aim to give Anthropic additional supply leverage beyond its existing chip relationships with Google, Amazon, and NVIDIA.
+
+- [Let's Data Science](https://letsdatascience.com/news/xai-launches-grok-43-and-custom-voices-4b8d0730) xAI launched Grok 4.3 alongside Custom Voices, offering voice cloning from roughly one minute of audio. The model is priced aggressively lower than prior Grok releases; Custom Voices ships with a library of 80+ voices across 28 languages and is available in the US via the xAI API.
+
+## Security
+
+- [Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2026/05/01/cve-2026-31431-copy-fail-vulnerability-enables-linux-root-privilege-escalation/) CVE-2026-31431 ("Copy Fail") is a Linux local privilege escalation flaw (CVSS 7.8) with a 732-byte working exploit affecting every mainstream distribution built since 2017. It is particularly dangerous in shared cloud environments and Kubernetes workloads where container breakout and lateral movement are possible. CISA added it to KEV.
+
+- [The Hacker News](https://thehackernews.com/2026/04/litellm-cve-2026-42208-sql-injection.html) CVE-2026-42208 is a critical SQL injection flaw (CVSS 9.3) in LiteLLM proxy versions 1.81.16 through 1.83.6. An unauthenticated attacker can read all upstream LLM provider credentials — OpenAI keys, Anthropic console keys, AWS Bedrock credentials — from the proxy database. Active exploitation was observed 36 hours after disclosure; patch to 1.83.7-stable immediately.
