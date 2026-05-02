@@ -63,3 +63,19 @@ last_verified: 2026-05-02
 ## Just for You
 
 - [InfoQ](https://www.infoq.com/news/2026/04/cloudflare-mcp/) Cloudflare published guidance on MCP architecture for enterprise deployments, covering security governance risks and recommended patterns for exposing tools via the Model Context Protocol. Relevant for teams building MCP-backed agents on Cloudflare Workers.
+
+---
+
+## Update — 16:00 UTC
+
+## AI Industry
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/openai-and-nvidia-announce-strategic-partnership-to-deploy-10gw-of-nvidia-systems) NVIDIA announced a strategic partnership with OpenAI to deploy at least 10 gigawatts of NVIDIA systems, with NVIDIA investing up to $100 billion progressively as each gigawatt is deployed. The first gigawatt goes live in H2 2026 on the Vera Rubin platform; both companies will co-optimize hardware and model software roadmaps.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-opus-4-7) Claude Opus 4.7 is now generally available across the API, Amazon Bedrock, Google Cloud Vertex AI, and Microsoft Foundry. Key additions include a new `xhigh` effort level for finer reasoning-depth control, enhanced vision accepting images up to 2,576 pixels on the long edge, and improved software engineering benchmarks. Pricing holds at $5/1M input and $25/1M output tokens.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/04/cisa-adds-actively-exploited.html) CISA added two actively exploited CVEs to the KEV catalog with a federal remediation deadline of May 12, 2026. CVE-2024-1708 is a path traversal flaw in ConnectWise ScreenConnect (CVSS 8.4) enabling remote code execution when chained with a prior authentication bypass. CVE-2026-32202 is a Windows Shell spoofing flaw allowing content forgery over a network.
