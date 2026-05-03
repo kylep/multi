@@ -308,3 +308,7 @@ which dependency vulnerabilities actually matter for a static
 export vs a running server. That's the real value of combining
 scanners with AI agents: the agent reads the output instead of
 just dumping a report.
+
+If you want to apply the same approach to code quality, I built a
+[lint toolkit](/ai-lint-toolkit.html) that bundles ruff, biome,
+hadolint, and tflint in the same Docker-based setup.
