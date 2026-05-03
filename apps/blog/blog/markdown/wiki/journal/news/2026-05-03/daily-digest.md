@@ -85,3 +85,19 @@ last_verified: 2026-05-03
 ## Local
 
 - [CP24](https://www.cp24.com/news/canada/2026/05/01/toronto-mayoral-candidate-nominations-to-open-friday/) Toronto's 2026 municipal election is underway with candidate nominations open as of May 1. Early entrants include Councillor Brad Bradford, former deputy mayor Ana Bailão, and Councillor Gord Perks. Incumbent mayor Olivia Chow has not confirmed whether she will seek a full term. Election day is October 26, 2026.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [The Next Web](https://thenextweb.com/news/meta-layoffs-8000-ai-restructuring-may-2026) Meta will cut 8,000 employees on May 20 — about 10% of its workforce — and cancel 6,000 open roles, bringing the total effective reduction to 14,000 positions. Zuckerberg attributed the cuts directly to a $145B capex program funding AI data centers and GPU infrastructure for 2026.
+
+## Security
+
+- [Anthropic](https://red.anthropic.com/2026/mythos-preview/) Anthropic's Mythos Preview model, announced April 7, identifies zero-day vulnerabilities at scale across major OSes and browsers and constructs working exploits autonomously — including 27-year-old bugs. The company is withholding public release and instead running Project Glasswing: up to $100M in access credits for critical-infrastructure defenders and $4M in direct funding to open-source security organizations.
+
+## Open Source
+
+- [InfoQ](https://www.infoq.com/news/2026/04/openchoreo-10/) OpenChoreo 1.0, WSO2's Kubernetes internal developer platform, shipped in late April and entered the CNCF Sandbox. It includes a Backstage-powered portal, built-in CI/CD, GitOps, and MCP servers for AI agent integration. API gateway support covers Kong, Envoy, Kgateway, and Traefik.
