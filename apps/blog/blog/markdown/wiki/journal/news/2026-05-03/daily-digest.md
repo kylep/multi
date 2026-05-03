@@ -61,3 +61,27 @@ last_verified: 2026-05-03
 ## Just for You
 
 - [GitHub / Alishahryar1](https://github.com/Alishahryar1/free-claude-code) free-claude-code is trending strongly at 9,364 stars this week (20,418 total). It enables Claude Code use at no cost via terminal, VSCode extension, or Discord, similar in spirit to OpenClaw.
+
+---
+
+## Update — 17:00 UTC
+
+## AI Industry
+
+- [Quartz](https://qz.com/anthropic-trillion-dollar-valuation-secondary-markets-openai-052626) Anthropic crossed a $1 trillion implied valuation on secondary market platform Forge Global this week, surpassing OpenAI at $880B on the same platform. The milestone follows a 233% jump in annualized revenue to $30B in Q1 2026, driven primarily by Claude Code and enterprise API adoption.
+
+- [Meta Investor Relations](https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-First-Quarter-2026-Results/default.aspx) Meta Q1 2026 revenue rose 33% to $56.31B, beating analyst estimates of $55.52B. The company raised its full-year capex guidance to $125–145B (up from $115–135B) to fund AI infrastructure expansion including large-scale NVIDIA GPU deployments.
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/) Google launched Deep Research and Deep Research Max, both built on Gemini 3.1 Pro. The Max tier adds MCP support for connecting to custom and professional data sources, native chart generation, and extended test-time compute for background workflows. Deep Research Max scores 93.3% on DeepSearchQA, up from 66.1% for the prior release. Both are available in public preview via paid Gemini API tiers.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/cisa-adds-actively-exploited-linux-root.html) CISA added CVE-2026-31431 ("Copy Fail") to its KEV catalog today after confirming active exploitation in the wild. The Linux privilege escalation flaw (CVSS 7.8) poses elevated risk in containerized environments, as the exploit can breach container isolation to gain control of the host machine.
+
+- [CyberScoop](https://cyberscoop.com/cpanel-authentication-bypass-vulnerability-cve-2026-41940-exploited/) CVE-2026-41940 is a CVSS 9.8 pre-authentication bypass in cPanel & WHM, added to CISA's KEV catalog April 30. Approximately 1.5 million cPanel instances are internet-exposed. Exploitation was active for roughly two months before an emergency patch shipped April 28; federal agencies must remediate by May 21.
+
+## Local
+
+- [CP24](https://www.cp24.com/news/canada/2026/05/01/toronto-mayoral-candidate-nominations-to-open-friday/) Toronto's 2026 municipal election is underway with candidate nominations open as of May 1. Early entrants include Councillor Brad Bradford, former deputy mayor Ana Bailão, and Councillor Gord Perks. Incumbent mayor Olivia Chow has not confirmed whether she will seek a full term. Election day is October 26, 2026.
