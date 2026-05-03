@@ -45,3 +45,7 @@ used and links to the individual provider reports.
   Three reports on architecting an autonomous AI-native SDLC
   pipeline for continuous PoC learning on Kubernetes (structured
   planning, agent sandboxing, orchestration frameworks). March 2026.
+- [Claude Code Plugins](/wiki/research/claude-plugins.html) —
+  Three reports on which Claude Code plugins, skills, and
+  marketplaces are worth installing (file-level audit, token cost,
+  trust surface, stack fit, ecosystem gaps). April 2026.
