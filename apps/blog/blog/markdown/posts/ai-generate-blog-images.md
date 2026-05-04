@@ -125,3 +125,5 @@ No text. No words. Just a simple image centered in white space.
 ```
 
 It does not seem to care for my preference. If anyone has any tricks for this I'd love to hear about it.
+
+*Update: The white background frustration eventually led to a [bakeoff comparing the best image generation APIs](/ai-image-gen-bakeoff.html).*
