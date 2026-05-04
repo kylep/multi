@@ -73,3 +73,15 @@ last_verified: 2026-05-04
 ## Weather
 
 - Whitby, ON update: Showers from the morning have cleared. High 18°C, low 11°C. Wind southwest 30 km/h gusting to 50 this afternoon. Tonight brings a 40% chance of showers with a risk of thunderstorm overnight. No alerts.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-04/goldman-blackstone-partner-with-anthropic-on-ai-services-firm) Anthropic launched a $1.5B enterprise AI services company backed by Blackstone, Hellman & Friedman, Goldman Sachs, GIC, General Atlantic, Apollo, and Sequoia. The firm will embed Anthropic engineers directly into portfolio companies, targeting mid-size businesses in a model that mirrors Palantir's forward-deployment approach and puts Anthropic in direct competition with traditional consulting firms.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/05/04/multiple-threat-actors-actively-exploit-cpanel-vulnerability-cve-2026-41940/) CVE-2026-41940 (cPanel auth bypass, CVSS 9.8) has escalated to mass exploitation. Censys found 8,859 compromised hosts with ransomware deploying a Go-based Linux encryptor appending a ".sorry" extension; Shadowserver tracked over 44,000 IPs scanning or attacking cPanel instances. Separate campaigns deployed Mirai botnet variants and conducted espionage against government targets in Southeast Asia. All unpatched internet-facing cPanel instances should be updated immediately.
