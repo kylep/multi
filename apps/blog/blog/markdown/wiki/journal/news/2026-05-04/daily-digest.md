@@ -47,3 +47,29 @@ last_verified: 2026-05-04
 - [InfoQ](https://www.infoq.com/news/2026/04/openchoreo-10/) OpenChoreo 1.0, an open-source internal developer platform built on Kubernetes, shipped its 1.0 release and was accepted into the CNCF Sandbox. The project adds AI agent support and GitOps capabilities.
 
 - [B2the7](https://www.b2the7.com/news-blog/marketing-trends-may-2026-ai-mode-meta-google-creator) Google AI Mode crossed 1 billion queries per month with 75 million daily active users. Organic search click-through rates for AI-featured queries dropped 61% compared to standard results.
+
+---
+
+## Update — 16:00 UTC
+
+## AI Industry
+
+- [CNN Business](https://www.cnn.com/2026/05/01/tech/pentagon-ai-anthropic) The Pentagon signed classified AI deployment agreements with seven companies — OpenAI, Google, NVIDIA, Microsoft, AWS, SpaceX, and Reflection AI — but excluded Anthropic. The Trump administration labeled Anthropic a "supply chain risk" after the company refused to grant unrestricted access to Claude for autonomous weapons and mass surveillance. Anthropic has filed suit; a federal judge previously blocked the administration's effort, but the contracts were issued regardless.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-04/openai-finalizes-10-billion-joint-venture-with-pe-firms-to-deploy-ai) OpenAI finalized a $10 billion joint venture — referred to internally as "The Deployment Company" — anchored by TPG and 18 other private equity firms. OpenAI guarantees investors a 17.5% annual return over five years; the JV's mandate is to embed OpenAI tools into PE portfolio companies across healthcare, logistics, and financial services.
+
+- [TechCrunch](https://techcrunch.com/2026/04/30/anthropic-potential-900b-valuation-round-could-happen-within-two-weeks/) Anthropic is weighing a $50B fundraising round at a valuation above $900 billion, which would surpass OpenAI's $852B post-money valuation. The company reported $30B in annualized revenue, with enterprise customers accounting for roughly 80% of that figure. A board decision is expected in May.
+
+- [The Register](https://www.theregister.com/2026/04/30/openai_anthropic_top_lines_research_counterpoint/) Counterpoint Research puts Anthropic ahead of OpenAI in global LLM revenue share for Q1 2026 — 31.4% versus 29% — driven by higher-spend enterprise customers rather than consumer user count.
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/critical-github-vulnerability-exposed-millions-of-repositories/) CVE-2026-3854 is a critical RCE flaw (CVSS 8.7) in GitHub's git push pipeline. Any authenticated user could execute arbitrary commands on GitHub's backend via a single crafted git push, with cross-tenant repository exposure on GitHub.com. GitHub.com was patched on March 4 at point of disclosure; 88% of self-hosted GitHub Enterprise Server instances remain vulnerable — admins should upgrade to GHES 3.19.3 or later immediately.
+
+- [The Hacker News](https://thehackernews.com/2026/05/trellix-confirms-source-code-breach.html) Cybersecurity vendor Trellix confirmed unauthorized access to a portion of its internal source code repository. Customer environments and data were not affected, but access to a security vendor's source code could enable detection-evasion research. The attacker has not been identified and investigation is ongoing.
+
+- [The Hacker News](https://thehackernews.com/2026/05/cisa-adds-actively-exploited-linux-root.html) CISA added CVE-2026-31431, a Linux local privilege escalation flaw (CVSS 7.8) that allows an unprivileged user to obtain root access, to the Known Exploited Vulnerabilities catalog. This is separate from the four-flaw KEV batch published last week.
+
+## Weather
+
+- Whitby, ON update: Showers from the morning have cleared. High 18°C, low 11°C. Wind southwest 30 km/h gusting to 50 this afternoon. Tonight brings a 40% chance of showers with a risk of thunderstorm overnight. No alerts.
