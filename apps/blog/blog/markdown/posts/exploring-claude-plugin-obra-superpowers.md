@@ -9,6 +9,8 @@ tags: Claude-Code, AI, plugins, skills, Superpowers
 date: 2026-05-05
 modified: 2026-05-05
 status: published
+image: exploring-claude-plugin-obra-superpowers.png
+thumbnail: exploring-claude-plugin-obra-superpowers-thumb.png
 imgprompt: A cartoon utility belt laid flat with little tool icons
   (gavel, magnifier, checklist, anvil, microscope, scroll), flat pastel
   illustration, belt arched across the upper third with pastel ground
