@@ -545,6 +545,7 @@ Typical uses:
 
 - Block `rm -rf` or edits to `.env` (`PreToolUse` + exit 2).
 - Run `prettier` or `gofmt` after every Edit (`PostToolUse`).
+- Run [Playwright tests](/playwright-mcp.html) after front-end changes to let Claude verify the browser renders correctly (`PostToolUse`).
 - Inject the current git branch into every prompt (`UserPromptSubmit`).
 - Ping Discord when the session finishes (`Stop`).
 - Gatekeep a single subagent's tool calls (hook in that agent's frontmatter).
