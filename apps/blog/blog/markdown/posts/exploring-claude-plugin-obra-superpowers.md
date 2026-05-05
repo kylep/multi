@@ -83,8 +83,7 @@ applicable skills, invoke skill, announce invocation, follow checklist,
 respond.
 
 The intent is to override the model's default behavior of jumping
-straight to action. The phrasing is deliberate. It doesn't ask, it
-instructs.
+straight to action. The phrasing is deliberate.
 
 # What's actually inside the strong ones
 
@@ -99,11 +98,14 @@ configuration files") that require asking the human first.
 
 **systematic-debugging** is a four-phase process gated on root cause:
 "NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST." Phase 1 alone has
-four numbered steps (read errors carefully, reproduce consistently,
-check recent changes, gather evidence at component boundaries). The
-"Use this ESPECIALLY when" list calls out time pressure, "just one
-quick fix", and "manager wants it fixed NOW" are the exact moments
-where an agent would otherwise guess.
+five numbered steps: read error messages carefully, reproduce
+consistently, check recent changes, gather evidence in multi-component
+systems, and trace data flow. The skill has two adjacent lists for
+when it applies: "Use this ESPECIALLY when" calls out time pressure
+and the "just one quick fix" reflex; "Don't skip when" answers the
+"manager wants it fixed NOW" pressure with "systematic is faster than
+thrashing." Both lists target the moments where an agent would
+otherwise guess.
 
 **verification-before-completion** is the one I'd hand to anyone
 shipping AI-written code. The Iron Law is "NO COMPLETION CLAIMS
