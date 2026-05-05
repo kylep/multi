@@ -93,3 +93,27 @@ last_verified: 2026-05-05
 ## Just for You
 
 - [InfoQ](https://www.infoq.com/news/2026/05/cloudflare-security-dashboard/) Cloudflare launched a Security Overview dashboard that aggregates security signals across the platform and surfaces prioritized action items, processing over 10 million daily insights.
+
+---
+
+## Update — 22:01 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/openai-pwc-finance-collaboration/) OpenAI and PwC announced a partnership to build AI agents around core finance workflows — planning, forecasting, reporting, procurement, payments, and treasury. PwC is deploying a procurement agent inside OpenAI's own finance org first, with results intended to feed back into the broader offering.
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/) Google launched Deep Research and Deep Research Max in public preview via the Gemini API. Both agents are built on Gemini 3.1 Pro and now support MCP, letting users connect private data and specialized data streams alongside web search. Deep Research Max scores 93.3% on DeepSearchQA, up from 66.1% in December.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/critical-apache-http2-flaw-cve-2026.html) CVE-2026-23918 is a double-free in Apache HTTP Server 2.4.66's mod_http2. A remote unauthenticated attacker can crash a worker process with two frames over a single TCP connection; on Debian-derived systems (including the official Docker image), the RCE path is accessible via the mmap allocator. Apache 2.4.67 patches the issue — disabling HTTP/2 blocks the RCE vector in the interim.
+
+## Local
+
+- [CP24](https://www.cp24.com/toronto/) Toronto mayoral race nominations opened May 5, with candidates having until August 21 to file. No major candidates declared on day one.
+
+## Weather
+
+- Whitby: Evening update — 15°C high, 9°C low overnight. 40% chance of showers persisting through the evening. (Source: Environment Canada)
