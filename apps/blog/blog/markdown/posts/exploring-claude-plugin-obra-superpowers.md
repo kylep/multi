@@ -9,9 +9,10 @@ tags: Claude-Code, AI, plugins, skills, Superpowers
 date: 2026-05-05
 modified: 2026-05-05
 status: published
-imgprompt: A cute cartoon otter wearing a red cape and standing on top
-  of a stack of three open books, flat pastel illustration, plenty of
-  white space, clean geometric shapes
+imgprompt: A cartoon utility belt laid flat with little tool icons
+  (gavel, magnifier, checklist, anvil, microscope, scroll), flat pastel
+  illustration, belt arched across the upper third with pastel ground
+  extending below
 keywords:
   - claude code superpowers plugin
   - obra superpowers skills
