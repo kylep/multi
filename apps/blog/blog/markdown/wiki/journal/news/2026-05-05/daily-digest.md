@@ -71,3 +71,25 @@ last_verified: 2026-05-05
 - [AWS News Blog](https://aws.amazon.com/blogs/aws/aws-weekly-roundup-whats-next-with-aws-2026-amazon-quick-openai-partnership-and-more-may-4-2026/) OpenAI Codex and GPT-5.5/5.4 are now available on Amazon Bedrock, letting teams authenticate with AWS credentials, apply usage toward cloud commitments, and govern AI access through existing Bedrock security controls.
 
 - [GitHub](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.2.11 was released April 30 with a reported bug in application reconciliation — the app controller may fail to refresh applications, leaving resources appearing out of sync. Review release notes before upgrading.
+
+---
+
+## Update — 14:00 UTC
+
+## AI Industry
+
+- [Fortune](https://fortune.com/2026/05/05/anthropic-wall-street-financial-services-agents-jamie-dimon/) Anthropic launched 10 pre-built AI agents targeting banking, insurance, asset management, and fintech — capable of drafting pitch decks, reviewing financial statements, and flagging compliance issues. The rollout includes full Microsoft 365 integration, enabling a single Claude agent to carry context across Excel, PowerPoint, Word, and Outlook simultaneously. Moody's is also embedding its full platform as a native Claude app, giving users in-context access to credit ratings and risk data for over 600 million companies.
+
+- [Reuters](https://money.usnews.com/investing/news/articles/2026-05-05/openai-anthropic-ventures-in-talks-to-buy-ai-services-firms-sources-say) Both OpenAI's Deployment Company and Anthropic's private equity-backed venture are now in active talks to acquire existing AI services firms, with OpenAI's vehicle reportedly in advanced stages on three deals. The acquisitions would bring in engineers and consultants to accelerate enterprise deployment.
+
+## AI Tooling
+
+- [Google Workspace Blog](https://workspace.google.com/blog/product-announcements/introducing-workspace-intelligence) Google's Workspace Intelligence admin AI control center reached general availability on May 4, providing a single console for managing security and governance settings across all generative AI and agent actions in Google Workspace.
+
+## Local
+
+- [CP24](https://www.cp24.com/local/toronto/2026/04/29/extended-runway-land-at-billy-bishop-could-be-more-than-two-kilometres-long/) Ontario Premier Doug Ford committed to preserving Little Norway Park near Billy Bishop Airport intact, responding to criticism over his decision to take Toronto's seat at the Toronto Port Authority to advance the runway extension into Lake Ontario.
+
+## Just for You
+
+- [InfoQ](https://www.infoq.com/news/2026/05/cloudflare-security-dashboard/) Cloudflare launched a Security Overview dashboard that aggregates security signals across the platform and surfaces prioritized action items, processing over 10 million daily insights.
