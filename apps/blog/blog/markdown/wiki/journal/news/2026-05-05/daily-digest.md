@@ -1,0 +1,73 @@
+---
+title: "Daily Digest: 2026-05-05"
+summary: "News digest covering AI, open source, security, geopolitics, and local news."
+keywords:
+  - daily-digest
+  - 2026-05-05
+related:
+  - wiki/journal
+scope: "Multi-topic news digest. No analysis or commentary."
+last_verified: 2026-05-05
+---
+
+## AI Industry
+
+- [CNN Business](https://www.cnn.com/2026/05/01/tech/pentagon-ai-anthropic) The Pentagon signed AI deals with eight companies — OpenAI, Google, Microsoft, Amazon, NVIDIA, Oracle, SpaceX, and Reflection AI — clearing them to deploy models on classified Department of Defense networks. Anthropic was excluded after a contract dispute; Defense Secretary Hegseth referred to CEO Dario Amodei as an "ideological lunatic" in congressional testimony.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-04/openai-finalizes-10-billion-joint-venture-with-pe-firms-to-deploy-ai) OpenAI finalized a $10 billion joint venture called The Deployment Company with PE firms including TPG, Brookfield, Bain Capital, and Advent. The vehicle targets four sectors — healthcare, finance, shipping, and manufacturing — and grants PE investors a 17.5% guaranteed annual return over five years.
+
+- [Prism News](https://www.prismnews.com/workplace/goldman-sachs/goldman-sachs-backs-anthropic-venture-to-deploy-claude) Goldman Sachs contributed $150 million to Anthropic's new AI services venture, which embeds engineers directly in portfolio companies and targets finance, coding, and support work.
+
+- [Anthropic](https://red.anthropic.com/2026/mythos-preview/) Anthropic released Claude Mythos Preview to a limited group of security researchers and open source developers through Project Glasswing. The model largely saturates existing benchmarks and is being evaluated for applications in defensive security.
+
+- [CNBC](https://www.cnbc.com/2026/02/17/meta-nvidia-deal-ai-data-center-chips.html) Meta's next flagship model, internally called "Avocado," was pushed to May 2026 after internal testing showed it underperforming against models from Google, OpenAI, and Anthropic.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-opus-4-7) Claude Security enters public beta for Claude Enterprise customers, adding code vulnerability scanning with proposed fixes powered by Opus 4.7, scheduled and targeted scans, triage tracking, and workflow integrations.
+
+- [Anthropic](https://www.anthropic.com/news/claude-opus-4-7) Claude Design launched with native connectors for Blender, Adobe, Autodesk, Ableton, and Splice, enabling rapid creative idea exploration and export directly from Claude.
+
+- [Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2026/05/01/microsoft-agent-365-now-generally-available-expands-capabilities-and-integrations) Microsoft Agent 365 became generally available on May 1, extending Entra network controls to Copilot Studio agents running on endpoint devices, with capabilities to block unsanctioned AI usage and filter prompt-injection attacks.
+
+- [Claude Code Docs](https://code.claude.com/docs/en/changelog) Claude Code updated on May 4 with improvements to the /color command, /mcp tool display, and an updated model picker adding Opus 4.7 entries.
+
+- [OpenAI](https://openai.com/news/) OpenAI Codex received a broad update with persisted /goal workflows, richer TUI controls, expanded permission profiles, improved multi-agent configuration, and better Windows and Amazon Bedrock support.
+
+## Open Source
+
+- [GitHub](https://github.com/mattpocock/skills) mattpocock/skills holds the #1 weekly trending spot for a second day with 31,091 stars this week, though down from 35k the prior day. The repository packages Claude Code agent skill configs for software engineers.
+
+- [GitHub](https://github.com/TauricResearch/TradingAgents) TauricResearch/TradingAgents climbed to 13,293 weekly stars (up from 11k yesterday), reflecting sustained interest in multi-agent LLM approaches to financial trading.
+
+- [GitHub](https://github.com/soxoj/maigret) soxoj/maigret entered the weekly top 8 with 4,789 stars this week; the OSINT tool scrapes 3,000+ sites to build dossiers from a single username. forrestchang/andrej-karpathy-skills dropped off after holding the #2 spot yesterday.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/cisa-adds-actively-exploited-linux-root.html) CISA added CVE-2026-31431, a Linux local privilege escalation flaw, to its Known Exploited Vulnerabilities catalog. The bug affects all major distributions running kernels from 2017 onward — including Ubuntu 24.04 LTS, Amazon Linux 2023, RHEL 10.1, and SUSE 16 — and can lead to container breakout and lateral movement. Patches are available in kernel versions 6.18.22, 6.19.12, and 7.0.
+
+- [SecurityWeek](https://www.securityweek.com/critical-github-vulnerability-exposed-millions-of-repositories/) Researchers at Wiz disclosed CVE-2026-3854, a critical remote code execution flaw in GitHub's internal Git infrastructure. Any authenticated user could execute arbitrary commands on GitHub's backend with a single git push. GitHub has patched the vulnerability and confirmed no known wild exploitation.
+
+## Geopolitics
+
+- [The Hill](https://thehill.com/policy/technology/5858995-pentagon-ai-companies-classified-work-deal/) The US-Iran standoff enters its third month with crude oil above $100 per barrel and Strait of Hormuz traffic effectively halted. No resolution or ceasefire discussions have been publicly announced.
+
+- [Enterprise Bank](https://www.enterprisebank.com/insights/geopolitical-update-may-2026) Venezuelan President Nicolás Maduro was captured by US forces, accelerating a broader US re-prioritization of the Western Hemisphere.
+
+- [Lazard](https://www.lazard.com/research-insights/top-geopolitical-trends-in-2026/) EU-China trade tensions broadened beyond electric vehicles to encompass wind components, solar panels, and semiconductors as Europe's political will continues to fragment over trade enforcement.
+
+## Local
+
+- [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) A funeral service for Ontario Provincial Police Sergeant Brandon Malcolm is scheduled for May 6 in Durham Region.
+
+- [Town of Whitby](https://www.whitby.ca/news/posts/whitby-council-adopts-2026-budget/) Whitby Council adopted the 2026 budget with a 3.44% increase to the Town's levy, translating to an estimated 1.2% increase on the total residential bill for Town services.
+
+## Weather
+
+- Whitby: 17°C high, 6°C low tonight. Mainly cloudy with 40% chance of showers through the morning and early afternoon, then showers developing in the afternoon. Wind becoming west 20 km/h gusting to 40 this morning. No alerts in effect. (Source: Environment Canada)
+
+## Just for You
+
+- [AWS News Blog](https://aws.amazon.com/blogs/aws/aws-weekly-roundup-whats-next-with-aws-2026-amazon-quick-openai-partnership-and-more-may-4-2026/) OpenAI Codex and GPT-5.5/5.4 are now available on Amazon Bedrock, letting teams authenticate with AWS credentials, apply usage toward cloud commitments, and govern AI access through existing Bedrock security controls.
+
+- [GitHub](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.2.11 was released April 30 with a reported bug in application reconciliation — the app controller may fail to refresh applications, leaving resources appearing out of sync. Review release notes before upgrading.
