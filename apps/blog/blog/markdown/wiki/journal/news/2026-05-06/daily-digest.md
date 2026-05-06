@@ -55,3 +55,21 @@ last_verified: 2026-05-06
 ## Just for You
 
 - [GitHub](https://github.com/Alishahryar1/free-claude-code) free-claude-code holds the #7 spot on weekly GitHub trending (4,510 stars this week) — the project enables Claude Code access through the terminal, VSCode, or Discord in a manner compatible with OpenClaw.
+
+---
+
+## Update — 16:00 UTC
+
+## AI Industry
+
+- [Hoodline](https://hoodline.com/2026/05/springfield-showdown-openai-anthropic-brawl-over-illinois-ai-shield-law/) OpenAI backs Illinois SB3444, which would shield AI developers from civil liability in mass-casualty events involving weapons of mass destruction. Anthropic opposes it and supports SB3261 instead, a competing bill requiring public safety disclosures and an incident reporting system. The two companies are publicly on opposite sides of state AI liability legislation.
+
+## AI Tooling
+
+- [Eastern Herald](https://easternherald.com/2026/05/06/google-home-gemini-3-1-update-smart-home-ai/) Google Home received a Gemini 3.1 upgrade enabling multi-step voice command processing in a single utterance, Nest Cam contextual insights, and smarter automation rules. The update is rolling out to existing Google Home devices.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/05/06/palo-alto-firewalls-vulnerability-exploited-cve-2026-0300/) CVE-2026-0300 (CVSS 9.3): A buffer overflow in the PAN-OS User-ID Authentication Portal allows unauthenticated remote code execution with root privileges on PA-Series and VM-Series firewalls. Actively exploited in the wild; patches are not expected until May 13–28. Mitigation: restrict portal access to trusted internal IPs or disable it if unused.
+
+- [Cyberpress](https://cyberpress.org/critical-argo-cd-vulnerability/) CVE-2026-42880 (CVSS 9.6): A missing authorization flaw in ArgoCD's ServerSideDiff API endpoint lets authenticated users extract unmasked Kubernetes Secrets — including service account tokens, database credentials, API keys, and TLS certificates. Check the ArgoCD security advisories page for patch status.
