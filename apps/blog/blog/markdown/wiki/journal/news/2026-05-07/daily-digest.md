@@ -1,0 +1,67 @@
+---
+title: "Daily Digest: 2026-05-07"
+summary: "News digest covering AI, open source, security, geopolitics, and local news."
+keywords:
+  - daily-digest
+  - 2026-05-07
+related:
+  - wiki/journal
+scope: "Multi-topic news digest. No analysis or commentary."
+last_verified: 2026-05-07
+---
+
+## AI Industry
+
+- [Fortune](https://fortune.com/2026/05/05/anthropic-wall-street-financial-services-agents-jamie-dimon/) Anthropic debuted Claude Opus 4.7 and a suite of pre-built AI agents for major banks at an invite-only Wall Street briefing on May 5, targeting financial services workflows including research, risk, and compliance.
+
+- [CNBC](https://www.cnbc.com/2026/05/04/anthropic-goldman-blackstone-ai-venture.html) Anthropic, Goldman Sachs, and Blackstone launched a $1.5 billion joint venture to deploy Claude models directly inside PE-owned portfolio companies, accelerating enterprise AI adoption.
+
+- [CNBC](https://www.cnbc.com/2026/05/06/anthropic-spacex-data-center-capacity.html) Anthropic signed a compute deal with SpaceX giving it access to the full capacity of the Colossus 1 data center in Memphis — over 300 megawatts — with stated interest in developing multiple gigawatts of space-based compute.
+
+- [TechCrunch](https://techcrunch.com/2026/05/04/anthropic-and-openai-are-both-launching-joint-ventures-for-enterprise-ai-services/) OpenAI partnered with PwC on an AI initiative to rebuild CFO office functions including forecasting, treasury, and reporting using AI-driven workflow coordination.
+
+- [CNBC](https://www.cnbc.com/2026/05/06/nvidia-corning-optical-factories-nc-texas-ai.html) NVIDIA committed up to $3.2 billion in Corning to fund three new optical fiber manufacturing facilities in North Carolina and Texas dedicated to AI data center infrastructure.
+
+## AI Tooling
+
+- [Anthropic Blog](https://claude.com/blog/auto-mode) Claude Code auto mode launched as a research preview for Team plan users, enabling multi-step autonomous coding workflows with layered safety checks and human approval gates for sensitive operations. Enterprise and API rollout follows shortly.
+
+- [Claude Code Docs](https://code.claude.com/docs/en/whats-new) Claude Code's usage limits were doubled for Pro, Max, and Enterprise customers. A broad update also shipped smarter model picking, project purge tools, improved OAuth login, and Windows/PowerShell stability fixes.
+
+## Open Source
+
+- [GitHub](https://github.com/mattpocock/skills) mattpocock/skills reached 20,777 stars this week (#1 on GitHub trending), a collection of Claude-focused engineering skills sourced from .claude directory configurations.
+
+- [GitHub](https://github.com/ruvnet/ruflo) ruvnet/ruflo added 10,993 stars this week, an agent orchestration platform for Claude with multi-agent swarms, RAG integration, and native Claude Code/Codex support.
+
+- [GitHub](https://github.com/TauricResearch/TradingAgents) TauricResearch/TradingAgents surpassed 70,000 total stars with 15,576 added this week, a multi-agent LLM framework for financial trading decisions.
+
+## Security
+
+- [Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2026/05/01/cve-2026-31431-copy-fail-vulnerability-enables-linux-root-privilege-escalation/) CVE-2026-31431, dubbed "Copy Fail," is an actively exploited Linux kernel local privilege escalation flaw (CVSS 7.8) that allows unprivileged users to gain root. CISA added it to the Known Exploited Vulnerabilities catalog; it affects millions of Kubernetes clusters across cloud environments.
+
+- [The Hacker News](https://thehackernews.com/2026/05/critical-apache-http2-flaw-cve-2026.html) CVE-2026-23918 is a critical double-free flaw (CVSS 8.8) in Apache HTTP Server 2.4.66's HTTP/2 handler enabling denial of service and possible remote code execution. Fixed in Apache 2.4.67.
+
+- [The Hacker News](https://thehackernews.com/) Cybersecurity vendor Trellix disclosed a breach in which attackers accessed a portion of its source code. The company engaged forensic investigators and has not disclosed the scope of the exposure.
+
+## Geopolitics
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/5/1/turbulent-and-dangerous-how-shipping-is-the-new-global-battleground) The Strait of Hormuz remains effectively closed to commercial shipping as the US-Iran conflict sustains competing blockades, disrupting a significant share of global oil transit and pushing insurance premiums sharply higher.
+
+- [Washington Post](https://www.washingtonpost.com/opinions/2026/05/05/year-later-india-pakistan-ceasefire-is-holding-so-far/) One year after India and Pakistan's four-day air war and subsequent ceasefire, the truce is holding but fragile, with underlying drivers of conflict — particularly cross-border terrorism — unchanged.
+
+## Local
+
+- [CTV News Toronto](https://www.ctvnews.ca/toronto/) Toronto's mayoral race officially opened for nominations on May 7, with the nomination period running through August 21.
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/lakeridge-health-failed-to-protect-patients-medical-records-9.7182011) Ontario's Privacy Commissioner found Lakeridge Health repeatedly failed to protect patient records across Durham Region hospitals between 2023 and 2025, with staff including physicians and nurses improperly accessing files of at least 326 patients. The commissioner ordered the hospital to set clear timelines for investigations and notify affected patients promptly.
+
+## Weather
+
+- Whitby: 12°C high, 2°C low, mainly cloudy with a 40% chance of showers during the day. Risk of frost overnight as temperatures drop to near 2°C. UV index 5 (moderate). Source: Environment Canada.
+
+## Just for You
+
+- [GitHub](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.1 reached end-of-life on May 6 and will no longer receive bug fixes or security patches. Users running v3.1 should upgrade to v3.2, v3.3, or v3.4.
+
+- [GitHub](https://github.com/Alishahryar1/free-claude-code) free-claude-code added 3,775 stars this week (22,176 total) — a tool for running Claude Code in the terminal, VSCode, or Discord, with OpenClaw compatibility noted in the description.
