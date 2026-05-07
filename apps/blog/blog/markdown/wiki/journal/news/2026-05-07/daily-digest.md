@@ -97,3 +97,33 @@ last_verified: 2026-05-07
 - [CBC News](https://www.cbc.ca/news/canada/toronto) Cancer Care Ontario issued updated guidelines lowering the colorectal cancer screening age from 50 to 45, citing a notable increase in diagnoses among younger adults.
 
 - [Mirage News](https://www.miragenews.com/champagne-in-toronto-may-6-7-for-2026-economic-1667767/) Federal Finance Minister François-Philippe Champagne was in Toronto on May 6-7 for the 2026 Economic Update, meeting with financial sector leaders ahead of the federal budget presentation.
+
+---
+
+## Update — 22:00 UTC
+
+## Geopolitics
+
+- [U.S. State Department](https://www.state.gov/releases/office-of-the-spokesperson/2026/05/norway-joins-pax-silica-initiative/) Norway became the 15th country to formally join the Pax Silica Initiative, a U.S.-led coalition launched in December 2025 to secure semiconductor, AI infrastructure, and critical mineral supply chains as a counterweight to China. Norway brings sovereign wealth fund capital and rare earth mineral reserves to the alliance.
+
+- [Manila Times](https://www.manilatimes.net/2026/05/06/regions/marcos-highlights-regional-cooperation-at-asean-summit-2026/2336921) The 48th ASEAN Summit in Cebu (May 6–8) concluded the ASEAN Digital Economy Framework Agreement, establishing common rules for cross-border data flows and digital trade among all 10 member states. Maritime security cooperation and South China Sea Code of Conduct talks were also on the agenda; no binding CoC agreement was reached.
+
+## Security
+
+- [NVD](https://nvd.nist.gov/vuln/detail/CVE-2026-35616) CVE-2026-6973 is a high-severity (CVSS 7.2) RCE vulnerability in Ivanti Endpoint Manager Mobile. Remotely authenticated attackers with admin-level access can achieve code execution on affected versions. Ivanti has issued a patch; organizations running EPMM should update promptly.
+
+## Local
+
+- [UrbanToronto](https://urbantoronto.ca/news/2026/05/news-roundup-may-7-2026.60954) The Don Valley Parkway will undergo a full weekend closure for maintenance. Toronto is also opening public washrooms, water fountains, and pools for the summer season.
+
+- [UrbanToronto](https://urbantoronto.ca/news/2026/05/news-roundup-may-7-2026.60954) More than 220,000 free tickets for Toronto's FIFA Fan Festival sold out within hours of release, signaling heavy demand for the summer event tied to the upcoming tournament.
+
+## Weather
+
+- Whitby: Evening update — frost advisory in effect overnight into Friday morning. High 11°C, low 1°C, patchy frost expected as temperatures fall near or below freezing. Source: Environment Canada.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/) Cloudflare launched Flagship, a feature flag service in closed beta built directly on its global edge platform, allowing teams to control rollouts and run experiments without redeployment.
+
+- [AWS](https://aws.amazon.com/) Valkey 8.1 is now the default caching engine on AWS ElastiCache, replacing Redis as the out-of-the-box option. Google Cloud Memorystore has also added Valkey support, making it the de facto Redis successor across major clouds.
