@@ -65,3 +65,35 @@ last_verified: 2026-05-07
 - [GitHub](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.1 reached end-of-life on May 6 and will no longer receive bug fixes or security patches. Users running v3.1 should upgrade to v3.2, v3.3, or v3.4.
 
 - [GitHub](https://github.com/Alishahryar1/free-claude-code) free-claude-code added 3,775 stars this week (22,176 total) — a tool for running Claude Code in the terminal, VSCode, or Discord, with OpenClaw compatibility noted in the description.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Bloomberg / Yahoo Finance](https://finance.yahoo.com/sectors/technology/articles/openai-anthropic-ventures-talks-buy-150744382.html) OpenAI's $10B joint venture "The Deployment Company" is in advanced talks to acquire three AI engineering services and consulting firms. The JV backed by TPG, Brookfield, Advent, and Bain Capital intends to use most of its raised capital for acquisitions rather than organic build-out.
+
+- [CNBC](https://www.cnbc.com/2026/05/05/ai-oversight-trump-google-microsoft-xai.html) The Trump administration's Center for AI Standards and Innovation reached agreements with Google DeepMind, Microsoft, and xAI to test their frontier models before public release. The policy shift was prompted in part by Anthropic's Mythos model raising concerns about AI cybersecurity capabilities.
+
+## AI Tooling
+
+- [9to5Google](https://9to5google.com/2026/05/06/gemini-agent-planner-upgrade/) Google is internally testing a new AI agent called "Remy" within the Gemini platform — a 24/7 personal assistant that can take autonomous actions across Google services, communicate on users' behalf, and monitor for events proactively. No launch date confirmed; Google I/O on May 19-20 is the expected reveal.
+
+- [GitHub Changelog](https://github.blog/changelog/2026-05-05-secret-scanning-with-github-mcp-server-is-now-generally-available/) Secret scanning in the GitHub MCP Server is now generally available. MCP-compatible AI coding agents and IDEs can scan code changes for exposed secrets before commits or pull requests are opened, with support for existing push protection customizations.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/palo-alto-pan-os-flaw-under-active.html) CVE-2026-0300 is a critical buffer overflow (CVSS 9.3) in Palo Alto Networks PAN-OS affecting the User-ID Authentication Portal. Unauthenticated attackers can gain root-level RCE on PA-Series and VM-Series firewalls. Active exploitation confirmed since April 9; CISA added it to KEV on May 6 with a federal patch deadline of May 9. Software fixes ship May 13.
+
+## Geopolitics
+
+- [CNBC](https://www.cnbc.com/2026/05/07/oil-prices-today-trump-iran-strait-of-hormuz-us-crude-brent-.html) The U.S. presented Iran with a one-page 14-point framework to end the war, offering sanctions relief in exchange for a nuclear enrichment moratorium. Iran is reviewing the proposal through Pakistani mediators. Brent crude fell below $100/bbl on deal hopes; Trump stated bombing would intensify if Iran declines.
+
+## Local
+
+- [CP24](https://www.cp24.com/local/toronto/2026/03/27/metrolinx-introducing-body-worn-cameras-on-go-transit-up-express/) Metrolinx has begun rolling out body-worn cameras on GO Transit and UP Express, with Customer Protection Officers and Station Safety Ambassadors deploying the devices at high-incident stations first.
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto) Cancer Care Ontario issued updated guidelines lowering the colorectal cancer screening age from 50 to 45, citing a notable increase in diagnoses among younger adults.
+
+- [Mirage News](https://www.miragenews.com/champagne-in-toronto-may-6-7-for-2026-economic-1667767/) Federal Finance Minister François-Philippe Champagne was in Toronto on May 6-7 for the 2026 Economic Update, meeting with financial sector leaders ahead of the federal budget presentation.
