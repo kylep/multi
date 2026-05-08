@@ -261,3 +261,171 @@ def commitments_due_at(path: Path, when: datetime) -> list[dict]:
         if due_dt <= when:
             out.append(c)
     return out
+
+
+class MemoryStore:
+    """Facade over markdown storage. Tool functions delegate here."""
+
+    def __init__(self) -> None:
+        data_dir = Path(os.environ.get("MEMORY_DATA_DIR", "/data"))
+        self.data_dir = data_dir
+        self.memory_path = data_dir / "MEMORY.md"
+        self.daily_dir = data_dir / "daily"
+        self.commitments_path = data_dir / "COMMITMENTS.md"
+
+    def save(
+        self,
+        scope: str,
+        content: str,
+        key: str | None = None,
+        due: str | None = None,
+        precision: str | None = None,
+        commitment_scope: str | None = None,
+    ) -> str:
+        if scope == "long":
+            if not key:
+                raise ValueError("key required for scope='long'")
+            append_memory_section(self.memory_path, key, content)
+            return f"Saved to MEMORY.md under '## {key}'"
+        if scope == "daily":
+            today = date.today()
+            append_daily_note(today, content)
+            return f"Appended to daily/{today.isoformat()}.md"
+        if scope == "commitment":
+            if not due:
+                raise ValueError("due required for scope='commitment'")
+            if not commitment_scope:
+                raise ValueError("commitment_scope required for scope='commitment'")
+            cmt_id = add_commitment(
+                self.commitments_path,
+                content=content,
+                due=due,
+                scope=commitment_scope,
+                precision=precision or "soft",
+            )
+            return f"Saved commitment {cmt_id}"
+        raise ValueError(f"unknown scope: {scope!r}")
+
+    def _collect_searchables(
+        self, scope: str | None
+    ) -> list[tuple[str, int, str]]:
+        out: list[tuple[str, int, str]] = []
+        if scope in (None, "long") and self.memory_path.exists():
+            for i, line in enumerate(self.memory_path.read_text().splitlines(), start=1):
+                if _BULLET_RE.match(line):
+                    out.append((str(self.memory_path), i, line))
+        if scope in (None, "daily") and self.daily_dir.exists():
+            for f in sorted(self.daily_dir.glob("*.md")):
+                for i, line in enumerate(f.read_text().splitlines(), start=1):
+                    if _BULLET_RE.match(line):
+                        out.append((str(f), i, line))
+        if scope in (None, "commitment") and self.commitments_path.exists():
+            cmts = parse_commitments(self.commitments_path.read_text())
+            for c in cmts:
+                out.append((
+                    str(self.commitments_path),
+                    0,
+                    f"[{c.get('status','?')}] {c.get('content','').strip()}",
+                ))
+        return out
+
+    def search(
+        self,
+        query: str,
+        scope: str | None = None,
+        limit: int = 5,
+    ) -> list[dict]:
+        searchables = self._collect_searchables(scope)
+        if not searchables:
+            return []
+        docs = [s[2] for s in searchables]
+        hits = bm25_score(query, docs)
+        return [
+            {
+                "path": searchables[i][0],
+                "line": searchables[i][1],
+                "snippet": searchables[i][2],
+                "score": round(score, 3),
+            }
+            for i, score in hits[:limit]
+        ]
+
+    def recall(self, query: str, max_chars: int = 400) -> str:
+        hits = self.search(query, limit=10)
+        if not hits:
+            return "NONE"
+        out_lines: list[str] = []
+        used = 0
+        for h in hits:
+            line = h["snippet"]
+            if used + len(line) + 1 > max_chars:
+                break
+            out_lines.append(line)
+            used += len(line) + 1
+        if not out_lines:
+            return "NONE"
+        return "\n".join(out_lines)
+
+    def get(self, path: str, lines: tuple[int, int] | None = None) -> str:
+        p = Path(path)
+        if not p.exists():
+            return f"(file not found: {path})"
+        if lines is None:
+            return p.read_text()
+        start, end = lines
+        body = p.read_text().splitlines()
+        return "\n".join(body[max(0, start - 1):end])
+
+    def list_(self, scope: str) -> str:
+        if scope == "long":
+            if not self.memory_path.exists():
+                return "(no long-term memory)"
+            sections = parse_memory_md(self.memory_path.read_text())
+            if not sections:
+                return "(no sections)"
+            return "\n".join(
+                f"- {name} ({len(bullets)} entries)" for name, bullets in sections.items()
+            )
+        if scope == "daily":
+            if not self.daily_dir.exists():
+                return "(no daily notes)"
+            files = sorted(self.daily_dir.glob("*.md"))
+            return "\n".join(f"- {f.stem}" for f in files) or "(empty)"
+        if scope == "commitment":
+            if not self.commitments_path.exists():
+                return "(no commitments)"
+            cmts = parse_commitments(self.commitments_path.read_text())
+            if not cmts:
+                return "(empty)"
+            return "\n".join(
+                f"- {c.get('id')} [{c.get('status')}] due={c.get('due')} {c.get('content','').strip()[:60]}"
+                for c in cmts
+            )
+        raise ValueError(f"unknown scope: {scope!r}")
+
+    def commitment_done(self, cmt_id: str) -> str:
+        ok = mark_commitment_done(self.commitments_path, cmt_id)
+        return f"Marked {cmt_id} delivered" if ok else f"Commitment {cmt_id} not found"
+
+    def commitments_due(self, now_iso: str | None = None) -> list[dict]:
+        when = (
+            datetime.fromisoformat(now_iso.replace("Z", "+00:00"))
+            if now_iso
+            else datetime.now(timezone.utc)
+        )
+        return commitments_due_at(self.commitments_path, when)
+
+    def promote(self, date_str: str, line_num: int, section: str = "Promoted") -> str:
+        daily_path = self.daily_dir / f"{date_str}.md"
+        if not daily_path.exists():
+            return f"daily/{date_str}.md not found"
+        lines = daily_path.read_text().splitlines()
+        if line_num < 1 or line_num > len(lines):
+            return f"line {line_num} out of range"
+        bullet_match = _BULLET_RE.match(lines[line_num - 1])
+        if not bullet_match:
+            return f"line {line_num} is not a bullet"
+        body = bullet_match.group(1)
+        body = re.sub(r"^\[\d{2}:\d{2} UTC\]\s*", "", body)
+        append_memory_section(self.memory_path, section, body)
+        return f"Promoted to MEMORY.md under '## {section}'"

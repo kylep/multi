@@ -3,6 +3,8 @@
 import re
 from datetime import date, datetime, timezone
 
+import pytest
+
 
 # --- write_atomic ---
 
@@ -274,3 +276,165 @@ def test_commitments_due_returns_pending_past_due(tmp_path, monkeypatch):
         memory_mcp.COMMITMENTS_FILE, datetime(2026, 5, 8, tzinfo=timezone.utc))
     assert len(due) == 1
     assert due[0]["content"].strip() == "past"
+
+
+# --- MemoryStore ---
+
+@pytest.fixture
+def store(tmp_path, monkeypatch):
+    monkeypatch.setenv("MEMORY_DATA_DIR", str(tmp_path))
+    import importlib
+    import memory_mcp
+    importlib.reload(memory_mcp)
+    return memory_mcp.MemoryStore()
+
+
+def test_save_long_requires_key(store):
+    with pytest.raises(ValueError, match="key"):
+        store.save(scope="long", content="x")
+
+
+def test_save_long_appends_to_memory_md(store):
+    msg = store.save(scope="long", content="prefers TS", key="Kyle")
+    assert "Kyle" in msg
+    text = store.memory_path.read_text()
+    assert "## Kyle" in text
+
+
+def test_save_daily_writes_today(store):
+    msg = store.save(scope="daily", content="context")
+    today = date.today().isoformat()
+    assert today in msg
+    target = store.daily_dir / f"{today}.md"
+    assert target.exists()
+
+
+def test_save_commitment_requires_due_and_scope(store):
+    with pytest.raises(ValueError, match="due"):
+        store.save(scope="commitment", content="x")
+    with pytest.raises(ValueError, match="commitment_scope"):
+        store.save(scope="commitment", content="x", due="2026-05-08T19:00:00Z")
+
+
+def test_save_commitment_returns_id(store):
+    msg = store.save(
+        scope="commitment", content="check in",
+        due="2026-05-08T19:00:00Z",
+        commitment_scope="channel:1234",
+        precision="soft",
+    )
+    assert "c-" in msg
+
+
+def test_save_unknown_scope_raises(store):
+    with pytest.raises(ValueError, match="scope"):
+        store.save(scope="garbage", content="x")
+
+
+def test_search_returns_hits_with_provenance(store):
+    store.save(scope="long", content="prefers TypeScript over JavaScript", key="Kyle")
+    store.save(scope="long", content="works in Toronto", key="Kyle")
+    store.save(scope="long", content="no relevance here", key="Random")
+    results = store.search(query="TypeScript", limit=5)
+    assert len(results) >= 1
+    top = results[0]
+    assert "TypeScript" in top["snippet"] or "typescript" in top["snippet"].lower()
+    assert top["path"].endswith("MEMORY.md")
+    assert "line" in top
+
+
+def test_search_respects_scope_filter(store):
+    store.save(scope="long", content="long-scope content", key="X")
+    store.save(scope="daily", content="daily-scope content")
+    long_only = store.search(query="content", scope="long")
+    daily_only = store.search(query="content", scope="daily")
+    assert all(r["path"].endswith("MEMORY.md") for r in long_only)
+    assert all("daily" in r["path"] for r in daily_only)
+
+
+def test_recall_returns_none_for_irrelevant_query(store):
+    store.save(scope="long", content="Kyle prefers TS", key="Kyle")
+    digest = store.recall(query="favorite color of penguins")
+    assert digest == "NONE"
+
+
+def test_recall_returns_digest_for_matched_query(store):
+    store.save(scope="long", content="Kyle prefers TypeScript", key="Kyle")
+    digest = store.recall(query="What language does Kyle prefer?")
+    assert digest != "NONE"
+    assert "TypeScript" in digest or "typescript" in digest.lower()
+
+
+def test_recall_respects_max_chars(store):
+    long_content = "TypeScript " * 200
+    store.save(scope="long", content=long_content, key="Kyle")
+    digest = store.recall(query="TypeScript", max_chars=200)
+    assert len(digest) <= 220
+
+
+def test_get_returns_full_file(store):
+    store.save(scope="long", content="x", key="Kyle")
+    text = store.get(str(store.memory_path))
+    assert "## Kyle" in text
+
+
+def test_get_with_line_range(store):
+    store.save(scope="long", content="a", key="A")
+    store.save(scope="long", content="b", key="B")
+    text = store.get(str(store.memory_path), lines=(1, 2))
+    assert "## A" in text
+
+
+def test_list_long_returns_section_headers(store):
+    store.save(scope="long", content="x", key="Kyle")
+    store.save(scope="long", content="y", key="Kara")
+    out = store.list_(scope="long")
+    assert "Kyle" in out
+    assert "Kara" in out
+
+
+def test_list_commitment_shows_status(store):
+    store.save(
+        scope="commitment", content="x",
+        due="2099-01-01T00:00:00Z", commitment_scope="ch:1",
+    )
+    out = store.list_(scope="commitment")
+    assert "pending" in out
+
+
+def test_commitment_done_changes_status(store):
+    msg = store.save(
+        scope="commitment", content="x",
+        due="2099-01-01T00:00:00Z", commitment_scope="ch:1",
+    )
+    cmt_id = msg.split("commitment ")[-1].strip()
+    result = store.commitment_done(cmt_id)
+    assert "delivered" in result.lower() or "done" in result.lower()
+
+
+def test_commitments_due_returns_list(store):
+    store.save(
+        scope="commitment", content="past",
+        due="2020-01-01T00:00:00Z", commitment_scope="ch:1",
+    )
+    store.save(
+        scope="commitment", content="future",
+        due="2099-01-01T00:00:00Z", commitment_scope="ch:1",
+    )
+    due = store.commitments_due(
+        now_iso=datetime(2026, 5, 8, tzinfo=timezone.utc).isoformat()
+    )
+    assert len(due) == 1
+    assert due[0]["content"].strip() == "past"
+
+
+def test_promote_moves_daily_bullet_to_long(store):
+    store.save(scope="daily", content="something to remember")
+    today = date.today().isoformat()
+    daily_path = store.daily_dir / f"{today}.md"
+    lines = daily_path.read_text().splitlines()
+    target_line = next(i for i, line in enumerate(lines, 1) if "something to remember" in line)
+    result = store.promote(date_str=today, line_num=target_line, section="Notes")
+    assert "promoted" in result.lower() or "moved" in result.lower()
+    assert "## Notes" in store.memory_path.read_text()
+    assert "something to remember" in store.memory_path.read_text()
