@@ -89,3 +89,19 @@ last_verified: 2026-05-08
 ## Weather
 
 - Whitby, ON: High 14°C, partly sunny morning turning cloudy, 30% chance of showers in the late afternoon. Low 4°C overnight. Source: [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939)
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-08/anthropic-inks-1-8-billion-computing-deal-with-akamai) Anthropic signed a seven-year, $1.8 billion computing deal with Akamai Technologies to handle surging inference demand. CEO Dario Amodei disclosed the company's annualized revenue and usage grew 80-fold in Q1, pushing it to tap Google, SpaceX, and now Akamai for additional compute. Akamai shares closed up 27%.
+
+- [PYMNTS](https://www.pymnts.com/news/artificial-intelligence/2026/anthropic-valuation-could-eclipse-openai-50-billion-dollar-funding-round/) Anthropic is in discussions to raise $50 billion in a new primary funding round at a valuation of approximately $900 billion, which would exceed OpenAI's last official primary valuation of $852 billion.
+
+## Security
+
+- [Krebs on Security](https://krebsonsecurity.com/2026/05/canvas-breach-disrupts-schools-colleges-nationwide/) ShinyHunters claimed a breach of Instructure's Canvas learning platform affecting 275 million students and faculty at nearly 9,000 schools. Stolen data includes names, email addresses, student IDs, and private messages. Canvas was taken offline briefly during finals week before being restored; ShinyHunters set a May 12 deadline for negotiations.
+
+- [Bleeping Computer](https://www.bleepingcomputer.com/news/security/new-linux-dirty-frag-zero-day-with-poc-exploit-gives-root-privileges/) "Dirty Frag" (CVE-2026-43284, CVE-2026-43500) is a new Linux kernel privilege escalation pairing two bugs in the IPsec ESP and rxrpc fast-path decryption code. A working exploit yields root from any unprivileged user on Ubuntu, RHEL, openSUSE, AlmaLinux, and Fedora. A partial patch for the ESP component landed in the upstream netdev tree May 7; the rxrpc fix is still pending.
