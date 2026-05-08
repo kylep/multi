@@ -88,11 +88,11 @@ spec:
               mountPath: /opt/pai/thread_manager.py
               subPath: thread_manager.py
             - name: pai-script
-              mountPath: /opt/pai/memory_store.py
-              subPath: memory_store.py
-            - name: pai-script
               mountPath: /opt/pai/memory_mcp.py
               subPath: memory_mcp.py
+            - name: pai-script
+              mountPath: /opt/pai/migrate.py
+              subPath: migrate.py
             - name: pai-script
               mountPath: /opt/discord-mcp/server.py
               subPath: discord-mcp-server.py

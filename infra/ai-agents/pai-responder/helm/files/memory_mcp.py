@@ -429,3 +429,103 @@ class MemoryStore:
         body = re.sub(r"^\[\d{2}:\d{2} UTC\]\s*", "", body)
         append_memory_section(self.memory_path, section, body)
         return f"Promoted to MEMORY.md under '## {section}'"
+
+
+# --- FastMCP wiring ---
+
+from mcp.server.fastmcp import FastMCP  # noqa: E402
+
+mcp = FastMCP("pai-memory")
+_store: MemoryStore | None = None
+
+
+def _get_store() -> MemoryStore:
+    global _store
+    if _store is None:
+        _store = MemoryStore()
+    return _store
+
+
+@mcp.tool()
+async def memory_save(
+    scope: str,
+    content: str,
+    key: str = "",
+    due: str = "",
+    precision: str = "",
+    commitment_scope: str = "",
+) -> str:
+    """Save a memory.
+
+    scope: 'long' (durable, requires key), 'daily' (timestamped daily note),
+           or 'commitment' (requires due ISO time and commitment_scope).
+    """
+    return _get_store().save(
+        scope=scope,
+        content=content,
+        key=key or None,
+        due=due or None,
+        precision=precision or None,
+        commitment_scope=commitment_scope or None,
+    )
+
+
+@mcp.tool()
+async def memory_search(query: str, scope: str = "", limit: int = 5) -> str:
+    """BM25 search across memory files. Returns formatted hits with provenance."""
+    hits = _get_store().search(query=query, scope=scope or None, limit=limit)
+    if not hits:
+        return "(no hits)"
+    lines: list[str] = []
+    for h in hits:
+        lines.append(f"[{h['path']}:{h['line']}] (score={h['score']}) {h['snippet']}")
+    return "\n".join(lines)
+
+
+@mcp.tool()
+async def memory_recall(query: str, max_chars: int = 400) -> str:
+    """Compact digest. Returns 'NONE' if no relevant memory."""
+    return _get_store().recall(query=query, max_chars=max_chars)
+
+
+@mcp.tool()
+async def memory_get(path: str, start: int = 0, end: int = 0) -> str:
+    """Direct file read with optional line range (1-indexed, inclusive)."""
+    lines = (start, end) if (start and end) else None
+    return _get_store().get(path=path, lines=lines)
+
+
+@mcp.tool()
+async def memory_list(scope: str) -> str:
+    """List entries by scope: 'long', 'daily', or 'commitment'."""
+    return _get_store().list_(scope=scope)
+
+
+@mcp.tool()
+async def memory_commitment_due(now_iso: str = "") -> str:
+    """Return pending commitments due at or before now_iso (defaults to now)."""
+    cmts = _get_store().commitments_due(now_iso=now_iso or None)
+    if not cmts:
+        return "(none due)"
+    lines: list[str] = []
+    for c in cmts:
+        lines.append(
+            f"{c.get('id')} due={c.get('due')} scope={c.get('scope')} precision={c.get('precision')}: {c.get('content','').strip()}"
+        )
+    return "\n".join(lines)
+
+
+@mcp.tool()
+async def memory_commitment_done(cmt_id: str) -> str:
+    """Mark a commitment as delivered."""
+    return _get_store().commitment_done(cmt_id=cmt_id)
+
+
+@mcp.tool()
+async def memory_promote(date_str: str, line_num: int, section: str = "Promoted") -> str:
+    """Move a daily-note bullet to MEMORY.md under the given section."""
+    return _get_store().promote(date_str=date_str, line_num=line_num, section=section)
+
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")
