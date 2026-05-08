@@ -24,6 +24,10 @@ storage:
   size: 100Mi
   hostPath: /tmp/pai-state
 
+repo:
+  url: "https://github.com/kylep/multi.git"
+  branch: main
+
 resources:
   requests:
     cpu: 100m

@@ -34,16 +34,69 @@ spec:
         fsGroup: 1001
         seccompProfile:
           type: RuntimeDefault
-      containers:
-        - name: pai-responder
+      initContainers:
+        - name: clone-repo
+          image: alpine/git:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              git clone --depth 1 --branch {{ .Values.repo.branch }} \
+                {{ .Values.repo.url }} /workspace/repo
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+        - name: migrate-memory
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
             - |
+              set -e
+              python3 /opt/pai/migrate.py
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: pai-state
+              mountPath: /data
+            - name: pai-script
+              mountPath: /opt/pai/migrate.py
+              subPath: migrate.py
+            - name: pai-script
+              mountPath: /opt/pai/memory_mcp.py
+              subPath: memory_mcp.py
+      containers:
+        - name: pai-responder
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          workingDir: /workspace/repo
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
               . /vault/secrets/config
               export PYTHONPATH=/opt/pai
-              exec python3 /opt/pai/gateway.py
+              python3 /opt/pai/gateway.py
           env:
             - name: DISCORD_GUILD_ID
               value: {{ .Values.discord.guildId | quote }}
@@ -59,6 +112,8 @@ spec:
               value: /data/state.json
             - name: HEALTH_PORT
               value: "8080"
+            - name: MEMORY_DATA_DIR
+              value: /data
           ports:
             - name: health
               containerPort: 8080
@@ -76,6 +131,8 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           volumeMounts:
+            - name: workspace
+              mountPath: /workspace
             - name: pai-state
               mountPath: /data
             - name: pai-script
@@ -103,6 +160,8 @@ spec:
             capabilities:
               drop: ["ALL"]
       volumes:
+        - name: workspace
+          emptyDir: {}
         - name: pai-state
           persistentVolumeClaim:
             claimName: {{ include "pai-responder.fullname" . }}-state
