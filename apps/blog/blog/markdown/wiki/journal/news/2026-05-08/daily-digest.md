@@ -61,3 +61,31 @@ last_verified: 2026-05-08
 ## Just for You
 
 - [Microsoft 365 Blog](https://www.microsoft.com/en-us/microsoft-365/blog/2026/05/05/microsoft-365-copilot-human-agency-and-the-opportunity-for-every-organization/) Microsoft's Frontier for Business program added experimental agentic Outlook features that can automatically accept meetings, draft follow-up emails, and reorganize calendars using natural language commands.
+
+---
+
+## Update — 14:00 UTC
+
+## AI Industry
+
+- [MEXC News](https://www.mexc.com/news/1076748) Anthropic's on-chain pre-IPO valuation reached $1.2 trillion on secondary markets, overtaking OpenAI's implied secondary-market price for the first time. Anthropic's last official funding round valued the company at $380 billion.
+
+## AI Tooling
+
+- [OpenAI](https://openai.com/index/gpt-5-5-with-trusted-access-for-cyber/) OpenAI released GPT-5.5-Cyber in limited preview to vetted cybersecurity teams through its Trusted Access for Cyber program. The model has fewer guardrails than the public version and supports authorized red teaming, penetration testing, and controlled validation workflows. Credential theft and malware writing remain blocked.
+
+## Geopolitics
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/5/8/iran-war-day-70-us-iran-trade-fire-in-hormuz-amid-ceasefire-tensions) U.S. forces and Iran exchanged strikes in the Strait of Hormuz on May 8 after Iranian vessels attacked U.S. destroyers. Trump described the U.S. response as a "love tap" and said the ceasefire remains in effect. The U.S. is awaiting Iran's formal response to a peace proposal submitted through Pakistani mediators.
+
+- [EMPR Media](https://empr.media/news/war/russia-ukraine-war-updates-key-developments-as-of-may-8-2026/) Day 1,535 of Russia's invasion of Ukraine recorded 208 combat engagements, with the heaviest fighting concentrated around Pokrovsk where Ukrainian forces repelled 33 Russian assaults. Russia launched 99 airstrikes dropping 292 guided bombs alongside over 9,100 kamikaze drones.
+
+## Local
+
+- [Toronto Police Service](https://www.tps.ca/media-centre/news-releases/65633/) The Mayfair in Rosedale Festival is underway May 8-9 in Rosedale Park with road closures in effect around the park.
+
+- [todocanada.ca](https://www.todocanada.ca/things-to-do-in-toronto-this-weekend/) The Toronto Tempo WNBA franchise plays its first regular season home game today at Scotiabank Arena.
+
+## Weather
+
+- Whitby, ON: High 14°C, partly sunny morning turning cloudy, 30% chance of showers in the late afternoon. Low 4°C overnight. Source: [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939)
