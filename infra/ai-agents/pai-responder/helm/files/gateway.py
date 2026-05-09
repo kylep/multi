@@ -476,17 +476,31 @@ class PaiBot(discord.Client):
                 log.warning("Catchup replay failed for msg=%s", msg.id, exc_info=True)
 
     async def on_message(self, msg: discord.Message):
-        # Ignore bots and DMs
+        # Trace every dispatch so we can tell "didn't receive" from "ignored".
+        log.info(
+            "on_message id=%s author=%s bot=%s guild=%s channel=%s ch_type=%s len=%d",
+            msg.id, msg.author.display_name, msg.author.bot,
+            getattr(msg.guild, "id", None),
+            getattr(msg.channel, "id", None),
+            type(msg.channel).__name__,
+            len(msg.content or ""),
+        )
         if msg.author.bot or not msg.guild:
             return
         if msg.guild.id != GUILD_ID:
+            log.info("on_message skip: wrong guild %s vs %s", msg.guild.id, GUILD_ID)
             return
         if self.session_mgr.is_processed(msg.id):
+            log.info("on_message skip: already processed id=%s", msg.id)
             return
         self.session_mgr.mark_processed(msg.id)
 
         is_mention = self._is_mention(msg)
         is_bound_thread = self._is_in_bound_thread(msg)
+        log.info(
+            "on_message classified id=%s mention=%s bound_thread=%s",
+            msg.id, is_mention, is_bound_thread,
+        )
 
         if is_mention or is_bound_thread:
             trigger = "mention" if is_mention else "thread"
