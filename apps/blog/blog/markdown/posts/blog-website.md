@@ -155,7 +155,7 @@ site.
 # Secure the site with HTTPS
 
 These days there's really no good excuse to not have HTTPS on your site. On
-a self-hosted site I usually use [LetsEncrypt](https://letsencrypt.org/), but
+a self-hosted site I usually use [LetsEncrypt](https://letsencrypt.org/) with [certbot](/certbot.html), but
 for this static site instead I've used the built-in HTTPS feature of
 CloudFlare's free CDN solution.
 
