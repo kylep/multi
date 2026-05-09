@@ -49,16 +49,10 @@ function escapeXml(value) {
 function generateSitemap() {
   const posts = getPosts();
 
-  // Collect all categories and tags
+  // Collect all categories
   const categories = new Set();
-  const tags = new Set();
   posts.forEach(p => {
     if (p.category) categories.add(p.category.toLowerCase());
-    if (p.tags) {
-      p.tags.split(',').forEach(t => {
-        tags.add(t.trim().toLowerCase().replace(/\s+/g, '-'));
-      });
-    }
   });
 
   const urls = [];

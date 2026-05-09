@@ -43,9 +43,9 @@ the post you're reading through it.
 
 # Automatic Skills
 
-These skills don't really have a learning curve. You add the plugin and they start making
-things ~better. The `using-superpowers` skill is worded aggressively so Superpowers'
-skills get invoked automatically:
+These skills don't really have a learning curve. You add the plugin and they
+start making things ~better. The `using-superpowers` skill is worded
+aggressively so Superpowers' skills get invoked automatically:
 
 ```text
 If you think there is even a 1% chance a skill might apply to what you are doing,
