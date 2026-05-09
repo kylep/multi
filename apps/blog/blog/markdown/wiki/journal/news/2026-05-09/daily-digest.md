@@ -77,3 +77,21 @@ last_verified: 2026-05-09
 ## Just for You
 
 - [GitLab Security Advisory](https://advisories.gitlab.com/golang/github.com/argoproj/argo-cd/v3/CVE-2026-42880/) ArgoCD CVE-2026-42880 disclosed May 7: a missing authorization flaw in the ServerSideDiff endpoint lets read-only users extract plaintext Kubernetes Secret values via the API server's dry-run mechanism. Upgrade to ArgoCD 3.2.11, 3.3.9 or later.
+
+---
+
+## Update — 22:05 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-04/openai-finalizes-10-billion-joint-venture-with-pe-firms-to-deploy-ai) OpenAI finalized a $4 billion raise for a new joint venture called The Deployment Company, backed by TPG, Brookfield, Bain Capital, Dragoneer, and SoftBank, among 19 investors. The venture is valued at $10 billion and will embed teams with enterprises adopting OpenAI's AI software. This mirrors Anthropic's similar partnership with Blackstone, H&F, and Goldman Sachs announced the same week.
+
+- [Gizmodo](https://gizmodo.com/openais-cfo-reportedly-wants-to-delay-the-ipo-from-2026-to-2027-2000753760) OpenAI CFO Sarah Friar is reportedly pushing to delay the company's IPO from late 2026 to 2027, citing missed user growth targets and roughly $600 billion in future infrastructure commitments. CEO Sam Altman is pushing for a Q4 2026 listing. Separately, Anthropic's annualized revenue ($30 billion) has reportedly surpassed OpenAI's ($25 billion).
+
+## AI Tooling
+
+- [OpenAI](https://openai.com/index/gpt-5-5-instant/) GPT-5.5 Instant is rolling out today to all ChatGPT users as the new default model, replacing GPT-5.3 Instant. It also replaces GPT-5.3 as `chat-latest` in the API. Paid users retain access to GPT-5.3 Instant for three months before retirement.
+
+- [OpenAI](https://openai.com/news/) ChatGPT for Excel and Google Sheets is now globally available, adding a sidebar integration that lets users build, update, and explain spreadsheets directly within either application.
+
+- [Claude Code Changelog](https://code.claude.com/docs/en/changelog) Claude Code shipped v2.1.136 today with stricter auto mode controls (a new `settings.autoMode.hard_deny` field for unconditional action blocking), enterprise feedback survey support via OpenTelemetry, MCP server persistence across `/clear`, and WSL2 image paste via PowerShell fallback. Same-day hotfixes v2.1.137 and v2.1.138 resolved a Windows VS Code extension activation failure and elevated errors on Claude Opus 4.1 respectively.
