@@ -1,8 +1,8 @@
 ---
 title: "Exploring Claude Plugin obra/superpowers"
-summary: A look at Jesse Vincent's Superpowers plugin, the skills it
-  ships, the aggressive loader that decides when to invoke them, and an
-  honest take after running it in a real session.
+summary: A look at Jesse Vincent's Superpowers plugin, what it ships,
+  the entry skill that decides when to invoke the others, and which
+  skills fire automatically versus the ones you reach for on purpose.
 slug: exploring-claude-plugin-obra-superpowers
 category: ai
 tags: Claude-Code, AI, plugins, skills, Superpowers
@@ -66,54 +66,47 @@ Each one is a `SKILL.md` plus optional reference files
 (`testing-anti-patterns.md`, `root-cause-tracing.md`, etc.) that the
 skill itself decides when to pull in.
 
-# The loader is intense
+# The entry skill
 
-The entry skill, `using-superpowers`, sets the tone. From the actual
-skill file in this session:
+The loader, `using-superpowers`, runs at session start and sets the
+rule: if there's any chance another skill applies, invoke it. From
+the file:
 
 > If you think there is even a 1% chance a skill might apply to what
 > you are doing, you ABSOLUTELY MUST invoke the skill.
->
-> IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST
-> USE IT.
 
-The skill includes a "Red Flags" table of rationalizations the agent
-might use to skip a skill ("This is just a simple question", "Let me
-explore the codebase first", "I know what that means") with a forced
-response for each. There's a Graphviz flowchart embedded in the
-markdown that walks through the decision: user message in, check for
-applicable skills, invoke skill, announce invocation, follow checklist,
-respond.
+There's a Red Flags table inside the skill listing the agent's likely
+excuses for skipping ("This is just a simple question", "I know what
+that means") with a forced response for each. The phrasing is
+deliberate. The file is trying to override Claude's default behavior
+of jumping straight to action.
 
-The intent is to override the model's default behavior of jumping
-straight to action. The phrasing is deliberate.
+# Skills that fire automatically
 
-# What's actually inside the strong ones
-
-Three skills earn the aggression. The rest are useful but lighter.
+These skills don't need you to invoke them. They watch for triggers
+and step in when Claude would otherwise cut a corner. You install
+Superpowers and they're on.
 
 **test-driven-development** has an "Iron Law": "NO PRODUCTION CODE
-WITHOUT A FAILING TEST FIRST." If the agent wrote code before the
+WITHOUT A FAILING TEST FIRST." If the agent writes code before the
 test, the skill instructs it to delete the code, not adapt it. The
-RED-GREEN-REFACTOR diagram is in the skill file itself. The skill
-also enumerates exceptions ("throwaway prototypes, generated code,
-configuration files") that require asking the human first.
+RED-GREEN-REFACTOR diagram is in the skill file. Exceptions
+("throwaway prototypes, generated code, configuration files") require
+asking the human first.
 
 **systematic-debugging** is a four-phase process gated on root cause:
 "NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST." Phase 1 alone has
 five numbered steps: read error messages carefully, reproduce
 consistently, check recent changes, gather evidence in multi-component
 systems, and trace data flow. The skill has two adjacent lists for
-when it applies: "Use this ESPECIALLY when" calls out time pressure
-and the "just one quick fix" reflex; "Don't skip when" answers the
+when it applies. "Use this ESPECIALLY when" calls out time pressure
+and the "just one quick fix" reflex. "Don't skip when" answers the
 "manager wants it fixed NOW" pressure with "systematic is faster than
-thrashing." Both lists target the moments where an agent would
-otherwise guess.
+thrashing."
 
-**verification-before-completion** is the one I'd hand to anyone
-shipping AI-written code. The Iron Law is "NO COMPLETION CLAIMS
-WITHOUT FRESH VERIFICATION EVIDENCE." It maps claims to required
-proof:
+**verification-before-completion** maps work claims to required
+evidence. The Iron Law is "NO COMPLETION CLAIMS WITHOUT FRESH
+VERIFICATION EVIDENCE."
 
 | Claim | Requires |
 |-------|----------|
@@ -123,98 +116,48 @@ proof:
 | Bug fixed | Test original symptom, passes |
 | Agent completed | VCS diff shows changes |
 
-It's a short list. It catches a lot.
+Two more activate based on context: `receiving-code-review` fires
+when review feedback shows up and pushes back on performative
+agreement; `finishing-a-development-branch` fires when work wraps up
+and walks through merge, PR, or cleanup options.
 
-# What's lighter
+# Skills to invoke intentionally
 
-The collaboration skills (`brainstorming`, `writing-plans`,
-`requesting-code-review`, `receiving-code-review`,
-`finishing-a-development-branch`) are sensible playbooks but they're
-mostly process I'd already follow. `brainstorming` has a `<HARD-GATE>`
-that blocks any implementation skill from running until a design is
-written and approved. That's a strong opinion. It's the right one for
-a multi-day feature. It's overkill for a fifty-line script.
+These don't fire on their own. The value depends on you reaching for
+them at the right time, and on what you bring to the conversation.
 
-`using-git-worktrees` and `dispatching-parallel-agents` assume a
-specific workflow (isolated worktree per feature, fresh subagent per
-task) that's worth reading even if you don't adopt it wholesale.
+**brainstorming**. Invoke before any new feature or design decision.
+Bring a vague idea, not a finished spec. The skill's whole job is
+forcing alternatives, so showing up with a decided answer wastes the
+round. The `<HARD-GATE>` inside it blocks implementation skills until
+a design exists and is approved. That's right for a multi-day
+feature, overkill for a fifty-line script. Use it when scope is
+genuinely unclear.
 
-`writing-skills` is the meta skill, and it's interesting on its own
-terms: skills are "test-driven", written against "pressure scenarios"
-where a baseline agent fails, then refined until the agent complies.
-The release notes for v5.0.6 mention regression testing across 5
-versions with 5 trials each before removing the old subagent review
-loop. There's actual evaluation behind these files.
+**writing-plans**. Invoke once the design is settled. The skill
+chunks work into 2-5 minute tasks, which can feel too granular but
+makes the executing step reliable. Don't pre-write the plan and ask
+the skill to format it. The granularity is the value.
 
-# What it feels like in a session
+**executing-plans and subagent-driven-development**. Invoke after
+writing-plans. These hand each task to a fresh subagent so context
+doesn't pollute across tasks. They work best when the plan's tasks
+are truly independent and worst when you keep interrupting to
+redirect.
 
-I had Claude write this post under Superpowers. The honest report:
+**dispatching-parallel-agents**. Invoke when you have two or more
+tasks with no shared state and no sequential dependency. If you can't
+articulate the independence, the tasks aren't actually parallel. The
+skill enforces that gate.
 
-The loader fired. The session reminder loaded `using-superpowers`
-content and listed thirteen other available skills. The agent
-announced when it was checking for applicable skills, which is part
-of the prescribed flow.
+**using-git-worktrees**. Invoke before long-running work you want
+isolated from main. Pairs with finishing-a-development-branch at the
+end. Skip it for a one-file change.
 
-For a writing task, most skills don't apply. `brainstorming` could
-have, but the user's request already specified angle, structure, and
-constraints, so there was nothing to refine. `verification-before-
-completion` is the one I'd reach for at the end of a writing pipeline
-(did the post render? do the links resolve?), since the rule of
-"evidence before claims" is the same whether the artifact is code or
-a markdown file.
+**requesting-code-review**. Invoke before declaring work done, not
+after merging. The structured ask is the value.
 
-The aggression cuts both ways. The loader's "1% rule" means the agent
-spends more tokens checking for applicable skills before responding.
-On a one-off question, that's overhead. On a multi-step coding task,
-that's the point.
-
-# Where I'd actually use it
-
-Three concrete places, in order of value:
-
-1. **Coding tasks where verification matters.** `verification-before-
-   completion` alone justifies the install. It turns "the tests should
-   pass now" into "I ran the tests, here's the output."
-2. **Debugging sessions.** `systematic-debugging` slows the agent down
-   in a useful way. Random one-line fixes are the failure mode it's
-   built to prevent.
-3. **Multi-task plans.** `writing-plans` and
-   `subagent-driven-development` are a coherent loop for breaking a
-   feature into small reviewable chunks. The plan format itself is
-   worth stealing even if you skip the skills.
-
-Where the value is thinner:
-
-- One-shot questions and quick edits. The loader overhead doesn't pay
-  off.
-- Projects where you already have detailed `CLAUDE.md` rules. The
-  skill instructions defer to user instructions ("user instructions
-  always take precedence"), but you'll have overlap.
-- Non-code work like writing or research. Most skills assume you're
-  shipping software.
-
-# Notes
-
-The plugin defers to your project rules. From the loader skill: "If
-CLAUDE.md, GEMINI.md, or AGENTS.md says 'don't use TDD' and a skill
-says 'always use TDD,' follow the user's instructions." That priority
-order matters in a monorepo with [Ruler-managed cross-tool
-rules](/ruler-cross-tool-ai-rules.html).
-
-Superpowers ships across Claude Code, Codex CLI, Codex App, Cursor,
-OpenCode, GitHub Copilot CLI, and Gemini CLI. The skill files are the
-same; the loader adapts to each platform's tool naming. The repo's
-[contributor guidelines](https://github.com/obra/superpowers/blob/main/CLAUDE.md)
-call out a 94% PR rejection rate with explicit pushback against AI-
-generated PRs that don't solve a real problem. Worth reading before
-you submit anything.
-
-Install command for Claude Code, from the README:
-
-```bash
-/plugin install superpowers@claude-plugins-official
-```
-
-The release announcement is on Jesse's blog at
-[blog.fsck.com](https://blog.fsck.com/2025/10/09/superpowers/) if you
-want the origin story.
+**writing-skills**. Only invoke after you've hit the same failure
+mode several times. Skills target repeated, real problems. Writing
+one against a single bad session is how you end up with skills
+nobody uses.
