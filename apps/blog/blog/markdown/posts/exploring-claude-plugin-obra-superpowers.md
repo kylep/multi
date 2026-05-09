@@ -37,8 +37,9 @@ plugin's manifest currently sits at version 5.0.7 and describes itself
 as a "core skills library for Claude Code: TDD, debugging, collaboration
 patterns, and proven techniques."
 
-I installed it from the official marketplace and ran the post you're
-reading through it. This is what I found.
+I installed it from the official marketplace as part of [the Claude
+plugin set I'm running](/selecting-a-claude-plugin-set.html) and ran
+the post you're reading through it. This is what I found.
 
 # Skills, briefly
 
