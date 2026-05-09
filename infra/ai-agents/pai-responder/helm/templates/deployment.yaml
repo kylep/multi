@@ -114,6 +114,11 @@ spec:
               value: "8080"
             - name: MEMORY_DATA_DIR
               value: /data
+            # Suppress claude CLI's launch-time network roundtrips
+            # (autoupdate, telemetry, error reporting, feedback survey).
+            # Cuts each subprocess cold-start by 2-5s.
+            - name: CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC
+              value: "1"
           ports:
             - name: health
               containerPort: 8080

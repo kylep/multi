@@ -37,7 +37,16 @@ log = logging.getLogger("pai-gateway")
 # ---------------------------------------------------------------------------
 
 STATE_PATH = Path(os.environ.get("STATE_PATH", "/data/state.json"))
-MCP_CONFIG_PATH = Path("/tmp/mcp.json")
+# Per-purpose MCP configs. Each claude --agent invocation only loads the
+# servers it actually needs — the recaller doesn't need playwright,
+# linear, or discord, so writing a smaller config for it cuts cold-start
+# substantially. The main pai-responder and commitment-delivery paths
+# get the larger configs they need.
+MCP_CONFIG_FULL_PATH = Path("/tmp/mcp-full.json")     # main pai
+MCP_CONFIG_RECALL_PATH = Path("/tmp/mcp-recall.json")  # recaller (memory only)
+MCP_CONFIG_DELIVER_PATH = Path("/tmp/mcp-deliver.json")  # commitment delivery (discord + memory)
+# Backwards-compat alias for any code path that hasn't been migrated.
+MCP_CONFIG_PATH = MCP_CONFIG_FULL_PATH
 GUILD_ID = int(os.environ["DISCORD_GUILD_ID"])
 BOT_TOKEN = os.environ["PAI_DISCORD_BOT_TOKEN"]
 
@@ -80,44 +89,73 @@ def save_state(state: dict):
 # ---------------------------------------------------------------------------
 
 
-def write_mcp_config():
-    config = {
-        "mcpServers": {
-            "pai-discord": {
-                "type": "stdio",
-                "command": "python3",
-                "args": ["/opt/discord-mcp/server.py"],
-                "env": {
-                    "DISCORD_BOT_TOKEN": BOT_TOKEN,
-                    "DISCORD_GUILD_ID": str(GUILD_ID),
-                },
-            },
-            "linear-server": {
-                "type": "stdio",
-                "command": "npx",
-                "args": ["-y", "@hatcloud/linear-mcp"],
-                "env": {
-                    "LINEAR_API_KEY": os.environ.get("LINEAR_API_KEY", ""),
-                },
-            },
-            "pai-memory": {
-                "type": "stdio",
-                "command": "python3",
-                "args": ["/opt/pai/memory_mcp.py"],
-                "env": {
-                    "MEMORY_DATA_DIR": "/data",
-                },
-            },
-            "playwright": {
-                "type": "stdio",
-                "command": "npx",
-                "args": ["-y", "@playwright/mcp@latest", "--headless"],
-            },
-        }
+def _mcp_server_pai_discord():
+    return {
+        "type": "stdio",
+        "command": "python3",
+        "args": ["/opt/discord-mcp/server.py"],
+        "env": {
+            "DISCORD_BOT_TOKEN": BOT_TOKEN,
+            "DISCORD_GUILD_ID": str(GUILD_ID),
+        },
     }
-    fd = os.open(str(MCP_CONFIG_PATH), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+
+
+def _mcp_server_linear():
+    return {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "@hatcloud/linear-mcp"],
+        "env": {"LINEAR_API_KEY": os.environ.get("LINEAR_API_KEY", "")},
+    }
+
+
+def _mcp_server_pai_memory():
+    return {
+        "type": "stdio",
+        "command": "python3",
+        "args": ["/opt/pai/memory_mcp.py"],
+        "env": {"MEMORY_DATA_DIR": "/data"},
+    }
+
+
+def _mcp_server_playwright():
+    return {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "@playwright/mcp@latest", "--headless"],
+    }
+
+
+def _write_mcp_config(path: Path, servers: dict) -> None:
+    fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w") as f:
-        json.dump(config, f)
+        json.dump({"mcpServers": servers}, f)
+
+
+def write_mcp_config():
+    """Write per-purpose MCP configs so each claude invocation only loads
+    the servers it needs. Combined with --strict-mcp-config, the recaller
+    cold-start drops by however long it took to spin up playwright +
+    linear + discord on every mention."""
+    full = {
+        "pai-discord": _mcp_server_pai_discord(),
+        "linear-server": _mcp_server_linear(),
+        "pai-memory": _mcp_server_pai_memory(),
+        "playwright": _mcp_server_playwright(),
+    }
+    _write_mcp_config(MCP_CONFIG_FULL_PATH, full)
+    _write_mcp_config(
+        MCP_CONFIG_RECALL_PATH,
+        {"pai-memory": _mcp_server_pai_memory()},
+    )
+    _write_mcp_config(
+        MCP_CONFIG_DELIVER_PATH,
+        {
+            "pai-discord": _mcp_server_pai_discord(),
+            "pai-memory": _mcp_server_pai_memory(),
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -195,7 +233,8 @@ async def recall_for(message_text: str, sender: str) -> str | None:
         "claude",
         "--agent", "pai-recaller",
         "-p", f"Sender: {sender}\nMessage: {message_text}",
-        "--mcp-config", str(MCP_CONFIG_PATH),
+        "--strict-mcp-config",
+        "--mcp-config", str(MCP_CONFIG_RECALL_PATH),
         "--allowedTools", "mcp__pai-memory__*",
         "--output-format", "text",
     ]
@@ -249,7 +288,9 @@ async def invoke_claude(prompt: str, trigger_type: str, channel: discord.abc.Mes
         "--allowedTools", "mcp__pai-discord__*",
         "--allowedTools", "mcp__linear-server__*",
         "--allowedTools", "mcp__pai-memory__*",
-        "--mcp-config", str(MCP_CONFIG_PATH),
+        "--allowedTools", "mcp__playwright__*",
+        "--strict-mcp-config",
+        "--mcp-config", str(MCP_CONFIG_FULL_PATH),
         "--output-format", "text",
     ]
 
@@ -771,7 +812,8 @@ class PaiBot(discord.Client):
             "--allowedTools", "mcp__pai-discord__send_message",
             "--allowedTools", "mcp__pai-discord__create_thread",
             "--allowedTools", "mcp__pai-memory__memory_commitment_done",
-            "--mcp-config", str(MCP_CONFIG_PATH),
+            "--strict-mcp-config",
+            "--mcp-config", str(MCP_CONFIG_DELIVER_PATH),
             "--output-format", "text",
         ]
         proc = await _async_proc(

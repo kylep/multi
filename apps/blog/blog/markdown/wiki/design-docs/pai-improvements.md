@@ -311,6 +311,34 @@ Pai's tool surface tight and makes recall available to other
 contexts (cronjobs, periodic reviews) that aren't running through
 Pai.
 
+### Cold-start budget per claude invocation
+
+Every `claude --agent ...` subprocess on the lima VM ate 5–30s of
+cold-start before producing tokens. The two main causes were
+(a) loading every MCP server in a single shared `/tmp/mcp.json` on
+every call (including playwright + chromium even when the recaller
+only needed `pai-memory`), and (b) the CLI's launch-time network
+roundtrips for autoupdate/telemetry/feedback. Two cheap fixes that
+landed together:
+
+1. **Per-purpose MCP configs.** The gateway writes three files at
+   startup: `mcp-recall.json` (memory only — used by `pai-recaller`),
+   `mcp-deliver.json` (memory + discord — used by commitment delivery),
+   and `mcp-full.json` (all four — used by main `claude --agent pai`).
+   Each invocation passes the smallest config it needs, plus
+   `--strict-mcp-config` so the CLI doesn't union it with auto-discovered
+   sources (`~/.claude.json`, project `.mcp.json`, etc.).
+2. **`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`** in the deployment
+   env. Single official knob that disables autoupdate checks,
+   telemetry, error reporting, and feedback surveys.
+
+Recaller cold-start drops the most because it no longer waits on
+playwright + linear + pai-discord to register tools just to ignore
+them. `@playwright/mcp` is already `npm install -g`-ed in the runtime
+image, but `@hatcloud/linear-mcp` still uses `npx -y ... @latest` —
+moving it to the image's global install would close the remaining
+metadata-roundtrip cost (next-step optimization).
+
 ### Auto-bind threads where Pai posts
 
 Threads previously got bound only when the bot was @-mentioned *inside*
