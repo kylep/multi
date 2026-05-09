@@ -331,6 +331,12 @@ landed together:
 2. **`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`** in the deployment
    env. Single official knob that disables autoupdate checks,
    telemetry, error reporting, and feedback surveys.
+3. **`--disable-slash-commands`** on every claude invocation. Skill
+   *bodies* already lazy-load (only descriptions enter context at
+   startup), but skipping the description-load step entirely is a
+   freebie when none of the project's skills are useful to Pai.
+   The cloned repo's `.claude/skills/fix-blog-problems` is irrelevant
+   to the bot's job, so loading even its description is wasted work.
 
 Recaller cold-start drops the most because it no longer waits on
 playwright + linear + pai-discord to register tools just to ignore

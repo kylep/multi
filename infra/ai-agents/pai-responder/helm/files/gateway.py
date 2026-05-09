@@ -236,6 +236,7 @@ async def recall_for(message_text: str, sender: str) -> str | None:
         "--strict-mcp-config",
         "--mcp-config", str(MCP_CONFIG_RECALL_PATH),
         "--allowedTools", "mcp__pai-memory__*",
+        "--disable-slash-commands",
         "--output-format", "text",
     ]
     try:
@@ -291,6 +292,7 @@ async def invoke_claude(prompt: str, trigger_type: str, channel: discord.abc.Mes
         "--allowedTools", "mcp__playwright__*",
         "--strict-mcp-config",
         "--mcp-config", str(MCP_CONFIG_FULL_PATH),
+        "--disable-slash-commands",
         "--output-format", "text",
     ]
 
@@ -814,6 +816,7 @@ class PaiBot(discord.Client):
             "--allowedTools", "mcp__pai-memory__memory_commitment_done",
             "--strict-mcp-config",
             "--mcp-config", str(MCP_CONFIG_DELIVER_PATH),
+            "--disable-slash-commands",
             "--output-format", "text",
         ]
         proc = await _async_proc(
