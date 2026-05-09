@@ -497,6 +497,24 @@ class PaiBot(discord.Client):
             [r.id for r in msg.role_mentions],
             is_mention_pre,
         )
+        # Auto-bind threads where Pai posts. Covers the case where Pai
+        # creates a thread via the Discord MCP to reply to a mention in
+        # the parent channel — without this, follow-ups in that thread
+        # need a fresh @-mention to register, which surprises users.
+        if (
+            msg.author.id == self.bot_user_id
+            and isinstance(msg.channel, discord.Thread)
+            and not self.thread_mgr.is_bound(str(msg.channel.id))
+        ):
+            self.thread_mgr.bind(
+                str(msg.channel.id),
+                str(msg.channel.parent_id or ""),
+            )
+            log.info(
+                "Auto-bound thread %s (parent=%s) from Pai's own post",
+                msg.channel.id, msg.channel.parent_id,
+            )
+
         if msg.author.bot or not msg.guild:
             return
         if msg.guild.id != GUILD_ID:

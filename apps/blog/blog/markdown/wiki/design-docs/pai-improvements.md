@@ -311,6 +311,17 @@ Pai's tool surface tight and makes recall available to other
 contexts (cronjobs, periodic reviews) that aren't running through
 Pai.
 
+### Auto-bind threads where Pai posts
+
+Threads previously got bound only when the bot was @-mentioned *inside*
+the thread. But Pai often *creates* a thread itself (via the Discord
+MCP) to reply to a mention in the parent channel — that fresh thread
+never sees a mention and so never gets bound, leaving follow-ups in it
+silently ignored. The on_message handler now also binds any thread
+where Pai herself posts (detected via `msg.author.id == bot_user_id`
+and `isinstance(msg.channel, discord.Thread)`). Caught 2026-05-09 when
+a follow-up question in a Pai-created thread went unanswered.
+
 ### Typing indicator covers the full pipeline
 
 `async with channel.typing():` lives in `_process_session`, wrapping
