@@ -382,5 +382,8 @@ tested, so the fix was a one-line edit instead of a fresh
 investigation. The design doc earned its keep during
 deployment, not before it.
 
+The next time I used the PRD and design doc pipeline, I pointed it at laptop
+security. An autonomous agent ran Lynis, rkhunter, and Ansible for a few days
+while I was on vacation. That's in [Ralph Secure My Laptop](/secure-my-laptop.html).
 
 [yien]: https://docs.google.com/document/d/1mEMDcHmtQ6twzNlpvF-9maNlAcezpWDtCnyIqWkODZs/edit
