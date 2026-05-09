@@ -311,9 +311,21 @@ class MemoryStore:
     ) -> list[tuple[str, int, str]]:
         out: list[tuple[str, int, str]] = []
         if scope in (None, "long") and self.memory_path.exists():
+            current_section: str | None = None
             for i, line in enumerate(self.memory_path.read_text().splitlines(), start=1):
-                if _BULLET_RE.match(line):
-                    out.append((str(self.memory_path), i, line))
+                m_section = _SECTION_RE.match(line)
+                if m_section:
+                    current_section = m_section.group(1)
+                    continue
+                m_bullet = _BULLET_RE.match(line)
+                if m_bullet:
+                    bullet_text = m_bullet.group(1)
+                    snippet = (
+                        f"{current_section}: {bullet_text}"
+                        if current_section
+                        else bullet_text
+                    )
+                    out.append((str(self.memory_path), i, snippet))
         if scope in (None, "daily") and self.daily_dir.exists():
             for f in sorted(self.daily_dir.glob("*.md")):
                 for i, line in enumerate(f.read_text().splitlines(), start=1):

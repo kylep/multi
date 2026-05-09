@@ -194,6 +194,24 @@ BM25 is a simple Python implementation over tokenised file contents.
 For Pai's volume (hundreds of memories at most), this is sufficient
 and beats embedding-based search on the no-API-billing constraint.
 
+### Section-aware indexing
+
+Each long-scope bullet is indexed as `"<section>: <bullet text>"` rather
+than just the bullet. The section header (e.g. `## Kyle`) carries the
+subject — without it, a memory like
+
+```markdown
+## Kyle
+- prefers TypeScript over JavaScript
+```
+
+would be invisible to a query like *"What language does Kyle prefer?"*
+because no token in the bullet overlaps the query. Folding the header
+into the searchable doc lets BM25 hit on subject tokens. The resulting
+snippet (`"Kyle: prefers TypeScript over JavaScript"`) also reads as a
+self-contained fact when surfaced to the recaller. Caught during the
+2026-05-09 production smoke test on M1.
+
 ### Why wrap markdown in an MCP rather than have Pai use Read/Glob/Grep directly
 
 Two reasons:

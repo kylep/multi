@@ -365,6 +365,16 @@ def test_recall_returns_digest_for_matched_query(store):
     assert "TypeScript" in digest or "typescript" in digest.lower()
 
 
+def test_recall_matches_on_section_header(store):
+    # Bullet text lacks the subject ("Kyle"); only the ## header carries it.
+    # Without section-aware indexing, BM25 misses queries phrased around the
+    # subject. Production smoke test 2026-05-09 hit this exact case.
+    store.save(scope="long", content="prefers TypeScript over JavaScript", key="Kyle")
+    digest = store.recall(query="What language does Kyle prefer?")
+    assert digest != "NONE"
+    assert "TypeScript" in digest
+
+
 def test_recall_respects_max_chars(store):
     long_content = "TypeScript " * 200
     store.save(scope="long", content=long_content, key="Kyle")
