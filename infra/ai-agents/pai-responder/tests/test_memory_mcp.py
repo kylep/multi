@@ -278,6 +278,22 @@ def test_commitments_due_returns_pending_past_due(tmp_path, monkeypatch):
     assert due[0]["content"].strip() == "past"
 
 
+def test_commitments_due_handles_naive_due_timestamps(tmp_path, monkeypatch):
+    # Pai sometimes saves due-times without a tz suffix. The ticker must
+    # treat those as UTC instead of crashing on aware/naive comparison.
+    # Caught 2026-05-09 in production: TypeError stalled all delivery.
+    monkeypatch.setenv("MEMORY_DATA_DIR", str(tmp_path))
+    import importlib
+    import memory_mcp
+    importlib.reload(memory_mcp)
+    memory_mcp.add_commitment(
+        memory_mcp.COMMITMENTS_FILE, content="naive past", due="2020-01-01T00:00:00", scope="x")
+    due = memory_mcp.commitments_due_at(
+        memory_mcp.COMMITMENTS_FILE, datetime(2026, 5, 8, tzinfo=timezone.utc))
+    assert len(due) == 1
+    assert due[0]["content"].strip() == "naive past"
+
+
 # --- MemoryStore ---
 
 @pytest.fixture

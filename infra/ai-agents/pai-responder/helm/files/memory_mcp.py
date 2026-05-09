@@ -258,6 +258,10 @@ def commitments_due_at(path: Path, when: datetime) -> list[dict]:
             due_dt = datetime.fromisoformat(due_str.replace("Z", "+00:00"))
         except ValueError:
             continue
+        # Pai sometimes saves naive ISO timestamps (e.g. "2026-05-09T22:08:00").
+        # Treat naive as UTC so we can compare against `when` (always aware).
+        if due_dt.tzinfo is None:
+            due_dt = due_dt.replace(tzinfo=timezone.utc)
         if due_dt <= when:
             out.append(c)
     return out
