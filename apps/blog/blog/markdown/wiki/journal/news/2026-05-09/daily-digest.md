@@ -49,3 +49,31 @@ last_verified: 2026-05-09
 ## Just for You
 
 - [Yahoo Tech](https://tech.yahoo.com/ai/gemini/articles/fact-check-google-chrome-may-110000895.html) Google Chrome silently installed a 4 GB Gemini Nano on-device model on users' machines, and the model reinstalls itself if deleted. The model is used for Chrome's "Help me write" and on-device scam detection features.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/higher-limits-spacex) Anthropic signed a deal to use all compute capacity at SpaceX's Colossus 1 facility in Memphis — over 220,000 NVIDIA GPUs and 300 MW of capacity — available within the month. The company also expressed interest in partnering with SpaceX on future orbital AI compute.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-08/anthropic-inks-1-8-billion-computing-deal-with-akamai) Anthropic separately signed a $1.8 billion computing deal with Akamai Technologies to meet demand for Claude. This is distinct from the SpaceX arrangement and expands Anthropic's cloud infrastructure footprint.
+
+- [Fortune](https://fortune.com/2026/05/08/anthropic-80fold-growth-quarter-renting-elon-musk-data-center/) Anthropic is launching a dedicated enterprise AI services company alongside Blackstone, Hellman & Friedman, and Goldman Sachs. The firm will embed Anthropic engineers directly with mid-sized clients to build custom Claude deployments.
+
+- [Motley Fool](https://www.fool.com/investing/2026/04/30/meta-platforms-just-delivered-great-news-for-nvidi/) Meta raised its 2026 capital expenditure forecast to $125-145 billion, up from the prior $115-135 billion range, following its May 8 earnings report. Spending is directed at data centers, GPUs, and custom chips for AI.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/higher-limits-spacex) Claude Code's five-hour rate limit is now doubled for Pro, Max, Team, and Enterprise plans. Peak-hour restrictions for Pro and Max plans have been removed. Claude Opus API token limits rose more than 10x — tier 1 input tokens per minute go from 30k to 500k.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/palo-alto-pan-os-flaw-under-active.html) CVE-2026-0300 in Palo Alto PAN-OS (CVSS 9.3) is under active exploitation by a suspected state-sponsored group. The unauthenticated buffer overflow in the Captive Portal service enables root-level RCE. CISA set a federal remediation deadline of today; vendor patches are not expected until May 13.
+
+- [SecurityWeek](https://www.securityweek.com/critical-github-vulnerability-exposed-millions-of-repositories/) CVE-2026-3854 allowed any authenticated GitHub user to execute arbitrary commands on GitHub's backend servers with a single git push, exposing millions of public and private repositories due to multi-tenant storage sharing. Wiz Research discovered and reported it; GitHub patched within hours. No evidence of exploitation in the wild. GHES users should upgrade to 3.19.3.
+
+## Just for You
+
+- [GitLab Security Advisory](https://advisories.gitlab.com/golang/github.com/argoproj/argo-cd/v3/CVE-2026-42880/) ArgoCD CVE-2026-42880 disclosed May 7: a missing authorization flaw in the ServerSideDiff endpoint lets read-only users extract plaintext Kubernetes Secret values via the API server's dry-run mechanism. Upgrade to ArgoCD 3.2.11, 3.3.9 or later.
