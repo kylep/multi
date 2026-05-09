@@ -311,6 +311,27 @@ Pai's tool surface tight and makes recall available to other
 contexts (cronjobs, periodic reviews) that aren't running through
 Pai.
 
+### Mention detection: user *and* role
+
+Discord supports two distinct mention forms: user mentions (`<@id>`)
+and role mentions (`<@&id>`). When a server has *both* a user named X
+and a role named X (Pai's case — the bot user "Pai" and a "Pai" role
+the bot is granted), Discord's `@Pai` autocomplete picks the **role**.
+discord.py exposes user mentions in `msg.mentions` but role mentions
+in `msg.role_mentions` — they're separate lists.
+
+`_is_mention` therefore returns true if any of:
+
+1. The bot user is in `msg.mentions` (direct user mention).
+2. The literal `<@bot_user_id>` substring is in `msg.content`
+   (handles edge cases where the User object isn't populated).
+3. Any role in `msg.role_mentions` is one the bot itself holds in
+   that guild.
+
+Without rule 3, `@Pai`-via-role-autocomplete silently falls through to
+periodic-review buffering — no ack, no reply. Caught 2026-05-09 during
+the M1 deploy when @-completing "Pai" stopped triggering the bot.
+
 ### Catchup behaviour on (re)connect
 
 `_catchup` runs once per `on_ready`. Its job is twofold:

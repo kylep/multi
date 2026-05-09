@@ -541,6 +541,16 @@ class PaiBot(discord.Client):
             return True
         if f"<@{self.bot_user_id}>" in (msg.content or ""):
             return True
+        # Discord auto-completes "@Pai" to a *role* mention (`<@&role_id>`)
+        # when both a user and a same-named role exist. Treat any role
+        # mention whose role the bot itself has as a mention of the bot.
+        try:
+            bot_member = msg.guild.me if msg.guild else None
+            bot_role_ids = {r.id for r in (bot_member.roles if bot_member else [])}
+            if any(r.id in bot_role_ids for r in msg.role_mentions):
+                return True
+        except AttributeError:
+            pass
         return False
 
     def _is_in_bound_thread(self, msg: discord.Message) -> bool:
