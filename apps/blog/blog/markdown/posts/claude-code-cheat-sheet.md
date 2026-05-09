@@ -20,7 +20,8 @@ keywords:
 ---
 
 This post is about using the actual `claude` CLI tool itself, not about using the
-best prompt techniques or plugins or whatever. I'll maybe do a plugins post later.
+best prompt techniques or plugins or whatever. I did end up writing a
+[plugins post](/selecting-a-claude-plugin-set.html) if that's what you're here for.
 
 ## Table of contents
 
