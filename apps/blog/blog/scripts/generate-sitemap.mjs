@@ -49,16 +49,10 @@ function escapeXml(value) {
 function generateSitemap() {
   const posts = getPosts();
 
-  // Collect all categories and tags
+  // Collect all categories
   const categories = new Set();
-  const tags = new Set();
   posts.forEach(p => {
     if (p.category) categories.add(p.category.toLowerCase());
-    if (p.tags) {
-      p.tags.split(',').forEach(t => {
-        tags.add(t.trim().toLowerCase().replace(/\s+/g, '-'));
-      });
-    }
   });
 
   const urls = [];
@@ -69,21 +63,14 @@ function generateSitemap() {
   // About page
   urls.push({ loc: `${SITE_URL}/about.html`, changefreq: 'monthly', priority: '0.5' });
 
-  // Index pages
-  const pageSize = 15;
-  const pageCount = Math.ceil(posts.length / pageSize);
-  for (let i = 1; i <= pageCount; i++) {
-    urls.push({ loc: `${SITE_URL}/index${i}.html`, changefreq: 'weekly', priority: '0.8' });
-  }
+  // Pagination index pages and tag pages are intentionally excluded from the
+  // sitemap. They remain reachable via on-site navigation but submitting them
+  // dilutes Google's crawl budget for a low-authority domain. See Linear
+  // ticket on indexing recovery.
 
   // Category pages
   for (const cat of categories) {
     urls.push({ loc: `${SITE_URL}/category/${encodeURIComponent(cat)}`, changefreq: 'weekly', priority: '0.6' });
-  }
-
-  // Tag pages
-  for (const tag of tags) {
-    urls.push({ loc: `${SITE_URL}/tag/${encodeURIComponent(tag)}`, changefreq: 'weekly', priority: '0.5' });
   }
 
   // Wiki pages

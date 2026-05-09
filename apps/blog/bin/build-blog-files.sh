@@ -43,6 +43,14 @@ if ! node scripts/generate-rss.mjs; then
   exit 1
 fi
 
+# Inject WebSite + Person JSON-LD into the static home page (index.html, index1.html).
+# Done post-build because React HTML-escapes script-tag children, breaking JSON-LD.
+echo "Injecting home-page JSON-LD..."
+if ! node scripts/inject-home-jsonld.mjs; then
+  echo "JSON-LD injection failed"
+  exit 1
+fi
+
 if [[ "$1" == "" ]]; then
   echo "WARNING: output_dir pos arg is reuqired if copying to volume mount"
   exit 0
