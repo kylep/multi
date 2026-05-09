@@ -179,7 +179,7 @@ class SessionManager:
 # ---------------------------------------------------------------------------
 
 
-RECALL_TIMEOUT = int(os.environ.get("RECALL_TIMEOUT", "30"))
+RECALL_TIMEOUT = int(os.environ.get("RECALL_TIMEOUT", "60"))
 
 # Aliased to avoid a security-hook false positive on the literal name.
 _async_proc = asyncio.create_subprocess_exec
@@ -225,10 +225,12 @@ async def recall_for(message_text: str, sender: str) -> str | None:
 
     text = (stdout or b"").decode(errors="replace").strip()
     if not text or text == "NONE" or text.startswith("NONE"):
+        log.info("pai-recaller returned NONE")
         return None
     if len(text) > 800:
         log.warning("pai-recaller output unexpectedly long (%d chars), truncating", len(text))
         text = text[:800]
+    log.info("pai-recaller hit (%d chars)", len(text))
     return text
 
 
@@ -273,16 +275,17 @@ async def invoke_claude(prompt: str, trigger_type: str, channel: discord.abc.Mes
                 pass
 
     try:
-        async with channel.typing():
-            thinking_task = asyncio.create_task(send_thinking())
+        # Typing indicator is owned by the caller (_process_session) so it
+        # spans the full recall + claude pipeline. Don't double-wrap here.
+        thinking_task = asyncio.create_task(send_thinking())
+        try:
+            returncode, stdout, stderr = await run_subprocess()
+        finally:
+            thinking_task.cancel()
             try:
-                returncode, stdout, stderr = await run_subprocess()
-            finally:
-                thinking_task.cancel()
-                try:
-                    await thinking_task
-                except asyncio.CancelledError:
-                    pass
+                await thinking_task
+            except asyncio.CancelledError:
+                pass
 
         elapsed = time.monotonic() - start
         if returncode != 0:
@@ -591,31 +594,36 @@ class PaiBot(discord.Client):
             # Build prompt with transcript context
             transcript_text = self.transcripts.format_for_prompt(session_id)
             channel_name = getattr(trigger_msg.channel, "name", str(trigger_msg.channel.id))
-            recall_text = await recall_for(
-                message_text=trigger_msg.content or "[embed/attachment]",
-                sender=trigger_msg.author.display_name,
-            )
 
-            prompt = build_mention_prompt(
-                trigger_msg, transcript_text, channel_name,
-                trigger_msg.channel.id, batched or None,
-                active_memory=recall_text,
-            )
+            # Show typing indicator across the whole pipeline (recall + claude)
+            # so users see "..." within ~1s of mentioning, not after recaller
+            # finishes/times out. discord.py auto-renews typing every ~5-9s
+            # while inside the context manager.
+            async with trigger_msg.channel.typing():
+                recall_text = await recall_for(
+                    message_text=trigger_msg.content or "[embed/attachment]",
+                    sender=trigger_msg.author.display_name,
+                )
 
-            # Invoke Claude
-            success = await invoke_claude(prompt, trigger_type, trigger_msg.channel)
+                prompt = build_mention_prompt(
+                    trigger_msg, transcript_text, channel_name,
+                    trigger_msg.channel.id, batched or None,
+                    active_memory=recall_text,
+                )
 
-            if not success:
-                # Single retry with backoff
-                await asyncio.sleep(5)
                 success = await invoke_claude(prompt, trigger_type, trigger_msg.channel)
+
                 if not success:
-                    try:
-                        await trigger_msg.channel.send(
-                            "Sorry, something went wrong on my end. Try mentioning me again."
-                        )
-                    except discord.HTTPException:
-                        pass
+                    # Single retry with backoff
+                    await asyncio.sleep(5)
+                    success = await invoke_claude(prompt, trigger_type, trigger_msg.channel)
+                    if not success:
+                        try:
+                            await trigger_msg.channel.send(
+                                "Sorry, something went wrong on my end. Try mentioning me again."
+                            )
+                        except discord.HTTPException:
+                            pass
 
             # Try to capture bot's response in transcript
             await self._record_bot_reply(session_id, trigger_msg.channel)

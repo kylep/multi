@@ -311,6 +311,17 @@ Pai's tool surface tight and makes recall available to other
 contexts (cronjobs, periodic reviews) that aren't running through
 Pai.
 
+### Typing indicator covers the full pipeline
+
+`async with channel.typing():` lives in `_process_session`, wrapping
+both `recall_for` and `invoke_claude`. Earlier the typing context was
+only inside `invoke_claude`, which meant users saw nothing for the
+duration of the recaller call (`RECALL_TIMEOUT`, default 60s). On a
+small VM the `claude --agent pai-recaller` cold-start is slow enough
+that this looked like the bot wasn't seeing the message at all.
+Putting the typing context on the outer pipeline gives users a
+visible "..." within ~1s of mentioning, regardless of recaller speed.
+
 ### Mention detection: user *and* role
 
 Discord supports two distinct mention forms: user mentions (`<@id>`)
