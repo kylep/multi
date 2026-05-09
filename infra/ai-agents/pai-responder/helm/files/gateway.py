@@ -8,7 +8,7 @@ import os
 import sys
 import time
 from collections import deque
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import discord
@@ -48,6 +48,7 @@ MAX_THREAD_AGE = int(os.environ.get("MAX_THREAD_AGE", "86400"))
 REVIEW_ENABLED = os.environ.get("REVIEW_ENABLED", "true").lower() == "true"
 HEALTH_PORT = int(os.environ.get("HEALTH_PORT", "8080"))
 THINKING_DELAY = 60  # seconds before "still thinking..." message
+CATCHUP_MAX_AGE_SECONDS = int(os.environ.get("CATCHUP_MAX_AGE_SECONDS", "60"))
 MAX_PROCESSED_IDS = 1000
 
 # ---------------------------------------------------------------------------
@@ -438,20 +439,41 @@ class PaiBot(discord.Client):
         self.loop.create_task(self._commitment_tick())
 
     async def _catchup(self):
-        """On startup/reconnect, mark recent messages as processed to avoid replays."""
+        """On startup/reconnect, seal old messages as processed and replay recent ones.
+
+        Messages older than CATCHUP_MAX_AGE_SECONDS are marked processed so the
+        bot won't re-reply to them. Messages newer than that are dispatched
+        through on_message so mentions sent during a brief downtime window (pod
+        restart, redeploy) get handled instead of silently dropped. The
+        idempotent processed-id check in on_message protects against double
+        handling if the gateway also delivers the message live.
+        """
         guild = self.get_guild(GUILD_ID)
         if not guild:
             log.warning("Guild %d not found, skipping catchup", GUILD_ID)
             return
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=CATCHUP_MAX_AGE_SECONDS)
+        pending: list[discord.Message] = []
         for channel in guild.text_channels:
             try:
                 async for msg in channel.history(limit=20):
-                    self.session_mgr.mark_processed(msg.id)
+                    if msg.created_at < cutoff:
+                        self.session_mgr.mark_processed(msg.id)
+                    else:
+                        pending.append(msg)
             except discord.Forbidden:
                 continue
             except Exception:
                 log.warning("Catchup failed for #%s", channel.name, exc_info=True)
-        log.info("Catchup complete, seeded %d message IDs", len(self.session_mgr.processed_ids))
+        log.info(
+            "Catchup: sealed %d old message IDs, replaying %d recent",
+            len(self.session_mgr.processed_ids), len(pending),
+        )
+        for msg in sorted(pending, key=lambda m: m.created_at):
+            try:
+                await self.on_message(msg)
+            except Exception:
+                log.warning("Catchup replay failed for msg=%s", msg.id, exc_info=True)
 
     async def on_message(self, msg: discord.Message):
         # Ignore bots and DMs

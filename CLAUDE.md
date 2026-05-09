@@ -29,6 +29,19 @@ a config file, run it. If you write code, build/test it. If you change
 a playbook, run it. The user should not have to ask "did you test this?"
 — verification is your responsibility before reporting completion.
 
+# Investigate before asking
+
+Always do what you can on your own before asking the user for input.
+Read logs, exec probes into running pods, query the cluster, search
+the codebase, run tests. Form a hypothesis from evidence, not from a
+guess you ask the user to confirm.
+
+If you genuinely need user help (credentials, an irreversible action,
+or you've exhausted the cheap diagnostic moves), lead with what you
+already tried and ruled out. "Pai didn't reply — could be A, B, or C,
+which is it?" is not acceptable when you could have checked the logs
+yourself in five seconds.
+
 # Bash rules
 
 Never use `sleep` commands longer than 30 seconds. If you need to wait

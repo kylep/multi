@@ -311,6 +311,26 @@ Pai's tool surface tight and makes recall available to other
 contexts (cronjobs, periodic reviews) that aren't running through
 Pai.
 
+### Catchup behaviour on (re)connect
+
+`_catchup` runs once per `on_ready`. Its job is twofold:
+
+1. **Seal old messages.** For each text channel, the most recent 20
+   messages older than `CATCHUP_MAX_AGE_SECONDS` (default 60s) get
+   marked as already-processed. Without this, gateway resume events
+   could replay and Pai would double-reply.
+2. **Replay recent missed messages.** Anything *newer* than that cutoff
+   is left unmarked and dispatched through `on_message` in chronological
+   order. This is what makes a pod restart graceful — a mention sent
+   while the pod was being rolled lands in `channel.history()`, gets
+   picked up on connect, and the user gets their reply.
+
+Discovered the hard way during the 2026-05-09 M1 deploy: with the old
+"mark last 20, period" logic, mentions sent during the rollout window
+got silently dropped. The idempotent `processed_ids` set protects
+against the live gateway also redelivering the same message — whichever
+path runs first wins, the other no-ops.
+
 ## Commitment scheduler
 
 New asyncio task in `gateway.py`: `_commitment_tick`.
