@@ -477,13 +477,22 @@ class PaiBot(discord.Client):
 
     async def on_message(self, msg: discord.Message):
         # Trace every dispatch so we can tell "didn't receive" from "ignored".
+        # Includes role-mention classification so we can verify mention
+        # detection against bot-authored probes that exit at the bot filter.
+        is_mention_pre = False
+        try:
+            is_mention_pre = self._is_mention(msg) if msg.guild else False
+        except Exception:
+            pass
         log.info(
-            "on_message id=%s author=%s bot=%s guild=%s channel=%s ch_type=%s len=%d",
+            "on_message id=%s author=%s bot=%s guild=%s channel=%s ch_type=%s len=%d roles=%s mention_match=%s",
             msg.id, msg.author.display_name, msg.author.bot,
             getattr(msg.guild, "id", None),
             getattr(msg.channel, "id", None),
             type(msg.channel).__name__,
             len(msg.content or ""),
+            [r.id for r in msg.role_mentions],
+            is_mention_pre,
         )
         if msg.author.bot or not msg.guild:
             return
