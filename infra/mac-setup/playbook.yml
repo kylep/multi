@@ -28,6 +28,7 @@
       - helm
       - helmfile
       - argocd
+      - opentofu  # MPL-licensed Terraform fork — drop-in compatible (`tofu` CLI)
       - pre-commit
       - semgrep
       - shellcheck
