@@ -7,7 +7,7 @@ slug: openclaw-inspired-assistant
 category: ai
 tags: AI, Claude-Code, agents, openclaw, Pai, K8s
 date: 2026-05-10
-status: draft
+status: published
 keywords:
   - openclaw inspired assistant
   - pai agent
