@@ -275,22 +275,3 @@ become useful, a slim `pai-diagnostics` sub-agent (modeled on
 pai-recaller) is the right shape.
 
 Ports openclaw's dreaming consolidation cron.
-
-## The broader agent team
-
-Pai isn't alone. Top-level Claude Code agents in `.claude/agents/`:
-`pai`, `pai-self-improver`, `publisher`, `prd-writer`,
-`design-doc-writer`, `analyst`, `synthesizer`, `journalist`,
-`autolearn`, `seo-bot`. Sub-agents: `pai-recaller`, `researcher`,
-`reviewer`, `qa`, `security-auditor`, `interviewee`. All
-version-controlled, all reviewed by me, no skill marketplace.
-
-## Deferred, not skipped
-
-- **Sub-agent orchestration**: letting Pai dispatch other agents
-  (publisher, prd-writer, etc.) the way openclaw does multi-agent
-  routing.
-- **Memory-wiki layer**: openclaw can compile durable memory into
-  a provenance-rich vault. Worth it once `MEMORY.md` outgrows
-  manual curation.
-- **HOT/WARM/COLD tiered memory**: not painful at ~1k bullets.
