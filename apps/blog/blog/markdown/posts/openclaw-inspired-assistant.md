@@ -149,7 +149,124 @@ failed rc=N"). That's coarse — it tells you *something* failed but not
 commands fail most often" or "which MCP tool errors recur" with a
 single SQL query. That's the data feed pai-self-improver clusters on.
 
-(more notes coming)
+# The full data flow
+
+Once the audit hook started shipping `is_error`, the rest of the loop
+fell into place. Vector was already collecting container stdout to
+OpenObserve's `k8s_logs` stream. The pieces I added connect the data
+back to memory.
+
+```mermaid
+graph LR
+  A[pai-responder<br/>+ cron agents] -->|stdout| B[Vector<br/>DaemonSet]
+  B -->|HTTP| C[(OpenObserve<br/>k8s_logs)]
+  C -->|SQL query| D[pai-self-improver<br/>cron @ 09:00 UTC]
+  D -->|file issue| E[Linear<br/>label: pai-self-improver]
+  D -->|summary| F[Discord<br/>#status-updates]
+  E -->|approve| G[Pai responder]
+  G -->|memory_save| H[(MEMORY.md)]
+```
+
+The thing I like about this shape is that no piece is novel.
+
+- Vector + O2 + audit-log were already in place; I just added two
+  fields to the audit payload.
+- The cron agent is a copy of `autolearn`'s shape, with a different
+  agent definition and a smaller toolbelt.
+- The approval surface is Discord + Linear, both already wired.
+- The application step (`memory_save`) was already Pai's bread and
+  butter.
+
+What changed is who reads what. Before, errors went into O2 and died
+there. Now they go in, get clustered, become proposals, sometimes
+become memory.
+
+# Mapping to openclaw's runtime
+
+What I ported, what I didn't, what's still open:
+
+| Openclaw feature | Pai equivalent | Status |
+|---|---|---|
+| `MEMORY.md` long-term store | `/data/MEMORY.md` w/ section headers | shipped |
+| Daily notes | `/data/daily/YYYY-MM-DD.md` | shipped |
+| Active Memory sub-agent | `pai-recaller` | shipped |
+| Inferred commitments + heartbeat | `COMMITMENTS.md` + 60s tick | shipped |
+| Standing orders | `pai.md` agent definition + repo `CLAUDE.md` | shipped (implicit) |
+| **Dreaming (consolidation cron)** | `pai-self-improver` | **shipped this branch** |
+| `DREAMS.md` review surface | (just Linear for now) | deferred |
+| Memory flush before compaction | n/a — each turn is fresh | not applicable |
+| HOT/WARM/COLD tiering | flat MEMORY.md | deferred |
+| Multi-channel routing | Discord only | won't do |
+| ClawHub skill marketplace | `.claude/agents/` versioned in repo | won't do |
+| Voice in/out | n/a | won't do |
+| Loop detection | gateway has typing + thinking msg | partial |
+| Pluggable embedding backends | BM25 only | deferred |
+| Recurrence counting | (Linear comments are the audit trail) | partial |
+
+Three columns I want to highlight:
+
+- **shipped this branch**: dreaming. That's the headline.
+- **deferred**: things I'll port when there's a reason to. HOT/WARM
+  isn't painful at ~1k bullets. DREAMS.md is symmetric with openclaw's
+  surface but Linear already does the job.
+- **won't do**: multi-channel, voice, marketplace. Each is an
+  architectural commitment I deliberately don't want.
+
+# Things I noticed along the way
+
+**Hook stdout vs container stdout.** The PostToolUse hook writes to
+stdout. In the pai-responder pod, `gateway.py` spawns `claude` as a
+subprocess with `stdout=PIPE` — meaning hook output gets captured
+into the gateway's stdout buffer rather than streaming to container
+stdout that Vector watches. So actually... the hook entries from the
+pai-responder loop *don't* reach O2 the way I thought they did. They
+end up inside Claude's reply text or get discarded.
+
+What *does* reach O2 from pai-responder is `gateway.py`'s own Python
+logger output (line `claude failed rc=N stderr=...`). That's still
+useful but coarser. So the audit-log enrichment mostly helps the
+**cron agents** (autolearn, journalist, seo-bot) where the shell
+script doesn't pipe-capture stdout.
+
+I'll come back to fix this — probably by having `gateway.py` parse
+the audit-log JSON out of claude's stdout and re-emit it as a
+structured Python log line. For now pai-self-improver gets a
+partial signal, which is still better than no signal.
+
+**Vault gives the openobserve creds neatly.** `secret/ai-agents/openobserve`
+already had `root_user_email` and `root_user_password` (set up for
+bootstrapping the K8s secret in the openobserve namespace). The cron
+just reuses those, computes the base64 token at startup. No new
+Vault entries needed.
+
+**Anonymous git clone.** The `kylep/multi` repo is public. Autolearn
+needs a GitHub App token because it pushes; pai-self-improver only
+reads, so it just clones unauthenticated. Saved a chunk of YAML.
+
+**No PVC sharing.** I considered mounting `/data` ROX from the cron
+pod so it could write a DREAMS.md alongside MEMORY.md. Local-path
+storage class is RWO — can't be mounted in two pods at once. Could
+flip to a different storage class, but the value isn't there. Linear
+issue is the review surface.
+
+# Verification status
+
+- `helm template` renders without errors. Confirmed.
+- `kubectl apply --dry-run=server` would catch schema issues but
+  needs a live cluster I can hit. The Mac mini's Rancher Desktop
+  isn't reachable from this dev environment, so this is deferred to
+  Kyle running it locally.
+- The audit hook's `is_error` extraction tested with three synthetic
+  payloads (bash success, bash error with stderr, edit with output
+  field). The actual PostToolUse payload schema may differ slightly
+  per Claude version — first real run will reveal that.
+- The agent definition wasn't run end-to-end. The first cron run
+  will tell us if the prompt + tool list combination produces
+  reasonable proposals or noise.
+
+I'm leaving these unverified deliberately. The next iteration is
+"deploy to pai-m1, watch the first run, fix what was wrong." That's
+Kyle's call.
 
 # Why this isn't a flexible platform
 
@@ -202,5 +319,37 @@ Things that don't generalize, listed for honesty:
 - Should pai-recaller also see the dreamer's promotion candidates?
   Probably yes — promoted-but-not-yet-applied items should still be
   loaded into active memory at recall time.
+- The audit hook's `is_error` field comes from `tool_response.is_error`
+  — schema is my best guess and may be wrong on some Claude versions.
+  Worth one real run to confirm before clustering on it.
+- Application loop is human-driven for now. Kyle reads the Linear
+  issue, replies `apply`, Pai applies. The "Pai applies" half isn't
+  wired yet — Pai needs a comment-watcher tick that polls Linear
+  issues with the `pai-self-improver` label and a `apply` reply, then
+  fires a `memory_save` for each approved bullet. Future iteration.
+
+# What's next
+
+If the first real run produces useful proposals:
+
+- Wire the comment-watch loop in `gateway.py` so Kyle's `apply`
+  reply actually applies the change. Likely a `_periodic_dream_apply`
+  tick alongside the commitment tick.
+- Add a `DREAMS.md` to `/data` (same shape as MEMORY.md but
+  read-only-from-cron) so Pai can recall *why* each rule exists.
+  Requires either a shared volume, an HTTP endpoint to write
+  through Pai, or having Pai write the entry herself when applying.
+- Surface stats: count proposals over time, accept/reject ratio,
+  recurrence-to-promotion latency. Just basic SQL against O2.
+
+If the first run produces noise:
+
+- Tighten threshold (5+ instead of 3+).
+- Add denylist patterns: things we *expect* to fail and don't want
+  promoted (e.g. `kubectl apply` against a paused argocd app
+  during a known maintenance window).
+- Probably the agent's normalization regex needs more cases. Run
+  the actual cluster output through it before relying on the
+  cluster grouping.
 
 (more as I go)
