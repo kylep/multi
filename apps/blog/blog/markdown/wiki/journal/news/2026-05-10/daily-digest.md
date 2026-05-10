@@ -61,3 +61,23 @@ last_verified: 2026-05-10
 - [Bloomberg](https://www.bloomberg.com/news/newsletters/2026-05-05/anthropic-announces-new-ai-agents-for-financial-professionals) Anthropic launched AI agents for financial professionals capable of drafting pitch decks, reviewing financial statements, and escalating compliance cases, targeting banking, insurance, asset management, and fintech.
 
 - [The Hacker News](https://thehackernews.com/2026/05/critical-apache-http2-flaw-cve-2026.html) CVE-2026-23918 is a double-free vulnerability in Apache HTTP Server 2.4.66 with CVSS 8.8 enabling denial-of-service and potential remote code execution.
+
+---
+
+## Update — 16:04 UTC
+
+## AI Industry
+
+- [Engadget](https://www.engadget.com/2165585/anthropic-reportedly-agrees-to-pay-google-200-billion-for-chips-and-cloud-access/) Anthropic has committed to spend $200 billion with Google Cloud over the next five years, covering TPU chips and cloud capacity. The deal accounts for more than 40% of Google's disclosed revenue backlog and includes Broadcom-built TPU capacity coming online in 2027.
+
+## AI Tooling
+
+- [Claude Code Docs](https://code.claude.com/docs/en/changelog) Claude Code 2.1.138 shipped on May 9, fixing unbounded memory growth when stdio MCP servers write non-protocol data to stdout and improving MCP server error handling.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/ivanti-epmm-cve-2026-6973-rce-under.html) CVE-2026-6973 is an actively exploited remote code execution flaw in Ivanti EPMM (on-prem versions 12.8.0.0 and earlier). CISA's federal remediation deadline was today, May 10. Patches are available in versions 12.6.1.1, 12.7.0.1, and 12.8.0.1.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/lite/news/canada/ontario/durham?sort=latest) Durham Region police are requesting a $1.1 billion budget, which could push residents' property tax increase above 10% next year.
