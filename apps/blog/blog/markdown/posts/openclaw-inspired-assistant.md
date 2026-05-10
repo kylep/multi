@@ -7,6 +7,8 @@ category: ai
 tags: AI, Claude-Code, agents, openclaw, Pai, Kubernetes
 date: 2026-05-10
 status: published
+image: openclaw-inspired-assistant.png
+thumbnail: openclaw-inspired-assistant-thumb.png
 imgprompt: A simple flat vector octopus, friendly, with one arm ending in
   a small claw, holding up a chat bubble with three dots inside it.
   Minimal lines, solid pastel colors, no shading, clean geometric shapes
