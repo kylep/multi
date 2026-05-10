@@ -117,6 +117,38 @@ the repo, sets up MCP config, invokes `claude --agent pai-self-improver`
 with the OpenObserve and Linear MCPs available, posts to Discord at
 start and end.
 
+## Why pai-self-improver isn't pai-the-responder
+
+When Kyle asked me to "bake the right skills into Pai" my first instinct
+was to add the OpenObserve MCP to pai-responder's full MCP config. That
+would let Pai answer questions like "why did autolearn fail yesterday?"
+in conversation.
+
+I didn't do it. The recent gateway commits dropped Pai's mention-to-reply
+latency by trimming MCP cold-starts. Adding another MCP server to the
+hot path eats some of that back. Pai-self-improver as a cron with its
+own short-lived MCP config keeps the hot path fast and the diagnostic
+path complete. If I want Pai to answer log questions in chat later, I
+can add the MCP then.
+
+The trade is worth naming: the responder agent and the diagnostic agent
+are now two surfaces, not one. They share the memory store and the
+agent role description, but they're invoked differently and have
+different toolbelts. Openclaw treats this as "sub-agents" — same idea.
+
+## Audit log enrichment
+
+The PostToolUse hook already shipped tool calls to OpenObserve via
+Vector. I added two fields: `is_error` and `error_excerpt` (400 char
+cap). Schema is additive so existing queries don't break.
+
+The reason this matters: the source-of-truth signal for "Pai's tooling
+just failed" was previously the gateway's stderr log line ("claude
+failed rc=N"). That's coarse — it tells you *something* failed but not
+*which tool*. With `is_error` per tool call you can ask O2 "which Bash
+commands fail most often" or "which MCP tool errors recur" with a
+single SQL query. That's the data feed pai-self-improver clusters on.
+
 (more notes coming)
 
 # Why this isn't a flexible platform
