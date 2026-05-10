@@ -35,9 +35,9 @@ What Pai is, today. Where something is ported from
 
 Three plain-markdown files on the pai-responder PVC at `/data/`:
 
-- `MEMORY.md` — durable, sectioned by `##` headers
-- `daily/YYYY-MM-DD.md` — rolling notes
-- `COMMITMENTS.md` — YAML-fenced follow-ups
+- `MEMORY.md`: durable, sectioned by `##` headers
+- `daily/YYYY-MM-DD.md`: rolling notes
+- `COMMITMENTS.md`: YAML-fenced follow-ups
 
 A typed MCP wraps the files and exposes `memory_save`,
 `memory_search`, `memory_recall`, `memory_get`, `memory_list`,
@@ -73,7 +73,7 @@ each searchable doc so a query like *"what language does Kyle
 prefer"* hits a bullet under `## Kyle` even when no token in the
 bullet itself overlaps.
 
-`memory_search` returns ranked hits with provenance — `{path, line,
+`memory_search` returns ranked hits with provenance: `{path, line,
 snippet, score}`. Pai calls it herself, mid-turn, when she decides
 she needs to look something up. No embeddings, no API keys.
 
@@ -98,7 +98,7 @@ Pai replies in Discord
 
 The recaller (`.claude/agents/pai-recaller.md`) has only
 `memory_recall`, `memory_search`, `memory_get`. No Discord, no
-Linear, no web. Sonnet, not Haiku — relevance judgment wants
+Linear, no web. Sonnet, not Haiku, because relevance judgment wants
 reasoning. `memory_recall` wraps `search` and returns the literal
 string `NONE` if nothing matched.
 
@@ -156,8 +156,8 @@ or recurring schedules.
 spawns Pai with a tight tool list (`send_message`, `create_thread`,
 `memory_commitment_done`) to deliver each.
 
-Each commitment carries a `precision` field — `precise` for
-explicit "remind me at..." or `soft` for inferred follow-ups —
+Each commitment carries a `precision` field, either `precise` (for
+explicit "remind me at...") or `soft` (for inferred follow-ups),
 which Pai uses to phrase the message. Same delivery path either
 way.
 
@@ -182,10 +182,10 @@ deprecated.
 
 Pai's MCPs:
 
-- `pai-discord` — Discord ops
-- `pai-memory` — the v2 markdown MCP
-- `linear-server` — issues, comments, statuses
-- `playwright` — read-only browser, curated to `browser_navigate`,
+- `pai-discord`: Discord ops
+- `pai-memory`: the v2 markdown MCP
+- `linear-server`: issues, comments, statuses
+- `playwright`: read-only browser, curated to `browser_navigate`,
   `browser_snapshot`, `browser_take_screenshot`, `browser_click`,
   `browser_evaluate`, `browser_close`
 
@@ -206,9 +206,9 @@ producing tokens. Four changes:
 - **`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`** in the
   deployment env (autoupdate / telemetry / feedback off).
 
-Recaller cold-start dropped the most — it no longer waits on
-Playwright + Linear + Discord MCPs to register tools just to
-ignore them.
+Recaller cold-start dropped the most. It no longer waits on
+Playwright + Linear + Discord MCPs to register tools that get
+ignored.
 
 ## Persona
 
@@ -250,7 +250,7 @@ Daily CronJob at 09:00 UTC. Mines the last 24h of failures,
 clusters by normalized signature, threshold 3+ recurrences, cap 5
 proposals per run. Each run produces one Linear issue (label
 `pai-self-improver`) and one Discord summary. Read-only against
-`MEMORY.md` — Kyle approves; Pai applies.
+`MEMORY.md`: Kyle approves, Pai applies.
 
 ```mermaid
 graph LR
@@ -267,7 +267,7 @@ The application-side comment-watcher in pai-responder is **not yet
 wired**. Today the loop is: cron files Linear issue → Kyle reads →
 Kyle either applies manually or asks Pai in chat.
 
-OpenObserve MCP isn't on pai-responder's hot path — adding it would
+OpenObserve MCP isn't on pai-responder's hot path. Adding it would
 eat the cold-start improvements. If diagnostic answers in chat ever
 become useful, a slim `pai-diagnostics` sub-agent (modeled on
 pai-recaller) is the right shape.
@@ -285,19 +285,19 @@ version-controlled, all reviewed by me, no skill marketplace.
 
 ## Deferred, not skipped
 
-- **Sub-agent orchestration** — letting Pai dispatch other agents
+- **Sub-agent orchestration**: letting Pai dispatch other agents
   (publisher, prd-writer, etc.) the way openclaw does multi-agent
   routing.
-- **Memory-wiki layer** — openclaw can compile durable memory into
+- **Memory-wiki layer**: openclaw can compile durable memory into
   a provenance-rich vault. Worth it once `MEMORY.md` outgrows
   manual curation.
-- **HOT/WARM/COLD tiered memory** — not painful at ~1k bullets.
+- **HOT/WARM/COLD tiered memory**: not painful at ~1k bullets.
 
 # What's still open
 
 A few unverifieds that need a real run on pai-m1:
 
-- The `is_error` field comes from `tool_response.is_error` —
+- The `is_error` field comes from `tool_response.is_error`. The
   schema is my best guess and may differ slightly per Claude
   version.
 - The application loop is half-wired: cron files proposals; Pai
@@ -330,10 +330,11 @@ one-week-old GitHub account, which is the supply chain. I write my
 own agents in `.claude/agents/`, version-controlled, reviewed by
 me.
 
-# What OpenClaw does Pai wont
+# What OpenClaw does that Pai won't
 
-- **ClawHub skill marketplace.** OpenClaw runs a 65k+ skill
-  registry. I don't, for the supply-chain reason above.
+- **ClawHub skill marketplace.** OpenClaw's
+  [ClawHub registry](https://clawhub.ai/) lists 65k+ community-
+  published skills. I don't, for the supply-chain reason above.
 - **`SOUL.md` / `AGENTS.md` / `USER.md` persona split.** OpenClaw
   auto-injects three persona files. Claude Code doesn't have that
   hook, so the cost outweighs the benefit.
@@ -341,7 +342,7 @@ me.
   (iMessage, Slack, WhatsApp, Telegram, Signal, Matrix, voice,
   …). Pai is Discord-only. I don't use the others.
 - **Pluggable embedding backends.** Honcho, LanceDB, QMD,
-  memory-wiki — all need API keys, which violates the no-API-
+  memory-wiki: all need API keys, which violates the no-API-
   billing constraint of running on Claude Max OAuth. BM25 is
   enough.
 - **Lobster typed-workflow runtime.** Typed multi-step pipelines
