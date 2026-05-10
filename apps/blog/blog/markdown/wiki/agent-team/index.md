@@ -1,10 +1,11 @@
 ---
 title: "Agent Team"
-summary: "AI agent team with 11 roles defined in .claude/agents/."
+summary: "AI agent team with 12 roles defined in .claude/agents/."
 keywords:
   - agent-team
   - ai-agents
   - pai
+  - pai-self-improver
   - publisher
   - researcher
   - reviewer
@@ -18,16 +19,17 @@ keywords:
 related:
   - wiki/history
 scope: "Source of truth for the agent team: roles, models, tools, coordination, and invocation."
-last_verified: 2026-03-16
+last_verified: 2026-05-10
 ---
 
-Eleven Claude Code agents defined in `.claude/agents/`.
+Twelve Claude Code agents defined in `.claude/agents/`.
 
 ## Roles
 
 | Role | Model | Tools | Purpose |
 |------|-------|-------|---------|
-| [Pai](/wiki/agent-team/pai.html) | Haiku | Read, Write, Bash, Glob, Grep, pai-discord MCP | Executive assistant, Discord comms, agent coordination |
+| [Pai](/wiki/agent-team/pai.html) | Sonnet | Read, Glob, Grep, WebSearch, WebFetch, pai-discord, pai-memory, playwright, linear | Executive assistant, Discord comms, persistent memory |
+| [Pai Self-Improver](/wiki/agent-team/pai-self-improver.html) | Sonnet | Read, Glob, Grep, Bash, openobserve, pai-discord, linear | Daily diagnostic cron — mines O2, proposes memory updates |
 | [Publisher](/wiki/agent-team/publisher.html) | Opus | Read, Write, Edit, Bash, Glob, Grep, Agent | Orchestrate content pipeline, write blog posts |
 | [Analyst](/wiki/agent-team/analyst.html) | Opus | Read, Glob, Grep, WebSearch, WebFetch | Ingest research, validate claims, propose system improvements |
 | [Synthesizer](/wiki/agent-team/synthesizer.html) | Opus | Read, Edit, Glob, Grep, Agent | Compare and contrast Deep Research reports |
