@@ -119,6 +119,16 @@ spec:
             # Cuts each subprocess cold-start by 2-5s.
             - name: CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC
               value: "1"
+            # Don't synchronously block claude startup on MCP servers —
+            # tools load lazily / in parallel with the first model call.
+            # Saves ~3.5s on the main-pai path (measured 2026-05-09).
+            - name: MCP_CONNECTION_NONBLOCKING
+              value: "1"
+            # Lift the per-startup concurrency cap so all 4 of Pai's MCP
+            # servers come up in parallel (default 3 forced playwright
+            # to wait for pai-discord to finish before slotting in).
+            - name: MCP_SERVER_CONNECTION_BATCH_SIZE
+              value: "10"
           ports:
             - name: health
               containerPort: 8080
