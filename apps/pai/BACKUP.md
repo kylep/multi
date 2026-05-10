@@ -52,10 +52,15 @@ service-account key are all declared in `apps/pai/tf/backup.tf`.
 You drive Terraform from your workstation. Expects `terraform`
 installed and `gcloud auth application-default login` already done.
 
+All paths below are relative to the repo root. The TF lives in
+this branch at `apps/pai/tf/`; once it lands on main the same paths
+work from there. From a worktree, prefix with the worktree dir
+(e.g. `cd .claude/worktrees/openclaw-features` first).
+
 ### 1. Apply the Terraform
 
 ```bash
-cd /Users/kp/gh/multi/apps/pai/tf
+cd apps/pai/tf
 terraform init
 terraform apply
 ```
@@ -71,9 +76,10 @@ The Terraform state holds the service-account key. Pipe it through
 to Vault without touching disk:
 
 ```bash
+# Run from the same apps/pai/tf directory.
 GCS_KEY_B64=$(terraform output -raw key_b64) \
 GCS_BACKUP_BUCKET=$(terraform output -raw bucket_name) \
-  /Users/kp/gh/multi/infra/ai-agents/bin/store-secrets.sh
+  ../../../infra/ai-agents/bin/store-secrets.sh
 ```
 
 `store-secrets.sh` walks every secret bucket; for the ones already
@@ -83,7 +89,7 @@ GCS section reads the env vars without prompting.
 ### 3. Apply the K8s manifests
 
 ```bash
-cd /Users/kp/gh/multi/infra/ai-agents
+cd ../../../infra/ai-agents   # repo-root-relative: infra/ai-agents
 helmfile sync
 ```
 
@@ -112,17 +118,17 @@ You should see structured JSON like:
 {"ts":"2026-05-10T04:00:14Z","log_level":"info","agent":"pai-memory-backup","run_id":"a1b2c3d4","message":"[INFO] backup ok target=gs://.../data.tar.gz size_bytes=4823"}
 ```
 
-Then verify in GCS:
+Then verify in GCS (from `apps/pai/tf`):
 
 ```bash
-BUCKET=$(terraform -chdir=/Users/kp/gh/multi/apps/pai/tf output -raw bucket_name)
-gcloud storage ls "gs://${BUCKET}/$(date -u +%Y-%m-%d)/"
+gcloud storage ls "gs://$(terraform output -raw bucket_name)/$(date -u +%Y-%m-%d)/"
 ```
 
 ### Rotating the service-account key
 
+From `apps/pai/tf`:
+
 ```bash
-cd /Users/kp/gh/multi/apps/pai/tf
 terraform taint google_service_account_key.pai_backup
 terraform apply
 # then re-run step 2 above to push the new key into Vault.
