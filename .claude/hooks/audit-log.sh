@@ -23,14 +23,18 @@ IS_ERROR=$(echo "$INPUT" | jq -r '.tool_response.is_error // false')
 # Pull a short error excerpt only when the call actually failed. Keeps the
 # happy-path payload small. Bash tool puts stderr/stdout under a few possible
 # keys depending on Claude version, so try several.
+# Truncation lives inside jq (`.[0:400]`) so we cut on Unicode codepoints
+# rather than bytes — `head -c 400` on stderr containing emoji or non-ASCII
+# could split mid-codepoint and produce invalid UTF-8, which then breaks
+# downstream JSON encoding.
 if [ "$IS_ERROR" = "true" ]; then
   ERROR_EXCERPT=$(echo "$INPUT" | jq -r '
     .tool_response as $r |
-    (
+    ((
       $r.stderr // $r.error // $r.output // $r.content //
       ($r.stdout // "")
-    ) // ""
-  ' | head -c 400)
+    ) // "")[0:400]
+  ')
 else
   ERROR_EXCERPT=""
 fi
@@ -55,7 +59,7 @@ ENTRY=$(jq -nc \
 
 echo "$ENTRY"
 
-LOCAL_LOG="/Users/pai/gh/multi/logs/claude-audit.jsonl"
+LOCAL_LOG="${HOME}/gh/multi/logs/claude-audit.jsonl"
 if [ -d "$(dirname "$LOCAL_LOG")" ]; then
   echo "$ENTRY" >> "$LOCAL_LOG"
   chmod 600 "$LOCAL_LOG" 2>/dev/null || true

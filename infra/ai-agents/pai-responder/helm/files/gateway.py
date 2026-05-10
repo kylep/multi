@@ -832,8 +832,21 @@ class PaiBot(discord.Client):
             return
         if proc.returncode != 0:
             log.error("commitment delivery failed for %s rc=%d", cmt_id, proc.returncode)
-        else:
-            log.info("delivered commitment %s", cmt_id)
+            return
+        log.info("delivered commitment %s", cmt_id)
+        # Backstop: if the spawned Pai turn forgot to call
+        # mcp__pai-memory__memory_commitment_done (model drift, MCP
+        # transient, etc.), mark it delivered ourselves. Without this
+        # the commitment stays pending and gets redelivered every 60s
+        # forever. mark_commitment_done is idempotent.
+        try:
+            from memory_mcp import MemoryStore  # type: ignore
+            MemoryStore().commitment_done(cmt_id)
+        except Exception:
+            log.warning(
+                "commitment_done backstop failed for %s",
+                cmt_id, exc_info=True,
+            )
 
     async def close(self):
         await self.health.stop()

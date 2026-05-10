@@ -464,3 +464,94 @@ def test_promote_moves_daily_bullet_to_long(store):
     assert "promoted" in result.lower() or "moved" in result.lower()
     assert "## Notes" in store.memory_path.read_text()
     assert "something to remember" in store.memory_path.read_text()
+
+
+# --- Code-review-driven security/robustness tests (2026-05-10) ---
+
+
+def test_get_rejects_path_outside_data_dir(store):
+    """Path traversal containment: memory_get must refuse paths outside data_dir.
+
+    Without containment, an inbound Discord prompt could ask the recaller to
+    `memory_get('/vault/secrets/config')` and exfiltrate tokens via the
+    active_memory digest.
+    """
+    out = store.get("/etc/passwd")
+    assert "outside memory dir" in out.lower()
+
+
+def test_get_rejects_relative_traversal(store):
+    """Relative `../../etc/passwd` style paths are also out-of-scope."""
+    target = str(store.data_dir / ".." / ".." / "etc" / "passwd")
+    out = store.get(target)
+    assert "outside memory dir" in out.lower()
+
+
+def test_get_allows_paths_under_data_dir(store):
+    """Sanity: legitimate paths under data_dir still work."""
+    store.save(scope="daily", content="hello world")
+    today_path = next(store.daily_dir.glob("*.md"))
+    out = store.get(str(today_path))
+    assert "hello world" in out
+
+
+def test_add_commitment_rejects_dash_dash_dash_in_body(tmp_path, monkeypatch):
+    """A bare `---` line in a body would corrupt round-trip parsing."""
+    from memory_mcp import add_commitment
+    path = tmp_path / "C.md"
+    with pytest.raises(ValueError, match="bare '---' line"):
+        add_commitment(
+            path=path,
+            content="line one\n---\nline two",
+            due="2099-01-01T00:00:00Z",
+            scope="ch:1",
+        )
+
+
+def test_parse_commitments_skips_frontmatter_without_id():
+    """Frontmatter lacking an id is malformed; emit nothing rather than junk."""
+    from memory_mcp import parse_commitments
+    content = (
+        "---\n"
+        "no_id: here\n"
+        "status: pending\n"
+        "---\n"
+        "body\n"
+        "---\n"
+        "id: c-real\n"
+        "status: pending\n"
+        "due: 2099-01-01T00:00:00Z\n"
+        "scope: ch:1\n"
+        "---\n"
+        "real body\n"
+    )
+    cmts = parse_commitments(content)
+    # Only the well-formed block survives.
+    ids = [c.get("id") for c in cmts]
+    assert ids == ["c-real"]
+
+
+def test_recall_defaults_to_long_scope(store):
+    """recall() should ignore daily-note hits by default so durable
+    facts dominate ranking as the daily corpus grows."""
+    # Same query phrase appears in both long (real fact) and daily (chatter).
+    store.save(scope="long", key="Kyle", content="prefers TypeScript over JavaScript")
+    store.save(scope="daily", content="random unrelated TypeScript chatter line one")
+    store.save(scope="daily", content="more TypeScript chatter line two")
+    digest = store.recall(query="What language does Kyle prefer?")
+    assert "TypeScript" in digest
+    # Default scope='long' means daily-only hits don't appear.
+    assert "chatter" not in digest
+
+
+def test_recall_scope_none_searches_everything(store):
+    """Passing scope=None lets recall fall back to whole-corpus search."""
+    store.save(scope="daily", content="only-in-daily-fact")
+    digest = store.recall(query="only-in-daily-fact", scope=None)
+    assert "only-in-daily-fact" in digest
+
+
+def test_promote_rejects_invalid_date_str(store):
+    """date_str must match YYYY-MM-DD so `..` traversal can't escape."""
+    out = store.promote(date_str="../etc/passwd", line_num=1)
+    assert "invalid date_str" in out.lower()

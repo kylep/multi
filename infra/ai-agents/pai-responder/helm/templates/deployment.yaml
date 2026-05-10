@@ -36,7 +36,10 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: clone-repo
-          image: alpine/git:latest
+          # Pinned to a specific tag rather than :latest so a hijacked
+          # alpine/git release can't change behavior under us. Bump
+          # deliberately, run security scans on bump.
+          image: alpine/git:v2.47.2
           command: ["/bin/sh", "-c"]
           args:
             - |
