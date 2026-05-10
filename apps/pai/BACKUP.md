@@ -49,10 +49,10 @@ On failure the script also posts a 🔴 message to
 
 The bucket, service account, IAM binding, lifecycle rule, and
 service-account key are all declared in `apps/pai/tf/backup.tf`.
-You drive Terraform-the-config-language via OpenTofu from your
-workstation. The `tofu` CLI ships from the `opentofu` brew package
-in the mac-setup Ansible playbook (re-run
-`ansible-playbook infra/mac-setup/playbook.yml` if it's missing).
+You drive Terraform from your workstation. The `terraform` CLI
+ships from `hashicorp/tap/terraform` in the mac-setup Ansible
+playbook — re-run
+`ansible-playbook infra/mac-setup/playbook.yml` if it's missing.
 Also expects `gcloud auth application-default login` already done.
 
 All paths below are relative to the repo root. The TF lives in
@@ -64,8 +64,8 @@ work from there. From a worktree, prefix with the worktree dir
 
 ```bash
 cd apps/pai/tf
-tofu init
-tofu apply
+terraform init
+terraform apply
 ```
 
 Defaults: project `kylepericak`, region `northamerica-northeast1`,
@@ -80,8 +80,8 @@ to Vault without touching disk:
 
 ```bash
 # Run from the same apps/pai/tf directory.
-GCS_KEY_B64=$(tofu output -raw key_b64) \
-GCS_BACKUP_BUCKET=$(tofu output -raw bucket_name) \
+GCS_KEY_B64=$(terraform output -raw key_b64) \
+GCS_BACKUP_BUCKET=$(terraform output -raw bucket_name) \
   ../../../infra/ai-agents/bin/store-secrets.sh
 ```
 
@@ -124,7 +124,7 @@ You should see structured JSON like:
 Then verify in GCS (from `apps/pai/tf`):
 
 ```bash
-gcloud storage ls "gs://$(tofu output -raw bucket_name)/$(date -u +%Y-%m-%d)/"
+gcloud storage ls "gs://$(terraform output -raw bucket_name)/$(date -u +%Y-%m-%d)/"
 ```
 
 ### Rotating the service-account key
@@ -132,8 +132,8 @@ gcloud storage ls "gs://$(tofu output -raw bucket_name)/$(date -u +%Y-%m-%d)/"
 From `apps/pai/tf`:
 
 ```bash
-tofu taint google_service_account_key.pai_backup
-tofu apply
+terraform taint google_service_account_key.pai_backup
+terraform apply
 # then re-run step 2 above to push the new key into Vault.
 ```
 
