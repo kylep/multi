@@ -1,9 +1,7 @@
 ---
 title: "Introducing Pai: My Openclaw-Inspired Assistant"
-summary: I've been quietly stripping openclaw for parts. Pai now runs on a
-  markdown memory model, active-recall sub-agent, commitment scheduler, and
-  a daily dreaming cron — all ported from openclaw concepts but pinned to
-  Claude Max OAuth and a single Discord channel.
+summary: Not Invented Here is my favourite way to learn. I copied what I
+  like from OpenClaw for a purpose-built private assistant.
 slug: openclaw-inspired-assistant
 category: ai
 tags: AI, Claude-Code, agents, openclaw, Pai, Kubernetes
