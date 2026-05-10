@@ -14,6 +14,14 @@ node_modules/
 postgres-data/
 **/values-*.yaml
 
+# Terraform — state can contain secrets (service account keys etc.)
+**/.terraform/
+**/.terraform.lock.hcl
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfvars
+!**/*.tfvars.example
+
 
 # START Ruler Generated Files
 /AGENTS.md

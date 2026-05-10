@@ -47,92 +47,56 @@ On failure the script also posts a 🔴 message to
 
 ## One-time setup
 
-You drive these steps from your workstation. Expects `gcloud`
-installed and authed against your Google account.
+The bucket, service account, IAM binding, lifecycle rule, and
+service-account key are all declared in `apps/pai/tf/backup.tf`.
+You drive Terraform from your workstation. Expects `terraform`
+installed and `gcloud auth application-default login` already done.
 
-### 1. Create the bucket
+### 1. Apply the Terraform
 
 ```bash
-# Pick whatever bucket name you want — must be globally unique.
-BUCKET="kp-pai-memory-backups"
-PROJECT_ID=$(gcloud config get-value project)
-
-gcloud storage buckets create "gs://${BUCKET}" \
-  --project="${PROJECT_ID}" \
-  --location=us-central1 \
-  --default-storage-class=COLDLINE \
-  --uniform-bucket-level-access
+cd /Users/kp/gh/multi/apps/pai/tf
+terraform init
+terraform apply
 ```
 
-### 2. Set the 365-day lifecycle rule
+Defaults: project `kylepericak`, region `northamerica-northeast1`,
+bucket `kp-pai-memory-backups`, retention 365 days, storage class
+COLDLINE. Override with `-var bucket_name=...` if the default name
+is taken globally.
+
+### 2. Push the key + bucket name into Vault
+
+The Terraform state holds the service-account key. Pipe it through
+to Vault without touching disk:
 
 ```bash
-cat > /tmp/lifecycle.json <<'EOF'
-{
-  "lifecycle": {
-    "rule": [
-      {
-        "action": {"type": "Delete"},
-        "condition": {"age": 365}
-      }
-    ]
-  }
-}
-EOF
-
-gcloud storage buckets update "gs://${BUCKET}" \
-  --lifecycle-file=/tmp/lifecycle.json
-```
-
-### 3. Create a service account scoped to writes only
-
-```bash
-SA_EMAIL="pai-backup@${PROJECT_ID}.iam.gserviceaccount.com"
-
-gcloud iam service-accounts create pai-backup \
-  --project="${PROJECT_ID}" \
-  --display-name="Pai memory backup writer"
-
-# storage.objectCreator: can create new objects in the bucket only.
-# Cannot read existing objects, list, delete, or touch other buckets.
-gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
-  --member="serviceAccount:${SA_EMAIL}" \
-  --role="roles/storage.objectCreator"
-```
-
-### 4. Generate a JSON key
-
-```bash
-gcloud iam service-accounts keys create /tmp/pai-backup-key.json \
-  --iam-account="${SA_EMAIL}"
-```
-
-### 5. Stash the key + bucket name in Vault
-
-```bash
-GCS_KEY_FILE=/tmp/pai-backup-key.json \
-GCS_BACKUP_BUCKET="${BUCKET}" \
+GCS_KEY_B64=$(terraform output -raw key_b64) \
+GCS_BACKUP_BUCKET=$(terraform output -raw bucket_name) \
   /Users/kp/gh/multi/infra/ai-agents/bin/store-secrets.sh
-
-# Securely shred the local key file when done.
-rm -P /tmp/pai-backup-key.json
 ```
 
-This populates `secret/ai-agents/gcs` with `key` (the JSON) and
-`bucket` (the name).
+`store-secrets.sh` walks every secret bucket; for the ones already
+populated it shows `[Already set]` and accepts an empty answer. The
+GCS section reads the env vars without prompting.
 
-### 6. Apply the cronjob
+### 3. Apply the K8s manifests
 
-If pai-m1 environment is set in your helmfile rotation, the next
-`helmfile sync` picks up the new template and the new RBAC. The
-`paiMemoryBackup.enabled: true` is already set in
-`environments/pai-m1.yaml`. Confirm:
+```bash
+cd /Users/kp/gh/multi/infra/ai-agents
+helmfile sync
+```
+
+The `paiMemoryBackup.enabled: true` is already set in
+`environments/pai-m1.yaml`. Confirm the CronJob and RBAC landed:
 
 ```bash
 kubectl -n ai-agents get cronjob pai-memory-backup
+kubectl -n ai-agents get role pai-pod-exec
+kubectl -n ai-agents get rolebinding pai-pod-exec
 ```
 
-### 7. Verify the first run manually
+### 4. Verify the first run manually
 
 ```bash
 kubectl -n ai-agents create job pai-memory-backup-test \
@@ -151,7 +115,17 @@ You should see structured JSON like:
 Then verify in GCS:
 
 ```bash
+BUCKET=$(terraform -chdir=/Users/kp/gh/multi/apps/pai/tf output -raw bucket_name)
 gcloud storage ls "gs://${BUCKET}/$(date -u +%Y-%m-%d)/"
+```
+
+### Rotating the service-account key
+
+```bash
+cd /Users/kp/gh/multi/apps/pai/tf
+terraform taint google_service_account_key.pai_backup
+terraform apply
+# then re-run step 2 above to push the new key into Vault.
 ```
 
 ## Restoring from a backup
