@@ -297,40 +297,19 @@ version-controlled, all reviewed by me, no skill marketplace.
 
 # What's still open
 
-A few unverifieds that need a real run on pai-m1:
+A few unverifieds that need a real run on pai-m1, each now tracked
+as its own ticket:
 
-- The `is_error` field comes from `tool_response.is_error`. The
-  schema is my best guess and may differ slightly per Claude
-  version.
-- The application loop is half-wired: cron files proposals; Pai
-  doesn't yet auto-apply on `apply` reply.
-- BM25 hasn't been measured against a realistic memory corpus. At
-  ~1k bullets it's cheap; at 10k it might want tuning.
-
-A few open design questions:
-
-- Should `pai-recaller` see pending self-improver proposals so
-  promoted-but-not-yet-applied items still influence active memory?
-- Should pai-self-improver write a `DREAMS.md` to `/data` so Pai
-  can recall *why* a rule exists?
-- How aggressive should the dreamer be? Daily vs. weekly.
-
-# What's not changing
-
-Two things I keep getting tempted to add and keep deciding against.
-
-**No `SOUL.md` / `AGENTS.md` / `USER.md` persona split.** Openclaw
-auto-injects these because its agent runtime owns the prompt.
-Claude Code doesn't, so reading them every turn costs tokens.
-
-**No skill marketplace.**
-[ClawHavoc](https://cybersecuritynews.com/clawhavoc-poisoned-openclaws-clawhub/)
-in February 2026 distributed
-[Atomic macOS Stealer](https://www.trendmicro.com/en_us/research/26/b/openclaw-skills-used-to-distribute-atomic-macos-stealer.html)
-through 1,184+ malicious skills. ClawHub publishing requires a
-one-week-old GitHub account, which is the supply chain. I write my
-own agents in `.claude/agents/`, version-controlled, reviewed by
-me.
+- **`is_error` PostToolUse schema.** The field comes from
+  `tool_response.is_error`. The schema is my best guess and may
+  differ slightly per Claude version. First real cron run tells me.
+- **The application loop is half-wired.** The cron files Linear
+  proposals; Pai doesn't yet auto-apply on `apply` reply. Next
+  iteration wires a periodic tick in `gateway.py` that watches
+  Linear comments.
+- **BM25 hasn't been measured against a realistic memory corpus.**
+  At ~1k bullets it's cheap; at 10k it might want tuning. Parking
+  the eval until the corpus actually grows.
 
 # What OpenClaw does that Pai won't
 
