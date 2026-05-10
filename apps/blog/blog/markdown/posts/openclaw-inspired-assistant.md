@@ -1,5 +1,5 @@
 ---
-title: "Building My Openclaw-Inspired Assistant"
+title: "Introducing Pai: My Openclaw-Inspired Assistant"
 summary: I've been quietly stripping openclaw for parts. Pai now runs on a
   markdown memory model, active-recall sub-agent, commitment scheduler, and
   a daily dreaming cron — all ported from openclaw concepts but pinned to
@@ -30,6 +30,8 @@ I name the analogue. Where it pre-existed I say so.
 
 ## Memory
 
+### Storage
+
 Three plain-markdown files live on the pai-responder PVC at `/data/`:
 `MEMORY.md` (durable, sectioned by `##` headers),
 `daily/YYYY-MM-DD.md` (rolling notes), and `COMMITMENTS.md`
@@ -43,25 +45,51 @@ memory_recall / memory_get / memory_list / memory_commitment_due /
 memory_commitment_done / memory_promote` surface lives in one Python
 file at `infra/ai-agents/pai-responder/helm/files/memory_mcp.py`.
 
-Search is builtin Python BM25 over the markdown. Section headers
-fold into each searchable doc so a query like *"what language does
-Kyle prefer"* hits a bullet under `## Kyle` even if no token in the
+### Search
+
+Builtin Python BM25 over the markdown. Section headers fold into
+each searchable doc so a query like *"what language does Kyle
+prefer"* hits a bullet under `## Kyle` even if no token in the
 bullet itself overlaps. No embeddings, no API keys, no vector DB —
 BM25 is fine for hundreds of bullets and stays inside the no-API-
 billing constraint. Section-aware indexing was caught in production
 during the M1 smoke test on 2026-05-09; without it, half of recall
-queries returned NONE on bullets a human reading the file would have
-answered.
+queries returned NONE on bullets a human reading the file would
+have answered.
 
-Active recall is a separate `pai-recaller` sub-agent
-(`.claude/agents/pai-recaller.md`) spawned by `gateway.py` before
-every main Pai turn. Its tool list is just `memory_recall`,
-`memory_search`, `memory_get` — nothing else. It returns `NONE` or a
-2-3 line digest, which the gateway prepends to the main Pai prompt as
-an `<active_memory>` block. Ports openclaw's Active Memory plugin
-pattern. Added this branch.
+`memory_search` returns ranked hits with provenance — `{path, line,
+snippet, score}` per hit. It's a tool Pai calls *herself*, mid-turn,
+when she decides she needs to look something up.
+
+### Active recall
+
+Same BM25 underneath, but pre-fetched. Where `memory_search` is
+on-demand inside Pai's main turn, active recall runs *between*
+message arrival and Pai's main call, in a separate claude
+invocation.
+
+The mechanism is the `pai-recaller` sub-agent
+(`.claude/agents/pai-recaller.md`). Its tool list is just
+`memory_recall`, `memory_search`, `memory_get` — nothing else. The
+gateway hands it the inbound message; the recaller decides if
+memory is relevant and returns either `NONE` or a 2-3 line digest.
+The gateway prepends the digest to Pai's main prompt as an
+`<active_memory>` block.
+
+`memory_recall` is the convenience wrapper. It calls `search`
+internally, formats the hits into a compact digest capped at
+`max_chars`, and returns the literal string `NONE` if nothing
+matched. Saves the recaller from doing the formatting plumbing.
+
+Filtering "is any of this relevant" is a different shape of task
+from "answer the user." Pre-fetching the digest beats forcing Pai
+to decide-to-search-then-synthesize every turn, and saves the main
+turn's tokens for actually replying. Ports openclaw's Active Memory
+plugin pattern. Added this branch.
 
 ## Discord gateway
+
+### Gateway loop
 
 Long-lived Python `gateway.py` on the Discord WS, running as a K8s
 Deployment. Per-session queue with a serialization lock (so a flurry
@@ -71,15 +99,19 @@ with hand-off compaction, idle thread sweeper, periodic review every
 health server on `:8080/healthz` for K8s liveness. Most of this
 pre-existed.
 
-Mention detection covers three forms. User mentions (`<@id>`) via
-`msg.mentions`, literal `<@bot_user_id>` substring fallback, and role
-mentions matching any role the bot itself holds. The third one
-matters: Discord autocomplete picks the role over the user when both
-exist with the same name, so without it `@Pai` silently fell through
-to periodic review. Every `on_message` now logs the classification so
-"didn't receive" vs. "received but ignored" is distinguishable in
+### Mention detection
+
+Three forms. User mentions (`<@id>`) via `msg.mentions`, literal
+`<@bot_user_id>` substring fallback, and role mentions matching any
+role the bot itself holds. The third one matters: Discord
+autocomplete picks the role over the user when both exist with the
+same name, so without it `@Pai` silently fell through to periodic
+review. Every `on_message` now logs the classification so "didn't
+receive" vs. "received but ignored" is distinguishable in
 OpenObserve. Role-mention rule + classification logging added this
 branch.
+
+### Thread tracking
 
 Threads bind on mention OR on Pai's own posts. The second case
 matters because Pai often *creates* a thread to reply to a parent-
@@ -88,44 +120,51 @@ silently get ignored. Caught when a follow-up question sat
 unanswered for an hour. Bindings auto-touch on activity and the
 sweeper sends a farewell when they expire.
 
-Catchup on reconnect runs once per `on_ready`. It seals the most
-recent 20 messages older than 60s as already-processed and replays
-anything *newer* through `on_message`. So a mention sent during a
-pod rollout lands in `channel.history()`, gets picked up on connect,
-and gets a reply. The idempotent `processed_ids` set protects
-against the live gateway also redelivering. Added this branch — the
-old "mark last 20, period" logic silently dropped mentions during
-the M1 deploy.
+### Catchup on reconnect
+
+Runs once per `on_ready`. Seals the most recent 20 messages older
+than 60s as already-processed and replays anything *newer* through
+`on_message`. So a mention sent during a pod rollout lands in
+`channel.history()`, gets picked up on connect, and gets a reply.
+The idempotent `processed_ids` set protects against the live
+gateway also redelivering. Added this branch — the old "mark last
+20, period" logic silently dropped mentions during the M1 deploy.
 
 ## Scheduling
 
 Two layers: in-process for short-fuse work, K8s CronJobs for daily
 or recurring schedules.
 
-In-process: `_commitment_tick` in `gateway.py` runs every 60 seconds.
-It polls `COMMITMENTS.md` for entries with `status: pending AND
-due <= now` and spawns Pai with a tight tool list to deliver each.
-Each commitment carries a `precision` field — `precise` for explicit
+### Commitment tick (in-process)
+
+`_commitment_tick` in `gateway.py` runs every 60 seconds. It polls
+`COMMITMENTS.md` for entries with `status: pending AND due <= now`
+and spawns Pai with a tight tool list to deliver each. Each
+commitment carries a `precision` field — `precise` for explicit
 "remind me at..." requests, `soft` for inferred follow-ups — which
 Pai uses to phrase the message; same delivery path either way.
 `memory_save(scope='commitment', ...)` is how Pai inscribes them.
 Ports openclaw's inferred-commitments delivered via heartbeat. Pai
 doesn't have a general 30-minute heartbeat; she's event-driven.
 
-CronJobs: per-task YAML in `infra/ai-agents/cronjobs/helm/templates/`.
-Today: `pai-morning`, `journalist-{morning,noon,evening}`, `seo-bot`,
+### CronJobs (out-of-process)
+
+Per-task YAML in `infra/ai-agents/cronjobs/helm/templates/`. Today:
+`pai-morning`, `journalist-{morning,noon,evening}`, `seo-bot`,
 `autolearn`, `bluesky-rss`, `mastodon-rss`, `tweet-rss`,
 `pai-self-improver`. Each one has its own YAML, its own MCP config,
 its own schedule. No platform abstraction; adding a schedule is a
-copy-paste of the canonical `pai-morning.yaml`. The pattern pre-
-existed. `pai-self-improver` added this branch. `healthcheck`
+copy-paste of the canonical `pai-morning.yaml`. The pattern
+pre-existed. `pai-self-improver` added this branch. `healthcheck`
 deprecated this branch — its state-change posts were noisier than
 they were useful.
 
 ## Tools and performance
 
-Pai's MCP set: `pai-discord` (custom Discord MCP), `pai-memory` (the
-v2 markdown MCP described above), `linear-server` (issues / comments /
+### MCP surface
+
+Pai's MCPs: `pai-discord` (custom Discord MCP), `pai-memory` (the
+v2 markdown MCP described above), `linear-server` (issues, comments,
 statuses), and `playwright` (read-only browser). Linear pre-existed;
 Playwright added this branch with a curated tool list —
 `browser_navigate`, `browser_snapshot`, `browser_take_screenshot`,
@@ -133,9 +172,12 @@ Playwright added this branch with a curated tool list —
 file_upload, no network_request, no drag-drop. WebSearch and
 WebFetch round it out as Claude Code builtins.
 
+### Cold-start optimizations
+
 Cold-start was the most painful piece of the whole branch. Every
 `claude --agent` subprocess on the lima VM was eating 5-30s before
-producing tokens, mostly from MCP server registration. Three changes:
+producing tokens, mostly from MCP server registration. Four
+changes:
 
 - Per-purpose MCP configs in `gateway.py`: `mcp-recall.json`
   (memory only), `mcp-deliver.json` (memory + Discord),
@@ -167,6 +209,8 @@ anyway, without the auto-injection token cost.
 
 ## Self-improvement and observability
 
+### Audit hook → Vector → OpenObserve
+
 The audit hook (`.claude/hooks/audit-log.sh`) is a PostToolUse hook
 that emits structured JSON per tool call: `timestamp`, `session_id`,
 `tool`, `input`, `cwd`, `is_error`, `error_excerpt` (up to 400
@@ -178,11 +222,13 @@ chars). Vector DaemonSet ships container stdout to OpenObserve's
 `o2_get_alert`. The hook + Vector + O2 stack pre-existed; `is_error`
 and `error_excerpt` are this branch.
 
-`pai-self-improver` is the consumer. Daily CronJob at 09:00 UTC,
-mines the last 24h of failures across pai-responder and the cron
-agents, clusters by normalized signature (timestamps, paths, hex
-digests, PIDs redacted before grouping), threshold 3+ recurrences,
-cap 5 proposals per run. Each run produces one Linear issue (label
+### pai-self-improver cron
+
+The consumer of the audit data. Daily CronJob at 09:00 UTC, mines
+the last 24h of failures across pai-responder and the cron agents,
+clusters by normalized signature (timestamps, paths, hex digests,
+PIDs redacted before grouping), threshold 3+ recurrences, cap 5
+proposals per run. Each run produces one Linear issue (label
 `pai-self-improver`) with proposals + one Discord summary. Read-
 only against `MEMORY.md` — Kyle approves, Pai applies. Ports
 openclaw's dreaming consolidation cron. Added this branch.
