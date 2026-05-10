@@ -12,7 +12,10 @@ cronjobs:
       schedule: "0 22 * * *"   # 6:00 PM EDT / 22:00 UTC
   healthcheck:
     enabled: false
-    schedule: "0 13 * * *"   # 9:00 AM EDT / 13:00 UTC
+    schedule: "0 13 * * *"   # 9:00 AM EDT / 13:00 UTC (deprecated — see pai-self-improver)
+  paiSelfImprover:
+    enabled: false
+    schedule: "0 9 * * *"    # 5:00 AM EDT (09:00 UTC) — daily, before paiMorning
   paiMorning:
     enabled: false
     schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC)
