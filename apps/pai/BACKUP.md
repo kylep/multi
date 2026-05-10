@@ -127,6 +127,25 @@ Then verify in GCS (from `apps/pai/tf`):
 gcloud storage ls "gs://$(terraform output -raw bucket_name)/$(date -u +%Y-%m-%d)/"
 ```
 
+### Backup
+
+The TF state file (`apps/pai/tf/terraform.tfstate`) holds the
+bucket, service-account, IAM binding, and the service-account
+key as a sensitive output. It's gitignored and lives only on this
+laptop. macOS Time Machine to the encrypted external disk picks
+it up daily; that's the backup.
+
+If state is ever lost, `terraform apply` re-creates the bucket
+(skipped if `force_destroy=false` and it still exists) and the
+service account, then issues a fresh key — re-run step 2 to push
+the new key into Vault. Existing backup objects in the bucket are
+untouched.
+
+The backup objects themselves don't need a separate backup story.
+GCS Coldline has 99.9% monthly availability and 11-nines durability
+on the underlying storage, and we keep 365 days of nightly snapshots
+in the bucket already.
+
 ### Rotating the service-account key
 
 From `apps/pai/tf`:
