@@ -30,6 +30,9 @@ cronjobs:
   paiSelfImprover:
     enabled: true
     schedule: "0 9 * * *"   # 5:00 AM EDT (09:00 UTC) — daily, before paiMorning
+  paiMemoryBackup:
+    enabled: true
+    schedule: "0 4 * * *"   # 12:00 AM EDT (04:00 UTC) — nightly, before everything else
   paiMorning:
     enabled: true
     schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC)
