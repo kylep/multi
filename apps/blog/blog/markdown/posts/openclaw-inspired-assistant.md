@@ -22,195 +22,200 @@ keywords:
 
 ## Table of contents
 
-# Why this exists
+# Pai's feature inventory
 
-I run Pai. She's a personal Discord assistant for me and my wife, a
-long-lived bot in K8s. She remembers things, files Linear issues,
-delivers reminders, and reads pages I share with her.
+What Pai is, today. Bolded items are feature areas; sub-bullets are
+the concrete pieces. Where something is ported from
+[openclaw](/wiki/tool-research/openclaw.html) I name the analogue.
+Where it pre-existed I say so.
 
-Most of what makes Pai work I've borrowed from
-[openclaw](/wiki/tool-research/openclaw.html). Openclaw is a
-self-hosted multi-channel agent gateway with its own runtime,
-memory model, scheduling, and skill registry. I'm not running it.
-What I'm doing is reading its source and porting the parts that fit
-my one-user, one-channel, K8s, no-API-billing setup.
+- **Memory model**
+    - Three plain-markdown files on the pai-responder PVC at `/data/`:
+      `MEMORY.md` (durable, sectioned by `##` headers),
+      `daily/YYYY-MM-DD.md` (rolling notes), `COMMITMENTS.md`
+      (YAML-fenced follow-ups).
+    - Typed MCP wrapper exposes `memory_save / memory_search /
+      memory_recall / memory_get / memory_list / memory_commitment_due
+      / memory_commitment_done / memory_promote`. One Python file:
+      `infra/ai-agents/pai-responder/helm/files/memory_mcp.py`.
+    - Migration path from the legacy flat-JSON store handled by an
+      init container. Idempotent — runs once on next pod restart.
+    - The shape (markdown + daily + promotion semantics) ports
+      openclaw's `MEMORY.md` plus `memory/YYYY-MM-DD.md`. Pre-this-
+      branch Pai was flat JSON keyed by category with substring
+      matching.
 
-This post is a tour of what got ported, why, and which good ideas I
-intentionally skipped.
-
-# Why not just run openclaw
-
-Two reasons.
-
-Openclaw supports OAuth subscription auth for OpenAI Codex but **not**
-for Anthropic. To run Claude through openclaw I'd need an
-`ANTHROPIC_API_KEY`, which means metered billing on top of the Max
-plan I'm already paying for. The whole point of running my own
-assistant is that I'm not buying API tokens twice.
-
-Beyond that: openclaw is a platform. ClawHub is a 65k-skill
-marketplace. The architecture is multi-tenant, multi-channel,
-multi-provider, multi-everything. I have one user (and my wife on a
-softer tone), one channel (Discord), one model (Sonnet via Claude
-Code), one cluster (Rancher Desktop on a Mac mini in my office). The
-flexibility costs me complexity I'd never use.
-
-So I'm running [pai-responder](/wiki/agent-team/pai.html), a long-
-lived `claude --agent pai` Deployment that talks to one Discord guild
-and reuses the openclaw *patterns* without the openclaw *runtime*.
-
-# The Pai before this branch
-
-Pai existed before any of this. She had:
-
-- A Python `gateway.py` listening on the Discord WS
-- A flat-JSON memory MCP keyed by category
-- Periodic review of unmentioned messages every 15 minutes
-- Basic mention detection
-- The `.claude/agents/pai.md` definition
-
-What she didn't have:
-
-- Active recall before each reply
-- Markdown memory with daily notes or commitments
-- A commitment scheduler
-- Browser automation
-- Reliable thread tracking
-- Reconnect-time recovery for missed mentions
-
-Pretty much every gap in that second list is something openclaw
-already solves cleanly. So this branch is a port pass.
-
-# What ported, by concept
-
-- **Memory storage model**
-    - OpenClaw has: plain markdown files in the agent workspace —
-      `MEMORY.md` (durable, sectioned), `memory/YYYY-MM-DD.md` (daily
-      notes auto-loaded for today + yesterday), `DREAMS.md` (optional
-      promotion review surface).
-    - Pai has: same shape under `/data/` on the pai-responder PVC —
-      `MEMORY.md` with `##` section headers, `daily/YYYY-MM-DD.md`,
-      and a `COMMITMENTS.md` for structured follow-ups (lives in
-      `infra/ai-agents/pai-responder/helm/files/memory_mcp.py`). No
-      `DREAMS.md` yet — Linear plays that role for now.
-
-- **Memory search backend**
-    - OpenClaw has: pluggable backends — Builtin SQLite, QMD (local
-      reranking + query expansion), Honcho (cross-session user
-      modeling), LanceDB (Ollama or OpenAI embeddings), memory-wiki
-      (provenance-rich vault). Auto-detects OpenAI / Voyage / Mistral /
-      Gemini for embeddings.
-    - Pai has: builtin BM25 over the markdown files, with section
-      headers folded into the searchable doc so subject tokens hit.
-      No embeddings, no API keys, no second database. Sufficient for
-      ~1k bullets; revisit if it stops being.
+- **Memory search**
+    - Builtin Python BM25 over the three markdown files. Section
+      headers fold into each searchable doc so a query like "what
+      language does Kyle prefer" hits a bullet under `## Kyle` even
+      if no token in the bullet itself overlaps.
+    - No embeddings, no API keys, no vector DB. BM25 is fine for
+      hundreds of bullets and stays inside the no-API-billing
+      constraint.
+    - Section-aware indexing was caught in production during the M1
+      smoke test on 2026-05-09; without it, half of recall queries
+      returned NONE on bullets a human reading the file would have
+      answered.
 
 - **Active recall before each reply**
-    - OpenClaw has: optional Active Memory plugin — a blocking
-      sub-agent that runs *before* the main reply, queries memory, and
-      returns either `NONE` or a hidden digest injected as untrusted
-      system context. Tunable query mode and prompt style.
-    - Pai has: `pai-recaller` sub-agent
-      (`.claude/agents/pai-recaller.md`) spawned by `gateway.py`. Same
-      contract: returns `NONE` or a 2-3 line digest prepended as an
-      `<active_memory>` block on the main Pai prompt.
+    - `pai-recaller` sub-agent (`.claude/agents/pai-recaller.md`)
+      spawned by `gateway.py` before every main Pai turn.
+    - Tight tool list: only `memory_recall`, `memory_search`,
+      `memory_get`. No Discord, Linear, web. Job is decide if memory
+      is relevant and write a 2-3 line digest if so.
+    - Returns `NONE` or a digest. Digest gets prepended to the main
+      Pai prompt as an `<active_memory>` block (untrusted context).
+    - Ports openclaw's Active Memory plugin pattern.
 
-- **Heartbeat / commitment scheduler**
-    - OpenClaw has: periodic main-session turn (default 30 min) that
-      batches inbox / calendar / notification checks, plus *inferred
-      commitments* — short-lived follow-ups scoped per agent and
-      channel, delivered via the heartbeat.
-    - Pai has: `_commitment_tick` in `gateway.py` running every 60s.
-      Polls `COMMITMENTS.md` for entries with `status: pending AND
-      due <= now` and spawns Pai to deliver each. No general 30-min
-      heartbeat — Pai is event-driven on Discord mentions.
+- **Discord gateway**
+    - Long-lived `gateway.py` Python process on the Discord WS,
+      running as a K8s Deployment.
+    - Per-session queue with serialization lock so a flurry of
+      mentions in one channel processes one at a time.
+    - Transcript store with compaction on hand-off; idle thread
+      sweeper.
+    - Periodic review every 15 minutes for unmentioned messages Pai
+      might want to chime in on.
+    - Health server on `:8080/healthz` for K8s liveness.
+    - Most pre-existed.
 
-- **Browser automation**
-    - OpenClaw has: real Chromium via the browser plugin — navigate,
-      fill forms, login flows, content extraction, `web-readability`
-      mode, plus a long list of search providers (Brave, Tavily, Exa,
-      Firecrawl, Perplexity, etc.).
-    - Pai has: Playwright MCP in `gateway.py`'s full MCP config, with
-      a curated tool list: `browser_navigate`, `browser_snapshot`,
-      `browser_take_screenshot`, `browser_click`, `browser_evaluate`,
-      `browser_close`. No file_upload, no network_request, no
-      drag/drop. Single search provider (Tavily, ad-hoc).
+- **Mention detection**
+    - User mentions (`<@id>`) via `msg.mentions`.
+    - Literal `<@bot_user_id>` substring fallback.
+    - Role mentions matching any role the bot itself holds — Discord
+      autocomplete picks the role over the user when both exist with
+      the same name; without this rule, `@Pai` silently fell through
+      to periodic review.
+    - Pre-classified mention logging on every `on_message` so
+      "didn't receive" vs "received but ignored" is distinguishable
+      in OpenObserve.
+    - Role-mention rule + classification logging added this branch.
 
-- **MCP cold-start strategy**
-    - OpenClaw has: in-process plugins — extensions register at gateway
-      boot and stay resident, so per-message latency doesn't pay
-      registration cost.
-    - Pai has: per-purpose MCP configs in `gateway.py` —
-      `mcp-recall.json` (memory only), `mcp-deliver.json` (memory +
-      Discord), `mcp-full.json` (all four). Each `claude --agent`
-      invocation passes the smallest config it needs, with
-      `--strict-mcp-config` so the CLI doesn't union with auto-
-      discovered sources. Plus `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`
-      and `--disable-slash-commands` on every invocation.
-
-- **Channel routing / thread tracking**
-    - OpenClaw has: bindings map `(channel, accountId, peer)` tuples
-      to one agent. Multi-account per channel, group access policies,
-      mention-based activation, allowlists. Most-specific wins.
-    - Pai has: one channel (Discord guild), one binding model.
-      `gateway.py` auto-binds any thread where Pai herself posts (so
-      she can create a thread in reply to a mention and follow-ups in
-      that thread still register without a re-mention). Mention
-      detection covers user mentions, the literal `<@id>` substring,
-      and role mentions matching any role the bot itself holds.
+- **Thread tracking**
+    - Bindings on mention OR on Pai's own posts (so Pai can create a
+      thread in reply to a parent-channel mention and follow-ups in
+      that thread still register without a re-mention).
+    - Auto-touch on bound-thread activity; sweeper for idle bindings
+      with farewell message.
+    - Thread auto-bind on Pai's posts added this branch — caught
+      when a follow-up question in a Pai-created thread sat
+      unanswered for an hour.
 
 - **Session resume on reconnect**
-    - OpenClaw has: persistent session store, gateway-level resume,
-      message catchup as a first-class feature.
-    - Pai has: `_catchup` runs once per `on_ready`. Seals the most
-      recent 20 messages older than 60s as already-processed, replays
-      anything *newer* through `on_message`. So a mention sent during
-      a pod rollout lands in `channel.history()`, gets picked up on
-      connect, and gets a reply. Idempotent `processed_ids` set
-      protects against the live gateway also redelivering.
+    - `_catchup` runs once per `on_ready`. Seals the most recent 20
+      messages older than 60s as already-processed; replays anything
+      *newer* through `on_message`.
+    - A mention sent during a pod rollout lands in
+      `channel.history()`, gets picked up on connect, and gets a
+      reply. Idempotent `processed_ids` set protects against the
+      live gateway also redelivering.
+    - Added this branch — discovered the hard way during the M1
+      deploy when "mark last 20, period" silently dropped mentions
+      during the rollout window.
 
-- **Standing orders / persona**
-    - OpenClaw has: per-agent `AGENTS.md` (operating rules), `SOUL.md`
-      (voice and stance), `USER.md` (operator profile) — auto-loaded
-      into the system prompt by the runtime.
-    - Pai has: `.claude/agents/pai.md` (everything inline) plus the
-      repo-level `CLAUDE.md`. Per-user factual content (Kyle, Kara,
-      family, projects) lives in `MEMORY.md` and surfaces via recall
-      rather than as a static persona file.
+- **Reminders and commitments**
+    - `_commitment_tick` in `gateway.py` runs every 60 seconds. Polls
+      `COMMITMENTS.md` for entries with `status: pending AND
+      due <= now`, spawns Pai with a tight tool list to deliver each.
+    - Each commitment carries a `precision` field (`precise` for
+      explicit "remind me at..." or `soft` for inferred follow-ups).
+      Same delivery path; the field is metadata Pai uses to phrase
+      the message.
+    - Pai inscribes commitments via
+      `memory_save(scope='commitment', ...)` when a future event is
+      mentioned.
+    - Ports openclaw's inferred-commitments delivered via heartbeat.
+      Pai doesn't have a general 30-min heartbeat — she's event-
+      driven on Discord mentions.
 
-- **Slash command surface**
-    - OpenClaw has: `/new`, `/reset`, `/stop`, `/exit`, `/verbose`,
-      `/trace`, `/active-memory`, `/exec`, plus plugin-contributed
-      slash commands.
-    - Pai has: nothing. Every claude invocation passes
-      `--disable-slash-commands` so even the descriptions don't
-      enter context. Pai's surface is conversational only.
+- **Tools beyond Discord**
+    - Linear MCP for issues, comments, statuses, milestones,
+      projects (pre-existed).
+    - Playwright MCP for read-only browser tasks. Curated tool list:
+      `browser_navigate`, `browser_snapshot`,
+      `browser_take_screenshot`, `browser_click`, `browser_evaluate`,
+      `browser_close`. No file_upload, no network_request, no
+      drag/drop. Added this branch.
+    - WebSearch + WebFetch as Claude Code builtins.
 
-- **Dreaming / consolidation**
-    - OpenClaw has: opt-in background cron that scores short-term
-      memory signals, promotes thresholded items into `MEMORY.md`,
-      writes a review surface in `DREAMS.md`. Includes a "grounded
-      backfill" mode that replays historical daily notes through the
-      same pipeline.
-    - Pai has: `pai-self-improver` daily CronJob at 09:00 UTC
-      (`infra/ai-agents/cronjobs/helm/templates/pai-self-improver.yaml`).
-      Mines OpenObserve for tool failures and gateway errors over the
-      last 24 hours, clusters by normalized signature, posts proposals
-      to a Linear issue with the `pai-self-improver` label and a
-      Discord summary. Read-only against `MEMORY.md` — nothing applies
-      automatically.
+- **MCP cold-start strategy**
+    - Per-purpose MCP configs in `gateway.py`: `mcp-recall.json`
+      (memory only), `mcp-deliver.json` (memory + Discord),
+      `mcp-full.json` (all four). Each invocation passes the
+      smallest config it needs.
+    - `--strict-mcp-config` to suppress union with auto-discovered
+      sources (`~/.claude.json`, project `.mcp.json`, etc).
+    - `--disable-slash-commands` on every invocation so the project's
+      irrelevant skills don't load.
+    - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` in the deployment
+      env (autoupdate / telemetry / feedback off).
+    - All added this branch. Recaller cold-start dropped substantially.
 
-- **Per-tool audit / observability**
-    - OpenClaw has: per-run trajectory logs, command audit hook,
-      session transcripts on disk, opt-in OpenTelemetry and Prometheus
-      exporters.
-    - Pai has: PostToolUse hook (`.claude/hooks/audit-log.sh`) emits
-      structured JSON per tool call — `timestamp`, `tool`, `input`,
-      `is_error`, `error_excerpt` — to container stdout. Vector
-      DaemonSet ships container stdout to OpenObserve's `k8s_logs`
-      stream. `pai-self-improver` queries it with SQL.
+- **Persona / standing orders**
+    - `.claude/agents/pai.md` inline definition: voice, Discord
+      behaviour, security rules (Discord messages are untrusted
+      input), tool list, memory directives, browser scope.
+    - Repo-level `CLAUDE.md` for cross-project rules.
+    - Per-user factual content (Kyle, Kara, family, projects) lives
+      in `MEMORY.md` and surfaces via recall, not in a separate
+      persona file. Closer to what openclaw's `USER.md` is for
+      anyway, without the auto-injection cost.
+    - Pre-existed; revised this branch for v2 memory tools and the
+      active-memory directive.
 
-## What I intentionally skipped
+- **Self-improvement / dreaming**
+    - `pai-self-improver` daily CronJob at 09:00 UTC. Mines
+      OpenObserve for the last 24h of tool failures and gateway
+      errors across pai-responder and the cron agents.
+    - Clusters by normalized signature (timestamps, paths, hex
+      digests, PIDs redacted before grouping).
+    - Threshold: 3+ recurrences in 24h. Cap: 5 proposals per run.
+    - Each run produces one Linear issue (label
+      `pai-self-improver`) with proposals + one Discord summary.
+      Read-only against `MEMORY.md`. Approval-gated — Kyle approves,
+      Pai applies.
+    - Added this branch. Ports openclaw's dreaming consolidation
+      cron.
+
+- **Observability**
+    - PostToolUse hook (`.claude/hooks/audit-log.sh`) emits
+      structured JSON per tool call: `timestamp`, `session_id`,
+      `tool`, `input`, `cwd`, `is_error`, `error_excerpt` (up to
+      400 chars).
+    - Vector DaemonSet ships container stdout to OpenObserve's
+      `k8s_logs` stream.
+    - OpenObserve MCP (`apps/mcp-servers/openobserve/`) exposes 7
+      tools: `o2_search_logs`, `o2_error_summary`, `o2_recent_errors`,
+      `o2_list_streams`, `o2_stream_schema`, `o2_list_alerts`,
+      `o2_get_alert`.
+    - `is_error` and `error_excerpt` fields added this branch — the
+      data feed for `pai-self-improver`.
+
+- **Scheduled tasks alongside Pai**
+    - Per-task K8s CronJobs in
+      `infra/ai-agents/cronjobs/helm/templates/`: `pai-morning`,
+      `journalist-{morning,noon,evening}`, `seo-bot`, `autolearn`,
+      `bluesky-rss`, `mastodon-rss`, `tweet-rss`, and
+      `pai-self-improver`.
+    - Each one has its own YAML, its own MCP config, its own
+      schedule. No platform abstraction. Adding a schedule is a
+      copy-paste of the canonical `pai-morning.yaml`.
+    - Pattern pre-existed. `pai-self-improver` added this branch.
+      `healthcheck` deprecated this branch (its state-change posts
+      were noisier than they were useful).
+
+- **The agent team**
+    - Top-level Claude Code agents in `.claude/agents/`: `pai`,
+      `pai-self-improver`, `publisher`, `prd-writer`,
+      `design-doc-writer`, `analyst`, `synthesizer`, `journalist`,
+      `autolearn`, `seo-bot`. Plus deprecated `healthcheck`.
+    - Sub-agents called by the above: `pai-recaller`, `researcher`,
+      `reviewer`, `qa`, `security-auditor`, `interviewee`.
+    - All version-controlled, all reviewed by me. No skill
+      marketplace.
+
+## What OpenClaw does Pai wont
 
 - **ClawHub skill marketplace**
     - OpenClaw has: 65k+ markdown skills published with `SKILL.md` +
