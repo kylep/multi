@@ -81,3 +81,25 @@ last_verified: 2026-05-10
 ## Local
 
 - [CBC News](https://www.cbc.ca/lite/news/canada/ontario/durham?sort=latest) Durham Region police are requesting a $1.1 billion budget, which could push residents' property tax increase above 10% next year.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-08/anthropic-inks-1-8-billion-computing-deal-with-akamai) Anthropic signed a seven-year, $1.8 billion computing deal with Akamai Technologies to handle surging Claude demand. Akamai did not name the customer at announcement; Bloomberg confirmed it as Anthropic. Akamai stock closed up 27% on May 8, its largest single-day gain in over 22 years.
+
+## AI Tooling
+
+- [Anthropic Blog](https://claude.com/blog/new-in-claude-managed-agents) Anthropic launched three new Claude Managed Agents features at its Code w/ Claude event (May 6): multi-agent orchestration for assigning subtasks across agent fleets, Outcomes for rubric-based self-evaluation with automatic retry, and Dreaming — a background process that reviews past sessions and updates agent memory to improve future runs. Outcomes and multi-agent orchestration are in public beta; Dreaming is in research preview.
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/medtronic-hack-confirmed-after-shinyhunters-threatens-data-leak/) Medtronic confirmed on April 24 that ShinyHunters accessed corporate IT systems and claimed theft of approximately 9 million records. The company said manufacturing, distribution, and patient-connected networks were isolated and unaffected.
+
+- [The Hacker News](https://thehackernews.com/2026/04/cisa-adds-actively-exploited.html) CISA added CVE-2024-1708 (ConnectWise ScreenConnect path traversal, CVSS 8.4) and CVE-2026-32202 (Windows Shell protection bypass, CVSS 4.3, linked to APT28) to the Known Exploited Vulnerabilities catalog. Federal remediation deadline is May 12.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/toronto-cleanup-fifa-9.7190959) Toronto launched an expanded citywide cleanup blitz ahead of the FIFA World Cup, with the city's first match roughly five weeks out. Around 400 city staff will run weekend blitzes from May through October targeting potholes, graffiti, litter, and illegal dumping. Some community workers raised concerns that the effort could result in the displacement of unhoused residents near venue areas.
