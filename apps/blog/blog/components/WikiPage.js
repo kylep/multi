@@ -65,6 +65,7 @@ export function WikiPage({ wikiContent }) {
 		<Box>
 			<Head>
 				<title>{title} - Bot-Wiki</title>
+				<meta name="robots" content="noindex,follow" />
 				<meta name="description" content={summary} />
 				{keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
 				<link rel="canonical" href={canonicalUrl} />
