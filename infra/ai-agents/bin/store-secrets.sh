@@ -249,6 +249,47 @@ prompt_or_env CLOUDFLARE_TUNNEL_TOKEN "Cloudflare Tunnel token (pai-m1)$(already
 [ -n "${CLOUDFLARE_TUNNEL_TOKEN:-}" ] && kv_store cloudflare "tunnel_token=$CLOUDFLARE_TUNNEL_TOKEN"
 
 echo ""
+echo "=== Google Cloud Storage (Pai memory backups) ==="
+EXISTING_GCS=$(get_existing gcs)
+# Service account JSON — accept base64 env or file path.
+GCS_KEY_TMPFILE=""
+GCS_KEY_SET=""
+if [ -n "${GCS_KEY_B64:-}" ]; then
+  echo "GCS service account key (from base64 env)"
+  GCS_KEY_TMPFILE=$(mktemp)
+  echo "$GCS_KEY_B64" | base64 -d > "$GCS_KEY_TMPFILE"
+  GCS_KEY_SET="set"
+elif [ -n "${GCS_KEY_FILE:-}" ]; then
+  echo "GCS service account key (from file path env)"
+  GCS_KEY_TMPFILE="$GCS_KEY_FILE"
+  GCS_KEY_SET="set"
+else
+  prompt_or_env GCS_KEY_FILE "GCS service account JSON path$(already_set "$EXISTING_GCS" key)"
+  if [ -n "${GCS_KEY_FILE:-}" ]; then
+    GCS_KEY_TMPFILE="$GCS_KEY_FILE"
+    GCS_KEY_SET="set"
+  fi
+fi
+prompt_or_env GCS_BACKUP_BUCKET "GCS bucket name (without gs://)$(already_set "$EXISTING_GCS" bucket)"
+[ -n "${GCS_BACKUP_BUCKET:-}" ] && kv_store gcs "bucket=$GCS_BACKUP_BUCKET"
+if [ -n "$GCS_KEY_SET" ] && [ -f "$GCS_KEY_TMPFILE" ]; then
+  cleanup_gcs_pem() {
+    kubectl exec -n vault vault-0 -- rm -f /tmp/gcs-key.json 2>/dev/null || true
+    if [ -n "${GCS_KEY_B64:-}" ] && [ -n "$GCS_KEY_TMPFILE" ]; then
+      rm -f "$GCS_KEY_TMPFILE"
+    fi
+  }
+  trap cleanup_gcs_pem EXIT
+  kubectl cp "$GCS_KEY_TMPFILE" vault/vault-0:/tmp/gcs-key.json
+  kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+    vault kv patch secret/ai-agents/gcs key=@/tmp/gcs-key.json 2>/dev/null \
+  || kubectl exec -n vault vault-0 -- env "VAULT_TOKEN=$ROOT_TOKEN" \
+    vault kv put secret/ai-agents/gcs key=@/tmp/gcs-key.json
+  cleanup_gcs_pem
+  trap - EXIT
+fi
+
+echo ""
 echo "=== OpenObserve ==="
 EXISTING_OPENOBSERVE=$(get_existing openobserve)
 prompt_or_env OPENOBSERVE_ADMIN_EMAIL "OpenObserve admin email$(already_set "$EXISTING_OPENOBSERVE" root_user_email)"
@@ -260,7 +301,8 @@ OPENOBSERVE_ARGS=""
 [ -n "$OPENOBSERVE_ARGS" ] && kv_store openobserve $OPENOBSERVE_ARGS
 
 echo ""
-echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,google,bluesky,webhook,cloudflare,openobserve}"
+echo "Secrets stored. Paths: secret/ai-agents/{anthropic,openrouter,github,discord,pai,google,bluesky,webhook,cloudflare,gcs,openobserve}"
 echo "  pai: discord_bot_token, claude_oauth_token, linear_api_key"
 echo "  cloudflare: tunnel_token"
+echo "  gcs: key (service account JSON), bucket"
 echo "  openobserve: root_user_email, root_user_password"

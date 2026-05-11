@@ -1,0 +1,168 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pai-memory-backup
+  namespace: ai-agents
+spec:
+  schedule: {{ .Values.cronjobs.paiMemoryBackup.schedule | quote }}
+  timeZone: "UTC"
+  # 24h deadline so a backup that missed its slot during a laptop sleep
+  # still fires once the cluster is back up.
+  startingDeadlineSeconds: 86400
+  suspend: {{ not .Values.cronjobs.paiMemoryBackup.enabled }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 7
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 600
+      ttlSecondsAfterFinished: 7200
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/role: "ai-agents"
+            vault.hashicorp.com/agent-inject-secret-config: "secret/ai-agents/discord"
+            vault.hashicorp.com/agent-inject-template-config: |
+              {{`{{- with secret "secret/ai-agents/discord" -}}`}}
+              export DISCORD_BOT_TOKEN="{{`{{ .Data.data.discord_bot_token }}`}}"
+              export DISCORD_LOG_CHANNEL_ID="{{`{{ .Data.data.discord_log_channel_id }}`}}"
+              {{`{{- end -}}`}}
+            vault.hashicorp.com/agent-inject-secret-bucket: "secret/ai-agents/gcs"
+            vault.hashicorp.com/agent-inject-template-bucket: |
+              {{`{{- with secret "secret/ai-agents/gcs" -}}`}}
+              export GCS_BUCKET="{{`{{ .Data.data.bucket }}`}}"
+              {{`{{- end -}}`}}
+            # Service account JSON written as its own file so gcloud can
+            # consume it via --key-file. Multiline content can't ride in
+            # the export-shell template above.
+            vault.hashicorp.com/agent-inject-secret-gcs-key: "secret/ai-agents/gcs"
+            vault.hashicorp.com/agent-inject-template-gcs-key: |
+              {{`{{- with secret "secret/ai-agents/gcs" -}}{{ .Data.data.key }}{{- end -}}`}}
+        spec:
+          serviceAccountName: cronjob-agent
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: backup
+              # google/cloud-sdk full image (not slim) ships kubectl,
+              # gcloud, gsutil, jq, curl. Pinned for supply-chain reasons.
+              # Bump deliberately when needed.
+              image: google/cloud-sdk:528.0.0
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: HOME
+                  value: /tmp
+                - name: CLOUDSDK_CONFIG
+                  value: /tmp/gcloud-config
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -eo pipefail
+                  . /vault/secrets/config
+                  . /vault/secrets/bucket
+
+                  RUN_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-8)
+                  AGENT="pai-memory-backup"
+                  STAMP=$(date -u '+%Y-%m-%d')
+
+                  # Structured JSON to stdout so Vector + OpenObserve
+                  # ingest with the right log_level. Matches the regex in
+                  # vector-values.yaml that tags the row with log_level
+                  # from "[LEVEL]" prefix in the message field.
+                  log() {
+                    LEVEL="$1"; shift
+                    MSG="$*"
+                    jq -nc \
+                      --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+                      --arg level "$LEVEL" \
+                      --arg agent "$AGENT" \
+                      --arg run "$RUN_ID" \
+                      --arg msg "[$LEVEL] $MSG" \
+                      '{ts: $ts, log_level: ($level|ascii_downcase), agent: $agent, run_id: $run, message: $msg}'
+                  }
+
+                  discord_post() {
+                    [ -n "${DISCORD_BOT_TOKEN:-}" ] || return 0
+                    [ -n "${DISCORD_LOG_CHANNEL_ID:-}" ] || return 0
+                    PAYLOAD=$(jq -n --arg c "$1" '{content: $c}')
+                    curl -sf -X POST \
+                      "https://discord.com/api/v10/channels/${DISCORD_LOG_CHANNEL_ID}/messages" \
+                      -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
+                      -H "Content-Type: application/json" \
+                      -d "$PAYLOAD" > /dev/null || true
+                  }
+
+                  fail() {
+                    log ERROR "$*"
+                    discord_post "🔴 ${RUN_ID} | ${AGENT} | $*"
+                    exit 1
+                  }
+
+                  log INFO "starting backup run"
+
+                  # 1. gcloud auth via vault-injected service account JSON.
+                  if [ ! -s /vault/secrets/gcs-key ]; then
+                    fail "GCS key not present at /vault/secrets/gcs-key"
+                  fi
+                  gcloud auth activate-service-account \
+                    --key-file=/vault/secrets/gcs-key 2>&1 \
+                    | tee /tmp/gcloud-auth.log \
+                    | grep -E '^(Activated|ERROR)' || true
+                  if ! gcloud auth list \
+                    --filter=status:ACTIVE \
+                    --format='value(account)' 2>/dev/null | grep -q .; then
+                    fail "gcloud auth activate-service-account failed"
+                  fi
+
+                  # 2. Locate the running pai-responder pod.
+                  POD=$(kubectl -n ai-agents get pods \
+                    -l app.kubernetes.io/name=pai-responder \
+                    --field-selector=status.phase=Running \
+                    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+                  if [ -z "$POD" ]; then
+                    fail "no Running pai-responder pod found in ai-agents namespace"
+                  fi
+                  log INFO "source pod=$POD"
+
+                  # 3. Stream the tarball directly from the pod's PVC to
+                  # GCS. No intermediate disk write — keeps the cron pod's
+                  # ephemeral storage tiny and avoids leaving a copy
+                  # behind on failure.
+                  TARGET="gs://${GCS_BUCKET}/${STAMP}/data.tar.gz"
+                  if ! kubectl -n ai-agents exec "$POD" -- \
+                       tar -czf - -C / data 2>/dev/null \
+                     | gcloud storage cp - "$TARGET"; then
+                    fail "tar/upload pipeline failed (target=$TARGET pod=$POD)"
+                  fi
+
+                  # 4. Verify the upload landed and is non-trivial in size.
+                  SIZE=$(gcloud storage ls -l "$TARGET" 2>/dev/null \
+                    | awk 'NR==1{print $1}')
+                  if [ -z "$SIZE" ] || [ "$SIZE" -lt 100 ]; then
+                    fail "uploaded object is missing or suspiciously small (size=${SIZE:-unknown})"
+                  fi
+                  log INFO "backup ok target=$TARGET size_bytes=$SIZE"
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}

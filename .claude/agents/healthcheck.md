@@ -1,10 +1,11 @@
 ---
 name: healthcheck
 description: >-
-  K8s cluster health check agent. Checks pod status, ArgoCD sync,
-  CronJob success, OpenObserve error logs, and Vault seal status.
-  Files bugs to Linear with deduplication. Use for manual or scheduled
-  health checks.
+  DEPRECATED 2026-05-10 — superseded by pai-self-improver. Kept for
+  ad-hoc invocation (`claude --agent healthcheck`) when you want a
+  quick read on pod status, ArgoCD sync, and Vault seal. The cron is
+  off in pai-m1; the actually-useful daily signal lives in
+  pai-self-improver. Don't extend this file — extend that one.
 model: sonnet
 tools:
   - Bash

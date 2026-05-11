@@ -148,6 +148,9 @@ def parse_commitments(content: str) -> list[dict]:
     """Parse YAML-fenced commitment blocks separated by `---`.
 
     Returns list of dicts with frontmatter keys plus 'content' (body).
+    Frontmatter blocks without an `id:` field are treated as malformed
+    and skipped — protects against bare `---` lines accidentally
+    landing in a body and shifting the pair-walk.
     """
     if not content.strip():
         return []
@@ -174,6 +177,11 @@ def parse_commitments(content: str) -> list[dict]:
             if ":" in fm_line:
                 k, _, v = fm_line.partition(":")
                 d[k.strip()] = v.strip()
+        if "id" not in d:
+            # Frontmatter without an id is structurally malformed — skip
+            # rather than emit a junk dict that would corrupt round-trip
+            # writes.
+            continue
         d["content"] = body.strip("\n")
         cmts.append(d)
     return cmts
@@ -210,6 +218,14 @@ def add_commitment(
     source: str = "",
 ) -> str:
     """Append a new pending commitment, return its id."""
+    # Block-separator confusion guard: a bare `---` line inside a body
+    # would re-pair the parse output and lose neighbouring commitments
+    # on round-trip. Reject the write and ask the caller to escape.
+    if any(line.strip() == "---" for line in content.splitlines()):
+        raise ValueError(
+            "commitment body cannot contain a bare '---' line "
+            "(would corrupt the block separator on read)"
+        )
     existing = path.read_text() if path.exists() else ""
     cmts = parse_commitments(existing)
     cmt_id = "c-" + uuid.uuid4().hex[:8]
@@ -366,8 +382,16 @@ class MemoryStore:
             for i, score in hits[:limit]
         ]
 
-    def recall(self, query: str, max_chars: int = 400) -> str:
-        hits = self.search(query, limit=10)
+    def recall(
+        self,
+        query: str,
+        scope: str | None = "long",
+        max_chars: int = 400,
+    ) -> str:
+        # Default scope is "long" so recall surfaces durable facts and
+        # daily-note chatter doesn't drown them out as the daily corpus
+        # grows. Caller can pass scope=None to broaden.
+        hits = self.search(query, scope=scope, limit=10)
         if not hits:
             return "NONE"
         out_lines: list[str] = []
@@ -383,7 +407,15 @@ class MemoryStore:
         return "\n".join(out_lines)
 
     def get(self, path: str, lines: tuple[int, int] | None = None) -> str:
-        p = Path(path)
+        # Containment check: only allow reads under data_dir. Without
+        # this, an inbound Discord prompt could ask the recaller to
+        # `memory_get('/vault/secrets/config')` and exfiltrate tokens
+        # via the active_memory digest.
+        p = Path(path).resolve()
+        try:
+            p.relative_to(self.data_dir.resolve())
+        except ValueError:
+            return f"(path outside memory dir: {path})"
         if not p.exists():
             return f"(file not found: {path})"
         if lines is None:
@@ -432,6 +464,9 @@ class MemoryStore:
         return commitments_due_at(self.commitments_path, when)
 
     def promote(self, date_str: str, line_num: int, section: str = "Promoted") -> str:
+        # Validate date_str shape so a `..` traversal can't escape daily_dir.
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date_str):
+            return f"invalid date_str: {date_str!r} (expected YYYY-MM-DD)"
         daily_path = self.daily_dir / f"{date_str}.md"
         if not daily_path.exists():
             return f"daily/{date_str}.md not found"
@@ -499,9 +534,17 @@ async def memory_search(query: str, scope: str = "", limit: int = 5) -> str:
 
 
 @mcp.tool()
-async def memory_recall(query: str, max_chars: int = 400) -> str:
-    """Compact digest. Returns 'NONE' if no relevant memory."""
-    return _get_store().recall(query=query, max_chars=max_chars)
+async def memory_recall(query: str, scope: str = "long", max_chars: int = 400) -> str:
+    """Compact digest. Returns 'NONE' if no relevant memory.
+
+    scope: 'long' (default — durable facts only), 'daily', 'commitment',
+           or '' / 'all' to search across everything. Default to 'long'
+           so daily-note volume doesn't dilute durable-fact ranking.
+    """
+    s: str | None = scope
+    if scope in ("", "all"):
+        s = None
+    return _get_store().recall(query=query, scope=s, max_chars=max_chars)
 
 
 @mcp.tool()

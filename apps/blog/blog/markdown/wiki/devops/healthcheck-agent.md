@@ -1,12 +1,13 @@
 ---
 title: "Health Check Agent"
-summary: "Automated K8s cluster health checking with Linear bug filing and deduplication."
+summary: "DEPRECATED — superseded by pai-self-improver. Kept for ad-hoc cluster checks."
 keywords:
   - health-check
   - kubernetes
   - openobserve
   - linear
   - agent
+  - deprecated
 related:
   - wiki/devops/openobserve.html
   - wiki/mcp-servers/openobserve.html
@@ -14,6 +15,18 @@ related:
 scope: "How the health check agent works, what it checks, and how it files bugs."
 last_verified: 2026-03-25
 ---
+
+> **Deprecated 2026-05-10.** The healthcheck CronJob was suspended on
+> pai-m1 because its state-change posts were noise more than signal.
+> The daily diagnostic loop is now [`pai-self-improver`](/wiki/agent-team/pai-self-improver.html),
+> which mines OpenObserve for recurring patterns and proposes memory
+> changes for human approval.
+>
+> The healthcheck agent file is still on disk for ad-hoc invocation
+> (`claude --agent healthcheck`) when you want a quick pod / ArgoCD /
+> Vault read. The old shell-only `healthcheck.sh` cron lives at
+> `infra/ai-agents/cronjobs/scripts/healthcheck.sh` if you ever want
+> to flip it back on temporarily.
 
 ## Overview
 
