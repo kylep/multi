@@ -26,6 +26,7 @@ MANIFEST=(
   "Bluesky App Password (Blog Crosspost Bot)  | BLUESKY_APP_PASS       | password"
   "Bluesky App Password (Blog Crosspost Bot)  | BLUESKY_HANDLE         | username"
   "Mastodon Access Token (Blog Crosspost Bot) | MASTODON_ACCESS_TOKEN  | password"
+  "Mem0 API Key                               | MEM0_API_KEY           | password"
 )
 
 # ---------------------------------------------------------------------------

@@ -24,6 +24,7 @@ git history.
 - [Agent Team](/wiki/agent-team.html) — Roles, org chart, coordination model
 - [RCA](/wiki/rca.html) — Post-mortems on agent team failures
 - [Research](/wiki/research.html) — Deep Research reports for reference and analysis
+- [Tool Research](/wiki/tool-research.html) — Industry tools evaluated as they are, with ecosystem-fit assessments
 - [History](/wiki/history.html) — Agent ecosystem changelog and architecture decisions
 - [Security](/wiki/security.html) — OWASP LLM Top 10, confidential data policy
 - [Custom Tools](/wiki/custom-tools.html) — MCP servers, OpenClaw skills, Docker images

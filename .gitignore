@@ -51,3 +51,4 @@ token.json
 
 # Xcode project Claude config
 apps/games/sillyapp/sillyapp.xcodeproj/.claude/
+infra/ai-agents/pai-responder/.venv/

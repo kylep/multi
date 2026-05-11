@@ -9,7 +9,7 @@ related:
   - wiki/prds
   - wiki/devops
 scope: "Index of design documents. Each doc captures the technical approach, trade-offs, and rationale for a significant system change."
-last_verified: 2026-03-16
+last_verified: 2026-05-08
 ---
 
 Technical design documents for significant architecture decisions.
@@ -36,3 +36,4 @@ section feeds directly into Claude Code's plan mode for implementation.
 - [Hardened IaC Bootstrap](hardened-iac-bootstrap.html) — Helmfile-orchestrated bootstrap with Vault secrets, PSS restricted, ResourceQuota (draft, 2026-03-17)
 - [Autonomous Security Improvement Loop](security-improvement-loop.html) — Bash wrapper invoking Claude Code for iterative Mac workstation hardening with adversarial verification (draft, 2026-03-18)
 - [Security Improvement Log](security-improvement-log.html) — Structured log of autonomous security improvements
+- [Pai Improvements](pai-improvements.html) — Markdown-backed memory MCP, active recall via pai-recaller sub-agent, 1-min commitment scheduler, browser automation. Single-user Discord assistant on Claude Max OAuth (draft, 2026-05-08)
