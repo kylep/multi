@@ -44,6 +44,11 @@ spec:
           args:
             - |
               set -e
+              # Idempotent: kubelet re-runs init containers when the pod
+              # sandbox is recreated (network glitch, node reboot), but
+              # the workspace emptyDir survives the sandbox change, so a
+              # naive `git clone` fails with "destination already exists".
+              rm -rf /workspace/repo
               git clone --depth 1 --branch {{ .Values.repo.branch }} \
                 {{ .Values.repo.url }} /workspace/repo
           resources:
