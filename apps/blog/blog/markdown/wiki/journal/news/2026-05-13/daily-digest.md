@@ -53,3 +53,28 @@ last_verified: 2026-05-13
 ## Just for You
 
 - [InfoQ](https://www.infoq.com/news/2026/02/argocd-33/) ArgoCD 3.1 reached end of life on May 6 and no longer receives security updates. Users should upgrade to v3.2, v3.3, or v3.4.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/05/13/anthropic-now-has-more-business-customers-than-openai-according-to-ramp-data/) Anthropic has more paying business customers than OpenAI for the first time, per Ramp's May AI Index: 34.4% of Ramp's business clients pay for Anthropic services versus 32.3% for OpenAI. Anthropic's share stood at 9% a year ago.
+
+## AI Tooling
+
+- [MarkTechPost](https://www.marktechpost.com/2026/05/13/google-deepmind-introduces-an-ai-enabled-mouse-pointer-powered-by-gemini-that-captures-visual-and-semantic-context-around-the-cursor/) Google DeepMind published experimental principles and demos for Magic Pointer — a Gemini-powered cursor that captures visual and semantic context around the pointer position. Two live demos appeared in Google AI Studio today: one for image editing and one for map navigation.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/new-exim-bdat-vulnerability-exposes.html) CVE-2026-45185 "Dead.Letter" is an unauthenticated RCE in Exim mail servers built with GnuTLS, affecting versions 4.97 through 4.99.2. An attacker can corrupt heap memory via a crafted BDAT command followed by a TLS close_notify and cleartext byte. Patch to 4.99.3 immediately; OpenSSL builds are not affected.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/05/13/politics/live-news/trump-china-visit-arrival-ceremony-hnk) Trump arrived in Beijing today for a two-day summit with Xi Jinping. Elon Musk and Jensen Huang are part of the U.S. delegation. Agenda covers trade deals, Taiwan, AI governance, and Iran.
+- [Al Jazeera](https://www.aljazeera.com/news/2026/5/13/iran-war-live-trump-slams-tehrans-reply-israel-kills-2-medics-in-lebanon) Israeli forces crossed the Litani River in southern Lebanon, breaching a key ceasefire boundary. Lebanon's government described the incursion as a serious escalation.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/artifacts-git-for-agents-beta/) Cloudflare Artifacts reached public beta — a Git-compatible versioned filesystem built for AI agents. Supports the standard Git wire protocol, SHA-1, delta encoding, and tens of millions of repositories per account.
