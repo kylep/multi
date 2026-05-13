@@ -37,3 +37,19 @@ last_verified: 2026-05-13
 ## Weather
 
 - Whitby: 16°C high, 5°C low. Morning showers ending near noon; risk of thunderstorm before 9am. 40% chance of afternoon showers. Wind east 20 km/h gusting to 40 shifting west in the afternoon. No alerts. Source: Environment Canada.
+
+---
+
+## Update — 17:00 UTC
+
+## AI Tooling
+
+- [Anthropic / TechCrunch](https://techcrunch.com/2026/05/12/the-ai-legal-services-industry-is-heating-up-anthropic-is-getting-in-on-the-action/) Anthropic launched Claude for Legal: 20+ MCP connectors linking Claude to DocuSign, iManage, Westlaw, LexisNexis, Everlaw, Box, and others, plus 12 practice-area plugins covering M&A, employment, IP, privacy, regulatory, and litigation work. Every paying Claude customer gets access.
+
+- [AWS](https://aws.amazon.com/about-aws/whats-new/2026/05/claude-platform-aws/) Claude Platform on AWS reached general availability on May 11. AWS customers can now access the full Claude API — including Managed Agents, Files API, MCP connector, prompt caching, and the Claude Console — using existing IAM credentials and AWS billing.
+
+- [OpenAI](https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/) OpenAI released three new Realtime API voice models: GPT-Realtime-2 (GPT-5-class reasoning, 128k context), GPT-Realtime-Translate (live speech translation across 70+ input languages into 13 outputs), and GPT-Realtime-Whisper (streaming speech-to-text). The Realtime API is now generally available.
+
+## Just for You
+
+- [InfoQ](https://www.infoq.com/news/2026/02/argocd-33/) ArgoCD 3.1 reached end of life on May 6 and no longer receives security updates. Users should upgrade to v3.2, v3.3, or v3.4.
