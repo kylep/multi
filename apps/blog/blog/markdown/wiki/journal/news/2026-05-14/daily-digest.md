@@ -63,3 +63,21 @@ last_verified: 2026-05-14
 ## Local
 
 - [Durham Radio News](https://www.durhamradionews.com/archives/212264) Students organized by Durham Students 4 Education protested outside Whitby MPP Lorne Coe's office at Whitby Town Square on May 14, pressing for restoration of 85% OSAP grants. Coe voted against a provincial motion to restore the grants earlier this session.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-12/anthropic-in-talks-to-raise-30-billion-at-900-billion-valuation) Anthropic is in talks to raise $30 billion at a valuation between $900 billion and $950 billion, which would surpass OpenAI's $854 billion post-money valuation. The round is expected to close within weeks and is likely the company's last private raise before an IPO. Annual revenue run rate has crossed $30 billion.
+
+## AI Tooling
+
+- [9to5Mac](https://9to5mac.com/2026/05/14/openai-brings-codex-control-to-chatgpt-for-iphone-and-android/) OpenAI added remote Codex control to the ChatGPT mobile app, rolling out today in preview on iOS and Android across all plans including Free. Users can review outputs, approve commands, switch models, and start new threads from their phone while the actual Codex environment runs on a Mac or remote server.
+
+- [9to5Google](https://9to5google.com/2026/05/14/gemini-spark-insight/) Google is introducing Gemini Spark, a new autonomous agent inside the Gemini app. Users can create tasks and schedule them to run at specified times; the feature is visible in Gemini app beta 17.23.
+
+## Security
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/microsoft-may-2026-patch-tuesday-fixes-120-flaws-no-zero-days/) Microsoft's May 2026 Patch Tuesday released fixes for 120 flaws across 20 product families, including 29 rated Critical. No zero-days are exploited in the wild this cycle — the first clean Patch Tuesday in nearly two years. Two unauthenticated vulnerabilities, CVE-2026-41089 and CVE-2026-41096, carry CVSS 9.8; one SSO plugin flaw scores 9.1.
