@@ -293,3 +293,8 @@ Two AIs, two different models, coordinating through a
 Kubernetes pod with Vault-injected secrets and a
 hand-written skill file. The whole thing is auditable
 from end to end.
+
+That experiment confirmed the pattern worked, but OpenClaw itself
+wasn't quite right for my use case. A couple months later I built
+[Pai](/openclaw-inspired-assistant.html), a purpose-built assistant
+that takes what I liked from OpenClaw and drops the rest.
