@@ -45,3 +45,21 @@ last_verified: 2026-05-14
 ## Just for You
 
 - [Phemex News](https://phemex.com/news/article/openai-offers-two-months-free-codex-access-amid-anthropic-changes-81350) The Anthropic credit meter change specifically affects OpenClaw and other third-party Claude agent harnesses — placing programmatic agent usage behind a separate billing track starting June 15.
+
+---
+
+## Update — 16:30 UTC
+
+## AI Tooling
+
+- [Eastern Herald](https://easternherald.com/2026/05/14/microsoft-edge-copilot-ai-tabs-update-2026/) Microsoft Edge shipped a Copilot update today that reads and summarizes content across all open tabs simultaneously. New capabilities include cross-tab comparison, converting tabs into a podcast, quiz generation from webpages, and long-term memory that persists context across sessions. The new tab page now consolidates chat, search, and browsing history into a single hub.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/cisa-adds-actively-exploited-linux-root.html) CISA added CVE-2026-31431 ("Copy Fail") to its Known Exploited Vulnerabilities catalog, with a federal patch deadline of May 15. The flaw is a Linux kernel logic bug in the authentication cryptographic template that lets an unprivileged local user reach root via a 732-byte Python exploit. Docker, LXC, and Kubernetes environments are particularly exposed because they grant container processes access to the AF_ALG subsystem by default. Fixes are in Linux kernel 6.18.22, 6.19.12, and 7.0.
+
+- [The Hacker News](https://thehackernews.com/2026/05/critical-apache-http2-flaw-cve-2026.html) CVE-2026-23918 is a double-free vulnerability in Apache HTTP Server 2.4.66 affecting mod_http2. One unauthenticated request can crash worker processes (trivial DoS); on Debian-derived systems with the default mmap allocator, the same bug can be escalated to remote code execution. The fix is Apache HTTP Server 2.4.67.
+
+## Local
+
+- [Durham Radio News](https://www.durhamradionews.com/archives/212264) Students organized by Durham Students 4 Education protested outside Whitby MPP Lorne Coe's office at Whitby Town Square on May 14, pressing for restoration of 85% OSAP grants. Coe voted against a provincial motion to restore the grants earlier this session.
