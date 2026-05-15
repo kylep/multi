@@ -37,3 +37,23 @@ last_verified: 2026-05-15
 ## Just for You
 
 - [Android Headlines](https://www.androidheadlines.com/2026/05/google-io-new-gemini-model-launch-gpt-5-5-rival.html) Google I/O on May 19 is expected to include a new Gemini model intended to rival GPT-5.5. The conference will also cover Gemini Intelligence for Android, AI-native Googlebook laptops, and further agentic features.
+
+---
+
+## Update — 18:00 UTC
+
+## Geopolitics
+
+- [Just Security](https://www.justsecurity.org/139062/early-edition-may-15-2026/) Material update from the Trump-Xi Beijing summit: China agreed to purchase 200 Boeing commercial jets — its first US-made commercial jet order in nearly a decade — and both sides established a "Board of Trade" to oversee tariff reductions on approximately $30 billion in goods. Markets had priced in roughly 500 jet orders.
+
+- [WEF / Reuters](https://www.weforum.org/stories/2026/05/blockade-diplomacy-and-other-geopolitical-stories-to-know-this-month/) Iran's blockade and the US military posture are keeping the Strait of Hormuz effectively closed, trapping much of the world's Gulf oil supply. The UAE announced it will accelerate construction of a pipeline to double export capacity through Fujairah by 2027, bypassing the strait.
+
+- [UN / AP](https://www.justsecurity.org/139062/early-edition-may-15-2026/) Over 40% of Sudan's population — roughly 19.5 million people — faces acute food insecurity, with at least 135,000 in Phase 5 (starvation). The figure marks the largest single-country famine caseload since UN tracking began.
+
+## Open Source
+
+- [GitHub](https://github.com/anomalyco/opencode/releases) opencode (150k+ GitHub stars) shipped a new release today adding experimental background subagents — tasks continue running in the background while the user keeps working. The release also fixes sessions stuck on interrupted assistant messages and repeated auto-compaction.
+
+## Security
+
+- [Wiz / SecurityWeek](https://www.wiz.io/blog/github-rce-vulnerability-cve-2026-3854) CVE-2026-3854 (CVSS 8.7): a push-option injection flaw in GitHub Enterprise Server's internal babeld service lets any authenticated user execute arbitrary commands on GitHub's backend with a single git push. Cross-tenant repository exposure is possible on shared storage nodes. Publicly disclosed April 28; 88% of GHES instances were still unpatched at disclosure. Upgrade to GHES 3.19.3+. GitHub.com is already mitigated.
