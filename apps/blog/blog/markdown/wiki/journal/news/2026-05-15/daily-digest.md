@@ -57,3 +57,21 @@ last_verified: 2026-05-15
 ## Security
 
 - [Wiz / SecurityWeek](https://www.wiz.io/blog/github-rce-vulnerability-cve-2026-3854) CVE-2026-3854 (CVSS 8.7): a push-option injection flaw in GitHub Enterprise Server's internal babeld service lets any authenticated user execute arbitrary commands on GitHub's backend with a single git push. Cross-tenant repository exposure is possible on shared storage nodes. Publicly disclosed April 28; 88% of GHES instances were still unpatched at disclosure. Upgrade to GHES 3.19.3+. GitHub.com is already mitigated.
+
+---
+
+## Update — 21:00 UTC
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/05/15/nx-s1-5823388/death-toll-in-attack-on-kyiv-apartment-building-now-stands-at-24) A Russian missile strike on a Kyiv apartment block in Darnytskyi district killed 24 people including three children. Ukraine said Russia launched more than 1,500 drones and dozens of missiles over two consecutive days; Kyiv declared a day of mourning and lowered flags to half-mast.
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/5/14/yemen-govt-houthis-to-release-more-than-1600-pows-in-largest-swap) Yemen's internationally recognized government and the Houthis agreed to free more than 1,600 detainees in Amman, brokered by the UN and ICRC after 14 weeks of talks. It is the largest prisoner swap since the 11-year civil war began.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/05/15/exchange-server-cve-2026-42897-exploited/) CVE-2026-42897 (CVSS 8.1): Microsoft confirmed active in-the-wild exploitation of a spoofing flaw in on-premises Exchange Server 2016, 2019, and Subscription Edition. Attackers send a crafted email that, when opened in Outlook Web Access, executes arbitrary JavaScript in the victim's browser. Exchange Online is not affected. No permanent patch is available yet; enable Exchange Emergency Mitigation Service immediately.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/world/russia-ukraine-kyiv-strike-apartment-9.7200577) The University of Toronto rescinded Buffy Sainte-Marie's honorary degree following a faculty and student petition. The university cited findings from a CBC documentary that questioned claims in her public biography.
