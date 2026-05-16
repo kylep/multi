@@ -87,3 +87,19 @@ last_verified: 2026-05-16
 ## Just for You
 
 - [Google Blog](https://blog.google/products-and-platforms/platforms/android/meet-googlebook/) Google announced Googlebook, an AI-native laptop category replacing Chromebook. Devices run a combined Android/ChromeOS "intelligence-first" environment with Gemini built into a new Magic Pointer cursor. Partners include Acer, Asus, Dell, HP, and Lenovo; devices ship this fall.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [The Next Web](https://thenextweb.com/news/salesforce-benioff-300-million-anthropic-tokens-slack-coding) Salesforce CEO Marc Benioff said on the All-In podcast that Salesforce expects to spend $300 million on Anthropic tokens in 2026, almost entirely on coding agents. Salesforce holds roughly a 1% equity stake in Anthropic in addition to being one of its largest customers.
+
+- [Anthropic](https://www.anthropic.com/research/2028-ai-leadership) Anthropic published a policy paper arguing 2028 could be a defining year for global AI leadership. Two scenarios outlined: the US maintains a 12–24 month frontier lead through tighter chip export enforcement, or China closes the gap if policy gaps remain. The paper calls for stronger safeguards on advanced compute and limits on model distillation.
+
+- [Anthropic / PwC](https://www.anthropic.com/news/pwc-expanded-partnership) PwC and Anthropic expanded their alliance, committing to certify 30,000 PwC professionals on Claude and deploying Claude Code and Cowork starting with US teams. PwC launched a new Office of the CFO business unit built exclusively on Anthropic technology, targeting regulated industries including banking, insurance, and healthcare. Announced May 14.
+
+## Local
+
+- [CTV News](https://www.ctvnews.ca/toronto/article/motorcyclist-airlifted-to-hospital-following-hwy-401-crash-in-whitby/) A motorcyclist was airlifted to hospital in critical condition after a crash on Highway 401 in Whitby on Saturday afternoon. OPP closed portions of the eastbound lanes while emergency crews responded.
