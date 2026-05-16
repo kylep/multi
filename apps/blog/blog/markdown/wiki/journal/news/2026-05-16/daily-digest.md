@@ -61,3 +61,29 @@ last_verified: 2026-05-16
 - [endoflife.date / GitHub](https://endoflife.date/argo-cd) ArgoCD 3.1 reached end-of-life on May 6 and will no longer receive bug or security fixes. Version 3.3.10 was released May 12 and is the recommended upgrade target; supported branches are v3.2, v3.3, and v3.4.
 
 - [Cloudflare Release Notes](https://releasebot.io/updates/cloudflare) Cloudflare R2 SQL now supports joining multiple Iceberg tables in a single query, enabling cross-table analytics without exporting data. The Developer Platform also added a Domains tab in the Workers dashboard for buying and managing Worker routing.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/05/11/openai-eu-cyber-model-anthropic-mythos-gpt.html) OpenAI is granting the EU preview access to GPT-5.5-Cyber, a permissive variant of its latest model designed for malware analysis, vulnerability identification, and patch validation. Anthropic has not yet granted EU access to its competing Mythos model; discussions with the EU Commission are described as being at a "different stage."
+
+## AI Tooling
+
+- [Claude Code Changelog](https://code.claude.com/docs/en/changelog) Claude Code's May 13 release adds a `terminalSequence` field to hook JSON output so hooks can trigger desktop notifications and window title updates without a controlling terminal. The rewind menu gains a "Summarize up to here" option to compress earlier context while preserving recent turns, and `ANTHROPIC_WORKSPACE_ID` is now available for workload identity federation.
+
+## Security
+
+- [CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) Material update: CISA formally added Cisco Catalyst SD-WAN CVE-2026-20182 (CVSS 10.0) to its Known Exploited Vulnerabilities catalog today, setting a federal remediation deadline of May 17, 2026. US federal civilian agencies must patch or mitigate by tomorrow.
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/05/08/ivanti-epmm-zero-day-cve-2026-6973/) CVE-2026-6973: a zero-day RCE in Ivanti Endpoint Manager Mobile exploited in targeted attacks. The flaw allows an authenticated remote admin to execute arbitrary commands. CISA added it to KEV with a 3-day federal deadline; patch to EPMM versions 12.6.1.1, 12.7.0.1, or 12.8.0.1.
+
+## Geopolitics
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/5/16/israel-hezbollah-ceasefire) The Israel-Hezbollah ceasefire has been extended through May 17; the truce does not include a total cessation of hostilities and Israel has continued near-daily strikes in the interim.
+
+## Just for You
+
+- [Google Blog](https://blog.google/products-and-platforms/platforms/android/meet-googlebook/) Google announced Googlebook, an AI-native laptop category replacing Chromebook. Devices run a combined Android/ChromeOS "intelligence-first" environment with Gemini built into a new Magic Pointer cursor. Partners include Acer, Asus, Dell, HP, and Lenovo; devices ship this fall.
