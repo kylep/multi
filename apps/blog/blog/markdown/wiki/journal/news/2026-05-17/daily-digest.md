@@ -77,3 +77,13 @@ last_verified: 2026-05-17
 ## Just for You
 
 - [Mondoo](https://mondoo.com/blog/three-ollama-cves-bleeding-llama-and-windows-updater-flaws) Two additional Ollama CVEs (CVE-2026-42248, CVE-2026-42249) affect the Windows auto-updater and can chain into persistent RCE on login; Ollama Windows 0.12.10 through 0.17.5 are vulnerable. Workaround: disable the auto-download updates option.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Tooling
+
+- [Anthropic Blog](https://www.anthropic.com/news/claude-for-small-business) Anthropic launched Claude for Small Business on May 13, embedding Claude into QuickBooks, PayPal, HubSpot, Canva, Docusign, Google Workspace, and Microsoft 365 with 15 ready-to-run agentic workflows covering payroll planning, month-end close, invoice chasing, lead triage, and campaign creation. No extra charge beyond existing Claude and partner tool subscriptions. A free AI Fluency course with PayPal and a 10-city US workshop tour launched alongside.
+
+- [9to5Google](https://9to5google.com/2026/05/14/gemini-spark-insight/) Gemini Spark, Google's always-on autonomous AI agent, has been found in Gemini app beta code ahead of its expected Google I/O announcement on May 19. The agent runs multi-step tasks across Gmail, Drive, and third-party apps in the background without per-action prompts; Google notes it is experimental and may make purchases or share data without asking.
