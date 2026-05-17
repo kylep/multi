@@ -41,3 +41,39 @@ last_verified: 2026-05-17
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby: 24°C high, 12°C low, dense fog advisory in effect this morning with visibility at 0.2 km; advisory expected to lift later in the day, 60% chance of showers tonight.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Ramp](https://ramp.com/leading-indicators/ai-index-may-2026) Anthropic surpassed OpenAI in business AI adoption for the first time in April, reaching 34.4% of businesses versus OpenAI's 32.3%, a 3.8-point gain to OpenAI's 2.9-point decline according to Ramp's monthly index.
+
+- [OpenAI](https://openai.com/index/openai-launches-the-deployment-company/) OpenAI launched the OpenAI Deployment Company (DeployCo) with $4 billion in funding at a $10 billion pre-money valuation, co-led by TPG, Bain Capital, and Brookfield. The firm embeds Forward Deployed Engineers inside enterprise clients and is acquiring consulting firm Tomoro to seed its initial team of ~150 specialists.
+
+- [Anthropic](https://www.anthropic.com/news/higher-limits-spacex) Anthropic signed a compute deal with SpaceX to use all capacity at the Colossus 1 data center in Memphis — over 300 megawatts and 220,000 NVIDIA GPUs including H100, H200, and GB200 accelerators. The deal enabled Anthropic to double Claude Code rate limits for paid plans and remove peak-hour caps.
+
+## AI Tooling
+
+- [Anthropic Blog](https://www.anthropic.com/news/higher-limits-spacex) Claude Code doubled five-hour rate limits for Pro, Max, Team, and Enterprise plans effective May 6; peak-hours throttling removed for Pro and Max accounts; Claude Opus API rate limits raised materially alongside the SpaceX compute announcement.
+
+- [InfoQ](https://www.infoq.com/news/2026/05/anthropic-routines-claude/) Anthropic shipped Routines for Claude Code, letting developers configure automated coding workflows that run on schedules, via API calls, or triggered by external events.
+
+- [Microsoft 365 Blog](https://www.microsoft.com/en-us/microsoft-365/blog/2026/05/05/microsoft-365-copilot-human-agency-and-the-opportunity-for-every-organization/) Microsoft rolled out Cowork, a headline Copilot feature for 2026 that carries out tasks across the Microsoft 365 environment autonomously — sending emails, scheduling meetings, creating Word documents, and managing calendars on behalf of users.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/cisa-adds-cisco-sd-wan-cve-2026-20182.html) CISA added CVE-2026-20182 to its Known Exploited Vulnerabilities catalog — a CVSS 10.0 authentication bypass in Cisco Catalyst SD-WAN Controller that lets unauthenticated remote attackers gain full admin access; CISA attributes active exploitation to threat cluster UAT-8616.
+
+- [The Hacker News](https://thehackernews.com/2026/05/ollama-out-of-bounds-read-vulnerability.html) CVE-2026-7482 "Bleeding Llama" is a CVSS 9.1 out-of-bounds read in Ollama affecting an estimated 300,000 exposed servers; a crafted GGUF file can leak environment variables, API keys, system prompts, and in-flight conversation data. Patch available in Ollama v0.17.1.
+
+- [SecurityWeek](https://www.securityweek.com/microsoft-warns-of-exchange-server-zero-day-exploited-in-the-wild/) Microsoft is patching CVE-2026-42897, a zero-day in Exchange Server Subscription Edition, 2016, and 2019 that has been exploited in the wild; no patch is yet available for older Exchange versions.
+
+## Local
+
+- [CP24](https://www.cp24.com/) Toronto District School Board is cutting 15 specialized kindergarten classes for students with complex needs and eliminating outdoor education programs as part of broader staff reductions tied to provincial funding constraints.
+
+## Just for You
+
+- [Mondoo](https://mondoo.com/blog/three-ollama-cves-bleeding-llama-and-windows-updater-flaws) Two additional Ollama CVEs (CVE-2026-42248, CVE-2026-42249) affect the Windows auto-updater and can chain into persistent RCE on login; Ollama Windows 0.12.10 through 0.17.5 are vulnerable. Workaround: disable the auto-download updates option.
