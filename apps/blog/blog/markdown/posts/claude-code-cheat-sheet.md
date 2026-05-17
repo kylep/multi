@@ -1,6 +1,7 @@
 ---
 title: "Claude Code CLI Cheat-Sheet"
-summary: A deeper look into CLI flags, slash commands, keyboard shortcuts, hooks, custom agents and skills.
+summary: "Claude Code cheat sheet: CLI flags, slash commands, keyboard shortcuts,
+  hooks, session management, worktrees, permissions, and custom agents."
 slug: claude-code-cheat-sheet
 category: ai
 tags: Claude-Code, AI, reference, CLI
