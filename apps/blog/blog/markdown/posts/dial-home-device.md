@@ -25,7 +25,7 @@ into their network, but its not practical to set you up with a VPN. Enter the
 
 # What is the Dial-Home Device
 It's just an Ubuntu server that repeatedly tries to dial an internet connected
-jump box in order to open a [reverse SSH tunnel](/ssh-tunnel.html). As soon as
+jump box in order to open a [reverse SSH tunnel](/ssh-tunnels.html). As soon as
 the networking is set up, it will dial home and open itself up for remote
 administration.
 
