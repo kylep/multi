@@ -337,4 +337,8 @@ Pai wrote a log entry automatically:
 no hard blockers but three dependency chains.
 ```
 
+That version of Pai ran well for a few weeks. Eventually I moved away from
+OpenClaw entirely and [rebuilt it from scratch](/openclaw-inspired-assistant.html),
+keeping the name but replacing almost everything under the hood.
+
 
