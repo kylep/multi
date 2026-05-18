@@ -25,6 +25,7 @@ Reads from the local Stellaris install at `~/Library/Application Support/Steam/s
 | C8 | Every localisation YAML starts with a UTF-8 BOM | Stellaris loads YAML without BOM as literal raw keys instead of translated strings |
 | C9 | `descriptor.mod` present and contains `supported_version` | Launcher won't load the mod |
 | C10 | If deployed: symlink in `~/Documents/Paradox Interactive/Stellaris/mod/` resolves into this repo and the outer `.mod` descriptor has an absolute `path=` | Deploy script regression |
+| C11 | `thumbnail.png` present in mod root, real PNG bytes, under 1 MB, and referenced from `descriptor.mod` via `picture="..."` | Steam Workshop preview shows broken-image placeholder otherwise |
 
 Exit code is non-zero on any FAIL.
 

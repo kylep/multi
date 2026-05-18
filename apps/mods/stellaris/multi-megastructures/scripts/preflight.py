@@ -22,6 +22,9 @@ turn into "mod loads but silently does nothing" or "crash on new game":
   C10 (Only if deployed) Symlink in ~/Documents/Paradox Interactive/Stellaris/
       mod/ resolves into this repo, and the outer .mod descriptor has an
       absolute path= pointing at the symlink.
+  C11 thumbnail.png present in mod root, real PNG bytes, under 1 MB, and
+      referenced from descriptor.mod via picture="..." (Steam Workshop
+      preview will be broken otherwise).
 
 Each check prints PASS or FAIL with a short reason. Exits non-zero on any FAIL.
 """
@@ -314,6 +317,28 @@ def c9_descriptor() -> None:
     ok("C9", "descriptor.mod present and contains supported_version")
 
 
+def c11_thumbnail() -> None:
+    descriptor = MOD_DIR / "descriptor.mod"
+    descriptor_text = read(descriptor) if descriptor.exists() else ""
+    m = re.search(r'picture\s*=\s*"([^"]+)"', descriptor_text)
+    if not m:
+        fail("C11", "descriptor.mod missing picture=\"...\" line")
+        return
+    thumb = MOD_DIR / m.group(1)
+    if not thumb.exists():
+        fail("C11", f"thumbnail file not found at {thumb.relative_to(MOD_DIR)}")
+        return
+    header = thumb.read_bytes()[:8]
+    if header[:8] != b"\x89PNG\r\n\x1a\n":
+        fail("C11", f"{thumb.name} is not a real PNG (bad magic bytes)")
+        return
+    size = thumb.stat().st_size
+    if size >= 1024 * 1024:
+        fail("C11", f"{thumb.name} is {size} bytes (>= 1 MB Workshop limit)")
+        return
+    ok("C11", f"{thumb.name} present, valid PNG, {size} bytes")
+
+
 def c10_deploy() -> None:
     link = STELLARIS_USER_MOD_DIR / MOD_NAME
     outer = STELLARIS_USER_MOD_DIR / f"{MOD_NAME}.mod"
@@ -352,6 +377,7 @@ def main() -> int:
     c8_localisation_bom()
     c9_descriptor()
     c10_deploy()
+    c11_thumbnail()
 
     for line in passes:
         print(f"PASS {line}")

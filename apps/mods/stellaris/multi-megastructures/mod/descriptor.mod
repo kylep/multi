@@ -6,4 +6,6 @@ tags={
 	"Technologies"
 	"Balance"
 }
+picture="thumbnail.png"
 supported_version="v4.3.*"
+remote_file_id="3728460082"
