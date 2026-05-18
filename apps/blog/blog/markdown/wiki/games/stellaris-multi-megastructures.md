@@ -47,7 +47,7 @@ Reads from `~/Library/Application Support/Steam/steamapps/common/Stellaris/commo
 python3 apps/mods/stellaris/multi-megastructures/scripts/preflight.py
 ```
 
-Eleven automated checks against the locally installed vanilla files: brace balance, leaked limit markers, vanilla key drift, tech-ID and on_action existence, event-ref resolution, localisation BOM, descriptor sanity, deploy symlink integrity, Workshop thumbnail validity. No dotnet / CWTools required. Full test plan in `apps/mods/stellaris/multi-megastructures/TESTING.md`.
+Twelve automated checks against the locally installed vanilla files: brace balance, leaked limit-flag reads, vanilla key drift, tech-ID and on_action existence, event-ref resolution, localisation BOM, descriptor sanity, deploy symlink integrity, Workshop thumbnail validity, and read/write sentinel isolation (catches the same-flag-for-read-and-write bug class). No dotnet / CWTools required. Full test plan in `apps/mods/stellaris/multi-megastructures/TESTING.md`.
 
 ## Deploy
 

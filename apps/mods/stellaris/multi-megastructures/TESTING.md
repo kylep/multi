@@ -16,8 +16,8 @@ Reads from the local Stellaris install at `~/Library/Application Support/Steam/s
 | # | Check | What it catches |
 |---|---|---|
 | C1 | Brace balance on every script file | Transformations that drop a `}` and silently corrupt the parser |
-| C2 | No leaked `built_<X>` flags or `has_no_non_gate_megastructure` in generated megastructure files outside comments | Transformations that missed an occurrence |
-| C3 | `mmegs_unused_flag` or `always = yes` appears in every generated file whose vanilla had a limit | The transformation didn't run on a file |
+| C2 | No `has_country_flag = <tracking_flag>` (read of `built_<X>` or `<X>_built`) survives in generated megastructure files outside comments. Also no leftover `has_no_non_gate_megastructure` | Transformations that missed an occurrence — including the `<X>_built` suffix form (`cosmogenesis_world_built` etc.) |
+| C3 | Context-aware: if vanilla had a tracking-flag read, the read sentinel is present; if vanilla had `has_no_non_gate_megastructure`, `always = yes` is present | The transformation didn't run, or required only one rewrite kind and got the wrong one |
 | C4 | Every top-level megastructure key in the vanilla file also exists in the override | Generator accidentally stripped an entire stage (e.g. `dyson_sphere_3`) |
 | C5 | Every tech ID in `give_technology` exists in vanilla `common/technology/` | Typo'd or DLC-renamed tech (e.g. `tech_mega_art_installation` vs `tech_mega_art`) |
 | C6 | Every on_action hook (e.g. `on_game_start_country`) is a real vanilla on_action | Typo in hook name that would make the entire mod a no-op |
@@ -26,6 +26,7 @@ Reads from the local Stellaris install at `~/Library/Application Support/Steam/s
 | C9 | `descriptor.mod` present and contains `supported_version` | Launcher won't load the mod |
 | C10 | If deployed: symlink in `~/Documents/Paradox Interactive/Stellaris/mod/` resolves into this repo and the outer `.mod` descriptor has an absolute `path=` | Deploy script regression |
 | C11 | `thumbnail.png` present in mod root, real PNG bytes, under 1 MB, and referenced from `descriptor.mod` via `picture="..."` | Steam Workshop preview shows broken-image placeholder otherwise |
+| C12 | Read sentinel `mmegs_read_never_set` only appears in `has_country_flag` positions, never `set_country_flag` / `remove_country_flag` | The bug class where a single sentinel is both read as a gate AND set on build_complete — reintroduces the per-empire cap after the first build |
 
 Exit code is non-zero on any FAIL.
 

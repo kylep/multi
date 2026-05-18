@@ -5,10 +5,15 @@ Runs without launching Stellaris. Catches the failure modes most likely to
 turn into "mod loads but silently does nothing" or "crash on new game":
 
   C1  Brace balance on every script file (no unmatched braces).
-  C2  No leaked `built_<X>` flags or `has_no_non_gate_megastructure` in
-      generated megastructure files outside comments.
-  C3  `mmegs_unused_flag` appears in every generated megastructure file
-      where vanilla had a `built_X` reference (the rewrite actually fired).
+  C2  No `has_country_flag = <tracking_flag>` (gate read of a build-tracking
+      flag) survives in generated megastructure files outside comments. Also
+      no leftover `has_no_non_gate_megastructure`. Writes (`set_country_flag`)
+      are intentionally left alone — they're read by external systems and
+      removing them would break unrelated game logic.
+  C3  For each generated file, the rewrite vanilla actually needed actually
+      fired: if vanilla had a build-tracking-flag read, the read sentinel is
+      present; if vanilla had `has_no_non_gate_megastructure`, `always = yes`
+      is present.
   C4  Every top-level megastructure key in the vanilla file also exists in
       the override (we didn't drop a stage like `dyson_sphere_3`).
   C5  Every tech ID we `give_technology` exists in vanilla
@@ -25,8 +30,10 @@ turn into "mod loads but silently does nothing" or "crash on new game":
   C11 thumbnail.png present in mod root, real PNG bytes, under 1 MB, and
       referenced from descriptor.mod via picture="..." (Steam Workshop
       preview will be broken otherwise).
-
-Each check prints PASS or FAIL with a short reason. Exits non-zero on any FAIL.
+  C12 Read sentinel `mmegs_read_never_set` only appears in `has_country_flag`
+      positions — never set or removed. Catches the bug class where a single
+      flag is both read as a gate AND set on build_complete, which would
+      reintroduce the per-empire cap after the first build.
 """
 
 from __future__ import annotations
@@ -56,6 +63,8 @@ STELLARIS_USER_MOD_DIR = (
     Path.home() / "Documents" / "Paradox Interactive" / "Stellaris" / "mod"
 )
 
+READ_SENTINEL = "mmegs_read_never_set"
+
 failures: list[str] = []
 passes: list[str] = []
 
@@ -66,9 +75,6 @@ def fail(check: str, detail: str) -> None:
 
 def ok(check: str, detail: str) -> None:
     passes.append(f"{check}: {detail}")
-
-
-# ---------- helpers ----------
 
 
 def read(path: Path) -> str:
@@ -87,7 +93,6 @@ def strip_comments(text: str) -> str:
 
 
 def top_level_keys(text: str) -> set[str]:
-    """Return the set of `name = {` identifiers at brace depth 0."""
     keys: set[str] = set()
     text = strip_comments(text)
     depth = 0
@@ -97,7 +102,6 @@ def top_level_keys(text: str) -> set[str]:
         c = text[i]
         if c == "{":
             if depth == 0:
-                # Search backward to extract `name = {`.
                 m = re.search(r"([A-Za-z_][A-Za-z0-9_]*)\s*=\s*$", text[line_start:i])
                 if m:
                     keys.add(m.group(1))
@@ -115,12 +119,10 @@ def find_techs_in_event_file(text: str) -> set[str]:
 
 
 def find_on_actions_in_file(text: str) -> set[str]:
-    """Top-level on_action hooks (e.g. `on_game_start_country = {`)."""
     return top_level_keys(text)
 
 
 def find_event_refs_in_on_actions(text: str) -> set[str]:
-    """Every `<namespace>.<id>` referenced inside an `events = { ... }` block."""
     refs: set[str] = set()
     for block in re.finditer(r"events\s*=\s*\{([^}]*)\}", text):
         for tok in re.findall(r"([a-z_]+\.\d+)", block.group(1)):
@@ -129,13 +131,11 @@ def find_event_refs_in_on_actions(text: str) -> set[str]:
 
 
 def find_event_defs(text: str) -> set[str]:
-    """Every event defined in our events file."""
     namespace_match = re.search(r"namespace\s*=\s*([A-Za-z_0-9]+)", text)
     if not namespace_match:
         return set()
     ns = namespace_match.group(1)
     ids = re.findall(r"\bid\s*=\s*([A-Za-z_0-9.]+)", text)
-    # Normalize bare numeric ids into ns.id.
     out: set[str] = set()
     for raw in ids:
         out.add(raw if "." in raw else f"{ns}.{raw}")
@@ -143,7 +143,6 @@ def find_event_defs(text: str) -> set[str]:
 
 
 def vanilla_on_action_names() -> set[str]:
-    """All top-level on_action hook names found across vanilla on_actions files."""
     names: set[str] = set()
     if not VANILLA_ON_ACTIONS.exists():
         return names
@@ -153,13 +152,21 @@ def vanilla_on_action_names() -> set[str]:
 
 
 def vanilla_tech_ids() -> set[str]:
-    """All top-level tech identifiers found across vanilla technology files."""
     techs: set[str] = set()
     if not VANILLA_TECH.exists():
         return techs
     for path in VANILLA_TECH.glob("*.txt"):
         techs |= {k for k in top_level_keys(read(path)) if k.startswith("tech_")}
     return techs
+
+
+def is_tracking_flag_name(flag: str) -> bool:
+    return flag.startswith("built_") or flag.endswith("_built")
+
+
+FLAG_REF_RE = re.compile(
+    r"(has_country_flag|set_country_flag|remove_country_flag)\s*=\s*([A-Za-z_0-9]+)"
+)
 
 
 # ---------- checks ----------
@@ -183,46 +190,48 @@ def c1_brace_balance() -> None:
     ok("C1", "brace balance OK on all script files")
 
 
-LIMIT_LEAK_PATTERNS = (
-    re.compile(r"has_country_flag\s*=\s*built_"),
-    re.compile(r"set_country_flag\s*=\s*built_"),
-    re.compile(r"has_no_non_gate_megastructure"),
-)
-
-
-def c2_no_limit_leaks() -> None:
-    found: list[str] = []
+def c2_no_tracking_flag_read_leaks() -> None:
+    leaks: list[str] = []
     for path in sorted((MOD_DIR / "common" / "megastructures").glob("*.txt")):
         for lineno, line in enumerate(read(path).splitlines(), start=1):
             stripped = line.lstrip()
             if stripped.startswith("#"):
                 continue
-            for pat in LIMIT_LEAK_PATTERNS:
-                if pat.search(line):
-                    found.append(f"{path.name}:{lineno}: {stripped.rstrip()}")
-    if found:
-        fail("C2", "limit marker leaked: " + "; ".join(found[:3]))
+            if re.search(r"has_no_non_gate_megastructure", line):
+                leaks.append(f"{path.name}:{lineno} (per-system gate)")
+                continue
+            m = re.search(r"has_country_flag\s*=\s*([A-Za-z_0-9]+)", line)
+            if m and is_tracking_flag_name(m.group(1)):
+                leaks.append(f"{path.name}:{lineno} (has_country_flag = {m.group(1)})")
+    if leaks:
+        fail("C2", "tracking-flag read leaked: " + "; ".join(leaks[:5]))
     else:
-        ok("C2", "no limit markers leaked into override files")
+        ok("C2", "no tracking-flag read references leaked into override files")
 
 
-def c3_sentinel_present() -> None:
-    """If the vanilla file had a built_X reference, the override must
-    contain at least one mmegs_unused_flag occurrence."""
+def c3_required_rewrites_fired() -> None:
     missing: list[str] = []
     for path in sorted((MOD_DIR / "common" / "megastructures").glob("*.txt")):
         vanilla_path = VANILLA_MEGAS / path.name
         if not vanilla_path.exists():
             continue
         vanilla_text = read(vanilla_path)
-        if "built_" not in vanilla_text and "has_no_non_gate_megastructure" not in vanilla_text:
-            continue
-        if "mmegs_unused_flag" not in read(path) and "always = yes" not in read(path):
-            missing.append(path.name)
+        override_text = read(path)
+
+        needs_flag_rewrite = any(
+            op == "has_country_flag" and is_tracking_flag_name(flag)
+            for op, flag in FLAG_REF_RE.findall(vanilla_text)
+        )
+        needs_system_gate_rewrite = "has_no_non_gate_megastructure" in vanilla_text
+
+        if needs_flag_rewrite and READ_SENTINEL not in override_text:
+            missing.append(f"{path.name}: needed read-sentinel rewrite, missing")
+        if needs_system_gate_rewrite and "always = yes" not in override_text:
+            missing.append(f"{path.name}: needed per-system rewrite, missing")
     if missing:
-        fail("C3", f"override didn't pick up sentinel flag in: {', '.join(missing)}")
+        fail("C3", "; ".join(missing))
     else:
-        ok("C3", "sentinel flag rewrite verified on all transformed files")
+        ok("C3", "context-aware rewrite verification passed for all transformed files")
 
 
 def c4_vanilla_keys_preserved() -> None:
@@ -317,28 +326,6 @@ def c9_descriptor() -> None:
     ok("C9", "descriptor.mod present and contains supported_version")
 
 
-def c11_thumbnail() -> None:
-    descriptor = MOD_DIR / "descriptor.mod"
-    descriptor_text = read(descriptor) if descriptor.exists() else ""
-    m = re.search(r'picture\s*=\s*"([^"]+)"', descriptor_text)
-    if not m:
-        fail("C11", "descriptor.mod missing picture=\"...\" line")
-        return
-    thumb = MOD_DIR / m.group(1)
-    if not thumb.exists():
-        fail("C11", f"thumbnail file not found at {thumb.relative_to(MOD_DIR)}")
-        return
-    header = thumb.read_bytes()[:8]
-    if header[:8] != b"\x89PNG\r\n\x1a\n":
-        fail("C11", f"{thumb.name} is not a real PNG (bad magic bytes)")
-        return
-    size = thumb.stat().st_size
-    if size >= 1024 * 1024:
-        fail("C11", f"{thumb.name} is {size} bytes (>= 1 MB Workshop limit)")
-        return
-    ok("C11", f"{thumb.name} present, valid PNG, {size} bytes")
-
-
 def c10_deploy() -> None:
     link = STELLARIS_USER_MOD_DIR / MOD_NAME
     outer = STELLARIS_USER_MOD_DIR / f"{MOD_NAME}.mod"
@@ -362,14 +349,52 @@ def c10_deploy() -> None:
     ok("C10", "deploy symlink + outer descriptor verified")
 
 
+def c11_thumbnail() -> None:
+    descriptor = MOD_DIR / "descriptor.mod"
+    descriptor_text = read(descriptor) if descriptor.exists() else ""
+    m = re.search(r'picture\s*=\s*"([^"]+)"', descriptor_text)
+    if not m:
+        fail("C11", 'descriptor.mod missing picture="..." line')
+        return
+    thumb = MOD_DIR / m.group(1)
+    if not thumb.exists():
+        fail("C11", f"thumbnail file not found at {thumb.relative_to(MOD_DIR)}")
+        return
+    header = thumb.read_bytes()[:8]
+    if header[:8] != b"\x89PNG\r\n\x1a\n":
+        fail("C11", f"{thumb.name} is not a real PNG (bad magic bytes)")
+        return
+    size = thumb.stat().st_size
+    if size >= 1024 * 1024:
+        fail("C11", f"{thumb.name} is {size} bytes (>= 1 MB Workshop limit)")
+        return
+    ok("C11", f"{thumb.name} present, valid PNG, {size} bytes")
+
+
+def c12_read_sentinel_isolation() -> None:
+    """The read sentinel must never appear in `set_country_flag` or
+    `remove_country_flag` positions. If it did, the first build would set the
+    flag, and subsequent builds would fail the gate — the exact bug class
+    that broke the first version of the mod."""
+    violations: list[str] = []
+    for path in sorted((MOD_DIR / "common" / "megastructures").glob("*.txt")):
+        for op, flag in FLAG_REF_RE.findall(read(path)):
+            if flag == READ_SENTINEL and op != "has_country_flag":
+                violations.append(f"{path.name}: {READ_SENTINEL} appears in {op}")
+    if violations:
+        fail("C12", "; ".join(violations[:5]))
+    else:
+        ok("C12", "read sentinel never appears in write positions")
+
+
 def main() -> int:
     if not VANILLA_ROOT.exists():
         print(f"ERROR: Stellaris not found at {VANILLA_ROOT}", file=sys.stderr)
         return 2
 
     c1_brace_balance()
-    c2_no_limit_leaks()
-    c3_sentinel_present()
+    c2_no_tracking_flag_read_leaks()
+    c3_required_rewrites_fired()
     c4_vanilla_keys_preserved()
     c5_tech_ids_exist()
     c6_on_actions_exist()
@@ -378,6 +403,7 @@ def main() -> int:
     c9_descriptor()
     c10_deploy()
     c11_thumbnail()
+    c12_read_sentinel_isolation()
 
     for line in passes:
         print(f"PASS {line}")
