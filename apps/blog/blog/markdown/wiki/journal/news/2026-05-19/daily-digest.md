@@ -55,3 +55,19 @@ last_verified: 2026-05-19
 - [PostgreSQL](https://www.postgresql.org/support/security/) PostgreSQL released security updates on May 14 across all supported branches: versions 18.4, 17.10, 16.14, 15.18, and 14.23. Users on any of these branches should upgrade.
 
 - [Orca Security](https://orca.security/resources/blog/cve-2026-21858-n8n-rce-vulnerability/) n8n has had multiple critical RCE vulnerabilities disclosed in 2026 (CVE-2026-21858 CVSS 10.0 in January, CVE-2026-25049 in February, CVE-2026-33660 in March). Patches are available for all three; self-hosted n8n instances should be on the latest release.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/05/19/openai-co-founder-andrej-karpathy-joins-anthropics-pre-training-team/) Andrej Karpathy, OpenAI co-founder and former Tesla AI lead, joined Anthropic's pre-training team this week, working under team lead Nick Joseph. His initial focus is helping build a team that uses Claude to accelerate pre-training research — applying AI to automate parts of its own training pipeline.
+
+## AI Tooling
+
+- [Android Central](https://www.androidcentral.com/phones/live/google-i-o-2026-live-blog-android-17-android-xr-glasses-and-all-the-gemini-ai-news) Google I/O 2026 keynote delivered: Gemini Intelligence suite brings Rambler (voice-to-text with filler-word filtering), Chrome Autobrowse for automated research, and enhanced form autofill. Android 17 adds Screen Reactions for overlay recording without a green screen. Android Auto gets 3D Immersive Navigation and Material 3 Expressive UI. Bank call spoof protection launching with Revolut, Itaú, and Nubank.
+
+## Local
+
+- [TorontoToday](https://www.torontotoday.ca/ontario-news/ttc-and-union-announce-tentative-deal-to-avert-strike-as-fifa-world-cup-approaches-12297113) Material update: TTC and CUPE Local 2 reached a tentative one-year bridge deal on Monday, averting a strike threat ahead of the FIFA World Cup. Toronto hosts six matches starting June 12. The deal still requires union membership and TTC board ratification.
