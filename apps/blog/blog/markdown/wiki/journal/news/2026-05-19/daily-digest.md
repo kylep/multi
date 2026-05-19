@@ -71,3 +71,19 @@ last_verified: 2026-05-19
 ## Local
 
 - [TorontoToday](https://www.torontotoday.ca/ontario-news/ttc-and-union-announce-tentative-deal-to-avert-strike-as-fifa-world-cup-approaches-12297113) Material update: TTC and CUPE Local 2 reached a tentative one-year bridge deal on Monday, averting a strike threat ahead of the FIFA World Cup. Toronto hosts six matches starting June 12. The deal still requires union membership and TTC board ratification.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [NPR](https://www.npr.org/2026/05/18/nx-s1-5822366/musk-altman-openai-jury-verdict-claims-dismissed) A California jury unanimously dismissed Elon Musk's lawsuit against OpenAI and Sam Altman on May 18, finding that Musk missed the three-year statute of limitations to file his claims. Musk had sought $150 billion in damages over allegations OpenAI broke its nonprofit founding mission. He has said he will appeal.
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/) Google released Gemini 3.5 Flash globally at I/O 2026 — available now in the Gemini app, AI Mode in Search, AI Studio, Android Studio, and the Gemini API. Google claims it is 4x faster than prior models and outperforms Gemini 3.1 Pro on coding and agentic benchmarks. Gemini Spark, the 24/7 personal agent powered by 3.5 Flash, is entering beta for Google AI Ultra subscribers next week. Gemini 3.5 Pro is targeted for June.
+
+## Local
+
+- [CP24](https://www.cp24.com/local/halton/2026/05/19/months-long-probe-into-sophisticated-drug-trafficking-network-leads-to-largest-gun-bust-in-halton-police-history-investigators-say/) Halton Regional Police concluded Project Cyprus, a six-month probe into a drug trafficking network spanning Halton, Toronto, York, and Durham regions. Four men were arrested facing a combined 30 charges; 24 US-origin firearms and over $700,000 in drugs were seized — the largest gun seizure in Halton police history.
