@@ -5,10 +5,11 @@ keywords:
   - games
   - browser-games
 scope: "Index of games hosted on the blog."
-last_verified: 2026-03-28
+last_verified: 2026-05-18
 ---
 
 ## Games
 
 - [Robot Battle](/wiki/games/robot-battle.html) — Turn-based robot combat. Buy weapons, fight enemies, level up.
 - [HOI4: Canada Overpowered](/wiki/games/hoi4-canada-overpowered.html) — Hearts of Iron 4 mod.
+- [Stellaris: Multi-Megastructures + Free Tech](/wiki/games/stellaris-multi-megastructures.html) — Stellaris mod.

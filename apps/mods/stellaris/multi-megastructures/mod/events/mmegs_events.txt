@@ -1,0 +1,32 @@
+namespace = mmegs
+
+# Grants every regular empire (player + AI) every megastructure technology at game start.
+# Fires once per country on game start via on_game_start_country.
+country_event = {
+	id = mmegs.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = default
+	}
+
+	immediate = {
+		give_technology = { tech = tech_mega_engineering message = no }
+		give_technology = { tech = tech_dyson_sphere message = no }
+		give_technology = { tech = tech_dyson_swarm message = no }
+		give_technology = { tech = tech_ring_world message = no }
+		give_technology = { tech = tech_matter_decompressor message = no }
+		give_technology = { tech = tech_science_nexus message = no }
+		give_technology = { tech = tech_sentry_array message = no }
+		give_technology = { tech = tech_strategic_coordination message = no }
+		give_technology = { tech = tech_mega_art message = no }
+		give_technology = { tech = tech_interstellar_assembly message = no }
+		give_technology = { tech = tech_mega_shipyard message = no }
+		give_technology = { tech = tech_quantum_catapult message = no }
+		give_technology = { tech = tech_orbital_arc_furnace message = no }
+		give_technology = { tech = tech_galactic_archivism message = no }
+		give_technology = { tech = tech_deep_space_citadel message = no }
+		give_technology = { tech = tech_cosmogenesis_world message = no }
+	}
+}
