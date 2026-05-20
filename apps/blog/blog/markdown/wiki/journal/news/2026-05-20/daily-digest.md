@@ -85,3 +85,19 @@ last_verified: 2026-05-20
 ## Weather
 
 - Whitby: 14°C high (revised from morning), 4°C low overnight, 30% chance of afternoon showers. (Source: Environment Canada)
+
+---
+
+## Update — 21:00 UTC
+
+## AI Tooling
+
+- [MarkTechPost](https://www.marktechpost.com/2026/05/19/google-launches-antigravity-2-0-at-i-o-2026-a-standalone-agent-first-platform-with-cli-sdk-managed-execution-and-enterprise-support/) Google Antigravity 2.0 shipped at I/O 2026 as a standalone desktop application for agent orchestration, with an Antigravity CLI, SDK, Managed Agents in the Gemini API, and an enterprise tier via the Gemini Enterprise Agent Platform. Google demoed it building the core framework of an operating system in 12 hours using 93 subagents at under $1,000 in compute.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/drupal-to-release-urgent-core-security.html) Drupal released patches today for a highly critical (20/25) unauthenticated vulnerability in Drupal core affecting all supported branches: 11.3.x, 11.2.x, 10.6.x, and 10.5.x. No authentication or prior access is required to exploit the flaw; the Drupal Security Team warned exploits could appear within hours of release.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/oshawa-ajax-election-municipal-mayor-durham-region-9.7205111) Oshawa and Ajax, two of Durham Region's largest municipalities, will have new mayors at the October 26, 2026 municipal election. Few candidates have registered so far — Oshawa has one declared candidate and Ajax has two.
