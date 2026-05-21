@@ -37,3 +37,29 @@ last_verified: 2026-05-21
 ## Just for You
 
 - [GitHub](https://github.com/colbymchenry/codegraph) colbymchenry/codegraph enters the GitHub weekly trending top 8 with 6,731 stars this week and 11,554 total. The project pre-indexes a codebase into a knowledge graph for Claude Code, Codex, Cursor, and OpenCode — reducing token usage and tool call count by letting agents query the graph rather than reading files directly.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/05/19/openai-co-founder-andrej-karpathy-joins-anthropics-pre-training-team/) Andrej Karpathy, OpenAI co-founder and former head of Tesla Autopilot, joined Anthropic on May 19 to work on pre-training under team lead Nick Joseph. He will start a new team that uses Claude to accelerate pre-training research.
+
+- [Google Blog](https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/) At Google I/O 2026 (May 19-20), Google launched Gemini 3.5 Flash — generally available via Google AI Studio and Vertex AI, outperforming Gemini 3.1 Pro on coding and agentic benchmarks at Flash speeds. Google also announced Gemini Spark, a general-purpose agent that takes actions across connected apps on the user's behalf; it begins rolling out to AI Ultra subscribers in the US next week.
+
+- [Axios](https://www.axios.com/2026/05/21/ai-news-cycle-openai-anthropic-spacex) Anthropic reported it is on track for $10.9 billion in Q2 revenue and a $559 million operating profit — its first profitable quarter, arriving two years ahead of internal projections. Separately, OpenAI announced one of its reasoning models independently solved a geometry problem that had remained open for 80 years.
+
+## AI Tooling
+
+- [Google Developers Blog](https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/) Google Antigravity 2.0 shipped at I/O 2026 with multi-agent orchestration, a built-in Chromium browser, dynamic subagents, and scheduled background tasks. Gemini 3.5 Flash is the default model powering it from launch day.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/compromised-nx-console-18950-targeted.html) The Nx Console VS Code extension (nrwl.angular-console, 2.2M installs) was compromised on May 18: version 18.95.0 was live for roughly 11 minutes and deployed an obfuscated credential-stealer harvesting GitHub tokens, AWS keys, HashiCorp Vault secrets, Kubernetes credentials, 1Password data, and Claude Code configuration files. The attack originated from a stolen contributor token and is linked to a group called TeamPCP; approximately 3,800 repositories were exfiltrated. The malicious version has been pulled.
+
+- [The Hacker News](https://thehackernews.com/2026/05/highly-critical-drupal-core-flaw.html) CVE-2026-9082 is a SQL injection flaw in Drupal Core's database abstraction API affecting sites backed by PostgreSQL, allowing anonymous users to achieve remote code execution, privilege escalation, or information disclosure. Drupal released patches on May 20; all sites running Drupal 8 or later on PostgreSQL should upgrade to at least 10.6 immediately.
+
+## Local
+
+- [CP24](https://www.cp24.com/) A Toronto council committee heard Tuesday that expanding the island airport would create severe traffic congestion in the downtown core, with transportation modelling showing gridlock effects extending to the Gardiner Expressway.
