@@ -141,7 +141,7 @@ API has a `customViewCreate` mutation, but nobody's wrapped it in
 IaC tooling yet.
 
 So instead of declaring views in HCL, I described mine as a prompt
-and had Claude set it up via Playwright MCP:
+and had Claude set it up via [Playwright MCP](/playwright-mcp.html):
 
 > Create a custom view called "Suggestion Backlog" on the Pericak
 > team. Filter to issues where label includes "Suggestion" and
