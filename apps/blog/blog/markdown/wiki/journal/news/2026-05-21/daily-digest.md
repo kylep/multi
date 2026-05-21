@@ -63,3 +63,21 @@ last_verified: 2026-05-21
 ## Local
 
 - [CP24](https://www.cp24.com/) A Toronto council committee heard Tuesday that expanding the island airport would create severe traffic congestion in the downtown core, with transportation modelling showing gridlock effects extending to the Gardiner Expressway.
+
+---
+
+## Update — 22:01 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-21/anthropic-in-talks-to-use-microsoft-ai-chips-information-says) Anthropic is in early talks to rent Microsoft AI server chips, which would give it an additional source of compute to run Claude models beyond its existing AWS and SpaceX Colossus agreements.
+
+- [TechCrunch](https://techcrunch.com/2026/05/21/trump-delays-ai-security-executive-order-i-dont-want-to-get-in-the-way-of-that-leading/) Trump postponed the signing of an AI executive order at the last minute on May 21, saying he pulled it because he did not want to impede US AI competitiveness. The order would have updated cybersecurity information-sharing programs to include AI companies and established voluntary government testing of frontier models; no new signing date was announced.
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/meta-builds-ai-infrastructure-with-nvidia) NVIDIA and Meta announced a multiyear, multigenerational chip partnership valued at an estimated $35–67 billion, covering millions of Blackwell and Rubin GPUs, Grace CPUs, and Spectrum-X Ethernet switches for Meta's AI infrastructure across on-premises and cloud deployments.
+
+- [NVIDIA Investor Relations](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-First-Quarter-Fiscal-2027/default.aspx) NVIDIA posted record Q1 FY27 revenue of $81.6 billion, up 85% year over year, beating analyst estimates of $79.2 billion. Data Center revenue reached $75.2 billion, up 92% year over year. NVIDIA also announced an $80 billion share repurchase authorization and raised its quarterly dividend from $0.01 to $0.25 per share.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/05/21/microsoft-defender-vulnerabilities-cve-2026-41091-cve-2026-45498/) CISA added two actively exploited Microsoft Defender zero-days to its KEV catalog: CVE-2026-41091 (CVSS 7.8, local privilege escalation to SYSTEM via improper link resolution in the Malware Protection Engine) and CVE-2026-45498 (CVSS 4.0, denial-of-service disabling Defender). Both are patched in Defender Antimalware Platform versions 1.1.26040.8 and 4.18.26040.7; FCEB agencies must apply fixes by June 3.
