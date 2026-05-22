@@ -57,3 +57,23 @@ last_verified: 2026-05-22
 ## Local
 
 - [insauga](https://www.insauga.com/two-motorcyclists-with-life-altering-injuries-after-collisions-in-oshawa-and-whitby/) Two Durham Region motorcyclists suffered life-altering injuries in separate collisions this week. A 24-year-old on a Yamaha was struck at Taunton Road East and Thickson Road North in Whitby on May 20; a 69-year-old on a Triumph was rear-ended in Oshawa on May 18. The Oshawa driver faces charges including dangerous operation causing bodily harm. Both riders are in stable condition.
+
+---
+
+## Update — 22:03 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-19/google-hires-staff-from-bezos-backed-contextual-ai-in-licensing-deal) Google DeepMind hired more than 20 researchers from Bezos-backed Contextual AI — including co-founder and CEO Douwe Kiela — under an $80–100M licensing deal announced May 19. The arrangement acquires talent and technology without a formal acquisition, following the pattern of Google's earlier Windsurf and Character.AI deals to limit antitrust exposure.
+
+## AI Tooling
+
+- [GitHub Changelog](https://github.blog/changelog/2026-05-21-github-copilot-for-eclipse-is-open-source/) GitHub open sourced the Copilot for Eclipse plugin under MIT license on May 21, publishing the chat, completion, agent, and prompt layers to the microsoft/copilot-for-eclipse repository. The Copilot service itself remains proprietary; only the Eclipse IDE frontend is open.
+
+## Security
+
+- [CyberPress](https://cyberpress.org/splunk-patches-multiple-flaws/) Splunk patched three vulnerabilities across Splunk Enterprise, Cloud Platform, and AI Toolkit on May 20. CVE-2026-20239 (High) allows session cookie and HTTP body theft from internal logs; CVE-2026-20240 (High) enables DoS via directory renaming in the archiver app; CVE-2026-20238 (Medium) lets low-privileged users bypass search filters in the AI Toolkit. Fixed in Splunk Enterprise 10.2.2 / 10.0.5 / 9.4.10 / 9.3.11.
+
+## Just for You
+
+- [GitGuardian Blog](https://blog.gitguardian.com/how-we-got-a-cisa-github-leak-taken-down-in-26-hours/) GitGuardian discovered a public GitHub repository named "Private-CISA" on May 14, containing Kubernetes manifests, ArgoCD application files, AWS account references, IAM identities, and internal service endpoints. The repository had been publicly accessible for approximately 183 days before GitGuardian contacted CISA and it was taken down May 15 — roughly 26 hours after discovery.
