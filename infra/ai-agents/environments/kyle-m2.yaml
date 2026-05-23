@@ -20,3 +20,6 @@ cronjobs:
   paiMorning:
     enabled: false
     schedule: "30 12 * * *"
+  paiWeeklyHoroscopes:
+    enabled: false
+    schedule: "30 12 * * 1"
