@@ -89,9 +89,9 @@ below.
 
 # About Plugins and the Marketplace
 
-A Claude Code **plugin** is a folder that bundles slash commands, agents, skills, hooks,
-MCP server config, and default settings. If those terms are fuzzy, this
-[cheat-sheet](/claude-code-cheat-sheet.html) covers all of them.
+A Claude Code **plugin** is a folder that bundles slash commands, agents, skills,
+[hooks](/claude-hooks.html), MCP server config, and default settings. If those terms
+are fuzzy, this [cheat-sheet](/claude-code-cheat-sheet.html) covers all of them.
 
 A **marketplace** is a catalog of plugins. It's a JSON file at
 `.claude-plugin/marketplace.json` living inside a Git repo, a local
