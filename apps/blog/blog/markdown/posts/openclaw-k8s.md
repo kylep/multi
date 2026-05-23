@@ -481,6 +481,8 @@ The `emptyDir` volumes have size limits. If something
 tries to fill `/tmp`, it gets evicted instead of filling
 the node's disk. The `/dev/shm` volume uses `medium:
 Memory` because Chromium needs shared memory for rendering.
+Docker's [default `/dev/shm` is only 64MB](/docker-shared-memory.html),
+which is too small for most browser-based workloads.
 
 
 # Seccomp and capabilities
