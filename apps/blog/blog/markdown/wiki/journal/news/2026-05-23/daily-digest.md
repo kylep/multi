@@ -75,3 +75,33 @@ last_verified: 2026-05-23
 - [CP24](https://www.cp24.com/local/toronto/2026/05/22/doors-open-toronto-returns-this-weekend-with-cn-tower-debut/) Doors Open Toronto runs May 23–24 with more than 160 sites open free to the public, including a first-time appearance by the CN Tower. The theme is "The World in a City."
 
 - [Now Toronto](https://nowtoronto.com/news/bruno-mars-toronto-rogers-stadium-concert-guide/) Bruno Mars opens a five-show sold-out run at Rogers Stadium in North York tonight, kicking off the venue's second summer season. Doors at 7 p.m.; no GO train service at Downsview Park Station due to track work — TTC is the recommended transit option.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-21/anthropic-in-talks-to-use-microsoft-ai-chips-information-says) Anthropic is in early talks to rent servers running Microsoft's Maia 200 AI chips, adding a third compute source alongside its existing AWS Trainium and Google TPU arrangements. No deal has been signed; Microsoft's Maia 200 is not yet available to standard Azure customers.
+
+- [CNBC](https://www.cnbc.com/2026/05/20/openai-ipo-filing.html) OpenAI confidentially filed its S-1 IPO prospectus with the SEC on May 22, targeting a September 2026 public listing at a valuation above $1 trillion. Goldman Sachs and Morgan Stanley are leading the deal. The company reported roughly $2 billion per month in revenue but lost $1.22 for every $1 earned in Q1 2026.
+
+## AI Tooling
+
+- [TechCrunch](https://techcrunch.com/2026/05/19/google-introduces-gemini-spark-a-24-7-agentic-assistant-with-gmail-integration/) Google launched Gemini Spark at Google I/O 2026, a 24/7 cloud-based AI agent that proactively manages tasks in Gmail, Docs, and Slides and keeps running after the user closes their device. It enters beta for Google AI Ultra subscribers next week, with Canva, OpenTable, and Instacart integrations available at launch.
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/cisco-patches-critical-vulnerability-in-secure-workload/) Cisco patched CVE-2026-20223 (CVSS 10.0) in Cisco Secure Workload, a REST API authentication bypass allowing unauthenticated remote attackers to read sensitive data and change configurations across tenant boundaries with Site Admin privileges. No workaround is available; fixed in versions 3.10.8.3 and 4.0.3.17.
+
+- [The Hacker News](https://thehackernews.com/2026/05/drupal-core-sql-injection-bug-actively.html) CVE-2026-9082, a critical SQL injection flaw in Drupal Core's JSON:API layer affecting PostgreSQL-backed sites, was added to CISA's KEV catalog on May 22 after over 15,000 exploitation attempts against nearly 6,000 sites in the first 48 hours post-disclosure. Patches are available for Drupal 10.4/10.5/10.6 and 11.x branches.
+
+## Geopolitics
+
+- [CBC News](https://www.cbc.ca/news/world/russia-luhansk-attack-putin-9.7208752) Ukrainian drones struck a student dormitory in Starobilsk in Russian-occupied Luhansk Oblast on May 22, killing at least 6 and injuring 39, with 15 still missing. Putin ordered the Russian defence ministry to prepare retaliatory options.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/toronto-police-suspended-with-pay-9.7205903) Three Toronto Police Service officers arrested in Barcelona on May 13 for alleged sexual assault and assault — Evan Glennie, Rich Rand, and Caglar Yigit — have returned to Canada and are suspended with pay pending details from Spanish authorities.
+
+- [CP24](https://www.cp24.com/politics/toronto-city-hall/2026/05/21/school-lands-should-be-off-the-table-toronto-parents-rally-to-block-housing-development/) Parents and students rallied outside multiple Toronto schools on May 21 opposing a legal challenge by the TDSB and TCDSB that seeks to overturn a City exemption protecting school properties from high-density redevelopment along major streets.
