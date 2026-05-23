@@ -176,7 +176,9 @@ limited to ~8B parameter models on 16GB RAM, maybe a quantized 14B
 if you squeeze. A local Llama 8B or Qwen3 8B via Ollama will be
 noticeably worse at coding tasks than Big Pickle or Gemini Flash,
 and slower too. Run local if you need privacy or offline access,
-not for quality.
+not for quality. The [local LLM bakeoff on M2](/local-llm-bakeoff.html)
+compares Qwen3 8B, DeepSeek-R1, and Mistral Nemo with hands-on numbers
+for 16GB machines.
 
 ## Init and go
 
