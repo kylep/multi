@@ -57,3 +57,21 @@ last_verified: 2026-05-23
 - [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare added Wrangler Tunnel support for sharing local dev sessions with a public URL, and added multi-table query support (JOINs, subqueries, CTEs) to R2 SQL for Apache Iceberg tables in R2 Data Catalog.
 
 - [GitHub / ArgoCD](https://endoflife.date/argo-cd) ArgoCD 3.1 reached end of life on May 6, 2026 and will no longer receive bug fixes or security patches. Users on 3.1 should upgrade to 3.2, 3.3, or 3.4.
+
+---
+
+## Update — 16:00 UTC
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/laravel-lang-php-packages-compromised.html) A supply chain attack compromised 233 versions of Laravel-Lang packages across 700 GitHub repositories, detected May 22–23. The attacker rewrote historical version tags in the laravel-lang/lang, laravel-lang/http-statuses, laravel-lang/attributes, and laravel-lang/actions packages to point to malicious forks containing a 5,900-line PHP credential stealer that harvests AWS, GCP, Azure, Kubernetes, SSH, and browser credentials. Packagist took down the affected versions and temporarily unlisted the packages.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/05/23/nx-s1-5832394/rubio-arrives-india) US Secretary of State Marco Rubio arrived in India on May 23 ahead of a Quad foreign ministers meeting in New Delhi on May 26 with counterparts from India, Australia, and Japan. The visit is Rubio's first to India and aims to reset US-India ties strained by Trump tariff policy, with trade and energy security as the primary agenda items.
+
+## Local
+
+- [CP24](https://www.cp24.com/local/toronto/2026/05/22/doors-open-toronto-returns-this-weekend-with-cn-tower-debut/) Doors Open Toronto runs May 23–24 with more than 160 sites open free to the public, including a first-time appearance by the CN Tower. The theme is "The World in a City."
+
+- [Now Toronto](https://nowtoronto.com/news/bruno-mars-toronto-rogers-stadium-concert-guide/) Bruno Mars opens a five-show sold-out run at Rogers Stadium in North York tonight, kicking off the venue's second summer season. Doors at 7 p.m.; no GO train service at Downsview Park Station due to track work — TTC is the recommended transit option.
