@@ -95,8 +95,9 @@ Creates a symlink `~/Documents/Paradox Interactive/Stellaris/mod/3x-bigger-world
 
 ## Steam Workshop upload (when ready)
 
-1. Drop a 3x-bigger-worlds-themed source image at `mod/thumbnail-src.<ext>` and run `scripts/process-thumbnail.sh` — produces canonical 512×512 8-bit RGB PNG at `mod/thumbnail.png` (avoids the "JPEG bytes with `.png` extension" trap that broke the first Multi-Megastructures upload).
-2. `scripts/preflight.py` — C9 verifies the thumbnail is real PNG, 512×512, no alpha, under 1 MB.
-3. Launcher → Mods → Mod Tools → Upload Mod.
-4. Select "3x Bigger Worlds", add description, upload.
-5. Change visibility from Private to Public on the Workshop page.
+1. (Optional) `node scripts/generate-thumbnail.mjs` to regenerate `mod/thumbnail-src.png` via Gemini, OR drop your own source image at `mod/thumbnail-src.<ext>` (PNG / JPEG / WebP / TIFF). The shipped thumbnail is the Gemini-generated one.
+2. `scripts/process-thumbnail.sh` — re-encodes the source to canonical 512×512 8-bit RGB PNG at `mod/thumbnail.png` (avoids the "JPEG bytes with `.png` extension" trap that broke the first Multi-Megastructures upload) and syncs the blog companion image.
+3. `scripts/preflight.py` — C9 verifies the thumbnail is real PNG, 512×512, no alpha, under 1 MB.
+4. Launcher → Mods → Mod Tools → Upload Mod.
+5. Select "3x Bigger Worlds", add description, upload.
+6. Change visibility from Private to Public on the Workshop page.
