@@ -100,7 +100,7 @@ and inspect the rendered page.
 
 Every agent connected to real
 [MCP](https://modelcontextprotocol.io/) servers to do cool stuff. The
-CMO queried real GA4 data. The CFO pulled real OpenRouter
+CMO queried real [GA4 data](/ga4-mcp.html). The CFO pulled real OpenRouter
 bills.
 
 # The org chart
