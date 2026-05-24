@@ -47,3 +47,13 @@ last_verified: 2026-05-24
 ## Local
 
 - [The Weather Network](https://www.theweathernetwork.com/en/news/weather/severe/thousands-of-outages-reported-as-gusty-winds-buffet-ontario) Gusty winds of 60–72 km/h across Ontario on Saturday knocked down trees and power lines, leaving at least 30,000 Hydro One customers without power heading into Saturday evening. The strongest gusts hit Muskoka Airport (72 km/h) and Sault Ste. Marie (69 km/h); winds are easing through Sunday.
+
+---
+
+## Update — 21:00 UTC
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/7-eleven-data-breach-confirmed-after-shinyhunters-ransom-demand/) 7-Eleven confirmed a breach affecting approximately 600,000 Salesforce records, with ShinyHunters publicly releasing the stolen data today. The exposed records include names, driver's licences, Social Security numbers, and addresses of franchise applicants — data entered since at least April 2026. The attack vector: misconfigured guest user permissions in Salesforce Experience Cloud sites, a technique ShinyHunters has used against 300–400 organizations since September 2025. 7-Eleven is offering 24 months of identity theft protection through IDX.
+
+- [The Hacker News](https://thehackernews.com/2026/05/on-prem-microsoft-exchange-server-cve.html) CVE-2026-42897, an Exchange OWA zero-day being actively exploited since at least May 14, still has no permanent patch as of today. Sending a crafted email to any user who opens it in Outlook Web Access executes attacker-controlled JavaScript in the authenticated browser session, enabling session token theft and mailbox takeover. Affects Exchange Server 2016, 2019, and Subscription Edition. Microsoft pushed an automatic emergency mitigation via the Exchange EM Service; FCEB remediation deadline is May 29.
