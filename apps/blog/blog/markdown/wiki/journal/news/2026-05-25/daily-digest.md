@@ -63,3 +63,43 @@ last_verified: 2026-05-25
 - [n8n](https://releasebot.io/updates/n8n) n8n shipped a Linear Trigger Node with signing secret validation and a MiniMax Chat Model Node, plus bug fixes across AI Builder, workflows, authentication, and execution handling.
 
 - [ArgoCD](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.1 reached end of life on May 6, 2026. Users running v3.1 should upgrade to v3.2, v3.3, or v3.4 to continue receiving security updates.
+
+---
+
+## Update — 16:07 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/model-disproves-discrete-geometry-conjecture/) An OpenAI general-purpose reasoning model autonomously disproved the Erdős planar unit distance conjecture, an unsolved geometry problem from 1946. The model found a new family of point constructions beating square grids and connected the problem to algebraic number theory; the proof has been independently verified by external mathematicians.
+
+- [CNBC](https://www.cnbc.com/2026/05/20/anthropic-revenue-explosive-growth-ipo-profitable-quarter.html) Anthropic is projected to post its first profitable quarter in Q2 2026, with revenue estimated at $10.9 billion (up from $4.8B in Q1) and an expected operating profit of roughly $559 million. The company cautioned that sustained profitability is uncertain due to scheduled increases in compute costs later in the year.
+
+- [CNBC](https://www.cnbc.com/2026/05/21/anthropic-microsoft-maia-200-ai-chip.html) Anthropic expanded its compute partnership with SpaceX, committing approximately $1.25 billion per month through 2029 for access to the Colossus supercomputing cluster, the same infrastructure behind the Claude Code rate limit increase.
+
+## AI Tooling
+
+- [Havoptic](https://www.havoptic.com/tools/github-copilot) Claude Code doubled 5-hour usage limits and removed peak-hour throttling for Pro and Max plan subscribers, citing the expanded SpaceX Colossus compute deal as the enabling factor.
+
+- [Lushbinary](https://lushbinary.com/blog/ai-coding-agents-comparison-cursor-windsurf-claude-copilot-kiro-2026/) Cursor shipped Composer 2.5 on May 18, adding cloud agent dev environments, Microsoft Teams integration, and a Build in Parallel feature for multi-agent workflows.
+
+- [Havoptic](https://www.havoptic.com/tools/github-copilot) GitHub Copilot switches to AI Credits flex billing on June 1, 2026, keeping the existing $10 Pro and $39 Pro+ price points but replacing flat monthly limits with a shared credit pool. A new Copilot Max tier is also being added for heavy individual workloads.
+
+- [TechGenyz](https://techgenyz.com/microsoft-claude-code-copilot-cli-transition-cancels/) Microsoft is canceling most internal Claude Code licenses for the Experiences + Devices group (Windows, Microsoft 365, Outlook, Teams, Surface) and requiring engineers to migrate to GitHub Copilot CLI by June 30, 2026.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/github-internal-repositories-breached.html) GitHub confirmed that threat actor TeamPCP (UNC6780) exfiltrated roughly 3,800 internal repositories after a developer installed a trojanized build of the Nx Console VS Code extension (version 18.95.0), which was live on the VS Code Marketplace for 18 minutes on May 18. The malicious extension harvested credentials from 1Password vaults, Claude Code configurations, npm, GitHub, and AWS tokens.
+
+- [CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) CISA issued an alert for CVE-2026-9082, a critical SQL injection vulnerability in Drupal Core being actively exploited in the wild. Drupal site administrators should apply available patches immediately.
+
+- [The Hacker News](https://thehackernews.com/) CVE-2026-26980, a CVSS 9.4 SQL injection flaw in Ghost CMS's Content API, is being actively exploited to inject malicious JavaScript and fuel ClickFix phishing campaigns. Ghost users should update to the patched release.
+
+- [Tenable](https://www.tenable.com/cve/newest) CVE-2026-48172, a CVSS 10.0 vulnerability in the LiteSpeed User-End cPanel Plugin, is under active exploitation. The maximum-severity rating reflects unauthenticated remote code execution with no prerequisites.
+
+## Geopolitics
+
+- [Reuters](https://www.enterprisebank.com/insights/geopolitical-update-may-2026) India and Pakistan are being asked whether talks on the Indus Waters Treaty will resume, with the long-suspended cross-border water-sharing agreement back in focus following recent diplomatic signals from both governments.
+
+## Local
+
+- [CP24](https://www.cp24.com/) A scheduled Bruno Mars concert at Rogers Stadium was cancelled due to heavy rain and poor weather conditions affecting the GTA this weekend.
