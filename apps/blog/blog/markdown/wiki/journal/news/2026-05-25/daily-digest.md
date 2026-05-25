@@ -103,3 +103,19 @@ last_verified: 2026-05-25
 ## Local
 
 - [CP24](https://www.cp24.com/) A scheduled Bruno Mars concert at Rogers Stadium was cancelled due to heavy rain and poor weather conditions affecting the GTA this weekend.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [TechNode](https://technode.com/2026/05/21/alibaba-introduces-qwen3-7-max-as-next-gen-ai-agent-model/) Alibaba announced Qwen3.7-Max at the Alibaba Cloud Summit on May 20, a proprietary 1M-token reasoning model capable of 35 hours of uninterrupted autonomous operation. Supports external harnesses including Claude Code and Codex; no open-weight release announced. Available via preview API on Alibaba Cloud, OpenRouter, and Together AI at $2.50/$7.50 per million tokens.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/lazarus-deploys-remotepe-memory-only.html) Fox-IT published new research on RemotePE, a fileless RAT used by North Korea's Lazarus Group against financial institutions and cryptocurrency firms. The malware executes entirely in memory via a two-stage DPAPI loader chain, leaving no filesystem artifacts and evading endpoint detection through ETW patching. Initial samples trace to mid-2023; neither loader nor payload appeared on VirusTotal prior to this disclosure.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/olivia-chow-run-for-mayor-9.7210991) Toronto Mayor Olivia Chow formally announced her re-election bid on May 25 for the October 26 municipal election, citing transit fare freezes, free school meals, and longer library hours as first-term accomplishments. Primary challenger is City Councillor Brad Bradford. Nominations close August 21.
