@@ -278,7 +278,7 @@ secrets that were committed and later deleted. Trivy also has
 a secret scanner, but it only checks files on disk. If someone
 committed an API key and removed it in the next commit, trivy
 wouldn't see it. Gitleaks would, because the key is still in
-the git log.
+the git log. Found one in history? [Git filter-branch](/git-reference.html) scrubs it.
 
 That's why both are in the image. Trivy covers dependency vulns
 and current-file secrets. Gitleaks covers the git history angle.
