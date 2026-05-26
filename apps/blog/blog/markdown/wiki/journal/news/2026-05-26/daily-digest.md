@@ -39,3 +39,27 @@ last_verified: 2026-05-26
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby: 25°C high, fog patches dissipating this morning, wind becoming southwest 20 km/h, humidex 27°C. No alerts in effect.
+
+---
+
+## Update — 15:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-12/anthropic-in-talks-to-raise-30-billion-at-900-billion-valuation) Anthropic is reportedly finalizing a new funding round above $30 billion at a pre-money valuation near $900 billion, co-led by Sequoia, Dragoneer, Altimeter, and Greenoaks. The round would make Anthropic the most valuable private AI company, surpassing OpenAI's roughly $852 billion valuation. The company's annualized revenue reached $30 billion in April, ahead of OpenAI's $25 billion run rate.
+
+## AI Tooling
+
+- [Google Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/) Gemini 3.5 Flash launched at Google I/O on May 19 and is generally available across the Gemini app, AI Studio, Vertex AI, Android Studio, and the Gemini API. It outperforms Gemini 3.1 Pro on agentic and coding benchmarks at $1.50 input / $9.00 output per 1M tokens. Gemini 3.5 Pro is expected in June.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/microsoft-releases-mitigation-for.html) CVE-2026-45585 (YellowKey) is a zero-day BitLocker bypass that requires physical access — an attacker boots into Windows Recovery Environment from a crafted USB or EFI partition to unlock an encrypted drive without the PIN. Affects Windows 11 24H2 through 26H1 and Windows Server 2025. Microsoft released a mitigation on May 20; switching BitLocker from TPM-only to TPM+PIN mode blocks exploitation.
+
+## Geopolitics
+
+- [AnewZ](https://anewz.tv/world/world-news/20399/world-news-main-stories-26-may-2026/news) Passenger rail service between Baku, Azerbaijan and Tbilisi, Georgia resumed today after a six-year suspension, with the first train departing Baku at 23:10 local time and arriving in Tbilisi at 08:41.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-liberal-leadership-race-navdeep-bains-9.7211747) Former federal cabinet minister Navdeep Bains entered the Ontario Liberal leadership race on May 25. Bains served as Minister of Innovation, Science and Industry under Justin Trudeau before leaving politics in 2021; he recently resigned from Rogers to pursue the bid.
