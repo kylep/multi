@@ -63,3 +63,19 @@ last_verified: 2026-05-26
 ## Local
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/ontario-liberal-leadership-race-navdeep-bains-9.7211747) Former federal cabinet minister Navdeep Bains entered the Ontario Liberal leadership race on May 25. Bains served as Minister of Innovation, Science and Industry under Justin Trudeau before leaving politics in 2021; he recently resigned from Rogers to pursue the bid.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/05/26/anthropic-project-glasswing-update/) Anthropic released updated Project Glasswing figures: 23,019 total issues found across 1,000+ open-source projects, with 6,202 classified as high- or critical-severity and over 90% confirmed as true positives by six independent security firms. A notable find is a certificate forgery vulnerability in wolfSSL, a cryptography library used by billions of devices. Anthropic identified patching speed — not discovery — as the primary remaining bottleneck.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/microsoft-patches-sharepoint-rce-flaw.html) CVE-2026-45659 (CVSS 8.8) is a deserialization RCE flaw in SharePoint Server Subscription Edition, 2019, and 2016. Any authenticated attacker with Site Member permissions can execute code remotely without user interaction. Patches available via Microsoft Update Catalog as of May 21; no public exploit or PoC known yet.
+
+## Geopolitics
+
+- [US State Department](https://www.state.gov/releases/office-of-the-spokesperson/2026/05/joint-statement-from-the-quad-foreign-ministers-meeting-in-new-delhi/) The 11th Quad Foreign Ministers' Meeting concluded in New Delhi today with US Secretary Rubio, and foreign ministers of India, Australia, and Japan. Outcomes include the new Indo-Pacific Maritime Surveillance Collaboration (IPMSC), a Quad Critical Minerals Initiative Framework to coordinate supply chains, and an Indo-Pacific Energy Security Initiative.
