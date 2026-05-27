@@ -36,7 +36,7 @@ generations.
 MacBook Air M2, 16GB unified memory. The Air throttles under sustained load since
 it has no active cooling. Fine for a game that generates at natural breaks (between
 scenes, at combat start) rather than continuously. If you're curious how LLMs
-perform on this same hardware, I ran a [local LLM bakeoff on the M2 Air](/local-llm-bakeoff.html)
+perform on this same hardware, I ran a [local LLM bakeoff on the M2 Air](/local-llm-m2-air.html)
 that compares Qwen3, DeepSeek, and Mistral at 16GB.
 
 16GB comfortably fits:
