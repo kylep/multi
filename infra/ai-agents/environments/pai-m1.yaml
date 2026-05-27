@@ -34,8 +34,8 @@ cronjobs:
     enabled: true
     schedule: "0 4 * * *"   # 12:00 AM EDT (04:00 UTC) — nightly, before everything else
   paiMorning:
-    enabled: true
-    schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC)
+    enabled: false
+    schedule: "0 11 * * *"   # 7:00 AM EDT (11:00 UTC) — suspended; horoscopes moved to paiWeeklyHoroscopes
   paiWeeklyHoroscopes:
     enabled: true
     schedule: "0 11 * * 1"   # 7:00 AM EDT (11:00 UTC) on Mondays
