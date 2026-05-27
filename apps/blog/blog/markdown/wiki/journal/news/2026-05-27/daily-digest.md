@@ -51,3 +51,21 @@ last_verified: 2026-05-27
 - [The Trillium](https://www.thetrillium.ca/news/education-and-training/tdsb-drop-special-ed-funding-next-year-6-million-12332373) The TDSB will receive $6.4M less in provincial special education funding in 2026-27, dropping from $403M to $396.5M due to an enrollment-based formula adjustment. The board says it will maintain staffing levels; the special education advisory committee chair called it a "disaster."
 
 - [The Trillium](https://www.thetrillium.ca/news/municipalities-transit-and-infrastructure/eglinton-bike-lanes-toronto-backpedal-ford-government-crackdown-12332316) Toronto cancelled planned Eglinton Avenue bike lanes between Keele Street and Mount Pleasant Road following the Ford government's Bill 60 (Fighting Delays, Building Faster Act), which bars municipalities from converting vehicle lanes to bike infrastructure. A short completed segment between Chaplin Crescent and Avenue Road will remain.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Fujitsu Global](https://global.fujitsu/en-global/pr/news/2026/05/27-01) Fujitsu signed strategic partnerships with both Anthropic and OpenAI on May 27, embedding Claude and OpenAI models across its AI service portfolio and activating roughly 100,000 Fujitsu Group employees on each platform. The Anthropic deal emphasizes mission-critical systems safety; the OpenAI deal targets enterprise AI transformation across Japan.
+
+- [Time](https://time.com/article/2026/05/26/sam-altman-ai-job-losses-openAI-/) OpenAI CEO Sam Altman said at a Commonwealth Bank of Australia event that he was "delighted to be wrong" about AI's labor market impact — specifically that more entry-level white-collar jobs have not been eliminated as he projected in 2025. Fortune notes both Altman and Amodei softened earlier predictions ahead of anticipated IPOs.
+
+## Security
+
+- [GBHackers](https://gbhackers.com/github-enterprise-server-3-20-3-addresses-critical-security-flaws/) GitHub Enterprise Server 3.20.3 shipped May 26 with fixes for a pre-authentication SSRF (CVE-2026-9312) and two Linux kernel privilege-escalation bugs dubbed Dirty Frag (CVE-2026-43284, CVE-2026-43500). Administrators must rotate cryptographic signing keys before applying the update.
+
+## Local
+
+- [CP24](https://www.cp24.com/local/toronto/2026/05/27/ontario-skies-lit-up-by-possible-meteor/) A fireball streaked across Ontario skies around 5:10 a.m. Wednesday, captured on dashcam near Whitchurch-Stouffville. The American Meteor Society logged more than 30 reports from Toronto, Mississauga, Burlington, and Pickering. The object has not yet been confirmed as a meteor by official sources.
