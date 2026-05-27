@@ -159,7 +159,9 @@ Inspired by openclaw's inferred-commitments.
 
 ### CronJobs (out-of-process)
 
-Per-task YAML in `infra/ai-agents/cronjobs/helm/templates/`.
+Per-task YAML in `infra/ai-agents/cronjobs/helm/templates/`. The
+[K8s cron agent post](/cron-event-triggered-ai-agents-k8s.html) covers how I built
+that framework.
 
 At the time of writing this I have it summarizing the news, writing curated
 horroscopes for my wife and kids, making nightly SEO improvements to the site, and
