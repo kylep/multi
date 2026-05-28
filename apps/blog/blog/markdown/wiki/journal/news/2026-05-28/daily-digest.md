@@ -59,3 +59,27 @@ last_verified: 2026-05-28
 ## Local
 
 - [CTV News](https://www.ctvnews.ca/business/article/cpkc-given-strike-notice-by-union-for-signals-and-communications-workers/) The International Brotherhood of Electrical Workers issued a 72-hour strike notice to CPKC today. About 300 signals and communications workers could walk off the job Sunday at 8 a.m. MT. CPKC says rail operations will continue if a strike proceeds; talks are ongoing through the weekend.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/05/28/anthropic-raises-65-billion-nears-1t-valuation-ahead-of-ipo/) Anthropic closed a $65 billion Series H today at a $965 billion post-money valuation, eclipsing OpenAI's most recent $852 billion valuation. The round was co-led by Altimeter, Dragoneer, Greenoaks, and Sequoia, with Samsung, SK Hynix, and Micron joining as strategic partners. Run-rate revenue crossed $47 billion earlier this month.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/microsoft-patches-sharepoint-rce-flaw.html) CVE-2026-45659 (CVSS 8.8): Microsoft patched a deserialization RCE flaw in SharePoint Server affecting Subscription Edition, 2019, and Enterprise Server 2016. Any authenticated user with Site Member permissions can trigger remote code execution over the network. Patched in the May 21 Patch Tuesday release via KB5002863, KB5002870, and KB5002868. No active exploitation reported.
+
+## Geopolitics
+
+- [FX.co](https://www.fx.co/en/analysis/447333) Israeli aircraft struck 47 populated areas in Lebanon on May 28, introducing a new complication into ongoing US-Iran ceasefire talks. Iran has made an end to Israeli strikes on Hezbollah a prerequisite for any formal deal; Secretary of State Rubio said Washington would give negotiations a "chance for success," and a formal announcement is still expected around the May 31 Eid celebrations.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/whitby-teens-injured-in-crash-9.7215398) Four teenagers were injured in a single-vehicle rollover crash on Myrtle Road near Baldwin Street in Whitby at 5:35 a.m. today. Two teens were ejected from the vehicle; a 16-year-old girl was airlifted to a trauma centre with critical injuries. Durham police are investigating speed as a possible factor.
+
+## Just for You
+
+- [Cloudflare Changelog](https://developers.cloudflare.com/changelog/post/2026-05-21-rest-api/) Cloudflare AI Gateway added a unified REST API on May 21 that routes calls to OpenAI, Anthropic, Google, and Workers AI models through a single endpoint with shared authentication. All existing AI Gateway features — logging, caching, rate limiting, and guardrails — apply automatically, and billing is consolidated through Unified Billing.
