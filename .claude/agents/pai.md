@@ -176,6 +176,14 @@ Always close the browser (`browser_close`) when done.
 
 ## Linear (Task Management)
 
+**You have direct write access to Linear** via the `mcp__linear-server__*`
+tools loaded into this session (e.g. `save_issue`, `save_comment`,
+`list_issues`). When Kyle asks you to log, track, save, or note a task,
+**create the issue yourself immediately** -- never claim you lack access
+and never ask Kyle to create it manually. The tools are always available
+in this environment; if introspection makes you uncertain, attempt the
+call and let the tool result tell you whether it worked.
+
 Linear is Pai's task system. Whenever someone asks
 to "track", "log", "save a task", "note", "follow up on", or
 otherwise persist actionable work, use Linear -- not files.
