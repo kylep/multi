@@ -69,3 +69,29 @@ last_verified: 2026-05-29
 - [The New Stack / AWS](https://thenewstack.io/aws-kubernetes-invisible-simplicity/) AWS presented Karpenter, Kro, and Cedar at KubeCon CloudNativeCon Europe 2026 as the pillars of its effort to abstract Kubernetes complexity away from developers — relevant to both Kubernetes and AWS watchlist topics.
 
 - [Releasebot/Anthropic](https://releasebot.io/updates/anthropic) Claude Managed Agents now connect to private MCP servers within enterprise-controlled execution sandboxes — a notable MCP server platform update for Claude/API users.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [Yahoo Finance / The Information](https://finance.yahoo.com/markets/stocks/articles/microsoft-stock-rises-3-push-144852884.html) Microsoft shares rose 3% on a report the company is developing a new in-house coding model, part of a broader effort to reduce dependence on external AI vendors like Anthropic and OpenAI.
+
+## AI Tooling
+
+- [Microsoft 365 Blog](https://www.microsoft.com/en-us/microsoft-365/blog/2026/05/28/introducing-a-new-design-for-microsoft-365-copilot/) Microsoft 365 Copilot rolled out a redesigned interface on May 28, with faster performance, adaptive tools, and streamlined AI-powered workflow layouts.
+
+## Security
+
+- [Cyberpress / Security Affairs](https://securityaffairs.com/192817/malware/cve-2026-35616-forticlient-ems-flaw-actively-exploited-in-malware-attacks.html) Attackers are distributing a fake Fortinet patch for the previously disclosed FortiClient EMS flaw (CVE-2026-35616, CVSS 9.1) that installs EKZ Infostealer — a credential-harvesting malware exfiltrating browser credentials over HTTP. Arctic Wolf identified the campaign in May 2026.
+
+- [Cyberpress](https://cyberpress.org/openvpn-connect-macos-flaw/) CVE-2026-9560 (CVSS 9.4): an OS command injection flaw in OpenVPN Connect for macOS allows local attackers to execute arbitrary commands as root via the privileged helper IPC channel. Affects versions 3.5.1–3.8.1; patched in v3.8.2. No active exploitation reported.
+
+## Local
+
+- [BNN Bloomberg / Global News](https://globalnews.ca/news/11873378/gdp-march-2026/) Statistics Canada confirmed Canada entered a technical recession in Q1 2026, with real GDP contracting 0.1% annualized after a 1% drop in Q4 2025. Weakness in resource extraction and construction drove the decline; early April data shows a rebound.
+
+## Just for You
+
+- [InfoQ](https://www.infoq.com/news/2026/05/cloudflare-dynamic-workflows/) Cloudflare shipped Dynamic Workflows, an MIT-licensed library extending its durable execution engine so workflow code can vary per tenant, agent, or request at runtime — relevant to Cloudflare Workers and agent infrastructure.
