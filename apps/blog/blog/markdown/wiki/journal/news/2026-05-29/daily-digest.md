@@ -95,3 +95,21 @@ last_verified: 2026-05-29
 ## Just for You
 
 - [InfoQ](https://www.infoq.com/news/2026/05/cloudflare-dynamic-workflows/) Cloudflare shipped Dynamic Workflows, an MIT-licensed library extending its durable execution engine so workflow code can vary per tenant, agent, or request at runtime — relevant to Cloudflare Workers and agent infrastructure.
+
+---
+
+## Update — 23:30 UTC
+
+## AI Tooling
+
+- [GitHub Blog](https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/) GitHub Copilot moves all plans to usage-based AI Credits billing on June 1. Pro remains $10/month and Pro+ $39/month, but each dollar of subscription now converts to AI Credits for model usage. New sign-ups for Pro and Pro+ are paused while GitHub tightens capacity for existing subscribers.
+
+- [9to5Google](https://9to5google.com/2026/05/29/gemini-spark-ultra-us/) Gemini Spark began rolling out today to Google AI Ultra subscribers in the US. The 24/7 personal agent — announced at I/O last week — can autonomously execute tasks across Google apps and connected services.
+
+## Security
+
+- [The Hacker News / Sysdig](https://thehackernews.com/2026/05/attackers-use-llm-agent-for-post.html) Sysdig's threat research team documented an attack where an LLM agent handled the entire post-exploitation phase after an initial breach via Marimo CVE-2026-39987 (pre-auth RCE, CVSS 9.3). The agent extracted cloud credentials, retrieved an SSH private key from AWS Secrets Manager, then exfiltrated the full contents of an internal PostgreSQL database — four pivots completed in under two minutes. First documented case of an LLM driving autonomous lateral movement in a real-world intrusion.
+
+## Just for You
+
+- [The Hacker News / Sysdig](https://thehackernews.com/2026/05/attackers-use-llm-agent-for-post.html) The Marimo post-exploitation attack also exfiltrated credentials from AWS Secrets Manager and targeted a PostgreSQL database — watchlist items for AWS and PostgreSQL users.
