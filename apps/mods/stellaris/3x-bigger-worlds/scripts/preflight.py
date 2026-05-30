@@ -273,10 +273,13 @@ def c5_negatives_preserved() -> None:
         override = DEPOSITS_OUT / src.name
         if not override.exists():
             continue
-        v_count = len(DISTRICT_NEG_RE.findall(read(src)))
-        o_count = len(DISTRICT_NEG_RE.findall(read(override)))
-        if v_count != o_count:
-            wrong.append(f"{src.name}: vanilla had {v_count} negatives, override has {o_count}")
+        v_neg = DISTRICT_NEG_RE.findall(read(src))
+        o_neg = DISTRICT_NEG_RE.findall(read(override))
+        if v_neg != o_neg:
+            wrong.append(
+                f"{src.name}: negative district modifiers differ "
+                f"(vanilla={len(v_neg)}, override={len(o_neg)})"
+            )
     if wrong:
         fail("C5", "; ".join(wrong))
     else:
@@ -310,7 +313,10 @@ def c7_descriptor() -> None:
 def c8_deploy() -> None:
     link = STELLARIS_USER_MOD_DIR / MOD_NAME
     outer = STELLARIS_USER_MOD_DIR / f"{MOD_NAME}.mod"
-    if not link.exists() and not outer.exists():
+    # Path.exists() returns False for a broken symlink; treat any symlink
+    # (broken or not) as evidence of a deploy attempt.
+    link_present = link.exists() or link.is_symlink()
+    if not link_present and not outer.exists():
         ok("C8", "not deployed (skipping deploy integrity check)")
         return
     if not link.is_symlink():
@@ -324,8 +330,16 @@ def c8_deploy() -> None:
         fail("C8", f"missing outer descriptor {outer}")
         return
     text = read(outer)
-    if "path=" not in text:
-        fail("C8", "outer descriptor missing path= line")
+    m = re.search(r'^\s*path\s*=\s*"([^"]+)"\s*$', text, re.MULTILINE)
+    if not m:
+        fail("C8", "outer descriptor missing path=\"...\" line")
+        return
+    declared = Path(m.group(1)).expanduser()
+    if not declared.is_absolute():
+        fail("C8", f"outer descriptor path is not absolute: {declared}")
+        return
+    if declared != link:
+        fail("C8", f"outer descriptor path {declared} != expected symlink {link}")
         return
     ok("C8", "deploy symlink + outer descriptor verified")
 
