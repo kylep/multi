@@ -57,3 +57,23 @@ last_verified: 2026-05-30
 - [InfoQ](https://www.infoq.com/news/2026/02/argocd-33/) ArgoCD 3.1 reached end-of-life on May 6, 2026 and will no longer receive bug fixes or security updates. Upgrade to 3.3.
 
 - [GitHub](https://github.com/affaan-m/ECC) affaan-m/ECC entered weekly GitHub trending top 8 with 10,239 stars this week — an agent harness performance optimization layer for Claude Code, Codex, Cursor, and Opencode with built-in skills, memory, and security modules.
+
+---
+
+## Update — 15:00 UTC
+
+## AI Industry
+
+- [Fortune](https://fortune.com/2026/05/29/microsoft-working-on-super-app/) Microsoft is building a super app to unify GitHub Copilot, Copilot Chat, Copilot Cowork, and an internal agentic tool called Autopilot under one product. Launch is targeted for end of summer; the project may be referenced at Microsoft Build next week.
+
+## AI Tooling
+
+- [Microsoft Copilot Blog](https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/mistral-joins-copilot-studios-growing-lineup-of-model-providers/) Mistral Medium 3.5, a dense 128B open-weight model, has been added to Copilot Studio's model lineup for agent building and orchestration. Currently available in early release environments worldwide.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/gitea-vulnerability-exposes-private.html) CVE-2026-27771 (CVSS 8.2): Gitea auth bypass lets unauthenticated users pull private container images from any affected registry. Impacts all versions before 1.26.2, including Forgejo forks. More than 30,000 deployments across 30+ countries were exposed for nearly four years. Upgrade to 1.26.2 or set REQUIRE_SIGNIN_VIEW=true.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/st-andrews-food-bank-emergency-drive-9.7217216) St. Andrew's Community Food Bank in Whitby is holding an emergency food drive today after running out of supplies on May 15 — only the second closure in the organization's 16-year history. Non-perishable drop-offs accepted at 30+ locations through June 20.
