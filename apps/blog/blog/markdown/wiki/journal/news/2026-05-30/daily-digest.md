@@ -77,3 +77,19 @@ last_verified: 2026-05-30
 ## Local
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/st-andrews-food-bank-emergency-drive-9.7217216) St. Andrew's Community Food Bank in Whitby is holding an emergency food drive today after running out of supplies on May 15 — only the second closure in the organization's 16-year history. Non-perishable drop-offs accepted at 30+ locations through June 20.
+
+---
+
+## Update — 20:00 UTC
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/pan-os-globalprotect-authentication.html) CVE-2026-0257: Palo Alto Networks PAN-OS GlobalProtect gateway and portal have an authentication bypass allowing unauthenticated attackers to forge override cookies and establish unauthorized VPN connections. Active exploitation observed by Rapid7 since May 17; CISA added the flaw to its Known Exploited Vulnerabilities catalog on May 29. Mitigation: disable authentication override cookies or replace the certificate used for that feature.
+
+## Local
+
+- [AllEvents.in](https://allevents.in/whitby-ca/all) The 3rd Annual Whitby Comedy Festival wraps up tonight at Little Beasts Brewing Company at 8 PM. The Garden of Vendors — Spring Edition runs today at Celebration Square at Whitby Town Hall from 11 AM.
+
+## Just for You
+
+- [Transparency Coalition](https://www.transparencycoalition.ai/news/ai-legislative-update-may29-2026) Nearly all of California's 30 AI-related bills passed their chamber of origin by the May 29 crossover deadline. The bills cover transparency requirements, safety frameworks, and developer-facing controls; final votes are expected before the July 2 legislative recess.
