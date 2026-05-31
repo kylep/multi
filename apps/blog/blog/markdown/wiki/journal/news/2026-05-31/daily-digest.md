@@ -77,3 +77,19 @@ last_verified: 2026-05-31
 ## Just for You
 
 - [Help Net Security](https://www.helpnetsecurity.com/2026/05/29/forticlient-ems-vulnerability-infostealer/) CVE-2026-27771 (CVSS 8.2) in Gitea allows unauthenticated remote users to pull private container images without credentials, affecting all versions prior to 1.26.2 and estimated to impact more than 30,000 deployments across 30+ countries. The flaw went undetected for close to four years. Relevant for Docker/container security.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Build Fast with AI](https://www.buildfastwithai.com/blogs/ai-news-today-may-31-2026) Microsoft will unveil a suite of in-house AI models at Build 2026 (June 2–3, San Francisco), including a coding-focused model to strengthen GitHub Copilot and additional models for transcription, reasoning, speech, and images. Reuters and The Information reported the move is a direct response to Anthropic's Claude Code overtaking Copilot in enterprise developer adoption and reduces Microsoft's dependence on OpenAI.
+
+## Geopolitics
+
+- [CBS News](https://www.cbsnews.com/live-updates/iran-war-us-trump-vance-ceasefire-strait-of-hormuz-deal-close/) The US and Iran are in active talks on a memorandum of understanding that would extend their ceasefire by 60 days, reopen shipping through the Strait of Hormuz, end the US blockade of Iranian ports, and launch nuclear negotiations. The strait has been largely closed since February 28 when the US and Israel began air operations against Iran, cutting roughly 25% of global seaborne oil trade. A CNBC analysis published May 30 notes tanker traffic through the strait may recover to only 60–70% of pre-war levels even if a deal is reached.
+
+## Priority Watchlist
+
+- [InfoQ](https://www.infoq.com/news/2026/05/cloudflare-workflows-v2-release/) Cloudflare Workflows V2 ships with deterministic replayable execution, improved observability, and support for 50,000 concurrent workflow instances and 2 million queued workflows — a significant scaling upgrade for the Workers platform.
