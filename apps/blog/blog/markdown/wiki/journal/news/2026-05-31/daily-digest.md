@@ -35,3 +35,45 @@ last_verified: 2026-05-31
 ## Just for You
 
 - [Microsoft / PyPI](https://github.com/microsoft/markitdown) microsoft/markitdown, a Python tool for converting Office documents, PDFs, and other files to Markdown, entered the GitHub weekly trending top 8 at #7 with 6,652 stars this week (133,481 total). Relevant for Python tooling and blog/content pipeline readers.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-opus-4-8) Anthropic raised $65B in a Series H round at a $965B valuation, led by Altimeter Capital, Dragoneer, Greenoaks, and Sequoia. The company reports a $47B annual revenue run rate. Separately, Anthropic released Claude Opus 4.8 on May 28 — the model improves on agentic coding (64.3% to 69.2%) and multidisciplinary reasoning, and ships with user-controlled effort levels.
+
+- [9to5Google](https://9to5google.com/2026/05/19/google-io-2026-news/) Google launched Gemini 3.5 Flash at Google I/O 2026 on May 19, now generally available at $1.50/$9.00 per million tokens — roughly 40% cheaper than Gemini 3.1 Pro. Google also cut the Ultra subscription from $250 to $200/month and added a new $100/month Developer tier. Gemini 3.5 Pro is slated for June.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-opus-4-8) Claude Opus 4.8 ships a "dynamic workflows" feature in Claude Code that lets the tool break very large-scale engineering tasks into automatically structured sub-steps. Fast mode is now three times cheaper than in Opus 4.7.
+
+- [GitHub Changelog](https://github.blog/changelog/) GitHub Copilot is switching from flat-rate to usage-based billing on June 1. Copilot Pro and Pro+ new sign-ups were paused ahead of the transition.
+
+## Open Source
+
+- [GitHub Blog](https://github.blog/changelog/2026-05-21-github-copilot-for-eclipse-is-open-source/) GitHub Copilot for Eclipse was open-sourced under the MIT license on May 21.
+
+## Security
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/security/hackers-exploit-forticlient-ems-flaw-to-push-infostealer-malware/) CVE-2026-35616 (CVSS 9.1) is a critical pre-authentication API bypass in FortiClient EMS affecting versions 7.4.5–7.4.6, confirmed exploited by CISA and Fortinet. Attackers are delivering the EKZ infostealer disguised as a legitimate Fortinet update via PowerShell, harvesting browser credentials from Chrome and Firefox.
+
+- [CloudLinux Blog](https://blog.cloudlinux.com/dirty-frag-mitigation-and-kernel-update) "Dirty Frag" (CVE-2026-43284, CVE-2026-43500) is a second Linux kernel local privilege escalation disclosed by researcher Hyunwoo Kim, who also found Copy Fail. The flaw is in the ESP4/ESP6/rxrpc in-place decryption path; a public proof-of-concept grants root to any local user. Temporary mitigation is blacklisting the affected modules — do not apply on systems running IPsec tunnels.
+
+## Priority Watchlist
+
+- [Apache Kafka](https://kafka.apache.org/blog/releases/) Apache Kafka 4.3 released May 22. Separately, Strimzi Kafka Operator 1.0.0 ships with support for Kafka 4.1.2, HTTPS on the bridge, and in-place pod resizing for brokers and controllers — it now only supports v1 CRD APIs.
+
+- [GitHub](https://github.com/argoproj/argo-cd/releases) ArgoCD v3.1 reached end of life on May 6. Users still on v3.1 should upgrade to v3.2, v3.3, or v3.4.
+
+## Local
+
+- [City of Toronto](https://www.toronto.ca/news/) Toronto held a ribbon-cutting ceremony on May 31 to mark the reopening of the Amsterdam Bridge, a steel cable footbridge originally gifted by the Mayor of Amsterdam in 1974. The bridge underwent full rehabilitation before returning to Harbourfront Centre.
+
+- [CP24](https://www.cp24.com/politics/toronto-city-hall/2026/05/25/olivia-chow-confirms-she-is-running-for-second-term-as-toronto-mayor/) Toronto Mayor Olivia Chow announced on May 25 she is running for a second term. The 2026 Toronto mayoral election is scheduled for October 26.
+
+## Just for You
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/05/29/forticlient-ems-vulnerability-infostealer/) CVE-2026-27771 (CVSS 8.2) in Gitea allows unauthenticated remote users to pull private container images without credentials, affecting all versions prior to 1.26.2 and estimated to impact more than 30,000 deployments across 30+ countries. The flaw went undetected for close to four years. Relevant for Docker/container security.
