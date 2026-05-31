@@ -1,0 +1,13 @@
+### Multi-Megastructures + Free Tech — interface sprites.
+### Reuses the vanilla Mega-Engineering tech icon for our repeatable
+### megastructure-capacity tech. The mod + vanilla virtual filesystem is merged,
+### so textureFile can point at the vanilla .dds directly (no binary committed).
+### Sprite name must be GFX_tech_<tech_id> for the tech to auto-resolve its icon.
+### NOTE: .gfx files must be plain UTF-8 with NO byte-order mark.
+
+spriteTypes = {
+	spriteType = {
+		name = "GFX_tech_mmegs_megastructure_capacity"
+		textureFile = "gfx/interface/icons/technologies/tech_mega_engineering.dds"
+	}
+}

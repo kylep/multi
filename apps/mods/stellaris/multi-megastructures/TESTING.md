@@ -49,8 +49,13 @@ Run after `scripts/deploy.sh` succeeds and preflight is green.
 5. **Feature 2 (multiple per system / celestial body):**
    - In a system that already has a finished megastructure, attempt to build a different megastructure on a different celestial body in the same system. Must succeed.
    - Then attempt to build a third megastructure on the *same* celestial body. Must succeed.
-6. **Error log:** tail `~/Documents/Paradox Interactive/Stellaris/logs/error.log` after starting the game. Any new `[ERROR]` entries naming our files (`mmegs_*`, `00_ring_world.txt`, etc.) is a regression.
-7. **Mod conflict sanity:** disable other megastructure-affecting mods before this test — last-loaded wins on `common/megastructures/*.txt`.
+6. **Feature 4 (repeatable simultaneous-build tech):**
+   - Open the Research panel → Society. Confirm **Megastructure Construction Capacity** appears as an available repeatable tech with a real icon (the Mega-Engineering icon, not a blank/pink placeholder) and ~50,000 cost. It's researchable from game start because Mega-Engineering is auto-granted.
+   - Note your current simultaneous megastructure build limit (base 1, shown when you have one megastructure building and try to start another). Research level 1 — console fast path: `research_technology tech_mmegs_megastructure_capacity`.
+   - Confirm the limit rises to 2: start one megastructure, then start a second elsewhere while the first is still building. Repeat-research and confirm it keeps climbing.
+   - Research it 10 times total and confirm the limit reaches 11 and the tech then stops being offered (it's finite at `levels = 10`).
+7. **Error log:** tail `~/Documents/Paradox Interactive/Stellaris/logs/error.log` after starting the game. Any new `[ERROR]` entries naming our files (`mmegs_*`, `00_ring_world.txt`, etc.) is a regression. Watch specifically for unresolved `GFX_tech_mmegs_megastructure_capacity` or unknown-category errors.
+8. **Mod conflict sanity:** disable other megastructure-affecting mods before this test — last-loaded wins on `common/megastructures/*.txt`.
 
 ## Failure handling
 
