@@ -47,3 +47,23 @@ last_verified: 2026-06-01
 - [GitHub](https://github.com/anthropics/knowledge-work-plugins) anthropics/knowledge-work-plugins, an open-source repository of Claude Cowork plugins for knowledge workers, gained 4,944 stars this week (18,535 total) — relevant for Claude tooling and MCP server readers.
 
 - [GitHub Trending](https://github.com/trending?since=weekly) This week's top-8 GitHub trending is dominated by Claude Code ecosystem tooling: Understand-Anything (interactive code knowledge graphs), codegraph (pre-indexed local graphs for fewer token and tool-call overhead), and ECC (agent harness optimization) are all designed to work with Claude Code, Codex, and Cursor.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [Fortune](https://fortune.com/2026/05/29/anthropic-raises-65-billion-at-record-965-billion-valuation-promises-mythos-ai-model-in-wide-release-in-coming-weeks-releases-claude-opus-4-8/) Anthropic closed a $65B Series H led by Altimeter Capital, Dragoneer, Greenoaks, and Sequoia, valuing the company at $965B and surpassing OpenAI's $852B valuation as the most valuable AI startup. Amazon's $5B commitment is included in the total. Anthropic also previewed Claude Mythos, a restricted-access model focused on advanced cybersecurity capabilities.
+
+- [Axios](https://www.axios.com/2026/05/28/anthropic-opus-release-mythos) Andrej Karpathy, an OpenAI co-founder, joined Anthropic to lead pretraining capabilities ahead of next-generation model work.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-opus-4-8) Claude Opus 4.8 shipped on May 28, scoring 74.2% on Terminal-Bench 2.1 (up 8.4% from 4.7) and 4.9% higher on SWE-Bench Pro. The release also adds dynamic workflows to Claude Code, enabling the agent to rewrite entire applications across languages in a single session.
+
+- [GitHub Blog](https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/) GitHub Copilot switched to usage-based AI Credits billing today. Copilot Pro+ is $39/month including $39 in AI Credits; Business is $19/user/month; Enterprise is $39/user/month. Code completions remain unlimited for all paid plans and are not charged against credits.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/olivia-chow-run-for-mayor-9.7210991) Toronto Mayor Olivia Chow announced her re-election bid on May 25 for the October 26 municipal election, citing free school meals, frozen TTC fares, and expanded library hours as first-term accomplishments. Councillor Brad Bradford is expected to be her main challenger.
