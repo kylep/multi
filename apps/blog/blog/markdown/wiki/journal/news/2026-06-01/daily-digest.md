@@ -67,3 +67,23 @@ last_verified: 2026-06-01
 ## Local
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/olivia-chow-run-for-mayor-9.7210991) Toronto Mayor Olivia Chow announced her re-election bid on May 25 for the October 26 municipal election, citing free school meals, frozen TTC fares, and expanded library hours as first-term accomplishments. Councillor Brad Bradford is expected to be her main challenger.
+
+---
+
+## Update — 19:30 UTC
+
+## AI Industry
+
+- [NBC News](https://www.nbcnews.com/business/corporations/anthropic-files-ipo-openai-rcna347897) Anthropic confidentially filed for an IPO with the SEC on June 1, coming weeks after closing a $65B Series H at a $965B valuation. The filing positions Anthropic ahead of OpenAI in the race to public markets; OpenAI is expected to file in the coming days.
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/meta-builds-ai-infrastructure-with-nvidia) NVIDIA and Meta announced a multiyear, multigenerational infrastructure partnership. Meta will deploy millions of NVIDIA Blackwell and Rubin GPUs alongside NVIDIA CPUs in hyperscale data centers optimized for training and inference, with Spectrum-X Ethernet networking and Confidential Computing.
+
+- [Google Blog](https://blog.google/innovation-and-ai/sundar-pichai-io-2026/) At Google I/O on May 19, Sundar Pichai launched Gemini 3.5 Flash (GA), declared the agentic Gemini era, and reported 900M monthly Gemini app users and 1B monthly AI Mode in Search users. AI Ultra was repriced from $250 to $200 per month. Gemini Spark, a personal AI agent running on private Google Cloud infrastructure, also launched.
+
+## Security
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/security/palo-alto-globalprotect-vpn-auth-bypass-flaw-now-exploited-in-attacks/) CVE-2026-0257, an authentication bypass in Palo Alto Networks PAN-OS GlobalProtect (CVSS 7.8), has been actively exploited since May 17. Attackers used forged authentication override cookies to establish unauthorized VPN tunnels. CISA added it to the KEV catalog with a June 1 remediation deadline for federal agencies.
+
+## Just for You
+
+- [Google Cloud Blog](https://cloud.google.com/blog/products/ai-machine-learning/innovations-from-google-io-26-on-google-cloud) Google launched Managed Agents in the Gemini API as a public preview at I/O 2026 — developers can build and deploy stateful, autonomous agents that run in isolated Google-hosted sandbox environments. Relevant for MCP and agent-framework readers.
