@@ -387,6 +387,31 @@ def c12_read_sentinel_isolation() -> None:
         ok("C12", "read sentinel never appears in write positions")
 
 
+def c13_no_misnamed_common_dirs() -> None:
+    """Stellaris reads a fixed set of `common/` subdir names. A plausible-looking
+    typo (e.g. `technologies` instead of the real `technology`) is silently
+    ignored by the game — the files load into nothing and the tech is "invalid".
+    Catch the known-confusable plurals here."""
+    common = MOD_DIR / "common"
+    # Map of wrong-name -> correct vanilla name for dirs we actually use.
+    confusable = {
+        "technologies": "technology",
+    }
+    bad: list[str] = []
+    if common.exists():
+        for child in common.iterdir():
+            if child.is_dir() and child.name in confusable:
+                correct = confusable[child.name]
+                bad.append(
+                    f"common/{child.name}/ should be common/{correct}/ "
+                    f"(Stellaris ignores the wrong name)"
+                )
+    if bad:
+        fail("C13", "; ".join(bad))
+    else:
+        ok("C13", "no misnamed common/ subdirectories")
+
+
 def main() -> int:
     if not VANILLA_ROOT.exists():
         print(f"ERROR: Stellaris not found at {VANILLA_ROOT}", file=sys.stderr)
@@ -404,6 +429,7 @@ def main() -> int:
     c10_deploy()
     c11_thumbnail()
     c12_read_sentinel_isolation()
+    c13_no_misnamed_common_dirs()
 
     for line in passes:
         print(f"PASS {line}")

@@ -27,6 +27,7 @@ Reads from the local Stellaris install at `~/Library/Application Support/Steam/s
 | C10 | If deployed: symlink in `~/Documents/Paradox Interactive/Stellaris/mod/` resolves into this repo and the outer `.mod` descriptor has an absolute `path=` | Deploy script regression |
 | C11 | `thumbnail.png` present in mod root, real PNG bytes, under 1 MB, and referenced from `descriptor.mod` via `picture="..."` | Steam Workshop preview shows broken-image placeholder otherwise |
 | C12 | Read sentinel `mmegs_read_never_set` only appears in `has_country_flag` positions, never `set_country_flag` / `remove_country_flag` | The bug class where a single sentinel is both read as a gate AND set on build_complete — reintroduces the per-empire cap after the first build |
+| C13 | No misnamed `common/` subdirectories (e.g. `technologies/` instead of vanilla `technology/`) | Stellaris silently ignores wrongly-named common dirs, so the files load into nothing and the tech is reported "invalid technology" in-game |
 
 Exit code is non-zero on any FAIL.
 
