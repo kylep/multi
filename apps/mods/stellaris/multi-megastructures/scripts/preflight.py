@@ -412,6 +412,37 @@ def c13_no_misnamed_common_dirs() -> None:
         ok("C13", "no misnamed common/ subdirectories")
 
 
+def c14_mod_techs_have_icons() -> None:
+    """Every mod-defined technology needs an icon at
+    `gfx/interface/icons/technologies/<tech_key>.dds`. Stellaris loads tech
+    icons by that filename convention; a `.gfx` sprite redirect to a vanilla
+    path does NOT satisfy it, so without the real file the tech renders with a
+    "missing icon" placeholder. Only checks mod-defined techs (those in our
+    common/technology/), not the vanilla techs we merely grant."""
+    tech_dir = MOD_DIR / "common" / "technology"
+    icon_dir = MOD_DIR / "gfx" / "interface" / "icons" / "technologies"
+    if not tech_dir.exists():
+        ok("C14", "no mod-defined technologies (icon check skipped)")
+        return
+    missing: list[str] = []
+    checked = 0
+    for path in sorted(tech_dir.glob("*.txt")):
+        for key in top_level_keys(read(path)):
+            if not key.startswith("tech_"):
+                continue
+            checked += 1
+            if not (icon_dir / f"{key}.dds").exists():
+                missing.append(key)
+    if missing:
+        fail(
+            "C14",
+            f"mod techs without {icon_dir.relative_to(MOD_DIR)}/<key>.dds: "
+            f"{sorted(missing)}",
+        )
+    else:
+        ok("C14", f"all {checked} mod-defined tech(s) have an icon .dds")
+
+
 def main() -> int:
     if not VANILLA_ROOT.exists():
         print(f"ERROR: Stellaris not found at {VANILLA_ROOT}", file=sys.stderr)
@@ -430,6 +461,7 @@ def main() -> int:
     c11_thumbnail()
     c12_read_sentinel_isolation()
     c13_no_misnamed_common_dirs()
+    c14_mod_techs_have_icons()
 
     for line in passes:
         print(f"PASS {line}")

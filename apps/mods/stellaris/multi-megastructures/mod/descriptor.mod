@@ -1,5 +1,5 @@
 name="Multi-Megastructures + Free Tech"
-version="0.2.1"
+version="0.2.3"
 tags={
 	"Gameplay"
 	"Buildings"
