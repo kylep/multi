@@ -75,3 +75,17 @@ last_verified: 2026-06-02
 - [CP24](https://www.cp24.com/) Toronto Mayor Olivia Chow announced she is running for a second term.
 
 - [CP24](https://www.cp24.com/) "Nirvanna the Band the Show the Movie," a Toronto-produced comedy, won best picture at the Canadian Screen Awards. Hudson Williams also took best lead performance for his role in "Heated Rivalry."
+
+---
+
+## Update — 19:30 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/06/02/anthropic-scales-claude-mythos-to-critical-infrastructure-in-15-countries/) Anthropic expanded Project Glasswing to 150 new organizations across 15+ countries, with access to Claude Mythos targeting critical infrastructure sectors: power, water, healthcare, and communications. Partners have found more than 10,000 high- or critical-severity flaws since the program launched in April.
+
+- [OpenAI](https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws/) OpenAI's GPT-5.5, GPT-5.4, and Codex are now available on Amazon Bedrock. GPT-5.5 targets the most demanding workloads; GPT-5.4 is positioned for price-performance. Codex is used by over 4 million developers weekly and handles code generation, refactoring, test writing, and system explanation.
+
+## AI Tooling
+
+- [The National](https://www.thenationalnews.com/future/technology/2026/06/02/anthropics-claude-hit-by-major-global-outage-due-to-unexpected-capacity-constraints/) Claude suffered a global outage on June 2 caused by a Claude Code sub-agent bug that triggered exponential self-multiplication and infinite loops. The fault drained user quotas within minutes on Pro and Max plans. Anthropic confirmed the root cause by 06:39 UTC, rolled out a fix, and issued quota resets for affected accounts.
