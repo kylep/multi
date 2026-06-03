@@ -93,3 +93,21 @@ last_verified: 2026-06-03
 - [Security Online](https://securityonline.info/argo-cd-critical-secret-leak-cve-2026-42880-kubernetes-security/) ArgoCD CVE-2026-42880 (CVSS 9.6) allows users with read-only access to extract plaintext Kubernetes secrets from etcd via the ServerSideDiff dry-run mechanism. Affects versions 3.2.0–3.2.10 and 3.3.0–3.3.8. Patches available in 3.2.11 and 3.3.9.
 
 - [IBM Support](https://www.ibm.com/support/pages/node/7274740) IBM disclosed three critical WebSphere Application Server vulnerabilities: CVE-2026-8644 (CVSS 9.1, identity spoofing), CVE-2026-9311 (CVSS 9.0, RCE via security control bypass), and CVE-2026-9319 (CVSS 9.0, RCE via JAX-WS deserialization). Affects versions 8.5 and 9.0; patches available.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Tooling
+
+- [Microsoft Community Hub](https://techcommunity.microsoft.com/blog/adforpostgresql/announcing-azure-horizondb/4469710) Azure HorizonDB entered public preview at Build 2026 Day 2 — a fully managed PostgreSQL-compatible database with up to 3x faster transactions, elastic storage to 128 TB, 3,072 vCores, built-in pgvector and full-text hybrid search, and native Azure AI model integration. Available to select Azure customers.
+
+- [Microsoft Community Hub](https://techcommunity.microsoft.com/blog/adforpostgresql/announcing-new-security-maintenance-and-analytics-features-for-postgresql-at-mic/4524559) Azure Database for PostgreSQL gained several new features at Build 2026: pg_duckdb extension (GA) for vectorized analytical queries against Parquet and Azure Blob Storage, pg_ivm (GA) for automatic incremental materialized view updates, Temporal Tables (GA) for auditable historical data queries, and a V6 NVMe SKU supporting up to 192 vCores and 1.8 TiB memory.
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/critical-github-vulnerability-exposed-millions-of-repositories/) CVE-2026-3854 (CVSS 8.7): GitHub Enterprise Server RCE via unsanitized git push options — any authenticated user can execute arbitrary commands with a standard git push. GitHub.com was patched on the day of disclosure (March 4); Enterprise Server patches released March 10. As of this week, 88% of Enterprise Server instances remain unpatched. Upgrade to GHES 3.14.25, 3.15.20, or 3.16.16.
+
+## Local
+
+- [Durham Radio News](https://www.durhamradionews.com/) Lakeshore East GO train service is suspended this weekend; Durham Region commuters should use alternative routes or Metrolinx shuttle buses.
