@@ -71,3 +71,25 @@ last_verified: 2026-06-03
 - [Cloudflare](https://releasebot.io/updates/cloudflare) Cloudflare AI Agents SDK added new capabilities including Agent Skills, Telegram chat messengers, scheduled tasks, and durable reasoning steps in Workflows. The release also hardened durable chat recovery to survive deploys and evictions.
 
 - [Anthropic Blog](https://www.anthropic.com/news/higher-limits-spacex) Anthropic raised usage limits for Claude and announced a compute deal with SpaceX.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Google Cloud Blog](https://cloud.google.com/blog/products/ai-machine-learning/innovations-from-google-io-26-on-google-cloud) Gemini 3.5 Flash is now generally available, with the Managed Agents API entering public preview. Developers can spin up stateful agents running in isolated Google-hosted Linux sandboxes via a single API call, powered by the Antigravity agent harness.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/services-track-partner-hub) Anthropic launched the Services Track and Partner Hub for the Claude Partner Network, introducing three tiers for consulting firms based on certified practitioners and production deployments. A new MCP connector lets partners query their partnership status directly through Claude.
+
+- [Microsoft AI](https://microsoft.ai/news/introducingmai-code-1-flash/) Microsoft released MAI-Code-1-Flash, an in-house coding model rolling out to GitHub Copilot individual users in VS Code today. It uses adaptive reasoning, scaling effort based on task complexity.
+
+- [Microsoft Build Blog](https://blogs.microsoft.com/blog/2026/06/02/microsoft-build-2026-be-yourself-at-work/) Microsoft IQ is now generally available across GitHub Copilot, Foundry, and Copilot Studio. Work IQ grounds agents in Microsoft 365 data (emails, documents, meetings); the new Web IQ provides live web grounding and also powers ChatGPT's web search.
+
+## Security
+
+- [Security Online](https://securityonline.info/argo-cd-critical-secret-leak-cve-2026-42880-kubernetes-security/) ArgoCD CVE-2026-42880 (CVSS 9.6) allows users with read-only access to extract plaintext Kubernetes secrets from etcd via the ServerSideDiff dry-run mechanism. Affects versions 3.2.0–3.2.10 and 3.3.0–3.3.8. Patches available in 3.2.11 and 3.3.9.
+
+- [IBM Support](https://www.ibm.com/support/pages/node/7274740) IBM disclosed three critical WebSphere Application Server vulnerabilities: CVE-2026-8644 (CVSS 9.1, identity spoofing), CVE-2026-9311 (CVSS 9.0, RCE via security control bypass), and CVE-2026-9319 (CVSS 9.0, RCE via JAX-WS deserialization). Affects versions 8.5 and 9.0; patches available.
