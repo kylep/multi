@@ -67,3 +67,27 @@ last_verified: 2026-06-04
 ## Just for You
 
 - [Anthropic](https://www.anthropic.com/news/expanding-project-glasswing) Anthropic expanded Project Glasswing to 150 new organizations in 15-plus countries on June 2. Partners gain access to Claude Mythos Preview for offensive security research; the newly released Claude Security product scanned partner codebases and suggested patches for over 2,100 vulnerabilities in its first three weeks.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Google AI for Developers](https://ai.google.dev/gemini-api/docs/changelog) Google launched Managed Agents in the Gemini API as a public preview on May 19. Developers can deploy autonomous stateful agents running in isolated Google-hosted Linux sandboxes. The Antigravity Agent — the first general-purpose managed agent — can plan, reason, write and execute code, manage files, and browse the web from within its sandbox.
+
+## AI Tooling
+
+- [Releasebot](https://releasebot.io/updates/anthropic) Claude Code shipped three releases on June 4 (2.1.160 through 2.1.162): safety prompts for shell startup files, OTEL metric attribute labels on datapoints, agent `waitingFor` status display, and independent failure handling for parallel MCP tool calls.
+
+- [Releasebot](https://releasebot.io/updates/openai) OpenAI Codex 0.137.0 (June 4) adds enterprise and admin flows showing monthly credit limits with cloud-managed config bundle support, remote-control pairing with controller grant management, and per-thread runtime selection in multi-agent v2 sessions.
+
+- [OpenAI](https://openai.com/news/) ChatGPT Sites, announced June 2, lets teams and workspaces build and deploy hosted full-stack web apps directly from ChatGPT, with workspace-internal access controls and Sign in with ChatGPT authentication.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/politics/carney-ai-strategy-9.7223236) PM Mark Carney launched "AI for All," Canada's national AI strategy, at a Toronto news conference on June 4. The plan targets 250,000 new AI-related jobs and $200 billion in economic growth by 2031, backed by over $2.3 billion in funding covering a public AI supercomputer, a National AI Literacy Initiative, and a $50 million expansion of the Canadian AI Safety Institute.
+
+## Just for You
+
+- [TechCrunch](https://techcrunch.com/2026/06/02/uber-caps-employee-ai-spending-after-blowing-through-budget-in-four-months/) Uber burned through its entire 2026 AI tools budget by April, driven by Claude Code and Cursor costs running $500–$2,000 per engineer per month. The company capped per-employee AI tool spending at $1,500 per month.
