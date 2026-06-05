@@ -134,6 +134,8 @@ traceable changes.
 | [QA](https://github.com/kylep/multi/blob/main/.claude/agents/qa.md) | Sonnet | Build, render, links via [Playwright](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents). Trigger phrase. |
 | [Security Auditor](https://github.com/kylep/multi/blob/main/.claude/agents/security-auditor.md) | Opus | [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/), confidential data. Added LLM05 check. |
 
+Delegation hierarchy ([Mermaid flowchart](/mermaid-markdown-support.html)):
+
 ```mermaid
 graph TD
     Claude["Vanilla Claude"]
