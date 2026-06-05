@@ -18,6 +18,7 @@ keywords:
   - qwen3 vs mistral vs deepseek comparison
   - best local llm for 16gb ram
   - gguf quantization explained
+description: "Compare Qwen3 8B, DeepSeek-R1, Mistral Nemo 12B, and Mistral Small 24B running locally on Apple M2 Air. llama.cpp setup and honest performance notes."
 ---
 
 No API costs, no data leaving the machine, works offline. The catch is you're
