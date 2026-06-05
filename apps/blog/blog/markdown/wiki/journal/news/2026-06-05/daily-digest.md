@@ -37,3 +37,21 @@ last_verified: 2026-06-05
 - [White House](https://www.whitehouse.gov/presidential-actions/2026/06/promoting-advanced-artificial-intelligence-innovation-and-security/) An executive order signed June 2 establishes a federal AI cybersecurity clearinghouse for coordinating vulnerability detection across agencies and critical infrastructure, mandates 30-day federal system upgrades, and expands access to frontier AI models for rural hospitals and community banks.
 
 - [Anthropic](https://www.anthropic.com/news) Anthropic reported that over 80% of code merged into its own codebase is now authored by Claude, citing this as a benchmark for recursive self-improvement progress.
+
+---
+
+## Update — 16:00 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/services-track-partner-hub) Anthropic launched the Services Track and Partner Hub of the Claude Partner Network on June 3. Three tiers — Select, Preferred, and Global Premier — require increasing counts of certified staff, deployed joint customers, and public case studies. More than 40,000 firms have applied; over 10,000 consultants have earned Claude certification since March.
+
+## AI Tooling
+
+- [Anthropic](https://releasebot.io/updates/anthropic) Claude Code 2.1.163 (June 5) ships version guardrails that prevent launching outside an approved version range, a `/plugin list` command with enable/disable filtering, enhanced hook context feedback, and fixes for background command hangs and hook conditions incorrectly firing on bash variables.
+
+- [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare AI Gateway (June 5) added cost-based spend limits — operators can cap cumulative dollar spend per model, provider, or custom metadata with configurable time windows, blocking requests once the budget is exceeded.
+
+## Just for You
+
+- [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare MCP Server Portal (June 4) lets admins rename tools and prompts and rewrite their descriptions directly on the portal without touching upstream server code.
