@@ -65,6 +65,6 @@ tshark -i eno1 -Y "ip.addr == 10.1.0.76 and http"
 
 ---
 
-**See also:** [Operations Reference Page](/ops.html) for more Linux ops
+**See also:** [Operations Reference Page](/ops-cheatsheet.html) for more Linux ops
 recipes: vim find-and-replace, passwordless sudo, loopback volumes,
 journalctl, and bash exit traps.
