@@ -93,3 +93,7 @@ Now the image is ready to be converted to raw/qcow2 and uploaded to OpenStack.
 **Note**: CloudBase has released a Windows version of `qemu-img` so you can do
 the conversions on Windows now without VirtualBox tools. You can download it
 [here](https://cloudbase.it/qemu-img-windows/)
+
+If you want to create a brand-new Windows VM on KVM from scratch rather than
+importing an existing image, see
+[Create Windows KVM VM from Command Line](/windows-kvm-command-line.html).
