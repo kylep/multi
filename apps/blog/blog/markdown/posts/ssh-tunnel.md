@@ -1,8 +1,6 @@
 ---
 title: Port Forwarding through SSH Tunnels
-summary: "How to use SSH tunnels to reach a server behind a firewall using a
-  pivot host. Covers reverse SSH tunnels with -R, local port forwarding with
-  -L, and chaining two tunnels to proxy through an intermediary server."
+summary: "Reach servers behind firewalls using SSH tunnels. Covers local port forwarding (-L), reverse SSH tunnels (-R), and chaining via a pivot host."
 slug: ssh-tunnels
 category: guides
 tags: ssh
