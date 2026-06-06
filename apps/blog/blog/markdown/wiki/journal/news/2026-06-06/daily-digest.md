@@ -77,3 +77,19 @@ last_verified: 2026-06-06
 ## AI Tooling
 
 - [Releasebot](https://releasebot.io/updates/anthropic) Claude Code 2.1.166 (June 6) adds a `fallbackModel` setting supporting up to three backup models when the primary is unavailable or overloaded. Cross-session security is hardened: messages relayed via `SendMessage` from other Claude sessions no longer carry user authority. Administrators can now disable extended thinking on supported models via environment variable. The agents list gains URL filtering to find sessions by prompt content.
+
+---
+
+## Update — 19:00 UTC
+
+## AI Industry
+
+- [Fortune](https://fortune.com/2026/06/05/openai-anthropic-microsoft-ceos-congress-bioweapon-safeguards/) The heads of OpenAI, Anthropic, and Microsoft AI signed a joint letter to Congress on June 5 asking lawmakers to mandate screening of all synthetic DNA and RNA providers operating in the US. The letter, also signed by life sciences researchers and former defense officials, argues that AI is eroding the technical barriers that previously made bioweapon creation difficult.
+
+## AI Tooling
+
+- [Cognition](https://cognition.ai/blog/introducing-devin-desktop) Windsurf rebranded as Devin Desktop on June 2. The Agent Command Center is now the default surface, and the IDE adds support for the open Agent Client Protocol, letting any ACP-compatible agent — including Claude Agent, Codex, and OpenCode — run alongside Devin inside the same editor.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/) Cloudflare AI Gateway shipped real-time per-identity spend limits on June 5, integrating with Cloudflare Access to let teams enforce token budgets by user or group across multiple AI providers — relevant for anyone managing Claude Code, Cursor, or other agentic tool costs.
