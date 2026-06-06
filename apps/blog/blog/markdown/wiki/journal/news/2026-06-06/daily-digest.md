@@ -69,3 +69,11 @@ last_verified: 2026-06-06
 - [GitHub](https://github.com/affaan-m/ECC) ECC (agent harness optimization system) holds #4 in weekly trending at 208,678 total stars, with explicit support for Claude Code, Codex, Cursor, and Opencode. Skills, instincts, and memory management for agent workflows.
 
 - [GitHub](https://github.com/colbymchenry/codegraph) codegraph holds #5 in weekly trending — a pre-indexed local code knowledge graph targeting Claude Code, Codex, Gemini, and Cursor, designed to cut tokens and tool calls.
+
+---
+
+## Update — 14:00 UTC
+
+## AI Tooling
+
+- [Releasebot](https://releasebot.io/updates/anthropic) Claude Code 2.1.166 (June 6) adds a `fallbackModel` setting supporting up to three backup models when the primary is unavailable or overloaded. Cross-session security is hardened: messages relayed via `SendMessage` from other Claude sessions no longer carry user authority. Administrators can now disable extended thinking on supported models via environment variable. The agents list gains URL filtering to find sessions by prompt content.
