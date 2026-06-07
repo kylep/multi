@@ -95,3 +95,15 @@ last_verified: 2026-06-07
 ## Just for You
 
 - [GitHub](https://github.com/nexu-io/open-design) Open Design integrates with Claude Code, Cursor, Codex, and Gemini as design engine adapters — relevant to any AI-assisted blog or web development workflow.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Tom's Hardware](https://www.tomshardware.com/tech-industry/artificial-intelligence/anthropic-says-claude-now-writes-more-than-80-percent-of-its-merged-code) Anthropic disclosed on June 5 that Claude now writes more than 80% of code merged into its own production codebase, up from low single digits before Claude Code launched. The company issued a call for the world to have an option to slow or pause frontier AI development, citing AI task capacity doubling every four months and warning that recursive self-improvement could cause humans to lose control of the systems.
+
+## Just for You
+
+- [Cloudflare Changelog](https://developers.cloudflare.com/changelog/) Cloudflare Workflows added saga-style rollbacks on June 5 — each step can define compensating logic that executes in reverse order on failure, with rollback outcomes exposed in instance status and analytics. Workers with VPC Network bindings now route public Internet traffic through Cloudflare Gateway, extending Zero Trust DNS, HTTP, Network, and egress policies to Worker egress.
