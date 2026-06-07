@@ -59,3 +59,39 @@ last_verified: 2026-06-07
 - [GitHub](https://github.com/chopratejas/headroom) headroom ships as both a library and an MCP server for LLM token compression — relevant to any workflow using MCP servers with context-heavy inputs.
 
 - [GitHub](https://github.com/D4Vinci/Scrapling) D4Vinci/Scrapling entered the weekly trending list at 61,764 total stars, gaining 6,002 this week. An adaptive Python web scraping framework handling single requests through full crawls.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Google Cloud Blog](https://cloud.google.com/blog/products/ai-machine-learning/innovations-from-google-io-26-on-google-cloud) Google I/O 2026 brought Gemini 3.5 Flash as the new default model in AI Mode for Search globally, Gemini Spark (a 24/7 personal AI agent for Enterprise and Workspace customers), and Gemini Omni (a multimodal model generating dynamic video from text, audio, image, and video inputs). The Ultra subscription dropped from $250 to $200/month, and monthly Gemini users reached 900 million.
+
+- [Heygotrade](https://www.heygotrade.com/en/news/google-io-2026-gemini-deepmind-contextual-ai/) DeepMind hired more than 20 researchers from Contextual AI under an $80–90 million licensing deal.
+
+- [buildfastwithai](https://www.buildfastwithai.com/blogs/ai-news-today-june-7-2026) Apple announced an Extensions system that lets users select which AI handles Apple Intelligence features — Claude, Gemini, or ChatGPT — each with a distinct voice to identify which model answered.
+
+- [buildfastwithai](https://www.buildfastwithai.com/blogs/ai-news-today-june-7-2026) President Trump told reporters June 6 that the US government may take direct equity stakes in OpenAI, Anthropic, and xAI.
+
+## Open Source
+
+- [GitHub](https://github.com/nexu-io/open-design) Open Design (nexu-io/open-design) reached 57.4K GitHub stars after shipping v0.9.0 on June 2. A local-first open-source alternative to Claude Design supporting 17+ CLI adapters including Claude Code, Cursor, Codex, and Gemini.
+
+- [etcd Blog](https://etcd.io/blog/2026/june-patch-release/) etcd released security patches v3.6.12, v3.5.31, and v3.4.45 on June 1, fixing multiple Go vulnerabilities. v3.4 is now end-of-life with this as its final release.
+
+## Security
+
+- [Tenable / CVE Details](https://www.tenable.com/cve/newest) CVE-2026-10939: a use-after-free vulnerability in WebRTC in Google Chrome prior to 149.0.7827.53 allows a remote attacker to execute arbitrary code inside a sandbox via a crafted HTML page.
+
+## Geopolitics
+
+- [Al Jazeera](https://www.aljazeera.com/news/liveblog/2026/6/6/iran-war-live-us-says-iranian-drones-shot-down-radar-sites-attacked) Material update on the US-Iran conflict: on June 6, the US downed Iranian drones and struck radar sites at Sirik and Qeshm Island. Iran responded by firing seven ballistic missiles at US bases in Kuwait and Bahrain; six were intercepted, one failed to reach its target. Both sides have accused each other of ceasefire violations since the April agreement.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/durham-police-investigating-hate-motivated-arson-threats-against-whitby-women-s-shelter-9.7223986) Durham police's Hate Crime and Extremism Unit is investigating arson threats against Muslim Welfare Residences, a women's shelter in Whitby serving women and children of all backgrounds. The threats followed hateful posts in a public Facebook group mischaracterizing the shelter as exclusive Muslim housing.
+
+## Just for You
+
+- [GitHub](https://github.com/nexu-io/open-design) Open Design integrates with Claude Code, Cursor, Codex, and Gemini as design engine adapters — relevant to any AI-assisted blog or web development workflow.
