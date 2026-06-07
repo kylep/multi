@@ -45,6 +45,10 @@ cat /proc/net/bonding/bond0
 openssl pkcs7 -print_certs -in certnew.p7b -out cert.pem
 ```
 
+To generate a CSR with Subject Alternative Names (required to fix
+`ERR_CERT_COMMON_NAME_INVALID`), see
+[Creating a CSR with a SAN](/openssl-csr-san.html).
+
 ---
 
 # Journalctl commands
