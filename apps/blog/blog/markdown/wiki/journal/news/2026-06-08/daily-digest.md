@@ -61,3 +61,33 @@ last_verified: 2026-06-08
 ## Just for You
 
 - [Apple](https://www.apple.com/newsroom/) The WWDC 2026 Extensions system positions Claude as a selectable default AI engine inside Apple Intelligence, putting Anthropic's model directly in the iOS 27 user workflow alongside ChatGPT and Gemini.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-05-21/pentagon-tests-rival-ai-models-in-race-to-replace-anthropic) The Pentagon is testing OpenAI, Google, and xAI Grok models to replace Anthropic's Claude in classified military systems, after Anthropic refused to remove guardrails prohibiting mass surveillance and autonomous weapons targeting. Defense Secretary Hegseth designated Anthropic a supply-chain risk in early 2026; a six-month wind-down is underway. Anthropic is challenging the designation in court, citing billions in revenue at risk.
+
+- [buildfastwithai](https://www.buildfastwithai.com/blogs/ai-news-today-june-8-2026) SpaceX priced its IPO for June 11, with trading opening June 12 under ticker SPCX, targeting $75 billion in proceeds at a $1.75 trillion+ valuation.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/services-track-partner-hub) Anthropic launched the Services Track and Partner Hub of the Claude Partner Network on June 3, formalizing a $100M partner program. The hub refreshes daily; more than 40,000 firms have applied and 10,000 consultants have earned Claude certifications since the March launch.
+
+- [buildfastwithai](https://www.buildfastwithai.com/blogs/ai-news-today-june-8-2026) Microsoft Foundry now lists 11,000+ models — including Claude Opus 4.8 — accessible through a single Azure endpoint with unified billing.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/github-internal-repositories-breached.html) Nx Console v18.95.0 (CVE-2026-48027) was compromised in a May 18 supply chain attack affecting 2.2 million VS Code installs. The malicious version silently harvested credentials from GitHub, npm, AWS, HashiCorp Vault, Kubernetes, and 1Password, and was then used to breach GitHub's internal repositories, with roughly 3,800 repos exfiltrated. CISA added CVE-2026-48027 to the KEV catalog; threat group TeamPCP claimed responsibility.
+
+## Geopolitics
+
+- [CNN](https://www.cnn.com/2026/06/07/world/live-news/iran-war-trump-israel-lebanon) Israel halted strikes on Iran and Iran suspended its operations against Israel on June 7-8; Trump posted that both countries "are looking to do an immediate CEASEFIRE." Both sides warned they would resume attacks if provoked, and Iran stated the US has yet to fulfill agreed terms on releasing frozen assets.
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/6/8/tsunami-warnings-issued-after-8-2-magnitude-earthquake-off-philippines) A 7.8 magnitude earthquake struck off Mindanao in the Philippines on June 8, killing at least 32 and injuring more than 200. The quake triggered tsunami warnings across the Philippines, Indonesia, and the western Pacific; a landslide in Sarangani province killed 13. Strongest earthquake to hit the country since 1990.
+
+## Just for You
+
+- [buildfastwithai](https://www.buildfastwithai.com/blogs/ai-news-today-june-8-2026) Colorado's Consumer Protections for Artificial Intelligence Act takes effect June 30, requiring organizations to implement risk management programs and impact assessments for high-risk AI systems — 22 days away.
