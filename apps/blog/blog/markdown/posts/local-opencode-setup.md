@@ -1,7 +1,8 @@
 ---
-title: "Using OpenCode & Comparing it to Claude, Cursor"
-summary: Setting up OpenCode locally as an alternative to Cursor and Claude Code
-  for AI-assisted development. First try at multi-agent flows.
+title: "OpenCode vs Claude Code vs Cursor: Setup, Comparison, and Multi-Agent Workflows"
+summary: "OpenCode vs Claude Code vs Cursor: how they differ on model flexibility,
+  agent autonomy, and LSP support, plus a working multi-agent blog pipeline built on
+  OpenCode."
 slug: local-opencode-setup
 category: dev
 tags: opencode, llm, dev
