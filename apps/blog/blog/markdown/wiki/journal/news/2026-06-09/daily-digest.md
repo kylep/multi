@@ -57,3 +57,23 @@ last_verified: 2026-06-09
 ## Just for You
 
 - [Cloudflare Blog](https://blog.cloudflare.com/) Cloudflare One now routes Workers with a VPC Network binding through Cloudflare Gateway for public Internet destinations, extending Zero Trust DNS, HTTP, Network, and egress policies with full Gateway logs for Worker traffic.
+
+---
+
+## Update — 16:04 UTC
+
+## Open Source
+
+- [MiniMax Blog](https://www.minimax.io/blog/minimax-m3) MiniMax released M3 on June 1, an open-weight model combining a 1-million-token context window, native multimodal input (text, image, video), and computer use capability built on a new Sparse Attention architecture. It scores 59% on SWE-Bench Pro, edging past GPT-5.5 and Gemini 3.1 Pro. Weights and a technical report are open-sourced; training code is not included.
+
+## Security
+
+- [Bleeping Computer](https://www.bleepingcomputer.com/news/security/critical-everest-forms-pro-flaw-exploited-to-take-over-wordpress-sites/) A critical PHP eval() injection flaw in the Everest Forms Pro WordPress plugin (CVE-2026-3300, CVSS 9.8) is being actively exploited to achieve unauthenticated remote code execution on sites using the Complex Calculation feature. Wordfence has blocked over 29,300 exploit attempts; patched in version 1.9.13.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/06/09/nx-s1-5851482/trump-pilots-us-helicopter-crash) A US Army Apache helicopter crashed into the sea near the Strait of Hormuz early June 9 while patrolling off the coast of Oman during the Iran conflict. Both crew members were rescued within two hours by a sea drone in the first such US military sea-drone rescue operation; the cause is under investigation.
+
+## Just for You
+
+- [Cloudflare Changelog](https://developers.cloudflare.com/changelog/post/2026-06-05-saga-rollbacks/) Cloudflare Workflows added saga-style rollback support on June 5, letting each step define compensating logic that runs in reverse order on failure. Rollback outcomes are now exposed in instance status and in analytics for production debugging.
