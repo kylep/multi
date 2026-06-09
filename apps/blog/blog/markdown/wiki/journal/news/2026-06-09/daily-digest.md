@@ -77,3 +77,19 @@ last_verified: 2026-06-09
 ## Just for You
 
 - [Cloudflare Changelog](https://developers.cloudflare.com/changelog/post/2026-06-05-saga-rollbacks/) Cloudflare Workflows added saga-style rollback support on June 5, letting each step define compensating logic that runs in reverse order on failure. Rollback outcomes are now exposed in instance status and in analytics for production debugging.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5) Anthropic released Claude Fable 5 on June 9, its first public Mythos-class model. It scores 80.3% on SWE-Bench Pro (vs 69.2% for Opus 4.8) and is the first model to exceed 90% on Hex's analytical benchmark. Available immediately on Claude API, Claude Platform, Claude Code, AWS, Google Cloud, and Microsoft Foundry. Through June 22, included in Pro, Max, Team, and Enterprise plans; usage-credits pricing of $10/M input and $50/M output takes effect June 23. Mythos 5, the same model with some safeguards lifted, was simultaneously deployed to approved organizations via Project Glasswing in collaboration with the US government.
+
+## Security
+
+- [Bleeping Computer](https://www.bleepingcomputer.com/news/security/meta-ai-support-data-breach-affects-20-000-instagram-accounts/) Attackers exploited a flaw in Meta's High Touch Support AI recovery tool to hijack 20,225 Instagram accounts between April 17 and May 31, 2026. The tool issued password reset links without verifying the requester's email matched the target account. Meta shut down the system, invalidated all generated links, and reset affected accounts.
+
+- [SecurityWeek](https://www.securityweek.com/openssl-patches-high-severity-vulnerability-found-with-ai/) OpenSSL patched CVE-2026-45447 on June 9, a heap use-after-free in PKCS7_verify() that can be triggered by a crafted PKCS#7 or S/MIME message and may lead to remote code execution. Fixed in OpenSSL 3.6. The flaw was discovered by a researcher working with Claude AI.
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/06/08/cisa-patch-actively-exploited-solarwinds-serv-u-dos-vulnerability-cve-2026-28318/) CISA added CVE-2026-28318 to its Known Exploited Vulnerabilities catalog on June 5. The flaw in SolarWinds Serv-U allows unauthenticated attackers to crash the service via a malformed POST request using the Content-Encoding: deflate header. Federal agencies must patch by June 19; hotfix available in Serv-U 15.5.4 Hotfix 1.
