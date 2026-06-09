@@ -120,3 +120,10 @@ rbd snap rm volumes/myVolume@sampleSnapshot
 #   rbd export <pool>/<volume> <filename>
 rbd export volumes/myVolume myVolume.raw
 ```
+
+
+## Python Automation
+
+To automate any of the above from Python, the `rados` and `rbd` libraries
+wrap the same operations. See [Python Ceph Examples](/python-ceph.html) for
+pool management, volume creation, and snapshot handling via the Python API.
