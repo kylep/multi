@@ -249,4 +249,4 @@ docker exec -it pelican \
 
 # Next Up
 Now that the content is written, its time to
-[host the static website on Google Cloud Storage](/htsw-4-gcs-static-website.html).
+[host the static website on Google Cloud Storage](/google-cloud-storage-website.html).
