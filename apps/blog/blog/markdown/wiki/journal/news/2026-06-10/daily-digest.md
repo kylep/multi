@@ -61,3 +61,59 @@ last_verified: 2026-06-10
 - [GitHub / Perplexity](https://github.com/perplexity-ai/bumblebee) Perplexity open-sourced Bumblebee, a read-only supply chain scanner for npm, PyPI, Go modules, RubyGems, Composer, MCP servers, editor extensions, and browser extensions. It flags malicious or suspicious dependencies before they reach production.
 
 - [Microsoft Build 2026](https://www.engadget.com/2185601/microsoft-build-2026-live-blog-copilot-windows-news/) Microsoft announced Autopilot agents (branded Scout), long-running autonomous agents that monitor inboxes and Teams for actionable items, as part of the broader Copilot Studio platform expansion.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5) Anthropic released Claude Fable 5 and Claude Mythos 5 on June 9 — the first publicly available Mythos-class models. Fable 5 is available to Pro, Max, Team, and Enterprise plan users at no extra charge through June 22, after which it becomes a paid tier at $10 per million input tokens and $50 per million output. Mythos 5 remains restricted to vetted partners.
+
+- [OpenAI](https://openai.com/index/openai-submits-confidential-s-1/) OpenAI filed a confidential S-1 with the SEC on June 8, with Goldman Sachs, Morgan Stanley, and JPMorgan leading the offering. The company is targeting a public listing between September and November 2026, currently valued at $852 billion.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-10/anthropic-ceo-doesn-t-know-if-claude-used-in-iran-school-strike) Anthropic's CEO said he does not know what role Claude played in a US military strike that killed approximately 120 children at an Iranian school. The statement reflects a broader accountability gap as AI companies expand Department of Defense contracts.
+
+## AI Tooling
+
+- [Anthropic](https://itbrief.news/story/anthropic-launches-claude-managed-agents-in-public-beta) Claude Managed Agents in public beta now supports cron-based scheduling, vault-stored environment variables, browser integrations, and connection to private MCP servers running within enterprise network boundaries. Notion, Rakuten, Asana, and Sentry are among early adopters.
+
+- [OpenAI](https://openai.com/index/chatgpt-memory-dreaming/) OpenAI launched Dreaming V3, a rebuilt memory architecture for ChatGPT that automatically updates stored context as time passes — for example revising a future trip to a past one after it occurs. The upgrade rolled out to Plus and Pro users on June 4 and is coming to free accounts.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/06/05/cisco-sd-wan-cve-2026-20245-0-day-exploited/) A zero-day privilege escalation flaw in Cisco Catalyst SD-WAN Manager (CVE-2026-20245, CVSS 7.8) is being actively exploited with no patch available. Attackers with authenticated access can execute arbitrary commands as root across all SD-WAN deployment types including FedRAMP. Mandiant reported the vulnerability to Cisco.
+
+## Local
+
+- [CP24](https://www.cp24.com/) The official FIFA Fan Festival opens at Fort York National Historic Site and The Bentway on June 11 as the 2026 World Cup kicks off across the US, Canada, and Mexico. Toronto hosts matches at BMO Field starting in the group stage.
+
+## Just for You
+
+- [Anthropic Blog](https://uk.finance.yahoo.com/news/anthropic-says-something-unsettling-happening-103500529.html) Anthropic reported that Claude now writes more than 80% of its own code, up from under 10% in early 2025. The company described this as pointing toward a system capable of fully autonomously designing its own successor.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Tom's Guide](https://www.tomsguide.com/news/live/gemini-outage-june-10-live-updates) Google Gemini suffered a major service outage beginning around 06:00 ET on June 10, with users receiving error 1076 and error 1099 messages across Gemini Flash and Gemini Pro. Gemini Flash Lite remained partially functional; recovery was confirmed hours later after Google applied mitigations.
+
+## AI Tooling
+
+- [Windows Central](https://www.windowscentral.com/microsoft/microsoft-cancels-claude-code-licenses-shifting-developers-to-github-copilot-cli-a-move-likely-driven-by-financial-motives) Microsoft is canceling Claude Code licenses across its Experiences + Devices division — the group behind Windows, Microsoft 365, Outlook, Teams, and Surface — with a June 30 deadline for engineers to move to GitHub Copilot CLI. The decision is tied to the end of Microsoft's fiscal year and a strategic need to keep its own developers on the product it sells externally.
+
+- [Cursor Blog](https://cursor.com/blog/teams-pricing-june-2026) Cursor restructured its Teams plan effective July 1, splitting into a Standard seat ($40/month) with expanded usage pools and a new Premium seat at 5x the included usage. Third-party model usage now tracks separately from first-party Cursor model usage, making spend easier to forecast.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/mini-shai-hulud-worm-compromises.html) The "Mini Shai-Hulud" worm (CVE-2026-45321) compromised TanStack's npm organization in May, publishing 84 malicious package versions across 42 @tanstack/* packages in a six-minute window. The attack exfiltrated cloud credentials, Kubernetes service account tokens, Vault tokens, GitHub tokens, npm credentials, and SSH keys from developer and CI environments; cumulative downloads across affected packages exceed 518 million. CISA set a remediation deadline of June 10.
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/microsoft-june-2026-patch-tuesday-fixes-6-zero-days-200-flaws/) Microsoft's June Patch Tuesday also includes CVE-2026-45657, a Windows Kernel Remote Code Execution flaw rated CVSS 9.8 that allows unauthenticated remote attackers to execute code at SYSTEM level with no user interaction required.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/business/interest-rate-bank-of-canada-june-2026-9.7229759) The Bank of Canada held its overnight rate at 2.25% for the fifth consecutive time, citing weak domestic activity and ongoing US trade policy uncertainty. The next rate decision is July 15.
+
+- [CTV News](https://www.ctvnews.ca/politics/article/digital-safety-bill-banning-kids-under-16-from-social-media-to-be-introduced-today/) The federal government introduced Bill C-34, the Safe Social Media Act, which would set a minimum age of 16 for social media accounts and create a new Digital Safety Commission to enforce platform safety standards. Platforms meeting commission-approved safety thresholds may apply for an exemption allowing younger users.
