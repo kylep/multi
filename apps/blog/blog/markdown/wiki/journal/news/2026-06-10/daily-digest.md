@@ -61,3 +61,33 @@ last_verified: 2026-06-10
 - [GitHub / Perplexity](https://github.com/perplexity-ai/bumblebee) Perplexity open-sourced Bumblebee, a read-only supply chain scanner for npm, PyPI, Go modules, RubyGems, Composer, MCP servers, editor extensions, and browser extensions. It flags malicious or suspicious dependencies before they reach production.
 
 - [Microsoft Build 2026](https://www.engadget.com/2185601/microsoft-build-2026-live-blog-copilot-windows-news/) Microsoft announced Autopilot agents (branded Scout), long-running autonomous agents that monitor inboxes and Teams for actionable items, as part of the broader Copilot Studio platform expansion.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5) Anthropic released Claude Fable 5 and Claude Mythos 5 on June 9 — the first publicly available Mythos-class models. Fable 5 is available to Pro, Max, Team, and Enterprise plan users at no extra charge through June 22, after which it becomes a paid tier at $10 per million input tokens and $50 per million output. Mythos 5 remains restricted to vetted partners.
+
+- [OpenAI](https://openai.com/index/openai-submits-confidential-s-1/) OpenAI filed a confidential S-1 with the SEC on June 8, with Goldman Sachs, Morgan Stanley, and JPMorgan leading the offering. The company is targeting a public listing between September and November 2026, currently valued at $852 billion.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-10/anthropic-ceo-doesn-t-know-if-claude-used-in-iran-school-strike) Anthropic's CEO said he does not know what role Claude played in a US military strike that killed approximately 120 children at an Iranian school. The statement reflects a broader accountability gap as AI companies expand Department of Defense contracts.
+
+## AI Tooling
+
+- [Anthropic](https://itbrief.news/story/anthropic-launches-claude-managed-agents-in-public-beta) Claude Managed Agents in public beta now supports cron-based scheduling, vault-stored environment variables, browser integrations, and connection to private MCP servers running within enterprise network boundaries. Notion, Rakuten, Asana, and Sentry are among early adopters.
+
+- [OpenAI](https://openai.com/index/chatgpt-memory-dreaming/) OpenAI launched Dreaming V3, a rebuilt memory architecture for ChatGPT that automatically updates stored context as time passes — for example revising a future trip to a past one after it occurs. The upgrade rolled out to Plus and Pro users on June 4 and is coming to free accounts.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/06/05/cisco-sd-wan-cve-2026-20245-0-day-exploited/) A zero-day privilege escalation flaw in Cisco Catalyst SD-WAN Manager (CVE-2026-20245, CVSS 7.8) is being actively exploited with no patch available. Attackers with authenticated access can execute arbitrary commands as root across all SD-WAN deployment types including FedRAMP. Mandiant reported the vulnerability to Cisco.
+
+## Local
+
+- [CP24](https://www.cp24.com/) The official FIFA Fan Festival opens at Fort York National Historic Site and The Bentway on June 11 as the 2026 World Cup kicks off across the US, Canada, and Mexico. Toronto hosts matches at BMO Field starting in the group stage.
+
+## Just for You
+
+- [Anthropic Blog](https://uk.finance.yahoo.com/news/anthropic-says-something-unsettling-happening-103500529.html) Anthropic reported that Claude now writes more than 80% of its own code, up from under 10% in early 2025. The company described this as pointing toward a system capable of fully autonomously designing its own successor.
