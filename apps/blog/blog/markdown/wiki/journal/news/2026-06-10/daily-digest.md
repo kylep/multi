@@ -91,3 +91,29 @@ last_verified: 2026-06-10
 ## Just for You
 
 - [Anthropic Blog](https://uk.finance.yahoo.com/news/anthropic-says-something-unsettling-happening-103500529.html) Anthropic reported that Claude now writes more than 80% of its own code, up from under 10% in early 2025. The company described this as pointing toward a system capable of fully autonomously designing its own successor.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Tom's Guide](https://www.tomsguide.com/news/live/gemini-outage-june-10-live-updates) Google Gemini suffered a major service outage beginning around 06:00 ET on June 10, with users receiving error 1076 and error 1099 messages across Gemini Flash and Gemini Pro. Gemini Flash Lite remained partially functional; recovery was confirmed hours later after Google applied mitigations.
+
+## AI Tooling
+
+- [Windows Central](https://www.windowscentral.com/microsoft/microsoft-cancels-claude-code-licenses-shifting-developers-to-github-copilot-cli-a-move-likely-driven-by-financial-motives) Microsoft is canceling Claude Code licenses across its Experiences + Devices division — the group behind Windows, Microsoft 365, Outlook, Teams, and Surface — with a June 30 deadline for engineers to move to GitHub Copilot CLI. The decision is tied to the end of Microsoft's fiscal year and a strategic need to keep its own developers on the product it sells externally.
+
+- [Cursor Blog](https://cursor.com/blog/teams-pricing-june-2026) Cursor restructured its Teams plan effective July 1, splitting into a Standard seat ($40/month) with expanded usage pools and a new Premium seat at 5x the included usage. Third-party model usage now tracks separately from first-party Cursor model usage, making spend easier to forecast.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/05/mini-shai-hulud-worm-compromises.html) The "Mini Shai-Hulud" worm (CVE-2026-45321) compromised TanStack's npm organization in May, publishing 84 malicious package versions across 42 @tanstack/* packages in a six-minute window. The attack exfiltrated cloud credentials, Kubernetes service account tokens, Vault tokens, GitHub tokens, npm credentials, and SSH keys from developer and CI environments; cumulative downloads across affected packages exceed 518 million. CISA set a remediation deadline of June 10.
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/microsoft-june-2026-patch-tuesday-fixes-6-zero-days-200-flaws/) Microsoft's June Patch Tuesday also includes CVE-2026-45657, a Windows Kernel Remote Code Execution flaw rated CVSS 9.8 that allows unauthenticated remote attackers to execute code at SYSTEM level with no user interaction required.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/business/interest-rate-bank-of-canada-june-2026-9.7229759) The Bank of Canada held its overnight rate at 2.25% for the fifth consecutive time, citing weak domestic activity and ongoing US trade policy uncertainty. The next rate decision is July 15.
+
+- [CTV News](https://www.ctvnews.ca/politics/article/digital-safety-bill-banning-kids-under-16-from-social-media-to-be-introduced-today/) The federal government introduced Bill C-34, the Safe Social Media Act, which would set a minimum age of 16 for social media accounts and create a new Digital Safety Commission to enforce platform safety standards. Platforms meeting commission-approved safety thresholds may apply for an exemption allowing younger users.
