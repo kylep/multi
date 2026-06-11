@@ -104,6 +104,10 @@ Most tools read `AGENTS.md`: Cursor, OpenCode, Codex, ~others~. If all you have 
 rules, it's not a bad idea to skip all of this and just use that format. I think it
 might win. That doesn't help with Skills, though.
 
+Cursor also has a [headless CLI agent](/wiki/ai-tools/cursor-cli.html) for running
+agents from the terminal, similar to `claude -p` in Claude Code. Worth knowing
+about if you're scripting workflows across tools.
+
 ## Skills
 
 Rules are basically just fancy prompt context that are always loaded.
