@@ -73,3 +73,31 @@ last_verified: 2026-06-11
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby afternoon update: 28°C high, 18°C low. Morning showers and thunderstorm risk clearing to a mix of sun and cloud in the afternoon. Humidex 36, UV index very high. No alerts.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Google DeepMind](https://deepmind.google/blog/investing-in-multi-agent-ai-safety-research/) Google DeepMind, Schmidt Sciences, the Cooperative AI Foundation, ARIA, and Google.org announced a $10M technical research funding call for multi-agent AI safety. Priority areas include agent network science, safety sandboxes, cross-platform identity and reputation protocols, and oversight methods for large interacting agent populations. Applications open through August 8.
+
+## AI Tooling
+
+- [Claude Code Changelog](https://code.claude.com/docs/en/changelog) Claude Code v2.1.173 (June 11) fixes normalization of Fable 5 model names that include a [1m] suffix and removes a spurious "sandbox dependencies missing" startup warning on Windows.
+
+## Open Source
+
+- [GitHub Blog](https://github.blog/changelog/2026-06-10-list-view-and-create-discussions-in-github-cli/) GitHub CLI v2.94.0 (June 10) adds a gh discussion command group, bringing Discussions list, view, create, edit, and comment workflows natively to the terminal without requiring API calls.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/06/11/oracle-peoplesoft-under-attack-cve-2026-35273/) Oracle issued an out-of-band emergency patch for CVE-2026-35273, a CVSS 9.8 unauthenticated RCE in PeopleSoft PeopleTools 8.61–8.62. ShinyHunters has been exploiting the flaw in the wild against more than 100 organizations across 300 PeopleSoft instances. Patch immediately and restrict external access to PeopleSoft environments.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/toronto-police-officer-search-warrant-shooting-9.7231248) Toronto Emergency Task Force Const. Marc Pinizzotto, 43, was shot and killed early Thursday while executing a search warrant at a North York apartment building in connection with multiple shootings including one at the US Consulate. An 18-year veteran and father of twins, Pinizzotto died in hospital. A 19-year-old has been charged with first-degree murder; a second suspect remains at large.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby evening: low 18°C, 60% chance of showers early this evening with risk of thunderstorm, 40% chance of showers overnight. West 30 km/h wind becoming light. No alerts.
