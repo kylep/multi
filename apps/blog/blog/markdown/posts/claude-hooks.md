@@ -391,4 +391,6 @@ scripts, it uses JavaScript or TypeScript plugins placed in
 register functions on events like `tool.execute.before` and
 `tool.execute.after`. More powerful (you get full access to
 the session and project context), but less portable than a
-shell script you can reuse across tools.
+shell script you can reuse across tools. If you haven't set
+up OpenCode yet, [the setup guide covers the install and
+basic config](/local-opencode-setup.html).
