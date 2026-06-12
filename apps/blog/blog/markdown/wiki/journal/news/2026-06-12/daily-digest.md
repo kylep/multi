@@ -67,3 +67,19 @@ last_verified: 2026-06-12
 ## Local
 
 - [Durham Radio News](https://www.durhamradionews.com/archives/212632) Whitby hosted an outdoor World Cup watch party at Civic Park on Rossland Road East for Canada's match against Bosnia-Herzegovina, running 2–6 p.m.
+
+---
+
+## Update — 22:04 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/06/12/spacex-ipo-spcx-live-updates.html) SpaceX (SPCX) began trading on Nasdaq today, opening at $150 and closing at $160.95 — up 19.2% from its $135 IPO price. The day range hit $176.52 at peak. With $75B raised at a $1.75T valuation, it is the largest IPO in US history.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/google-sues-chinese-smishing-network.html) Google filed a lawsuit June 12 against a China-based phishing-as-a-service ring called "Outsider Enterprise" for using Gemini AI to generate phishing code and fake websites. The network created 9,000+ fraudulent sites, sent 2.5 million spam texts in a two-week window, and reached 100,000+ victims. It is the first time Google has sued a threat actor for weaponizing its own AI platform.
+
+## Geopolitics
+
+- [WEF](https://www.weforum.org/stories/2026/06/uncertainty-around-us-iran-ceasefire-and-other-geopolitical-stories-to-know-this-month/) Trump announced a further 60-day ceasefire extension with Iran on June 11, mediated by Pakistan, following continued US strikes. Iran has not issued a final confirmation. Negotiations center on Iran's nuclear program, ballistic missiles, sanctions relief, and Strait of Hormuz navigation. G7 leaders convene June 15–17 with Iran on the agenda.
