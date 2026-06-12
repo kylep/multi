@@ -43,3 +43,27 @@ last_verified: 2026-06-12
 - [GitHub](https://github.com/chopratejas/headroom) headroom is the #2 trending repo this week with 11,282 new stars — it compresses tool outputs, logs, files, and RAG chunks before they reach the LLM, claiming 60–95% token reduction with the same answer quality. Available as a library, a proxy, and an MCP server.
 
 - [GitHub](https://github.com/santifer/career-ops) santifer/career-ops entered the weekly GitHub trending top 8 with 4,111 stars this week. It is a Claude Code-based job search system with 14 skill modes, a Go dashboard, PDF generation, and batch processing across job boards.
+
+---
+
+## Update — 16:04 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/06/08/openai-confidentially-files-for-ipo-prepping-wall-street-for-ai-debut.html) OpenAI filed a confidential draft S-1 with the SEC on June 8, targeting a public listing as early as September 2026 at a valuation analysts expect to exceed $1 trillion. Goldman Sachs, Morgan Stanley, and JPMorgan are leading the offering.
+
+## AI Tooling
+
+- [developer-tech.com](https://www.developer-tech.com/news/microsoft-claude-code-github-copilot-cli/) Microsoft is canceling Claude Code licenses for engineers in its Experiences and Devices division by June 30, redirecting them to GitHub Copilot CLI. The decision follows Satya Nadella's internal "One AI Stack" memo and fiscal year-end cost controls; engineers reportedly chose Claude Code over Copilot CLI due to a significant feature gap.
+
+## Open Source
+
+- [MiniMax](https://www.minimax.io/blog/minimax-m3) MiniMax M3, an open-weights multimodal model released June 1, pairs a 1M-token context window with native image and video inputs and scores 59.0% on SWE-Bench Pro — topping all current open-weight models on that benchmark. Weights and a technical report are due on Hugging Face within 10 days of launch.
+
+## Security
+
+- [Bleeping Computer](https://www.bleepingcomputer.com/news/microsoft/microsoft-june-2026-patch-tuesday-fixes-6-zero-days-200-flaws/) Microsoft's June 10 Patch Tuesday fixed 200 CVEs — the largest single Patch Tuesday release on record — including three actively exploited zero-days: CVE-2026-45586 (CTFMON privilege escalation), CVE-2026-49160 (HTTP/2 DoS), and CVE-2026-50507 (BitLocker bypass).
+
+## Local
+
+- [Durham Radio News](https://www.durhamradionews.com/archives/212632) Whitby hosted an outdoor World Cup watch party at Civic Park on Rossland Road East for Canada's match against Bosnia-Herzegovina, running 2–6 p.m.
