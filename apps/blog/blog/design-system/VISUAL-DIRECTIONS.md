@@ -1,4 +1,11 @@
-# Visual Directions (TASK-001) — pick one
+# Visual Directions (TASK-001)
+
+> **DECISION (2026-06-13): A — Terminal.** Dark-first, developer-native.
+> Token build (TASK-003) seeds from A's palette: bg `#0B0E14`, surface
+> `#11151F`, text `#E6E9EF`, accent cyan `#36E2C4`, amber `#F5A623`; mono
+> display (Geist/JetBrains Mono) + sans body; tight grid, 2–4px radius,
+> borders over shadows. Light mode is the secondary theme.
+
 
 Three distinct directions for the redesign. All map onto the **same token
 structure** (primitive → semantic), so the choice changes *values*, not
