@@ -1,0 +1,19 @@
+/*
+ * Design system — Tailwind v4 entry + token source of truth (PER-135).
+ *
+ * Preflight (Tailwind's base reset) is INTENTIONALLY omitted while MUI's
+ * <CssBaseline> is still in the tree, so Tailwind coexists without
+ * double-resetting and changing the current look. Preflight gets enabled
+ * in the MUI-removal task (TASK-014), swapping `@import "tailwindcss/..."`
+ * below for the full `@import "tailwindcss";`.
+ *
+ * The Terminal-direction tokens land in the @theme block in TASK-003.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  /* Seed only. TASK-003 fills this with the Terminal palette/type/space. */
+}

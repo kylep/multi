@@ -1,3 +1,4 @@
+import '../design-system/tokens.css';
 import '../public/css/globals.css';
 import '../public/css/prism.css';
 import '../public/js/prism.js';
