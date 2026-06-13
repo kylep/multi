@@ -61,3 +61,6 @@ update-ca-certificates
 ```
 
 That's it. Now your system will trust certs signed by that CA too.
+
+If you need to generate a certificate for that CA to sign, see
+[Creating a CSR with a SAN using openssl](/openssl-csr-san.html).
