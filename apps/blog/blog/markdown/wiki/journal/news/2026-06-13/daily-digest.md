@@ -67,3 +67,25 @@ last_verified: 2026-06-13
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby update: 28°C high, 15°C low. Currently sunny; 30% chance of showers late afternoon with thunderstorm risk. Winds gusting to 50 km/h overnight. No alerts in effect.
+
+---
+
+## Update — 22:04 UTC
+
+## Geopolitics
+
+- [CNBC](https://www.cnbc.com/2026/06/13/trump-venezuela-tren-de-aragua.html) US military killed Tren de Aragua gang leader Héctor "El Niño" Guerrero in a strike in Las Claritas, Bolívar state, Venezuela on June 13. The operation involved intelligence sharing with the Venezuelan government. Trump described the strike as retribution for crimes committed by the gang on US soil.
+
+## Local
+
+- [City of Toronto](https://www.toronto.ca/news/) Mayor Olivia Chow announced the early opening of 15 outdoor pools and 16 wading pools across Toronto as summer temperatures climb.
+
+- [Toronto Police Service](https://www.tps.ca/media-centre/news-releases/66199/) Two people were arrested at Toronto Stadium during the FIFA World Cup match on June 12 for assaulting a peace officer. One of the accused, Eldar Grabovac, 27, of Germany, is linked to a Bosnian fan group.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby evening: skies cleared through the afternoon. Clear overnight, low near 17°C. No alerts in effect.
+
+## Just for You
+
+- [Cloudflare Docs](https://developers.cloudflare.com/changelog/post/2026-06-08-create-waf-rules-from-threat-events/) Cloudflare WAF now generates rules directly from Cloudforce One Threat Events Saved Views — one click blocks the dynamic IP list from a saved view, eliminating manual indicator extraction. Available via dashboard and API/Terraform.
