@@ -126,12 +126,12 @@ hand-code.
 
 **Acceptance criteria:**
 - [ ] The work is decomposed into dependency-ordered tasks (in the
-  design doc) that the autolearn pipeline / Claude Code can pick up and
+  design doc) that a Claude Code `/goal` session can pick up and
   execute one at a time.
 - [ ] A machine-checkable verification gate (`bin/verify-design-system.sh`
   or equivalent: build + lint + Storybook build + Playwright/axe) lets
   an agent self-verify a change before opening a PR.
-- [ ] A short `apps/blog/design-system/AGENTS.md` (mirrored through
+- [ ] A short `apps/blog/blog/design-system/AGENTS.md` (mirrored through
   `.ruler/`) tells any agent how to add, change, or remove a component
   so future maintenance is "ask an agent," not "relearn the system."
 
@@ -174,36 +174,31 @@ well-paved request to an agent, so that maintenance stays cheap.
   regression proves too noisy at scale.
 - Any redesign of non-blog apps in the monorepo.
 
+## Decisions (resolved 2026-06-13)
+
+Kyle's calls on the original open questions:
+
+- **Component model: shadcn/ui-seeded owned `.tsx`.** Kept small and
+  Storybook-documented so "maintain via AI" stays tractable. (Not a
+  versioned `npm` library.)
+- **Visual direction: agents generate 3 mockups; Kyle picks one** before
+  mass component work. This is the one intentional human gate.
+- **React: bias to newest → upgrade to React 19** as part of the work
+  (shadcn/ui targets 19; aligns with the "modern, 3–5yr" goal).
+- **TypeScript depth: new DS code in `.tsx`, legacy pages stay `.js`.**
+- **Token format: Tailwind v4 `@theme` is the load-bearing source of
+  truth; DTCG export optional and non-blocking** (removes the young-spec
+  risk Kyle flagged).
+- **Tailwind: upgrade the inert v3 to v4** for the `@theme` token model.
+- **Autonomy routing: a `/goal` session, not `autolearn` Linear
+  sub-issues.** Kyle pastes a goal that drives Claude Code through the
+  design doc's task breakdown until the verification gate is green.
+
 ## Open Questions
 
-These do not block starting; flagged for Kyle to pick at on review. The
-design doc proposes a default for each.
-
-- **Component model — shadcn/ui vs. a maintained library.** The seed
-  research recommends the shadcn/ui copy-paste model (you own the
-  `.tsx`), which is AI-friendly but means Kyle owns upstream
-  maintenance — a caveat he disliked. Design doc default: **use shadcn/ui
-  as the *starting point* for owned primitives but keep the surface
-  small and Storybook-documented**, which is what makes "maintain via
-  AI" tractable. Alternative to weigh: a versioned library (e.g. MUI
-  Joy / Park UI / Radix Themes) that upgrades via `npm`. *Decision
-  needed from Kyle.*
-- **Token format — DTCG JSON vs. Tailwind `@theme` as source of truth.**
-  Kyle flagged the DTCG spec as "young." Design doc default: **Tailwind
-  v4 `@theme` (or a plain tokens module) is the load-bearing source of
-  truth; DTCG export is optional and non-blocking**, which removes the
-  young-spec risk while keeping a real token layer. *Confirm acceptable.*
-- **TypeScript depth.** Author new DS components in `.tsx` (tooling
-  present) while leaving legacy pages `.js`? Design doc default: **yes.**
-  *Confirm.*
-- **How "redesigned" visually?** Is there a reference aesthetic Kyle
-  wants (e.g. Vercel/Geist, Linear, Stripe-like), or should the agents
-  propose 2–3 directions for him to pick? Design doc default: **agents
-  produce 2–3 visual directions as Storybook mockups for Kyle to choose
-  before mass component work.**
-- **Tailwind v4 vs. fixing v3.** v3 is already a (broken) dep. Design
-  doc default: **upgrade to Tailwind v4** for the `@theme` token model
-  and longevity. *Confirm the upgrade is wanted vs. repairing v3.*
+- None blocking. Remaining choices (exact palette/type for the 3 mockups,
+  whether to publish a registry later) are deferred and surface during
+  implementation.
 
 ## Risks
 

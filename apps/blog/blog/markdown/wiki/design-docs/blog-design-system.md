@@ -60,8 +60,8 @@ Two hard constraints shape every decision below:
 - No forced full-repo TS migration; legacy `pages/*.js` stay JS except
   where a component swap touches them.
 - No public component registry / npm package in v1.
-- No React 19 bump *required* (see Alternatives); stay on React 18 unless
-  a blocker forces it.
+- React **18 → 19** upgrade *is* in scope (Kyle: bias to newest); it is
+  the one framework-version bump. Still no App Router / SSR / re-platform.
 
 ## Proposed Design
 
@@ -139,7 +139,7 @@ usage is gone.
 
 **Primitives layer** — Radix UI (`@radix-ui/react-*`)
 - Unstyled, accessible behavior (dialog, dropdown, tooltip, etc.).
-  Supports React 18. Used as the foundation for the owned components.
+  Radix supports React 19. Used as the foundation for the owned components.
 
 **Owned component library** — `apps/blog/blog/components/ui/*.tsx`
 - shadcn/ui as the *seed* (`npx shadcn@latest init` → `add <component>`),
@@ -276,18 +276,27 @@ None. No persistence; tokens and components are source files. The only
 ## Task Breakdown
 
 Dependency-ordered. Each task is one coherent, isolated-testable change
-sized for a single Claude Code session / autolearn pick-up. `[P]` =
+sized for a single Claude Code `/goal`-driven turn. `[P]` =
 parallelizable with its siblings. Every task ends green on the relevant
 slice of `verify-design-system.sh`.
 
 ### TASK-001: Inventory + visual direction
 
-- **Requirement:** PRD "demos to experts" + open question "how redesigned?"
+- **Requirement:** PRD "demos to experts" + the visual-direction gate
 - **Files:** `apps/blog/blog/design-system/INVENTORY.md`
 - **Dependencies:** None
 - **Acceptance criteria:**
   - [ ] Every component, page, and MUI/styled-components usage listed with paths.
-  - [ ] 2–3 visual directions (palette + type + spacing) proposed as a short doc / mockup for Kyle to choose before mass component work.
+  - [ ] **3** visual directions (palette + type + spacing) proposed as mockups for Kyle to choose before mass component work.
+
+### TASK-001B: Upgrade React 18 → 19 `[P]`
+
+- **Requirement:** "bias to newest" decision; shadcn/ui targets React 19
+- **Files:** `package.json` (`react`, `react-dom`, `@types/react*`)
+- **Dependencies:** None
+- **Acceptance criteria:**
+  - [ ] React 19 + matching types installed; `next build` static export succeeds; existing pages render unchanged (Playwright smoke).
+  - [ ] Any peer-dep breakage resolved or recorded; isolated commit, easy to revert.
 
 ### TASK-002: Stand up Tailwind v4 alongside MUI
 
@@ -375,18 +384,12 @@ _(none yet — populated as scope drifts during implementation)_
 
 ## Open Questions
 
-- **Visual direction** — blocks TASK-009+ mass work. Resolved by Kyle
-  picking one of the TASK-001 directions.
-- **Component model confirmation** — shadcn-owned vs. versioned library
-  (PRD open question). Default proceeds with shadcn-owned; a reversal
-  before TASK-005 is cheap, expensive after.
-- **React 18 vs 19** — shadcn's latest targets React 19; components work
-  on 18 via Radix, but if a specific component needs 19, that's a
-  go/no-go on a small React bump. Blocks only the component(s) that hit it.
-- **Autonomy routing** — should TASK-002…014 become individual Linear
-  sub-issues under PER-135 with the `autolearn` label so the pipeline
-  executes them, or run as Claude Code sessions Kyle kicks off? Blocks how
-  "hands-off" execution actually is.
+- **Visual direction** — the one remaining human gate. Blocks TASK-009+
+  mass work until Kyle picks one of the three TASK-001B mockups. Everything
+  before it (foundations, React 19, tooling, gate) runs without it.
+
+Resolved (2026-06-13): component model = shadcn-owned `.tsx`; React = 19;
+autonomy = a `/goal` session (not `autolearn` Linear sub-issues).
 
 ## Risks
 
@@ -399,7 +402,9 @@ _(none yet — populated as scope drifts during implementation)_
   `_document.js` before first paint.
 - **Weak gate → autonomous regressions.** Mitigation: gate is TASK-008,
   landed and proven before any mass page migration.
-- **shadcn/React-19 assumptions.** Mitigation: pin component versions;
-  treat the React bump as an isolated, reversible decision if forced.
+- **React 19 ecosystem maturity.** Upgrading to React 19 (TASK-001B) can
+  surface peer-dep warnings or a lib not yet on 19. Mitigation: do the bump
+  early and isolated; `mermaid`/`openai`/`sharp` are runtime-agnostic; pin
+  versions and verify `next build` before any component work.
 - **Scope creep toward a full TS/App-Router rewrite.** Mitigation: tasks
   are additive; the non-goals are explicit and enforced in review.
