@@ -38,6 +38,7 @@ export function PostCard({
 				<img
 					src={thumbnail}
 					alt=""
+					loading="lazy"
 					className="mb-3 h-40 w-full rounded-md border border-border object-cover"
 				/>
 			) : null}

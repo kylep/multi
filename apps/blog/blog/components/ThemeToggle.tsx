@@ -37,8 +37,10 @@ export function ThemeToggle() {
 			size="sm"
 			onClick={toggle}
 			aria-label="Toggle light/dark theme"
+			title="Toggle light/dark theme"
 		>
-			{theme === "dark" ? "☀ Light" : "☾ Dark"}
+			<span aria-hidden>{theme === "dark" ? "☀" : "☾"}</span>
+			<span className="hidden sm:inline">{theme === "dark" ? "Light" : "Dark"}</span>
 		</Button>
 	);
 }

@@ -1,8 +1,24 @@
 import Head from 'next/head';
 import { PageShell } from '../components/PageShell';
 import { Prose } from '../components/primitives/prose';
+import { GlobalContextProvider } from '../utils/GlobalContext';
+import { getMarkdownService } from '../utils/MarkdownService';
+import { getGitService } from '../utils/GitService';
 
 const SITE_URL = 'https://kyle.pericak.com';
+
+export async function getStaticProps() {
+	const markdownService = await getMarkdownService();
+	const gitService = await getGitService();
+	return {
+		props: {
+			categories: markdownService.categories,
+			tags: markdownService.tags,
+			lastGitCommitHash: gitService.hash,
+			siteLastModified: gitService.date,
+		},
+	};
+}
 
 const SOCIALS = [
 	{ href: 'https://www.linkedin.com/in/kpericak/', img: '/images/LinkedIn.png', label: 'LinkedIn' },
@@ -12,12 +28,14 @@ const SOCIALS = [
 	{ href: 'https://bsky.app/profile/pericak.bsky.social', img: '/images/Bluesky.png', label: 'Bluesky' },
 ];
 
-const About = () => {
+const About = ({ categories, tags, lastGitCommitHash, siteLastModified }) => {
 	const description =
 		'About Kyle Pericak - Senior Engineering Director working in infrastructure, DevOps, security, and software engineering.';
 	const canonicalUrl = `${SITE_URL}/about.html`;
 	return (
-		<>
+		<GlobalContextProvider
+			globalData={{ categories, tags, lastGitCommitHash, siteLastModified }}
+		>
 			<Head>
 				<title>About - Kyle Pericak</title>
 				<meta name="description" content={description} />
@@ -28,7 +46,7 @@ const About = () => {
 				<meta property="og:type" content="website" />
 				<meta name="twitter:card" content="summary" />
 			</Head>
-			<PageShell>
+			<PageShell lastModified={siteLastModified} commitHash={lastGitCommitHash}>
 				<Prose>
 					<h1>About</h1>
 					<img src="/images/kyle-school-computers.png" alt="Me" />
@@ -92,7 +110,7 @@ const About = () => {
 					</p>
 				</Prose>
 			</PageShell>
-		</>
+		</GlobalContextProvider>
 	);
 };
 

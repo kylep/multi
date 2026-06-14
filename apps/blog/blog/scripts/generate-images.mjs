@@ -191,9 +191,13 @@ async function generateNewImage(prompt, imageFullPath) {
   return success;
 }
 
+// Card-sized 16:9 thumbnail (matches the source 1024x576 ratio; large enough
+// for the PostCard banner on retina). Was 70x70 for the old sidebar icons.
 async function resizeImageToThumbnail(imageFullPath, thumbFullPath) {
   console.log(`🖼️  Creating thumbnail: ${thumbFullPath}`);
-  await sharp(imageFullPath).resize(70, 70).toFile(thumbFullPath);
+  await sharp(imageFullPath)
+    .resize(640, 360, { fit: 'cover', position: 'attention' })
+    .toFile(thumbFullPath);
 }
 
 async function saveMissingBlogImageAndThumbnail(postPath) {
