@@ -11,10 +11,6 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.10",
-    "@mui/material": "^5.15.10",
     "@radix-ui/react-slot": "^1.2.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -30,7 +26,6 @@
     "remark-html": "^16.0.1",
     "remark-toc": "^9.0.0",
     "sharp": "^0.33.2",
-    "styled-components": "^6.1.8",
     "tailwind-merge": "^3.6.0",
     "unist-util-visit": "^5.0.0"
   },
@@ -45,7 +40,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.0.1",
-    "babel-plugin-styled-components": "^2.1.4",
     "eslint": "^8",
     "eslint-config-next": "^15.5.12",
     "postcss": "^8",

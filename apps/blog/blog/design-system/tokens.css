@@ -2,11 +2,9 @@
  * Design system — Tailwind v4 entry + token source of truth (PER-135).
  * Visual direction: A — Terminal (dark-default, developer-native).
  *
- * Preflight (Tailwind's base reset) is INTENTIONALLY omitted while MUI's
- * <CssBaseline> is still in the tree, so Tailwind coexists without
- * double-resetting and changing the current look. Preflight gets enabled
- * in the MUI-removal task (TASK-014), swapping the two scoped imports
- * below for the full `@import "tailwindcss";`.
+ * Preflight (Tailwind's base reset) is ENABLED via the full `@import
+ * "tailwindcss"` now that MUI's <CssBaseline> is gone (TASK-014) — it
+ * provides the base reset and base font.
  *
  * Token tiers:
  *   1. Primitives  — raw palette/scales in @theme (generate utilities + vars)
@@ -14,10 +12,7 @@
  *      mapped via @theme inline to CSS vars in :root / [data-theme="light"],
  *      so dark<->light is a pure variable swap with no component changes.
  */
-@layer theme, base, components, utilities;
-
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 /* 1. Primitives ---------------------------------------------------------- */
