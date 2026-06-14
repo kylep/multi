@@ -143,6 +143,13 @@
 .prose-ds :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-mono);
 }
+/* Mid-content h1 (markdown `#` sections) needs a real top margin. The
+   typography plugin zeroes h1's margin-top because it assumes h1 is the page
+   title, which leaves section breaks cramped against the preceding paragraph.
+   Larger than h2's 48px top so the top-level break reads as the bigger one. */
+.prose-ds h1:not(:first-child) {
+  margin-top: 4rem;
+}
 
 /* Base page background so horizontal/vertical overflow (e.g. the wide wiki
    tree) never reveals the browser's default white. Theme-aware via --ds-canvas. */
