@@ -1,16 +1,14 @@
 ---
-title: Redesigning My Blog With an Agent and a Verification Gate
-summary: I rebuilt this site from Material UI onto a token-driven Tailwind v4
-  design system, and let Claude do most of it by giving it a script that says
-  pass or fail. The gate is the part worth copying.
-slug: terminal-redesign
+title: Blog Redesign Through Architecture-Driven Development
+summary: Rebuilt a blog front-end in a few hours, experimenting with where humans belong "in the loop".
+slug: add-blog-redesign
 category: dev
 tags: Tailwind, Storybook, Claude-Code, Design-Systems, AI-Agents
 date: 2026-06-14
 modified: 2026-06-14
 status: published
-image: terminal-redesign.png
-thumbnail: terminal-redesign-thumb.png
+image: add-blog-redesign.png
+thumbnail: add-blog-redesign-thumb.png
 imgprompt: a minimalist terminal window outline with a single solid block
   cursor, one teal accent, flat vector, lots of white space, white background
 keywords:
@@ -22,11 +20,15 @@ keywords:
   - axe core playwright accessibility gate
 ---
 
-The blog you're reading used to run on Material UI. Now it's a dark-default
-"Terminal" design system built on Tailwind v4, and I wrote almost none of it by
-hand. I had Claude do the migration and checked its work with a script.
+The blog you're reading used to run on Material UI. I rebuilt it in a few hours
+onto a dark-default "Terminal" design system on Tailwind v4, and I wrote almost
+none of it by hand. I had Claude do the migration.
 
-That script is the interesting part, so I'll get to it fast.
+The design isn't the interesting part. The experiment was figuring out where I
+still needed to sit in the loop. I gave Claude the architecture up front, a
+design system, a single source of truth for tokens, and a verification gate,
+then let it drive the implementation. The gate is what decided which calls
+stayed mine, so I'll get to it fast.
 
 # What was actually wrong
 
@@ -188,7 +190,8 @@ for depth, and emit the RSS feed into `public/` so dev serves it too. The gate
 stayed green through every one of those. The changes came from looking, not from
 the build.
 
-That's the split worth internalizing. The gate buys you autonomy on everything
-objective: does it build, does it render, is it accessible, does it use the
-tokens. Taste is still yours. Build the gate so the agent can own the first
-part, and spend your attention on the part a script can't check.
+That's the answer to where the human still belongs. The gate buys you autonomy
+on everything objective: does it build, does it render, is it accessible, does
+it use the tokens. Taste is still yours. Define the architecture and the gate
+first, let the agent own that objective layer, and spend your attention on the
+part a script can't check.
