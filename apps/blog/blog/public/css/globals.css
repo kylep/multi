@@ -1,42 +1,16 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-size: 14px;
-}
+/*
+ * Structural styles for content the design-system <Prose> component does not
+ * own: the wiki directory tree (raw HTML) and a couple of one-off classes.
+ * Markdown typography (links, tables, hr, headings, …) is handled by Prose
+ * via the Terminal tokens, so the old global element styles are gone.
+ */
 
-hr {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border: 0;
-  border-top: 1px solid #eee;
-}
-
-a {
-  color: #337ab7;
-}
-/* project-table: For multi-post projects like in /aws.html  */
 .project-table {
-  border: 1px solid black;
+  border: 1px solid var(--ds-border);
   width: 80%;
 }
 
-/* currently ALL tables are from remark-gfm, 
-can use visit later to add a class to them if needed */
-table {
-  border: 1px solid black;
-  border-collapse: collapse;
-}
-th {
-  background-color: #EEEEEE;
-  border: 1px solid black;
-  padding: 5px;
-}
-td {
-  border: 1px solid black;
-  padding: 5px;
-}
-
-/* Wiki directory tree */
+/* Wiki directory tree (rendered as raw HTML inside [data-testid="wiki-tree"]) */
 [data-testid="wiki-tree"] ul {
   list-style: none;
   padding-left: 0;
@@ -49,19 +23,17 @@ td {
 }
 
 [data-testid="wiki-tree"] .tree-prefix {
-  color: #888;
-  font-family: monospace;
-  font-size: 14px;
+  color: var(--ds-text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
   user-select: none;
   white-space: pre;
 }
 
-/* round buttons linking to things like reddit and twitter */
-.social-button{
+/* Social buttons on /about */
+.social-button {
   padding: 0;
-  width: 50px;
-  height: 50px;
-  margin-left: 5px;
-  margin-right: 5px;
-  border-radius: 25px;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
 }

@@ -13,6 +13,10 @@ const MAX_ITEMS = 50;
 
 const postsDir = path.join(__dirname, '..', 'markdown', 'posts');
 const outDir = path.join(__dirname, '..', 'out');
+// Also emit into public/ so `next dev` and a plain `next build` preview serve
+// /feed.xml (Next copies public/* into out/). The prod pipeline still refreshes
+// out/feed.xml directly after the build. public/feed.xml is gitignored.
+const publicDir = path.join(__dirname, '..', 'public');
 
 function getPosts() {
   const files = fs.readdirSync(postsDir).filter(f => {
@@ -93,9 +97,14 @@ ${itemsXml}
 </rss>
 `;
 
-  fs.mkdirSync(outDir, { recursive: true });
-  fs.writeFileSync(path.join(outDir, 'feed.xml'), xml);
-  console.log(`RSS feed generated with ${items.length} items at out/feed.xml`);
+  fs.mkdirSync(publicDir, { recursive: true });
+  fs.writeFileSync(path.join(publicDir, 'feed.xml'), xml);
+  // out/ only exists post-build; write there too so the prod pipeline's
+  // post-build run lands a fresh feed without depending on the public copy.
+  if (fs.existsSync(outDir)) {
+    fs.writeFileSync(path.join(outDir, 'feed.xml'), xml);
+  }
+  console.log(`RSS feed generated with ${items.length} items (public/feed.xml${fs.existsSync(outDir) ? ' + out/feed.xml' : ''})`);
 }
 
 generateRss();

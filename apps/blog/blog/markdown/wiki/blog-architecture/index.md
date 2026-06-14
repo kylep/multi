@@ -117,3 +117,34 @@ no-cache,no-store,must-revalidate` on changed files so Cloudflare
 picks up updates immediately.
 
 Only Kyle runs manual deploys.
+
+
+## Design system and Storybook
+
+The site is built on a token-driven design system: Tailwind v4 with every
+token in `apps/blog/blog/design-system/tokens.css`, and shadcn-style
+components owned in `apps/blog/blog/components/`. Components are developed
+and previewed in Storybook 10 (Webpack builder).
+
+The Storybook static build ships with the site at
+[`/storybook/`](/storybook/), served from the same bucket. Its built
+`index.html` uses relative asset paths, so it works from that subpath with
+no extra config.
+
+### Why /storybook/ is not rebuilt on every deploy
+
+Storybook only changes when components, tokens, stories, or their build
+config change — far less often than blog posts. `bin/build-blog-files.sh`
+hashes those inputs (`.storybook`, `components`, `design-system`, `lib`,
+and the build configs) and compares the digest against
+`gs://kyle.pericak.com/storybook/.build-hash`:
+
+- **Hash matches** → the deployed Storybook is restored into
+  `out/storybook/` with `gsutil rsync` (no slow Webpack rebuild).
+- **Hash differs, or the bucket hash is unreadable** → Storybook is
+  rebuilt and the new hash is written to `out/storybook/.build-hash`.
+
+`out/storybook/` is always populated either way. This is mandatory:
+`prod-deploy.sh` and Cloud Build both sync with `gsutil rsync -d`, which
+deletes anything in the bucket missing from the local build, so an empty
+`out/storybook/` would delete the live workshop.

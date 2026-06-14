@@ -49,3 +49,9 @@ used and links to the individual provider reports.
   Three reports on which Claude Code plugins, skills, and
   marketplaces are worth installing (file-level audit, token cost,
   trust surface, stack fit, ecosystem gaps). April 2026.
+- [Agent-Native Design System](/wiki/research/design-system.html) —
+  Single-provider (Claude) report on building a modern, agent-native
+  design system for the blog as a predicate to a redesign: design
+  tokens, Tailwind v4, Radix primitives, the shadcn/ui model, MCP
+  glue, and a phased additive migration off MUI. Seed input for the
+  PER-135 redesign. May 2026.

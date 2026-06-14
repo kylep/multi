@@ -1,4 +1,4 @@
-import SiteLayout from '../components/SiteLayout';
+import { PageShell } from '../components/PageShell';
 import IndexPage from '../components/IndexPage';
 import BlogPostContentPage from '../components/BlogPostContentPage';
 import WikiPage from '../components/WikiPage';
@@ -130,28 +130,41 @@ function BaseSiteComponent({
 	*/
 	// "unefined" was a product of bad markdown processing
 	//if (route == "undefined") { route = ['index']; }
-	let pageContent = <></>;
 	const isWiki = route[0] === 'wiki';
+	const isListing =
+		route[0].startsWith('index') ||
+		route[0] === 'category' ||
+		route[0] === 'tag' ||
+		route[0] === '/';
+	const globalData = { categories, tags, lastGitCommitHash, siteLastModified };
+
+	let content;
 	if (isWiki) {
-		pageContent = <WikiPage wikiContent={wikiContent} />;
-	} else if (route[0].startsWith('index') || route[0] === 'category' || route[0] === 'tag' || route[0] === "/") {
-		if (route === '/') {
-			route = 'index';
-		}
-		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} route={route} />;
+		content = <WikiPage wikiContent={wikiContent} />;
+	} else if (isListing) {
+		content = (
+			<IndexPage
+				markdownFiles={markdownFiles}
+				currentPageIndexNumber={currentPageIndexNumber}
+				pageCount={pageCount}
+				route={route}
+			/>
+		);
 	} else {
-		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
+		content = (
+			<BlogPostContentPage
+				contentHtml={postContent.contentHtml}
+				metaData={postContent.metaData}
+			/>
+		);
 	}
+
+	// All page types now render in the tokenized Terminal shell.
 	return (
-		<GlobalContextProvider globalData={{
-			categories,
-			tags,
-			lastGitCommitHash,
-			siteLastModified
-		}}>
-			<SiteLayout hideSidebar={isWiki}>
-				{pageContent}
-			</SiteLayout>
+		<GlobalContextProvider globalData={globalData}>
+			<PageShell lastModified={siteLastModified} commitHash={lastGitCommitHash}>
+				{content}
+			</PageShell>
 		</GlobalContextProvider>
 	);
 }

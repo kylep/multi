@@ -1,8 +1,15 @@
-import SiteLayout from '../components/SiteLayout';
-import IndexPage from '../components/IndexPage';
+import Head from 'next/head';
+import { PageShell } from '../components/PageShell';
+import { PostCard } from '../components/PostCard';
+import { Pagination } from '../components/ui/pagination';
+import { Grid } from '../components/primitives/grid';
 import { getMarkdownService, pageSize, paginate } from '../utils/MarkdownService';
 import { GlobalContextProvider } from '../utils/GlobalContext';
 import { getGitService } from '../utils/GitService';
+
+const SITE_URL = 'https://kyle.pericak.com';
+const SITE_DESCRIPTION =
+	"Kyle Pericak's blog about infrastructure, DevOps, security, and software engineering.";
 
 export async function getStaticProps() {
 	const markdownService = await getMarkdownService();
@@ -22,18 +29,57 @@ export async function getStaticProps() {
 	};
 }
 
-export default function Home({ markdownFiles, categories, tags, pageCount, lastGitCommitHash, siteLastModified }) {
+export default function Home({
+	markdownFiles,
+	categories,
+	tags,
+	pageCount,
+	lastGitCommitHash,
+	siteLastModified,
+}) {
 	return (
-		<GlobalContextProvider globalData={{ categories, tags, lastGitCommitHash, siteLastModified }}>
-			<SiteLayout>
-				<IndexPage
-					markdownFiles={markdownFiles}
-					categories={categories}
-					currentPageIndexNumber={1}
-					pageCount={pageCount}
-					route={['index']}
-				/>
-			</SiteLayout>
+		<GlobalContextProvider
+			globalData={{ categories, tags, lastGitCommitHash, siteLastModified }}
+		>
+			<Head>
+				<title>Kyle Pericak&apos;s Blog</title>
+				<meta name="description" content={SITE_DESCRIPTION} />
+				<link rel="canonical" href={`${SITE_URL}/`} />
+				<meta property="og:title" content="Kyle Pericak's Blog" />
+				<meta property="og:description" content={SITE_DESCRIPTION} />
+				<meta property="og:url" content={`${SITE_URL}/`} />
+				<meta property="og:type" content="website" />
+				<meta name="twitter:card" content="summary" />
+			</Head>
+			<PageShell lastModified={siteLastModified} commitHash={lastGitCommitHash}>
+				<Grid min={300} gap={6}>
+					{markdownFiles.map((file) => {
+						const m = file.metaData;
+						return (
+							<PostCard
+								key={m.slug}
+								title={m.title}
+								href={`/${m.slug}.html`}
+								created={m.date}
+								modified={m.modified}
+								excerpt={m.summary}
+								thumbnail={m.thumbnail ? `/images/${m.thumbnail}` : undefined}
+							/>
+						);
+					})}
+				</Grid>
+				{pageCount > 1 && (
+					<div className="mt-8">
+						<Pagination
+							currentPage={1}
+							totalPages={pageCount}
+							onPageChange={(p) => {
+								window.location.href = `/index${p}.html`;
+							}}
+						/>
+					</div>
+				)}
+			</PageShell>
 		</GlobalContextProvider>
 	);
 }
