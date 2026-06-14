@@ -1,4 +1,3 @@
-import SiteLayout from '../components/SiteLayout';
 import { PageShell } from '../components/PageShell';
 import IndexPage from '../components/IndexPage';
 import BlogPostContentPage from '../components/BlogPostContentPage';
@@ -137,44 +136,35 @@ function BaseSiteComponent({
 		route[0] === 'category' ||
 		route[0] === 'tag' ||
 		route[0] === '/';
-	const isPost = !isWiki && !isListing;
-
 	const globalData = { categories, tags, lastGitCommitHash, siteLastModified };
 
-	// Migrated: posts and wiki pages render in the tokenized Terminal shell.
-	if (isPost || isWiki) {
-		return (
-			<GlobalContextProvider globalData={globalData}>
-				<PageShell lastModified={siteLastModified} commitHash={lastGitCommitHash}>
-					{isWiki ? (
-						<WikiPage wikiContent={wikiContent} />
-					) : (
-						<BlogPostContentPage
-							contentHtml={postContent.contentHtml}
-							metaData={postContent.metaData}
-						/>
-					)}
-				</PageShell>
-			</GlobalContextProvider>
+	let content;
+	if (isWiki) {
+		content = <WikiPage wikiContent={wikiContent} />;
+	} else if (isListing) {
+		content = (
+			<IndexPage
+				markdownFiles={markdownFiles}
+				currentPageIndexNumber={currentPageIndexNumber}
+				pageCount={pageCount}
+				route={route}
+			/>
+		);
+	} else {
+		content = (
+			<BlogPostContentPage
+				contentHtml={postContent.contentHtml}
+				metaData={postContent.metaData}
+			/>
 		);
 	}
 
-	// Not yet migrated: listing pages (index/category/tag) stay on MUI SiteLayout.
-	let listingRoute = route;
-	if (listingRoute === '/') {
-		listingRoute = 'index';
-	}
+	// All page types now render in the tokenized Terminal shell.
 	return (
 		<GlobalContextProvider globalData={globalData}>
-			<SiteLayout>
-				<IndexPage
-					markdownFiles={markdownFiles}
-					categories={categories}
-					currentPageIndexNumber={currentPageIndexNumber}
-					pageCount={pageCount}
-					route={listingRoute}
-				/>
-			</SiteLayout>
+			<PageShell lastModified={siteLastModified} commitHash={lastGitCommitHash}>
+				{content}
+			</PageShell>
 		</GlobalContextProvider>
 	);
 }
