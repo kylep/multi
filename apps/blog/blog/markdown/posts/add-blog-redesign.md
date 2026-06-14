@@ -1,6 +1,6 @@
 ---
-title: Blog Redesign Through Architecture-Driven Development
-summary: Rebuilt a blog front-end in a few hours, experimenting with where humans belong "in the loop".
+title: Blog Redesign 4 and an AI-First Design System
+summary: Rebuilt a blog front-end in a few hours, experimenting with where humans belong "in the loop". Playing with 'Architecture Driven Development'.
 slug: add-blog-redesign
 category: dev
 tags: Tailwind, Storybook, Claude-Code, Design-Systems, AI-Agents
@@ -20,178 +20,155 @@ keywords:
   - axe core playwright accessibility gate
 ---
 
-The blog you're reading used to run on Material UI. I rebuilt it in a few hours
-onto a dark-default "Terminal" design system on Tailwind v4, and I wrote almost
-none of it by hand. I had Claude do the migration.
+This is the fourth rebuild of this blog.
+This entire site exists as much for me to have something I
+care about to work on as it does to actually do *blog stuff*.
 
-The design isn't the interesting part. The experiment was figuring out where I
-still needed to sit in the loop. I gave Claude the architecture up front, a
-design system, a single source of truth for tokens, and a verification gate,
-then let it drive the implementation. The gate is what decided which calls
-stayed mine, so I'll get to it fast.
+The history of this site is kind of neat:
 
-# What was actually wrong
+1. Started out as a pure [github pages](/github-pages.html) theme and some markdown
+2. Rewrote into a [pelican theme](/writing-pelican-content.html) I forked from someone and slightly modified
+3. Replaced Pelican and it's theme with React and NextJs
+4. Now, the v4 design as committed alongside this post
 
-The old setup had three styling systems and used one of them. Material UI 5 with
-Emotion did the real work. Tailwind v3 was installed but inert: its content
-globs pointed at a `./src` directory that doesn't exist, so it scanned nothing
-and emitted nothing. styled-components was in the dependency tree doing nothing
-at all.
 
-So the site worked, but the foundation was a museum of half-finished decisions.
-I wanted one system, dark by default, that an agent could maintain without me
-re-explaining the design every time.
+The original React rewrite used MUI purely because work used it too and I'd been just
+slinging my own css and using bootstrap.js in Angular before that. I'd read
+the developer docs and coded it by hand. It took a while, but it was pretty fun.
+In the v3 design I had no opinions around design system. I still didn't need one in v4
+but decided to build it out anyways, again, for fun.
 
-# The idea: a gate the agent checks itself against
+I spent most of my time in this rebuild selecting the libraries, tools, frameworks,
+that sort of thing. I didn't care to actually learn the framework code: That feels low-leverage these days.
+I can honestly say that for better or worse, I didn't write a single line of the code.
+I did read some of the code, but mostly just to learn the frameworks better.
 
-Here's the problem with handing a frontend refactor to an agent. It will tell
-you it's done. It is often wrong, and the only way you find out is by opening a
-browser. That feedback loop is slow and it puts you back in the chair for every
-change.
 
-So before any redesign work, I had Claude write one thing: a verification gate.
-A single script that exits 0 only when the change is actually sound.
+# The new blog front-end architecture
 
-```bash
-# apps/blog/bin/verify-design-system.sh
-set -euo pipefail
+My goals were pretty straightforward:
 
-npx @biomejs/biome lint components lib .storybook   # [1/5] style/lint
-node scripts/check-no-raw-hex.mjs                    # [2/5] token discipline
-npm run build-storybook                              # [3/5] components compile
-npm run build                                        # [4/5] static export
-npx playwright test --retries=1                      # [5/5] render + a11y
+1. Learn something new
+2. Make sure it works AI-first, human way out of the loop
+3. Looks good and makes me happy
+
+These are the tools chosen to make it happen:
+
+## Server-Side Rendering: Next.js 15
+
+I don't pay for a server to host this site. There's no dynamic content. Every time I
+add a new post to it, I re-render the whole thing from markdown as static files and upload them to a
+[google storage bucket](/google-cloud-storage-website.html). The site content is served just as a bunch of static assets from there.
+
+It's dirt cheap and how it always worked. I didn't materially change this,
+I'm just calling it out because I think it's really cool. While blost costs me like
+$2/month.
+
+
+## Styling: Tailwind v4
+
+Tailwind has become the leader in CSS frameworks, [overtaking bootstrap](https://2025.stateofcss.com/en-US/other-tools/).
+AI works great with popular tools and when I researched how to make a modern best-in-class
+design system, it felt like a good fit.
+
+Given how small the blog app realistically is, I'm able to get the design tokens
+into a single `tokens.css` file. Pretty manageable.
+
+The [Tailwind themes](https://tailwindcss.com/docs/theme) feature also seemed worth using.
+All the new sites seem to support dark mode, presumably for a11y, so I wanted that too.
+
+
+## Component structure: shadcn-style on Radix primitives
+
+I really like how modern web dev chunks things into components, but everyone rips on MUI
+as being too same-y. I wanted something more modern, and something that might usually
+have more ownership overhead but that AI mitigates.
+
+AI can sling out component code on its own, so I really just want to be consistent.
+Went with shadcn-style on Radix primitives for the components. They both seem to have good adoption
+and when I reviewed how the style things it sat well with me.
+
+- [shadcn](https://ui.shadcn.com): components ship as source copied into the repo,
+  owned and edited directly, following a consistent convention for variants, class-merging, and config.
+- [Radix](https://www.radix-ui.com/primitives): primitives that supply the interaction
+  and a11y, focus management, keyboard navigation, ARIA roles, that kind of thing.
+
+
+## Workshop: Storybook 10
+
+Every component builds and renders in isolation, off the live site. The agent
+can stand one up and check it without touching a page.
+
+![The Storybook design-system view: the component tree in the sidebar, and the Terminal token palette and type scale rendered on the dark canvas.](/images/storybook-foundations.webp)
+
+The whole workshop ships with the site now. Poke around it at [/storybook/](/storybook/).
+
+## Content: markdown to static HTML
+
+Posts stay plain files in git, rendered with Prism for code and [Mermaid](/mermaid-markdown-support.html) for
+diagrams. No change here, I just think its neat.
+
+
+---
+
+# The development flow
+
+After the initial claude conversations and deep research report, I leveraged my
+[PRD writing and Design Doc writing](/ai-native-sdlc-first-try.html) claude skills to better scope the work. I really
+didn't need to do much on my own. It asks clarifying questions then just kind of
+*goes for it*. Works well.
+
+Once the work is scoped, it ends up being chunked out into tasks that Claude is really
+good at [stepping through and verifying](/using-agents-better.html) one at a time.
+
+I set up the backpressure mechanisms ahead of time. [Playwright MCP](/playwright-mcp.html) is the biggest one,
+and I had a solid test suite to get started. I recently read this article [Backpressure is all you need](https://www.lucasfcosta.com/blog/backpressure-is-all-you-need)
+that illustrates the approach well. You can work with Claude to set this up, don't do
+it by hand. It's good at building its own guard-rails.
+
+Next, I clean up my context and get my goal command.
+
+```text
+Your context is getting full. Write me a /context prompt, less than 2000 chars, that will
+clean up our work so far and leave us with what we need to know to execute on the plan.
+
+Also provide a /goal command, less than 4000 chars, that I will paste back after
+compaction. The goal should finish with a PR open and PW MCP rendering the changes. You
+should have validated everything you can and be ready to ship pending my review.
 ```
 
-```mermaid
-graph LR
-  A[edit] --> B[biome lint]
-  B --> C[no raw hex]
-  C --> D[storybook build]
-  D --> E[next build]
-  E --> F[playwright + axe]
-  F --> G{exit 0?}
-  G -->|yes| H[commit]
-  G -->|no| A
-```
+That took it all the way from my old site to my new site. Night and day difference.
+It took mabye 2 or 3 hours of claude cooking. I just use the auto mode classifier on my
+Max plan, Opus 4.8 for this one, and walked away to hang out with my kids.
 
-The gate changes the deal. Claude makes a change, runs the gate, reads the
-failure, fixes it, runs it again. It only comes back to me when the gate is
-green. I went from reviewing every diff to reviewing the ones that passed a
-build, a component compile, 23 Playwright tests, and an accessibility scan.
+It wasn't perfect when it was done, but it was way further along than I'd have figured
+it'd get. I clicked about, asked for some cosmetic changes, and then really spent the
+rest of my time just getting it to teach me about what it did so I wasn't owning code
+I didn't understand.
 
-A task is "done" when this exits 0. That sentence is the whole methodology.
+## AI-First Design
 
-# Tokens are the only source of truth
+The experience of modifying the design was surreal. Entierly conversational. It built
+the components, I talked to it, it changed them. I wanted some spacing, alignment, borders,
+whatever - and I got them. This was a bit different from my usual flow in that it wasn't
+just changing the code in the page I was poking, but it was operating like it would in a
+more production style environment.
 
-The design lives in one file, `tokens.css`. Everything else reads from it.
+I'm pretty confident that this would work nicely with bigger teams and Design staff support.
 
-Tailwind v4 lets you define your palette in CSS with `@theme`, then alias those
-primitives to semantic names. Dark and light are the same variables pointing at
-different values:
+---
 
-```css
-/* primitives — the raw ramp */
-@theme {
-  --color-ink-950: #0b0e14;
-  --color-ink-900: #11151f;
-  --color-cyan-400: #36e2c4;
-}
+# QA remains critical
+I see this all the time at work, too. AI churns out code at lightning pace, but it
+still lands on humans for taste and UX. It also misses a lot of unhappy path scenarios.
 
-/* semantic aliases — components only ever use these */
-@theme inline {
-  --color-canvas: var(--ds-canvas);
-  --color-surface: var(--ds-surface);
-  --color-accent: var(--ds-accent);
-}
+Once it was done coding, I spent probably the majority of my actual at-laptop interaction
+time just going through what it had built and tightening up the experience. Small UI bugs,
+janky flows, weird allignment, that kind of thing.
 
-/* dark is the default */
-:root {
-  --ds-canvas: var(--color-ink-950);
-  --ds-surface: var(--color-ink-900);
-  --ds-accent: var(--color-cyan-400);
-}
+As AI coding continues to evolve, this is an area I'm researching and watching closely:
+Code QA processes are definitely changing and so far there's absolutely a big learning
+curve.
 
-/* light is a variable swap, nothing else */
-[data-theme="light"] {
-  --ds-canvas: #ffffff;
-  --ds-surface: #f4f6fa;
-  --ds-accent: #0f766e;
-}
-```
-
-A component writes `bg-surface` or `text-accent` and never names a color.
-Switching themes flips one attribute on `<html>` and the whole site follows. No
-per-component dark-mode branches, no second stylesheet.
-
-# Stopping raw hex from creeping back in
-
-Tokens only work if everyone uses them. An agent under deadline will happily
-write `#11151f` inline and move on, and then your "single source of truth" has
-exceptions. So the gate's second step is a script that greps the components for
-raw hex and fails the build if it finds any.
-
-```js
-// check-no-raw-hex.mjs — fail if a component hardcodes a color
-const HEX = /#[0-9a-fA-F]{3,8}\b/;
-if (HEX.test(source)) {
-  console.error(`raw hex in ${file}: use a token`);
-  process.exit(1);
-}
-```
-
-It runs on the `.tsx` components, skips the stories and `tokens.css` itself.
-This caught me more than once. The rule isn't "don't use hex," it's "the build
-won't let you."
-
-# Storybook runs on webpack, not Vite
-
-The design doc said to use `@storybook/nextjs-vite`. That was wrong, and the gate
-found out at step 3.
-
-This project's `next.config.js` has a custom webpack config. The Vite-based
-Storybook builder explicitly doesn't support custom webpack, so it can't see the
-project's setup. I had Claude switch to `@storybook/nextjs`, which uses Webpack
-5 and reads the existing Next config directly. Storybook built clean after that.
-
-Note: if your Next app has any custom webpack, reach for `@storybook/nextjs`,
-not the Vite builder. The Vite one is faster when it fits, and it didn't fit.
-
-# Letting axe find the contrast bugs
-
-The last step of the gate runs Playwright, and part of that is an accessibility
-pass with `@axe-core/playwright` over the home, post, wiki, and about pages. It
-asserts zero serious or critical violations.
-
-This is better than eyeballing because I'm bad at eyeballing contrast. axe
-flagged several text colors that looked fine to me and failed WCAG AA. The
-subtle gray I used for timestamps was too dim on the dark canvas. The teal
-accent was too light to read on white in light mode. Claude darkened the light
-accent and lightened the dark gray until the scan passed, then I confirmed the
-numbers hit 4.5:1.
-
-I would have shipped all of those. The machine that reads contrast ratios
-shouldn't be me.
-
-# The last mile is still a person in a browser
-
-A green gate proves the site builds, the components compile, the pages render,
-and the contrast is legal. It cannot tell you a thumbnail looks bad.
-
-The day after the migration passed, I sat down and actually looked at the
-homepage. The post thumbnails were transparent PNGs, so the dark card showed
-through the logos and they looked broken. The cards were flat and a little
-lifeless. And the RSS link 404'd, because the feed only got generated in the
-full production build, never in the dev server I was previewing against.
-
-None of that fails a gate. All of it matters. I had Claude put a white
-background behind the thumbnails, add a slight top-down gradient to the cards
-for depth, and emit the RSS feed into `public/` so dev serves it too. The gate
-stayed green through every one of those. The changes came from looking, not from
-the build.
-
-That's the answer to where the human still belongs. The gate buys you autonomy
-on everything objective: does it build, does it render, is it accessible, does
-it use the tokens. Taste is still yours. Define the architecture and the gate
-first, let the agent own that objective layer, and spend your attention on the
-part a script can't check.
+Given how simple this blog site realistically is, I was suprised how much manual
+review it needed.
