@@ -143,3 +143,9 @@
 .prose-ds :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-mono);
 }
+
+/* Base page background so horizontal/vertical overflow (e.g. the wide wiki
+   tree) never reveals the browser's default white. Theme-aware via --ds-canvas. */
+html {
+  background-color: var(--ds-canvas);
+}

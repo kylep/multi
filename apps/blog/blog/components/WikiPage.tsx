@@ -131,7 +131,8 @@ export function WikiPage({ wikiContent }: { wikiContent: WikiContent }) {
 			{childTreeHtml ? (
 				<div
 					data-testid="wiki-tree"
-					className="mt-8 font-mono text-sm [&_a:hover]:text-accent [&_a]:text-link [&_a]:no-underline [&_ul]:list-none [&_ul]:pl-4"
+					className="mt-8 overflow-x-auto pb-2 font-mono text-sm [&_a:hover]:text-accent [&_a]:text-link [&_a]:no-underline [&_ul]:list-none [&_ul]:pl-4"
+					suppressHydrationWarning
 					// nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml.react-dangerouslysetinnerhtml
 					dangerouslySetInnerHTML={{ __html: childTreeHtml }}
 				/>

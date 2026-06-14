@@ -14,6 +14,10 @@ export function Prose({ html, className, children, ...props }: ProseProps) {
 		return (
 			<div
 				className={cls}
+				// The rendered markdown HTML is server-authoritative; the browser
+				// can normalize it slightly differently than React's client parse
+				// (e.g. TOC lists), so suppress the benign hydration-mismatch warning.
+				suppressHydrationWarning
 				// `html` is build-time-rendered markdown from the repo's own .md
 				// files (never user input), and remark-html intentionally allows
 				// raw HTML in posts — sanitizing would strip authored content.
