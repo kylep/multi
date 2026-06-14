@@ -141,39 +141,40 @@ function BaseSiteComponent({
 
 	const globalData = { categories, tags, lastGitCommitHash, siteLastModified };
 
-	// Migrated: posts render in the tokenized Terminal shell.
-	if (isPost) {
+	// Migrated: posts and wiki pages render in the tokenized Terminal shell.
+	if (isPost || isWiki) {
 		return (
 			<GlobalContextProvider globalData={globalData}>
 				<PageShell lastModified={siteLastModified} commitHash={lastGitCommitHash}>
-					<BlogPostContentPage
-						contentHtml={postContent.contentHtml}
-						metaData={postContent.metaData}
-					/>
+					{isWiki ? (
+						<WikiPage wikiContent={wikiContent} />
+					) : (
+						<BlogPostContentPage
+							contentHtml={postContent.contentHtml}
+							metaData={postContent.metaData}
+						/>
+					)}
 				</PageShell>
 			</GlobalContextProvider>
 		);
 	}
 
-	// Not yet migrated: wiki + listing pages stay on the MUI SiteLayout.
+	// Not yet migrated: listing pages (index/category/tag) stay on MUI SiteLayout.
 	let listingRoute = route;
 	if (listingRoute === '/') {
 		listingRoute = 'index';
 	}
-	const pageContent = isWiki ? (
-		<WikiPage wikiContent={wikiContent} />
-	) : (
-		<IndexPage
-			markdownFiles={markdownFiles}
-			categories={categories}
-			currentPageIndexNumber={currentPageIndexNumber}
-			pageCount={pageCount}
-			route={listingRoute}
-		/>
-	);
 	return (
 		<GlobalContextProvider globalData={globalData}>
-			<SiteLayout hideSidebar={isWiki}>{pageContent}</SiteLayout>
+			<SiteLayout>
+				<IndexPage
+					markdownFiles={markdownFiles}
+					categories={categories}
+					currentPageIndexNumber={currentPageIndexNumber}
+					pageCount={pageCount}
+					route={listingRoute}
+				/>
+			</SiteLayout>
 		</GlobalContextProvider>
 	);
 }
