@@ -270,13 +270,20 @@ pre[class*="language-"] {
   border: 1px solid #222a38;
   border-radius: 4px;
 }
-:not(pre) > code[class*="language-"] {
+/* All inline code is a dark terminal island (readable in both site themes,
+   so it never fails contrast on a light surface). */
+:not(pre) > code {
   background: #11151f;
   color: #36e2c4;
   padding: 0.1em 0.35em;
   border-radius: 3px;
+  font-family: var(--font-mono, ui-monospace, monospace);
 }
-.token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6b7688; }
+:not(pre) > code::before,
+:not(pre) > code::after {
+  content: none;
+}
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: #8a94a4; }
 .token.punctuation { color: #9aa4b2; }
 .token.property, .token.tag, .token.boolean, .token.number,
 .token.constant, .token.symbol, .token.deleted { color: #f5a623; }

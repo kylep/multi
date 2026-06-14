@@ -83,7 +83,7 @@
   --ds-border: var(--color-ink-700);
   --ds-text: var(--color-ink-100);
   --ds-text-muted: var(--color-ink-300);
-  --ds-text-subtle: var(--color-ink-400);
+  --ds-text-subtle: #8a94a4; /* lightened for WCAG AA on the dark canvas */
   --ds-accent: var(--color-cyan-400);
   --ds-accent-hover: var(--color-cyan-300);
   --ds-on-accent: var(--color-ink-950);
@@ -101,9 +101,9 @@
   --ds-border: #d8dee9;
   --ds-text: #18181b;
   --ds-text-muted: #52606d;
-  --ds-text-subtle: #7b8794;
-  --ds-accent: var(--color-cyan-700);
-  --ds-accent-hover: var(--color-cyan-500);
+  --ds-text-subtle: #5e6b79; /* darkened for WCAG AA on white */
+  --ds-accent: #0f766e; /* darker teal — AA contrast on white */
+  --ds-accent-hover: #0a5d56;
   --ds-on-accent: #ffffff;
   --ds-warning: #b45309;
   --ds-danger: var(--color-red-600);
@@ -127,8 +127,11 @@
   --tw-prose-quote-borders: var(--ds-border);
   --tw-prose-captions: var(--ds-text-subtle);
   --tw-prose-code: var(--ds-accent);
-  --tw-prose-pre-code: var(--ds-text);
-  --tw-prose-pre-bg: var(--ds-surface);
+  /* Code blocks are always dark (Terminal) in both themes — fixed values so
+     the markdown <pre> (whose language class is only on the inner <code>)
+     keeps a dark surface and light text. */
+  --tw-prose-pre-code: #e6e9ef;
+  --tw-prose-pre-bg: #11151f;
   --tw-prose-th-borders: var(--ds-border);
   --tw-prose-td-borders: var(--ds-border);
 }

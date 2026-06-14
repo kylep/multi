@@ -2,7 +2,7 @@ import { Html, Head, Main, NextScript } from 'next/document'
 
 export default function Document() {
   return (
-    <Html>
+    <Html lang="en">
       <Head>
         {/* No-flash theme bootstrap: set data-theme before first paint from
             localStorage or prefers-color-scheme. Dark (Terminal) is the
