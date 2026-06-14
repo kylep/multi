@@ -18,6 +18,7 @@
 
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
+@plugin "@tailwindcss/typography";
 
 /* 1. Primitives ---------------------------------------------------------- */
 @theme {
@@ -113,4 +114,34 @@
   --ds-danger: var(--color-red-600);
   --ds-success: var(--color-green-600);
   --ds-link: var(--color-blue-600);
+}
+
+/* <Prose> — map @tailwindcss/typography to Terminal tokens so rendered
+ * markdown follows the active theme in both dark and light (the --ds-* vars
+ * swap). Used by the <Prose> primitive: `prose prose-ds`. */
+.prose-ds {
+  --tw-prose-body: var(--ds-text);
+  --tw-prose-headings: var(--ds-text);
+  --tw-prose-lead: var(--ds-text-muted);
+  --tw-prose-links: var(--ds-link);
+  --tw-prose-bold: var(--ds-text);
+  --tw-prose-counters: var(--ds-text-subtle);
+  --tw-prose-bullets: var(--ds-text-subtle);
+  --tw-prose-hr: var(--ds-border);
+  --tw-prose-quotes: var(--ds-text-muted);
+  --tw-prose-quote-borders: var(--ds-border);
+  --tw-prose-captions: var(--ds-text-subtle);
+  --tw-prose-code: var(--ds-accent);
+  --tw-prose-pre-code: var(--ds-text);
+  --tw-prose-pre-bg: var(--ds-surface);
+  --tw-prose-th-borders: var(--ds-border);
+  --tw-prose-td-borders: var(--ds-border);
+}
+
+/* Prose fonts: sans body, mono headings (Terminal brand). */
+.prose-ds {
+  font-family: var(--font-sans);
+}
+.prose-ds :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-mono);
 }
