@@ -5,6 +5,18 @@
 Never commit directly to `main`. Always create a new branch and open a PR against
 `main` for review instead.
 
+## One PR per effort
+
+A feature, fix, or Linear issue is ONE branch and ONE pull request. Never split a
+single effort into multiple PRs — no PR-per-task, no PRs stacked on other feature
+branches. Decompose the work into commits on one branch, not into separate
+branches and PRs.
+
+- Branch off `main`, never off another in-progress feature branch.
+- A design-doc / plan task breakdown becomes commits on the one branch, not a PR
+  per task.
+- Open a second PR only for genuinely independent, separately-mergeable work.
+
 ## Branch naming
 
 If the work relates to a Linear issue, the branch name **must** use Linear's
