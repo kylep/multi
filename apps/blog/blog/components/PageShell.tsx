@@ -1,4 +1,5 @@
 import type * as React from "react";
+import { BrowseBar } from "./BrowseBar";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader, SiteTitle } from "./SiteHeader";
 
@@ -26,6 +27,7 @@ export function PageShell({
 		>
 			<SiteHeader />
 			<SiteTitle />
+			<BrowseBar />
 			<main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6">
 				{sidebar ? (
 					<div className="flex flex-col gap-8 md:flex-row">
