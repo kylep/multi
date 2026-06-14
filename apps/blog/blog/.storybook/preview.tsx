@@ -30,7 +30,7 @@ const preview: Preview = {
       return (
         <div
           data-theme={theme}
-          className="bg-canvas text-default"
+          className="bg-canvas text-default font-sans"
           style={{ padding: 24, minHeight: '100vh' }}
         >
           <Story />
