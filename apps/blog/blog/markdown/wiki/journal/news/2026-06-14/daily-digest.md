@@ -75,3 +75,25 @@ last_verified: 2026-06-14
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby afternoon update: high revised to 17°C, low 9°C. Showers with thunderstorm risk, local amounts 10–20 mm possible this afternoon. Showers clearing tonight. No alerts.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [Time](https://time.com/article/2026/06/13/anthropic-fable-mythos-ban-US-security/) Anthropic suspended Mythos 5 access entirely on June 12–13, taking both Fable 5 and Mythos 5 offline for all customers to comply with the government's foreign-national ban. On June 14, David Sacks, Co-Chair of the President's Council of Advisers on Science and Technology, published a statement saying the directive was issued after Anthropic's Dario Amodei declined a government request to patch a jailbreak in Fable 5 — the first official account of the dispute from the administration's side.
+
+- [TechPolicy.Press](https://www.techpolicy.press/g7-summit-set-to-kick-off-amidst-allies-widening-rift-over-ai-sovereignty/) The G7 summit opens in Évian-les-Bains tomorrow (June 15–17) with AI governance on the agenda, though final language is expected to be watered down. The US has signaled opposition to any multilateral framework that could constrain American AI dominance, while France and the EU are pushing risk-based oversight with stricter competition rules for the most capable systems.
+
+## Security
+
+- [Security Affairs](https://securityaffairs.com/193557/security/u-s-cisa-adds-ivanti-sentry-flaw-to-its-known-exploited-vulnerabilities-catalog-and-urges-patching-by-june-14.html) CISA's federal patch deadline for Ivanti Sentry CVE-2026-10520 (CVSS 10.0) fell today — unauthenticated OS command injection granting root RCE on Sentry gateway appliances, confirmed actively exploited in the wild. Federal agencies required to patch or mitigate by end of day; all organizations running Ivanti Sentry should treat this as urgent.
+
+## Local
+
+- [CTV News](https://www.ctvnews.ca/toronto/) A procession honouring fallen Toronto police officer Const. Marc Pinizzotto took place Sunday afternoon, escorting him from the Office of the Chief Coroner in North York to a funeral home in Thornhill.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby evening: showers ending early tonight, thunderstorm risk, clearing near midnight. Overnight low 7°C. No alerts.
