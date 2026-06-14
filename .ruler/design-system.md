@@ -15,4 +15,4 @@ working on blog UI:
 - Document/iterate components in Storybook (`npm run storybook`); it uses
   `@storybook/nextjs` (webpack), not vite.
 - Verify any change with `apps/blog/bin/verify-design-system.sh` (exits 0).
-- Full guide: `apps/blog/blog/design-system/AGENTS.md`.
+- Full guide: `apps/blog/blog/design-system/README.md`.
