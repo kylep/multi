@@ -60,6 +60,6 @@ outcomes override several of its recommendations:
 - The end state must be **demoable as a POC to other full-stack
   experts** and **maintainable primarily through AI**.
 
-See [PER-135](https://linear.app/pericak/issue/PER-135/blog-redesign-agent-native-design-system),
+See PER-135,
 the [PRD](/wiki/prds/blog-design-system.html), and the
 [design doc](/wiki/design-docs/blog-design-system.html).

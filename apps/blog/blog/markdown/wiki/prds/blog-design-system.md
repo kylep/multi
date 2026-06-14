@@ -8,7 +8,6 @@ hidden: false
 related:
   - wiki/design-docs/blog-design-system
   - wiki/research/design-system
-  - https://linear.app/pericak/issue/PER-135/blog-redesign-agent-native-design-system
 ---
 
 ## Problem

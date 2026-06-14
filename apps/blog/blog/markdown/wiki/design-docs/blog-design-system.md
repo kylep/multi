@@ -9,7 +9,6 @@ hidden: false
 related:
   - wiki/prds/blog-design-system
   - wiki/research/design-system
-  - https://linear.app/pericak/issue/PER-135/blog-redesign-agent-native-design-system
 ---
 
 ## Context
