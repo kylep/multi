@@ -150,6 +150,11 @@
 .prose-ds h1:not(:first-child) {
   margin-top: 4rem;
 }
+/* Tighten the gap under h1 (plugin default is 2rem) so the heading sits
+   closer to the content it introduces. */
+.prose-ds h1 {
+  margin-bottom: 1rem;
+}
 
 /* Base page background so horizontal/vertical overflow (e.g. the wide wiki
    tree) never reveals the browser's default white. Theme-aware via --ds-canvas. */

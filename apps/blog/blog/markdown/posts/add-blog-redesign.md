@@ -26,17 +26,17 @@ care about to work on as it does to actually do *blog stuff*.
 
 The history of this site is kind of neat:
 
-1. Started out as a pure [github pages](/github-pages.html) theme and some markdown
-2. Rewrote into a [pelican theme](/writing-pelican-content.html) I forked from someone and slightly modified
-3. Replaced Pelican and it's theme with React and NextJs
-4. Now, the v4 design as committed alongside this post
+1. v1: Started out as a pure [github pages](/github-pages.html) theme and some markdown
+2. v2: Rewrote into a [pelican theme](/writing-pelican-content.html) I forked from someone and slightly modified
+3. v3: Replaced Pelican and its theme with React, MUI and NextJs
+4. v4: Basically v3 with a new custom front-end
 
 
-The original React rewrite used MUI purely because work used it too and I'd been just
+The v3 React rewrite used MUI purely because work used it too and I'd been just
 slinging my own css and using bootstrap.js in Angular before that. I'd read
 the developer docs and coded it by hand. It took a while, but it was pretty fun.
-In the v3 design I had no opinions around design system. I still didn't need one in v4
-but decided to build it out anyways, again, for fun.
+In the v3 design I had no opinions around design system use. I still didn't really need
+one in v4 but decided to build it out anyways, again, for fun.
 
 I spent most of my time in this rebuild selecting the libraries, tools, frameworks,
 that sort of thing. I didn't care to actually learn the framework code: That feels low-leverage these days.
@@ -52,7 +52,7 @@ My goals were pretty straightforward:
 2. Make sure it works AI-first, human way out of the loop
 3. Looks good and makes me happy
 
-These are the tools chosen to make it happen:
+The tools I landed on for this are kind of interesting.
 
 ## Server-Side Rendering: Next.js 15
 
@@ -105,8 +105,9 @@ The whole workshop ships with the site now. Poke around it at [/storybook/](/sto
 
 ## Content: markdown to static HTML
 
-Posts stay plain files in git, rendered with Prism for code and [Mermaid](/mermaid-markdown-support.html) for
-diagrams. No change here, I just think its neat.
+Posts stay plain markdown files in git with front-matter metadata,
+rendered with Prism for code and [Mermaid](/mermaid-markdown-support.html) for
+diagrams. No change here, I just think it's neat.
 
 
 ---
@@ -116,7 +117,7 @@ diagrams. No change here, I just think its neat.
 After the initial claude conversations and deep research report, I leveraged my
 [PRD writing and Design Doc writing](/ai-native-sdlc-first-try.html) claude skills to better scope the work. I really
 didn't need to do much on my own. It asks clarifying questions then just kind of
-*goes for it*. Works well.
+*goes for it*. Works well. I share these in a Marketplace Plugin [here](https://github.com/kylep/claude-plugins).
 
 Once the work is scoped, it ends up being chunked out into tasks that Claude is really
 good at [stepping through and verifying](/using-agents-better.html) one at a time.
@@ -138,7 +139,7 @@ should have validated everything you can and be ready to ship pending my review.
 ```
 
 That took it all the way from my old site to my new site. Night and day difference.
-It took mabye 2 or 3 hours of claude cooking. I just use the auto mode classifier on my
+It took maybe 2 or 3 hours of claude cooking. I just use the auto mode classifier on my
 Max plan, Opus 4.8 for this one, and walked away to hang out with my kids.
 
 It wasn't perfect when it was done, but it was way further along than I'd have figured
@@ -148,7 +149,7 @@ I didn't understand.
 
 ## AI-First Design
 
-The experience of modifying the design was surreal. Entierly conversational. It built
+The experience of modifying the design was surreal. Entirely conversational. It built
 the components, I talked to it, it changed them. I wanted some spacing, alignment, borders,
 whatever - and I got them. This was a bit different from my usual flow in that it wasn't
 just changing the code in the page I was poking, but it was operating like it would in a
@@ -164,11 +165,11 @@ still lands on humans for taste and UX. It also misses a lot of unhappy path sce
 
 Once it was done coding, I spent probably the majority of my actual at-laptop interaction
 time just going through what it had built and tightening up the experience. Small UI bugs,
-janky flows, weird allignment, that kind of thing.
+janky flows, weird alignment, that kind of thing.
 
 As AI coding continues to evolve, this is an area I'm researching and watching closely:
 Code QA processes are definitely changing and so far there's absolutely a big learning
 curve.
 
-Given how simple this blog site realistically is, I was suprised how much manual
+Given how simple this blog site realistically is, I was surprised how much manual
 review it needed.
