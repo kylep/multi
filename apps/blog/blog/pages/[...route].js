@@ -1,4 +1,5 @@
 import SiteLayout from '../components/SiteLayout';
+import { PageShell } from '../components/PageShell';
 import IndexPage from '../components/IndexPage';
 import BlogPostContentPage from '../components/BlogPostContentPage';
 import WikiPage from '../components/WikiPage';
@@ -130,28 +131,49 @@ function BaseSiteComponent({
 	*/
 	// "unefined" was a product of bad markdown processing
 	//if (route == "undefined") { route = ['index']; }
-	let pageContent = <></>;
 	const isWiki = route[0] === 'wiki';
-	if (isWiki) {
-		pageContent = <WikiPage wikiContent={wikiContent} />;
-	} else if (route[0].startsWith('index') || route[0] === 'category' || route[0] === 'tag' || route[0] === "/") {
-		if (route === '/') {
-			route = 'index';
-		}
-		pageContent = <IndexPage markdownFiles={markdownFiles} categories={categories} currentPageIndexNumber={currentPageIndexNumber} pageCount={pageCount} route={route} />;
-	} else {
-		pageContent =  <BlogPostContentPage contentHtml={postContent.contentHtml} metaData={postContent.metaData}/>;
+	const isListing =
+		route[0].startsWith('index') ||
+		route[0] === 'category' ||
+		route[0] === 'tag' ||
+		route[0] === '/';
+	const isPost = !isWiki && !isListing;
+
+	const globalData = { categories, tags, lastGitCommitHash, siteLastModified };
+
+	// Migrated: posts render in the tokenized Terminal shell.
+	if (isPost) {
+		return (
+			<GlobalContextProvider globalData={globalData}>
+				<PageShell lastModified={siteLastModified} commitHash={lastGitCommitHash}>
+					<BlogPostContentPage
+						contentHtml={postContent.contentHtml}
+						metaData={postContent.metaData}
+					/>
+				</PageShell>
+			</GlobalContextProvider>
+		);
 	}
+
+	// Not yet migrated: wiki + listing pages stay on the MUI SiteLayout.
+	let listingRoute = route;
+	if (listingRoute === '/') {
+		listingRoute = 'index';
+	}
+	const pageContent = isWiki ? (
+		<WikiPage wikiContent={wikiContent} />
+	) : (
+		<IndexPage
+			markdownFiles={markdownFiles}
+			categories={categories}
+			currentPageIndexNumber={currentPageIndexNumber}
+			pageCount={pageCount}
+			route={listingRoute}
+		/>
+	);
 	return (
-		<GlobalContextProvider globalData={{
-			categories,
-			tags,
-			lastGitCommitHash,
-			siteLastModified
-		}}>
-			<SiteLayout hideSidebar={isWiki}>
-				{pageContent}
-			</SiteLayout>
+		<GlobalContextProvider globalData={globalData}>
+			<SiteLayout hideSidebar={isWiki}>{pageContent}</SiteLayout>
 		</GlobalContextProvider>
 	);
 }
