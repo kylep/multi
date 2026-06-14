@@ -53,3 +53,25 @@ last_verified: 2026-06-14
 - [GitHub](https://github.com/addyosmani/agent-skills) addyosmani/agent-skills (9,348 new stars this week, 58,907 total) collects production-ready engineering skills for AI coding agents — directly relevant to Claude Code and AI tooling workflows.
 
 - [Claude Code Docs](https://code.claude.com/docs/en/changelog) Claude Code nested sub-agents (v2.1.172) allow agent trees up to 5 levels deep, each with its own fresh context window. Previously a hard guardrail against infinite recursion, the capability is deliberately capped at depth 5.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/nvidia-launches-cosmos-3-the-open-frontier-foundation-model-for-physical-ai) NVIDIA launched Cosmos 3 on June 1 — an open frontier foundation model for physical AI built on a mixture-of-transformers architecture. The model unifies physical reasoning, world simulation, and action generation, targeting robotics and autonomous vehicle development. Weights are fully open; NVIDIA simultaneously launched a Cosmos Coalition with Black Forest Labs, Runway, and others to advance open world models.
+
+## AI Tooling
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-02/uber-caps-usage-of-ai-tools-like-claude-code-to-cut-costs) Uber imposed a $1,500/month per-engineer cap on Claude Code and Cursor after exhausting its entire 2026 AI coding tools budget by April — four months into the fiscal year. Per-engineer monthly costs had run $500–$2,000 as usage doubled through February. Around 10% of Uber's code is now AI-generated; Uber COO Andrew Macdonald said the link between that spend and consumer-facing innovation is "not there yet."
+
+## Security
+
+- [SC Media](https://www.scworld.com/brief/google-releases-june-android-security-patches-addressing-124-vulnerabilities-including-one-zero-day) Google's June 2026 Android security update patches 124 flaws including actively exploited zero-day CVE-2025-48595 — an integer overflow in the Android Framework enabling local privilege escalation without user interaction. Affects Android 14, 15, and 16. Apply the 2026-06-05 patch level.
+
+- [HackRead](https://hackread.com/shinyhunters-instructure-canvas-lms-vimeo-data-breach/) ShinyHunters breached Instructure's Canvas LMS between April 25 and May 12, stealing 3.65 TB of data covering roughly 275 million users across 8,809 educational institutions worldwide — the largest educational data breach on record. Exposed data includes names, email addresses, student IDs, and private messages between students and teachers. No passwords or financial data confirmed compromised.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby afternoon update: high revised to 17°C, low 9°C. Showers with thunderstorm risk, local amounts 10–20 mm possible this afternoon. Showers clearing tonight. No alerts.
