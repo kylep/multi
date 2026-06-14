@@ -14,7 +14,11 @@ for (const pageDef of PAGES) {
 	test(`a11y: ${pageDef.name} has no serious/critical violations`, async ({
 		page,
 	}) => {
-		await page.goto(pageDef.url);
+		const response = await page.goto(pageDef.url);
+		expect(
+			response?.ok(),
+			`navigation to ${pageDef.url} failed (status ${response?.status()})`,
+		).toBeTruthy();
 		const results = await new AxeBuilder({ page }).analyze();
 		const seriousOrCritical = results.violations.filter(
 			(v) => v.impact === "serious" || v.impact === "critical",

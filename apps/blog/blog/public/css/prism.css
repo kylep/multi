@@ -290,6 +290,10 @@ pre[class*="language-"] {
 .token.selector, .token.attr-name, .token.string, .token.char,
 .token.builtin, .token.inserted { color: #4ade80; }
 .token.operator, .token.entity, .token.url, .token.variable { color: #36e2c4; }
+/* The default Prism theme adds a translucent white background to these tokens;
+   clear it so they don't render as light islands on the dark code surface. */
+.token.operator, .token.entity, .token.url,
+.language-css .token.string, .style .token.string { background: none; }
 .token.atrule, .token.attr-value, .token.keyword { color: #36e2c4; }
 .token.function, .token.class-name { color: #6ff0db; }
 .token.regex, .token.important { color: #f5a623; }

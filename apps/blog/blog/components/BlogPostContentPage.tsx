@@ -103,13 +103,13 @@ export function BlogPostContentPage({
 				</h1>
 				<Cluster gap={2} className="mt-3">
 					<a
-						href={`/category/${metaData.category.toLowerCase()}`}
+						href={`/category/${metaData.category.toLowerCase()}.html`}
 						className="font-mono text-muted text-xs no-underline transition-colors hover:text-accent"
 					>
 						{metaData.category.toLowerCase()}
 					</a>
 					{tagList.map((t) => (
-						<TagPill key={t.slug} href={`/tag/${t.slug}`}>
+						<TagPill key={t.slug} href={`/tag/${t.slug}.html`}>
 							{t.display}
 						</TagPill>
 					))}

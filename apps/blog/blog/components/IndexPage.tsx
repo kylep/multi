@@ -15,9 +15,13 @@ function seg(route: Route): string[] {
 
 function getCanonicalUrl(route: Route): string {
 	const r = seg(route);
-	if (!r[0] || r[0] === "index" || r[0].startsWith("index")) return `${SITE_URL}/`;
-	if (r[0] === "category") return `${SITE_URL}/category/${encodeURIComponent(r[1])}`;
-	if (r[0] === "tag") return `${SITE_URL}/tag/${encodeURIComponent(r[1])}`;
+	// Home / page 1 -> root; deeper listing pages self-canonicalize to their own
+	// URL. Category/tag pages are served as `.html` static files (extensionless
+	// paths 404 on the GCS bucket).
+	if (!r[0] || r[0] === "index" || r[0] === "index1") return `${SITE_URL}/`;
+	if (r[0].startsWith("index")) return `${SITE_URL}/${encodeURIComponent(r[0])}.html`;
+	if (r[0] === "category") return `${SITE_URL}/category/${encodeURIComponent(r[1])}.html`;
+	if (r[0] === "tag") return `${SITE_URL}/tag/${encodeURIComponent(r[1])}.html`;
 	return `${SITE_URL}/${encodeURIComponent(r[0])}.html`;
 }
 

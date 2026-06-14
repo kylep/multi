@@ -59,8 +59,9 @@ fi
 # prod-deploy.sh's `rsync -d` would delete the live workshop.
 SB_BUCKET="gs://kyle.pericak.com/storybook"
 SB_INPUTS=(.storybook components design-system lib package.json package-lock.json postcss.config.js tsconfig.json next.config.js)
-if command -v sha256sum >/dev/null 2>&1; then sha_cmd="sha256sum"; else sha_cmd="shasum -a 256"; fi
-sb_hash=$(find "${SB_INPUTS[@]}" -type f 2>/dev/null | LC_ALL=C sort | xargs $sha_cmd | $sha_cmd | awk '{print $1}')
+if command -v sha256sum >/dev/null 2>&1; then sha_cmd=(sha256sum); else sha_cmd=(shasum -a 256); fi
+# Null-delimited so filenames with spaces/special chars hash correctly.
+sb_hash=$(find "${SB_INPUTS[@]}" -type f -print0 2>/dev/null | LC_ALL=C sort -z | xargs -0 "${sha_cmd[@]}" | "${sha_cmd[@]}" | awk '{print $1}')
 echo "Storybook input hash: $sb_hash"
 
 rebuild_storybook() {

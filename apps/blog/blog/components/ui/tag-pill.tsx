@@ -14,7 +14,7 @@ export function TagPill({ className, href, children, ...props }: TagPillProps) {
 	);
 	if (href) {
 		return (
-			<a href={href} className={cls}>
+			<a href={href} className={cls} {...props}>
 				{children}
 			</a>
 		);
