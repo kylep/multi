@@ -60,7 +60,8 @@ export default function Home({
 								key={m.slug}
 								title={m.title}
 								href={`/${m.slug}.html`}
-								date={`Created: ${m.date}${m.modified ? `, Modified: ${m.modified}` : ''}`}
+								created={m.date}
+								modified={m.modified}
 								excerpt={m.summary}
 								thumbnail={m.thumbnail ? `/images/${m.thumbnail}` : undefined}
 							/>

@@ -5,20 +5,22 @@ import { cn } from "@/lib/utils";
 export interface PostCardProps {
 	title: string;
 	href: string;
-	date?: string;
+	created?: string;
+	modified?: string;
 	excerpt?: string;
 	tags?: string[];
 	thumbnail?: string;
 	className?: string;
 }
 
-// Homepage / archive post card: thumbnail + date + title + excerpt + tags,
+// Homepage / archive post card: thumbnail + dates + title + excerpt + tags,
 // all token-driven. The whole card is the link (tags render as plain spans
 // to avoid nested anchors).
 export function PostCard({
 	title,
 	href,
-	date,
+	created,
+	modified,
 	excerpt,
 	tags,
 	thumbnail,
@@ -46,8 +48,16 @@ export function PostCard({
 					className="mb-3 h-40 w-full rounded-md border border-accent/40 bg-white object-cover [[data-theme=light]_&]:border-border"
 				/>
 			) : null}
-			{date ? (
-				<span className="font-mono text-subtle text-xs">{date}</span>
+			{created ? (
+				<div className="font-mono text-subtle text-xs leading-snug">
+					<div>Created: {created}</div>
+					{/* Always render the Modified line so the second row of text is
+					    reserved and titles line up across cards. When there's no
+					    modified date it's hidden but still occupies the space. */}
+					<div className={modified ? undefined : "invisible"} aria-hidden={!modified}>
+						Modified: {modified ?? created}
+					</div>
+				</div>
 			) : null}
 			<h3 className="mt-1 font-mono font-semibold text-default text-lg group-hover:text-accent">
 				{title}

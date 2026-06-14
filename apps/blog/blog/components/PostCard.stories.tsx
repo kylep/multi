@@ -14,7 +14,8 @@ export const Default: Story = {
 	args: {
 		title: "Building an AI agent org chart",
 		href: "/agent-org-chart.html",
-		date: "2026-03-18",
+		created: "2026-03-18",
+		modified: "2026-03-20",
 		excerpt:
 			"How I broke a content pipeline into specialized Claude agents — researcher, writer, reviewer — orchestrated by a publisher.",
 		tags: ["ai-agents", "claude", "automation"],
@@ -25,21 +26,25 @@ const POSTS: React.ComponentProps<typeof PostCard>[] = [
 	{
 		title: "Building an AI agent org chart",
 		href: "/agent-org-chart.html",
-		date: "2026-03-18",
+		created: "2026-03-18",
+		modified: "2026-03-20",
 		excerpt: "Specialized Claude agents orchestrated by a publisher.",
 		tags: ["ai-agents", "claude"],
 	},
 	{
+		// No modified date — the Modified line is reserved but hidden, so this
+		// card's title still aligns with its neighbors.
 		title: "Securing my laptop with an AI loop",
 		href: "/secure-my-laptop.html",
-		date: "2026-05-02",
+		created: "2026-05-02",
 		excerpt: "An autonomous hardening loop with adversarial verification.",
 		tags: ["security", "automation"],
 	},
 	{
 		title: "An AI-native SDLC, first try",
 		href: "/ai-native-sdlc-first-try.html",
-		date: "2026-04-10",
+		created: "2026-04-10",
+		modified: "2026-04-12",
 		excerpt: "PRD and design-doc agents feeding Claude Code's plan mode.",
 		tags: ["sdlc", "claude"],
 	},
