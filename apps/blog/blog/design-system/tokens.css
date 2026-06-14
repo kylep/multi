@@ -149,3 +149,18 @@
 html {
   background-color: var(--ds-canvas);
 }
+
+/* Card surface — subtle top-down sheen for a touch of depth. Dark lifts the
+   top toward ink-700; light lifts it toward white. Tune the top stop to dial
+   the effect (lighter top = more lift). */
+.card-surface {
+  background-color: var(--ds-surface);
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-ink-700),
+    var(--color-ink-900)
+  );
+}
+[data-theme="light"] .card-surface {
+  background-image: linear-gradient(to bottom, #ffffff, var(--color-ink-50));
+}

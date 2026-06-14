@@ -30,7 +30,7 @@ export function PostCard({
 			className={cn(
 				// no-underline: preflight is omitted, so the native <a> would
 				// otherwise underline (and link-color) all child text.
-				"group block rounded-lg border border-border bg-surface p-5 no-underline transition-colors hover:border-accent",
+				"card-surface group block rounded-lg border border-border p-5 no-underline transition-colors hover:border-accent",
 				className,
 			)}
 		>
@@ -39,7 +39,11 @@ export function PostCard({
 					src={thumbnail}
 					alt=""
 					loading="lazy"
-					className="mb-3 h-40 w-full rounded-md border border-border object-cover"
+					// bg-white: transparent logos (e.g. Ubuntu/Python) sit on white like
+					// the baked-white thumbnails instead of the dark card showing through.
+					// Cyan-accent frame in dark (the white box is jarring on a bare border);
+					// light keeps the neutral border (looks right there already).
+					className="mb-3 h-40 w-full rounded-md border border-accent/40 bg-white object-cover [[data-theme=light]_&]:border-border"
 				/>
 			) : null}
 			{date ? (
