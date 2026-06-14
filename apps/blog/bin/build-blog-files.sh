@@ -51,6 +51,42 @@ if ! node scripts/inject-home-jsonld.mjs; then
   exit 1
 fi
 
+# Storybook ("the workshop") ships alongside the site at /storybook/. It only
+# changes when components/tokens/stories/config do, so the slow webpack rebuild
+# is gated on a content hash of those inputs vs the hash stored beside the
+# deployed copy. Match -> restore the deployed Storybook (no rebuild). Mismatch
+# or unreadable bucket -> rebuild. out/storybook is ALWAYS populated; otherwise
+# prod-deploy.sh's `rsync -d` would delete the live workshop.
+SB_BUCKET="gs://kyle.pericak.com/storybook"
+SB_INPUTS=(.storybook components design-system lib package.json package-lock.json postcss.config.js tsconfig.json next.config.js)
+if command -v sha256sum >/dev/null 2>&1; then sha_cmd="sha256sum"; else sha_cmd="shasum -a 256"; fi
+sb_hash=$(find "${SB_INPUTS[@]}" -type f 2>/dev/null | LC_ALL=C sort | xargs $sha_cmd | $sha_cmd | awk '{print $1}')
+echo "Storybook input hash: $sb_hash"
+
+rebuild_storybook() {
+  echo "Building Storybook (inputs changed or no deployed copy)..."
+  npm run build-storybook || return 1
+  rm -rf out/storybook
+  cp -r storybook-static out/storybook
+  printf '%s\n' "$sb_hash" > out/storybook/.build-hash
+}
+
+sb_deployed_hash=""
+if command -v gsutil >/dev/null 2>&1; then
+  sb_deployed_hash=$(gsutil cat "$SB_BUCKET/.build-hash" 2>/dev/null | tr -d '[:space:]' || true)
+fi
+
+if [ -n "$sb_deployed_hash" ] && [ "$sb_deployed_hash" = "$sb_hash" ]; then
+  echo "Storybook inputs unchanged; restoring deployed copy."
+  mkdir -p out/storybook
+  if ! gsutil -m rsync -r "$SB_BUCKET" out/storybook; then
+    echo "Restore failed; rebuilding Storybook."
+    rebuild_storybook || { echo "Storybook build failed"; exit 1; }
+  fi
+else
+  rebuild_storybook || { echo "Storybook build failed"; exit 1; }
+fi
+
 if [[ "$1" == "" ]]; then
   echo "WARNING: output_dir pos arg is reuqired if copying to volume mount"
   exit 0
