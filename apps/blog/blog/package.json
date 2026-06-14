@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "node --no-deprecation scripts/generate-images.mjs && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
@@ -30,6 +32,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@storybook/addon-a11y": "^10.4.4",
+    "@storybook/addon-docs": "^10.4.4",
+    "@storybook/nextjs": "^10.4.4",
     "@tailwindcss/postcss": "^4.3.1",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^20",
@@ -40,6 +45,7 @@
     "eslint": "^8",
     "eslint-config-next": "^15.5.12",
     "postcss": "^8",
+    "storybook": "^10.4.4",
     "tailwindcss": "^4.3.1",
     "typescript": "^5"
   }
