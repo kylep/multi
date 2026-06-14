@@ -1,19 +1,116 @@
 /*
  * Design system — Tailwind v4 entry + token source of truth (PER-135).
+ * Visual direction: A — Terminal (dark-default, developer-native).
  *
  * Preflight (Tailwind's base reset) is INTENTIONALLY omitted while MUI's
  * <CssBaseline> is still in the tree, so Tailwind coexists without
  * double-resetting and changing the current look. Preflight gets enabled
- * in the MUI-removal task (TASK-014), swapping `@import "tailwindcss/..."`
+ * in the MUI-removal task (TASK-014), swapping the two scoped imports
  * below for the full `@import "tailwindcss";`.
  *
- * The Terminal-direction tokens land in the @theme block in TASK-003.
+ * Token tiers:
+ *   1. Primitives  — raw palette/scales in @theme (generate utilities + vars)
+ *   2. Semantic    — themable aliases (--color-canvas, --color-text, ...)
+ *      mapped via @theme inline to CSS vars in :root / [data-theme="light"],
+ *      so dark<->light is a pure variable swap with no component changes.
  */
 @layer theme, base, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+/* 1. Primitives ---------------------------------------------------------- */
 @theme {
-  /* Seed only. TASK-003 fills this with the Terminal palette/type/space. */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo,
+    Consolas, monospace;
+
+  /* neutrals (ink) — dark-forward ramp */
+  --color-ink-950: #0b0e14;
+  --color-ink-900: #11151f;
+  --color-ink-850: #161b27;
+  --color-ink-800: #1c2230;
+  --color-ink-700: #222a38;
+  --color-ink-600: #2d3748;
+  --color-ink-500: #4a5568;
+  --color-ink-400: #6b7688;
+  --color-ink-300: #9aa4b2;
+  --color-ink-200: #c3cad6;
+  --color-ink-100: #e6e9ef;
+  --color-ink-50: #f4f6fa;
+
+  /* accent — terminal cyan */
+  --color-cyan-300: #6ff0db;
+  --color-cyan-400: #36e2c4;
+  --color-cyan-500: #1fc7ab;
+  --color-cyan-700: #0d9488;
+
+  /* status */
+  --color-amber-400: #f5a623;
+  --color-red-400: #f87171;
+  --color-red-600: #dc2626;
+  --color-green-400: #4ade80;
+  --color-green-600: #16a34a;
+  --color-blue-600: #2563eb;
+
+  /* radius — tight, terminal */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+}
+
+/* 2. Semantic aliases — themable; utilities like bg-canvas/text-default
+ *    resolve to these and switch at runtime via the var swap below.        */
+@theme inline {
+  --color-canvas: var(--ds-canvas);
+  --color-surface: var(--ds-surface);
+  --color-raised: var(--ds-raised);
+  --color-border: var(--ds-border);
+  --color-default: var(--ds-text);
+  --color-muted: var(--ds-text-muted);
+  --color-subtle: var(--ds-text-subtle);
+  --color-accent: var(--ds-accent);
+  --color-accent-hover: var(--ds-accent-hover);
+  --color-on-accent: var(--ds-on-accent);
+  --color-warning: var(--ds-warning);
+  --color-danger: var(--ds-danger);
+  --color-success: var(--ds-success);
+  --color-link: var(--ds-link);
+}
+
+/* Dark = default (Terminal) */
+:root {
+  --ds-canvas: var(--color-ink-950);
+  --ds-surface: var(--color-ink-900);
+  --ds-raised: var(--color-ink-800);
+  --ds-border: var(--color-ink-700);
+  --ds-text: var(--color-ink-100);
+  --ds-text-muted: var(--color-ink-300);
+  --ds-text-subtle: var(--color-ink-400);
+  --ds-accent: var(--color-cyan-400);
+  --ds-accent-hover: var(--color-cyan-300);
+  --ds-on-accent: var(--color-ink-950);
+  --ds-warning: var(--color-amber-400);
+  --ds-danger: var(--color-red-400);
+  --ds-success: var(--color-green-400);
+  --ds-link: var(--color-cyan-400);
+}
+
+/* Light = secondary theme */
+[data-theme="light"] {
+  --ds-canvas: #ffffff;
+  --ds-surface: var(--color-ink-50);
+  --ds-raised: #ffffff;
+  --ds-border: #d8dee9;
+  --ds-text: #18181b;
+  --ds-text-muted: #52606d;
+  --ds-text-subtle: #7b8794;
+  --ds-accent: var(--color-cyan-700);
+  --ds-accent-hover: var(--color-cyan-500);
+  --ds-on-accent: #ffffff;
+  --ds-warning: #b45309;
+  --ds-danger: var(--color-red-600);
+  --ds-success: var(--color-green-600);
+  --ds-link: var(--color-blue-600);
 }
