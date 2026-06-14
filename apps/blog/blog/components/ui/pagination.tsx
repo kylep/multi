@@ -48,14 +48,29 @@ export function Pagination({
 	onPageChange,
 	className,
 }: PaginationProps) {
-	const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 	const go = (p: number) => {
-		if (p >= 1 && p <= totalPages) onPageChange?.(p);
+		if (p >= 1 && p <= totalPages && p !== currentPage) onPageChange?.(p);
 	};
+
+	// Windowed page list — first, last, current ±1, with "…" gaps — so it stays
+	// compact on mobile no matter how many pages there are.
+	const shown = [
+		...new Set([1, currentPage - 1, currentPage, currentPage + 1, totalPages]),
+	]
+		.filter((p) => p >= 1 && p <= totalPages)
+		.sort((a, b) => a - b);
+	const items: (number | "gap")[] = [];
+	let prev = 0;
+	for (const p of shown) {
+		if (p - prev > 1) items.push("gap");
+		items.push(p);
+		prev = p;
+	}
+
 	return (
 		<nav
 			aria-label="Pagination"
-			className={cn("flex items-center justify-center gap-2", className)}
+			className={cn("flex items-center justify-center gap-1.5 sm:gap-2", className)}
 		>
 			<PageButton
 				label="Previous page"
@@ -64,16 +79,26 @@ export function Pagination({
 			>
 				←
 			</PageButton>
-			{pages.map((p) => (
-				<PageButton
-					key={p}
-					active={p === currentPage}
-					onClick={() => go(p)}
-					label={`Page ${p}`}
-				>
-					{p}
-				</PageButton>
-			))}
+			{items.map((it, i) =>
+				it === "gap" ? (
+					<span
+						key={`gap-${i}`}
+						aria-hidden
+						className="px-0.5 font-mono text-subtle text-sm"
+					>
+						…
+					</span>
+				) : (
+					<PageButton
+						key={it}
+						active={it === currentPage}
+						onClick={() => go(it)}
+						label={`Page ${it}`}
+					>
+						{it}
+					</PageButton>
+				),
+			)}
 			<PageButton
 				label="Next page"
 				disabled={currentPage === totalPages}
