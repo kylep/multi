@@ -37,3 +37,4 @@ section feeds directly into Claude Code's plan mode for implementation.
 - [Autonomous Security Improvement Loop](security-improvement-loop.html) — Bash wrapper invoking Claude Code for iterative Mac workstation hardening with adversarial verification (draft, 2026-03-18)
 - [Security Improvement Log](security-improvement-log.html) — Structured log of autonomous security improvements
 - [Pai Improvements](pai-improvements.html) — Markdown-backed memory MCP, active recall via pai-recaller sub-agent, 1-min commitment scheduler, browser automation. Single-user Discord assistant on Claude Max OAuth (draft, 2026-05-08)
+- [Blog Redesign: Agent-Native Design System](blog-design-system.html) — Token-driven Tailwind v4 `@theme` system, Radix + shadcn owned components in TSX, Storybook 10 workshop/docs/visual-tests, dark mode by token swap, autonomous verification gate; replaces MUI/Emotion/styled-components (draft, 2026-06-13)
