@@ -55,3 +55,19 @@ last_verified: 2026-06-15
 ## Local
 
 - [CTV News](https://www.ctvnews.ca/toronto/) SeatGeek and StubHub told Ontario regulators the province has not provided sufficient guidance on the new ticket scalping law banning above-face-value resale, complicating compliance ahead of the busy summer concert season.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [Data Center Dynamics](https://www.datacenterdynamics.com/en/news/anthropic-signs-more-than-a-dozen-letters-of-intent-for-data-center-leases-report/) Anthropic confidentially filed its S-1 with the SEC on June 1 at a $965B valuation following a $65B Series H. The company has signed more than a dozen letters of intent for US data center leases totalling over 1 GW and is seeking Alphabet — which committed $40B to Anthropic in April — to act as financial guarantor on those leases ahead of its public listing.
+
+## AI Tooling
+
+- [Windows Central](https://www.windowscentral.com/microsoft/microsoft-cancels-claude-code-licenses-shifting-developers-to-github-copilot-cli-a-move-likely-driven-by-financial-motives) Microsoft is canceling Claude Code licenses across its Experiences + Devices division — covering Windows, Microsoft 365, Teams, and Surface — by June 30. Token costs burned through the annual AI tools budget early. Engineers are being directed to GitHub Copilot CLI, Microsoft's own product.
+
+## Geopolitics
+
+- [Philadelphia Inquirer](https://www.inquirer.com/news/nation-world/g7-summit-trump-iran-deal-macron-zelensky-putin-20260615.html) Trump arrived at the G7 in Évian announcing a US-Iran memorandum of understanding, with formal signing expected Friday. The framework includes sanctions relief, Strait of Hormuz reopening, and a $300B Iran reconstruction fund, with details to be finalized over 60 days. Iran's nuclear program oversight and enriched uranium disposition remain unresolved.
