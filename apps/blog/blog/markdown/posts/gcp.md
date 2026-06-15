@@ -41,6 +41,8 @@ as time goes on.
 | :---------- | :--------------------------------------------------------- |
 |             | **Continuous Integration**                                 |
 | 2019-08-06  | [Google Cloud Build: Basics](/google-cloud-build.html)     |
+|             | **Serverless**                                             |
+| 2019-10-11  | [Google Cloud Functions: Basics](/gcp-cloud-functions.html) |
 |             | **Database**                                               |
 | 2019-10-14  | [Google Cloud Firestore Basics - Python](/gcp-firestore-python.html) |
 |             | **Containers**                                             |
