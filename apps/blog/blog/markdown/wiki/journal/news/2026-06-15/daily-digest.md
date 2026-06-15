@@ -35,3 +35,23 @@ last_verified: 2026-06-15
 - [GitHub](https://github.com/apple/container) apple/container gained 10,021 stars this week (37,220 total) — Apple's Swift-based tool for running Linux containers in lightweight VMs on Apple silicon Macs. Relevant to container and macOS tooling workflows.
 
 - [GitHub](https://github.com/safishamsi/graphify) safishamsi/graphify entered the weekly top 8 (5,478 stars this week, 67,415 total) — an AI coding assistant skill that converts code, SQL schemas, or documentation into a queryable knowledge graph, compatible with Claude Code, Codex, Cursor, and Gemini CLI.
+
+---
+
+## Update — 16:00 UTC
+
+## AI Industry
+
+- [TechTimes](https://www.techtimes.com/articles/318376/20260615/anthropic-races-lift-fable-5-export-ban-top-engineers-sent-washington-deal.htm) Anthropic dispatched senior technical staff to Washington for in-person meetings with White House and Commerce Department officials on the Fable 5 and Mythos 5 export-control ban. Commerce Secretary Howard Lutnick and Cyber Director Sean Cairncross joined the discussions. No agreement reached as of this evening. Fortune separately reported that an Amazon warning about a jailbreak in Fable 5 first triggered the government's action on June 12.
+
+- [OpenAI](https://openai.com/index/introducing-openai-partner-network/) OpenAI launched the Partner Network, a tiered global ecosystem for systems integrators and managed service providers, backed by $150M in partner support. OpenAI is targeting 300,000 certified consultants by year-end; the network goes live in July 2026.
+
+## Security
+
+- [Orca Security](https://orca.security/resources/blog/cve-2026-20253-splunk-enterprise-rce-unauthenticated-file-operations/) CVE-2026-20253: critical pre-authentication RCE in Splunk Enterprise (CVSS 9.8) affecting versions below 10.2.4 and 10.0.7. Unauthenticated attackers can create or truncate arbitrary files via an exposed PostgreSQL sidecar endpoint. Patch to 10.2.4 or 10.0.7 immediately.
+
+- [CVEFeed](https://cvefeed.io/newsroom/latest) Attackers tampered with trusted JavaScript files bundled by WordPress plugins PushEngage, OptinMonster, and TrustPulse, turning them into site backdoors. Published June 15; sites running any of the three plugins should verify plugin file integrity and update immediately.
+
+## Local
+
+- [CTV News](https://www.ctvnews.ca/toronto/) SeatGeek and StubHub told Ontario regulators the province has not provided sufficient guidance on the new ticket scalping law banning above-face-value resale, complicating compliance ahead of the busy summer concert season.
