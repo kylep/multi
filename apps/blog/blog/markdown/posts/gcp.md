@@ -1,8 +1,6 @@
 ---
 title: "Project: GCP Deep Dive"
-summary: An ongoing deep dive into Google Cloud Platform, with hands-on posts
-  covering Cloud Build, Cloud Storage website hosting, Container Registry, and
-  Firestore.
+summary: "An ongoing deep dive into Google Cloud Platform, with hands-on posts covering Cloud Build, Cloud Storage website hosting, Container Registry, Firestore, and Cloud Functions."
 slug: gcp
 tags: GCP
 category: projects
@@ -47,3 +45,5 @@ as time goes on.
 | 2019-08-05  | [Google Container Registry: Basics](/google-container-registry.html) |
 |             | **Cloud Storage**                                          |
 | 2019-08-09  | [Hosting websites on Cloud Storage](/google-cloud-storage-website.html) |
+|             | **Serverless**                                             |
+| 2019-10-11  | [Google Cloud Functions: Basics](/gcp-cloud-functions.html) |
