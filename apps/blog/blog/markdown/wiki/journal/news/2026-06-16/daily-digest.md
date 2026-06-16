@@ -47,3 +47,31 @@ last_verified: 2026-06-16
 ## Security
 
 - [Bleeping Computer](https://www.bleepingcomputer.com/news/microsoft/microsoft-june-2026-patch-tuesday-fixes-6-zero-days-200-flaws/) Microsoft's June 9 Patch Tuesday addressed approximately 200 CVEs — a new record — including 6 zero-days. CVE-2026-42897, an Exchange Server spoofing flaw enabling arbitrary JavaScript execution in the browser context, is confirmed actively exploited in the wild. Other zero-days cover BitLocker bypasses (CVE-2026-45585, CVE-2026-50507) and an HTTP/2 denial-of-service flaw (CVE-2026-49160).
+
+---
+
+## Update — 20:00 UTC
+
+## AI Tooling
+
+- [Releasebot / Claude Code Docs](https://releasebot.io/updates/anthropic/claude-code) Claude Code v2.1.178 ships a new `Tool(param:value)` permission syntax letting teams match rules by tool input — for example `Agent(model:opus)` blocks Opus subagents while allowing others. Skills in nested `.claude/skills` directories now load contextually and are namespaced on name collision. Also fixes out-of-memory crashes from stale websocket descriptors and Chrome OAuth token mismatches.
+
+## AI Industry
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/sk-telecom-ai-infrastructure) NVIDIA and SK Telecom announced a partnership to build gigawatt-scale AI infrastructure in South Korea using the NVIDIA DSX platform. The first AI factory is planned for 2027, with phased expansion toward gigawatt-scale capacity serving training, inference, and agentic workloads across Korea and greater Asia.
+
+## Open Source
+
+- [GitHub Changelog](https://github.blog/changelog/2026-06-16-github-code-quality-generally-available-july-20-2026/) GitHub Code Quality moves from public preview to a paid product on July 20, priced at $10 per active committer per month on enabled repositories, plus usage-based consumption for AI-powered features including Copilot code review and Autofix. More than 10,000 enterprises used the preview.
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/shinyhunters-claims-council-of-europe-hack/amp/) ShinyHunters claims to have stolen 297 GB from the Council of Europe via Oracle PeopleSoft CVE-2026-35273, a remotely exploitable RCE flaw used as a zero-day before Oracle's June 10 advisory. The alleged data includes payroll records, bank account numbers, medical files, and CVs for more than 10,000 employees spanning 2011–2026. A ransom deadline was set for today; the Council of Europe says it is investigating.
+
+- [CyberSecurity News](https://cybersecuritynews.com/arch-linux-aur-packages-compromised/) The "Atomic Arch" supply chain campaign compromised more than 1,500 Arch Linux AUR packages by adopting orphaned projects and injecting a Rust credential stealer and eBPF rootkit into their build scripts. Official Arch repositories were not affected. Detection tools are available on GitHub at `lenucksi/aur-malware-check`.
+
+## Local
+
+- [CTV News Toronto](https://www.ctvnews.ca/toronto/) The Ontario Medical Association warned Monday that Ontario emergency departments are entering summer under capacity strain, citing staffing shortages and rising patient volumes as the busiest months approach.
+
+- [CP24](https://www.cp24.com/) City of Toronto staff released a report warning that expanding Billy Bishop Airport would result in major adverse impacts on housing, traffic congestion, the waterfront environment, and surrounding neighbourhoods. The report goes to council for review.
