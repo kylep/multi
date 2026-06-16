@@ -35,3 +35,15 @@ last_verified: 2026-06-16
 - [The New Stack](https://thenewstack.io/ai-coding-tool-stack/) Claude Code, Cursor, and Codex are converging into a single AI coding stack: separate tools pulling from shared model backends, with Cursor supporting Claude Opus 4.8 directly and teams mixing tools by task rather than picking one.
 
 - [gHacks Tech News](https://www.ghacks.net/2026/06/02/github-copilot-usage-based-billing-takes-effect-drawing-developer-backlash-over-rapid-credit-depletion/) GitHub Copilot's switch to usage-based AI Credits billing (effective June 1) is drawing sustained developer backlash — monthly credit allowances are depleting within hours for heavy users. Budget controls are available but not enabled by default.
+
+---
+
+## Update — 16:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-16/trump-s-anthropic-crackdown-sets-off-ai-alarms-for-us-allies) US allies are alarmed after a Trump administration export control order forced Anthropic to disable global access to Fable 5 and Mythos 5 for all foreign nationals — including foreign-national Anthropic employees. The directive cited national security and Anthropic's models' effectiveness at identifying software vulnerabilities. Anthropic's other models remain accessible.
+
+## Security
+
+- [Bleeping Computer](https://www.bleepingcomputer.com/news/microsoft/microsoft-june-2026-patch-tuesday-fixes-6-zero-days-200-flaws/) Microsoft's June 9 Patch Tuesday addressed approximately 200 CVEs — a new record — including 6 zero-days. CVE-2026-42897, an Exchange Server spoofing flaw enabling arbitrary JavaScript execution in the browser context, is confirmed actively exploited in the wild. Other zero-days cover BitLocker bypasses (CVE-2026-45585, CVE-2026-50507) and an HTTP/2 denial-of-service flaw (CVE-2026-49160).
