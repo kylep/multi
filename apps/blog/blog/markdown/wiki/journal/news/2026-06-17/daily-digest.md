@@ -45,3 +45,31 @@ last_verified: 2026-06-17
 ## GitHub Trending
 
 iptv-org/iptv and NVIDIA/SkillSpector entered the top 8, displacing Leonxlnx/taste-skill and microsoft/markitdown. addyosmani/agent-skills holds #1 for a second consecutive day. The NVIDIA/SkillSpector entry — a security scanner targeting AI agent skill packages — is the most notable newcomer. The top 8 remains overwhelmingly agent skills and AI tooling, with iptv-org/iptv as the lone non-AI entry.
+
+---
+
+## Update — 19:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/06/09/anthropics-claude-fable-5-is-a-version-of-mythos-the-public-can-access-today/) Anthropic released Claude Fable 5 on June 9 — the first Mythos-class model made available to the general public. It is priced at $10/M input tokens and $50/M output tokens, with free access for Pro/Max/Team/Enterprise plan holders through June 22. The model was briefly taken offline following a U.S. government export directive and has since been restored.
+
+## AI Tooling
+
+- [Anthropic](https://releasebot.io/updates/anthropic) Claude Code versions 2.1.170–2.1.179 shipped nested sub-agents (agents can now spawn their own sub-agents up to 5 levels deep), a `/cd` command to relocate sessions between directories, and a `--safe-mode` flag to disable customizations for troubleshooting.
+
+- [Windows News](https://windowsnews.ai/article/microsoft-shifts-copilot-cowork-to-usage-based-pricing-charging-per-compute-consuming-task.427225) Microsoft moved Copilot Cowork to usage-based pricing on June 16, dropping the per-seat model in favor of "AI units" consumed per task. Cowork still requires a Microsoft 365 Copilot seat, with actual agent work billed in Copilot Credits.
+
+- [Space Daily](https://spacedaily.com/n-microsoft-is-canceling-claude-code-licenses-across-its-experiences-devices-division-by-june-30-steering-thousands-of-engineers-toward-github-copilot-while-uber-burned-through-its-entire-2026-ai-bu/) Microsoft is canceling Claude Code licenses for its Experiences + Devices division — the group behind Windows, Microsoft 365, Outlook, Teams, and Surface — by June 30, redirecting engineers to GitHub Copilot CLI.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/anthropic-releases-claude-fable-5-its.html) CISA added CVE-2026-48907 (CVSS 10.0) to its Known Exploited Vulnerabilities catalog. The flaw in Widget Factory Joomla Content Editor allows unauthenticated users to upload and execute PHP code by creating new editor profiles. Active exploitation is confirmed.
+
+- [The Hacker News](https://thehackernews.com/) Researchers found 15 malicious plugins on the JetBrains Marketplace masquerading as AI coding assistants. The plugins steal API keys for AI providers while appearing to function normally; some reached over 25,000 downloads before removal.
+
+- [The Hacker News](https://thehackernews.com/) A supply-chain attack on the Mastra npm namespace compromised 144 packages through a single hijacked account, injecting a cryptocurrency-stealing library as a dependency.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/world-cup-match-day-toronto-9.7232031) Toronto hosted its first-ever FIFA World Cup match, with Canada and Bosnia-Herzegovina drawing 1-1. A second match, Ghana vs. Panama, is scheduled tonight at BMO Field. Heavy traffic is expected near the stadium from 3:30 PM to 11 PM.
