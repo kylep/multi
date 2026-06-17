@@ -73,3 +73,19 @@ iptv-org/iptv and NVIDIA/SkillSpector entered the top 8, displacing Leonxlnx/tas
 ## Local
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/world-cup-match-day-toronto-9.7232031) Toronto hosted its first-ever FIFA World Cup match, with Canada and Bosnia-Herzegovina drawing 1-1. A second match, Ghana vs. Panama, is scheduled tonight at BMO Field. Heavy traffic is expected near the stadium from 3:30 PM to 11 PM.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/06/17/anthropic-amodei-google-hassabis-us-ai-coalition-g7.html) Anthropic CEO Dario Amodei and Google DeepMind CEO Demis Hassabis jointly called for a U.S.-led international AI coalition at the G7, asking world leaders to establish shared testing standards and global risk norms. OpenAI's Sam Altman separately called for a permanent international forum to provide impartial analysis of AI capabilities and serve as a cooperation venue.
+
+## Security
+
+- [CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) CISA added CVE-2026-54420 (CVSS 8.5) to its Known Exploited Vulnerabilities catalog — a privilege escalation flaw in LiteSpeed cPanel Plugin that allows a user with FTP or web shell access to escalate to root on shared hosting servers running CloudLinux or CageFS. Federal agencies must patch by June 18.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/claude-managed-agents/) Cloudflare and Anthropic announced Claude Managed Agents on Cloudflare Sandboxes — developers run the Claude agent loop on the Anthropic platform while Cloudflare handles code execution, secure connections to private services, and tool calls inside isolated Workers-based sandbox environments. Each sandbox is observable from the Cloudflare dashboard with logs shippable to external providers.
