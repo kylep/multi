@@ -63,3 +63,17 @@ last_verified: 2026-06-18
 - [AWS News Blog](https://aws.amazon.com/blogs/aws/aws-weekly-roundup-byom-for-amazon-rds-for-sql-server-aws-iot-device-sdk-for-swift-and-more-june-8-2026/) Amazon EKS and EKS Distro now support Kubernetes 1.36, which promotes User Namespaces to GA and introduces Mutating Admission Policies and In-Place Pod-Level Resources Vertical Scaling.
 
 - [IAPP](https://iapp.org/news/a/the-anthropic-episode-probably-a-security-challenge-in-need-of-governance-certainly-not-europe-s-kill-switch) The Anthropic Fable 5 export control directive is drawing attention from European policymakers and privacy regulators, with French President Macron stating it has "clarified the stakes" for democratic AI governance and supply-chain control.
+
+---
+
+## Update — 18:00 UTC
+
+## Local
+
+- [Durham Radio News](https://www.durhamradionews.com/archives/213810) Whitby Mayor Elizabeth Roy publicly addressed a wave of anti-Muslim hate comments that flooded her Facebook page after she posted a photo from a community lunch with ICNA Sisters Whitby. Roy noted the comments were "mostly racist, anti-Muslim, demeaning and threatening" and cited a pattern of hate incidents — including anti-Muslim graffiti and antisemitic vandalism — in Whitby over the past two years.
+
+- [Durham Radio News](https://www.durhamradionews.com/) The Durham Regional Police Service Board selected two new deputy chiefs on June 17: Acting Deputy Chief Ryan Connolly from DRPS and Superintendent Chirag Bhatt from York Regional Police.
+
+## Weather
+
+- Whitby update: Environment Canada now shows 22°C high, 13°C low, west winds 40 km/h gusting to 70 km/h, 60% chance of showers with a risk of thunderstorm. Conditions have shifted from the morning outlook; no formal alerts in effect.
