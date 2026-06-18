@@ -11,14 +11,6 @@
 #   `upkeep = { ... }` blocks (net deposit output therefore skews
 #   3x-favorable on deposits with upkeep; see README).
 
-## Possible Deposit Variables ##
-# resources, resource and amount
-# potential trigger (planet scope)
-# blocked_modifier - applied to planet only when deposit blocker has been cleared
-# constant_modifier - applied to planet always
-# blocker = <key/any/none> - default any
-# station = station class in orbit to gather
-
 #######################################
 ######### STRATEGIC RESOURCES #########
 #######################################
@@ -44,10 +36,7 @@ d_exotic_gases_1 = {
 	}
 
 	potential = {
-		OR = {
-			is_planet_class = pc_gas_giant
-			is_planet_class = pc_toxic
-		}
+		can_have_exotic_gases_deposits = yes
 	}
 
 	drop_weight = {
@@ -76,10 +65,7 @@ d_exotic_gases_2 = {
 	}
 
 	potential = {
-		OR = {
-			is_planet_class = pc_gas_giant
-			is_planet_class = pc_toxic
-		}
+		can_have_exotic_gases_deposits = yes
 	}
 
 	drop_weight = {
@@ -165,6 +151,10 @@ d_rare_crystals_1 = {
 	station = shipclass_mining_station
 	is_for_colonizable = no
 
+	potential = {
+		can_have_rare_crystals_deposits = yes
+	}
+
 	habitat_modifier = {
 		district_hab_mining_max_add = 3
 	}
@@ -195,6 +185,10 @@ d_rare_crystals_2 = {
 	}
 	station = shipclass_mining_station
 	is_for_colonizable = no
+
+	potential = {
+		can_have_rare_crystals_deposits = yes
+	}
 
 	habitat_modifier = {
 		district_hab_mining_max_add = 6
@@ -293,10 +287,7 @@ d_volatile_motes_1 = {
 	}
 
 	potential = {
-		OR = {
-			is_planet_class = pc_molten
-			is_planet_class = pc_asteroid
-		}
+		can_have_volatile_motes_deposits = yes
 	}
 
 	drop_weight = {
@@ -325,10 +316,7 @@ d_volatile_motes_2 = {
 	}
 
 	potential = {
-		OR = {
-			is_planet_class = pc_molten
-			is_planet_class = pc_asteroid
-		}
+		can_have_volatile_motes_deposits = yes
 	}
 
 	drop_weight = {
@@ -424,7 +412,7 @@ d_zro_deposit_1 = {
 	}
 
 	potential = {
-		is_planet_class = pc_toxic
+		can_have_zro_deposits = yes
 	}
 
 	drop_weight = {
@@ -453,7 +441,7 @@ d_zro_deposit_2 = {
 	}
 
 	potential = {
-		is_planet_class = pc_toxic
+		can_have_zro_deposits = yes
 	}
 
 	drop_weight = {
@@ -544,12 +532,12 @@ d_dark_matter_deposit_1 = {
 	station = shipclass_research_station
 	is_for_colonizable = no
 
+	potential = {
+		can_have_dark_matter_deposits = yes
+	}
+
 	drop_weight = {
-		weight = 0
-		modifier = {
-			weight = 10
-			is_planet_class = pc_black_hole
-		}
+		weight = 10
 		modifier = {
 			factor = 0.5
 			is_inside_nebula = no
@@ -573,12 +561,12 @@ d_dark_matter_deposit_2 = {
 	station = shipclass_research_station
 	is_for_colonizable = no
 
+	potential = {
+		can_have_dark_matter_deposits = yes
+	}
+
 	drop_weight = {
-		weight = 0
-		modifier = {
-			weight = 1
-			is_planet_class = pc_black_hole
-		}
+		weight = 1
 	}
 }
 

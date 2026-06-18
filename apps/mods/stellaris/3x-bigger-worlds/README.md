@@ -1,6 +1,6 @@
 # 3x Bigger Worlds
 
-A Stellaris mod for **Cetus v4.3.x** that triples every dimension of the
+A Stellaris mod for **Pegasus v4.4.x** that triples every dimension of the
 "resource real estate" on a world:
 
 1. **3x planet & moon size.** Habitable planets spawn at sizes 36–75 instead

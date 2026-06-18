@@ -1,6 +1,6 @@
 # Multi-Megastructures + Free Tech — Stellaris Mod
 
-A Stellaris mod for **Cetus v4.3.x** with four effects:
+A Stellaris mod for **Pegasus v4.4.x** with four effects:
 
 1. **Multiple of each megastructure.** Lifts the one-per-empire cap so a single empire can build, e.g., two Dyson Spheres.
 2. **Multiple megastructures per system / celestial body.** Removes the per-system uniqueness gate so a system can host more than one multi-stage megastructure.
@@ -54,7 +54,7 @@ Re-running `scripts/build.py` is picked up immediately by the launcher — no ne
 
 1. Launch Stellaris → Paradox Launcher → Mods → enable **Multi-Megastructures + Free Tech** → Play.
 2. Start a new game.
-3. **Feature 3 check:** open Research → all megastructure techs (Mega-Engineering, Dyson Sphere, Ring World, Matter Decompressor, Think Tank, Strategic Coordination, Mega Art, Interstellar Assembly, Mega Shipyard, Quantum Catapult, Orbital Arc Furnace, Dyson Swarm, Galactic Archivism, Deep Space Citadel, Cosmogenesis World) are already researched. Use the `play <country_id>` console command to confirm AI empires have them too.
+3. **Feature 3 check:** open Research → the base megastructure techs (Mega-Engineering, Dyson Sphere, Ring World, Matter Decompressor, Think Tank, Strategic Coordination, Mega Art, Interstellar Assembly, Mega Shipyard, Quantum Catapult) are already researched. DLC megastructure techs are granted only when the matching DLC is active: Dyson Swarm + Orbital Arc Furnace (Machine Age), Galactic Archivism (Grand Archive), Deep Space Citadel (BioGenesis), Dyson Gun (Nomads). `tech_cosmogenesis_world` is **not** granted — it is gated behind the Cosmogenesis ascension perk, so it is only obtainable on the crisis-ascension path. Use the `play <country_id>` console command to confirm AI empires have them too.
 4. **Feature 1 check:** build a Dyson Sphere. After completion, start a second Dyson Sphere in a different system — the construction option must still be available.
 5. **Feature 2 check:** in a system that has a finished megastructure, try to build a second (different) megastructure on a different celestial body in the same system. Then try on the same celestial body. Both should work.
 6. Tail `~/Documents/Paradox Interactive/Stellaris/logs/error.log` and check for unresolved trigger errors after starting the game.
