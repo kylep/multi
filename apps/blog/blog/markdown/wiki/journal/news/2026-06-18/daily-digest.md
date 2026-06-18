@@ -77,3 +77,23 @@ last_verified: 2026-06-18
 ## Weather
 
 - Whitby update: Environment Canada now shows 22°C high, 13°C low, west winds 40 km/h gusting to 70 km/h, 60% chance of showers with a risk of thunderstorm. Conditions have shifted from the morning outlook; no formal alerts in effect.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Tooling
+
+- [TechRepublic](https://www.techrepublic.com/article/news-anthropic-claude-design-overhaul-enterprise-teams/) Anthropic updated Claude Design on June 17 with a WYSIWYG canvas editor, design system imports from GitHub or file uploads, and a `/design-sync` command that bridges prototypes directly to Claude Code. The update is available in beta to Pro, Max, Team, and Enterprise subscribers.
+
+## Open Source
+
+- [The Decoder](https://the-decoder.com/minimax-m3-open-weight-model-with-a-million-token-context-challenges-proprietary-leaders/) MiniMax released M3 on June 1 as an open-weights model with a 1-million-token context window and native multimodality, scoring 59% on SWE-Bench Pro — above GPT-5.5 and Gemini 3.1 Pro. The weights are on Hugging Face; training code and inference operators have not been released.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/sections/world/) US Defense Secretary Pete Hegseth announced a review of American forces in Europe and called for a restructured "NATO 3.0," creating fresh uncertainty about US commitment to the alliance.
+
+## Weather
+
+- Whitby evening update: Showers clearing by midnight, becoming partly cloudy. Low 12°C. West winds 30 km/h gusting to 60, easing overnight. No alerts.
