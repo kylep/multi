@@ -53,3 +53,17 @@ last_verified: 2026-06-19
 ## Just for You
 
 - [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare released a major Agents SDK update adding safer browser automation, resumable Codemode execution, stronger Think delegation, and voice output device selection. The Developer Platform also added dashboard management for Artifacts namespaces and Git-compatible storage with scoped access controls.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Tooling
+
+- [Space Daily](https://spacedaily.com/n-microsoft-is-canceling-claude-code-licenses-across-its-experiences-devices-division-by-june-30-steering-thousands-of-engineers-toward-github-copilot-while-uber-burned-through-its-entire-2026-ai-bu/) Microsoft is canceling Claude Code licenses across its Experiences + Devices division (Windows, Microsoft 365, Teams) by June 30, redirecting thousands of engineers to GitHub Copilot CLI. The tool had displaced Copilot internally after rollout in December 2025. Separately, Uber confirmed it exhausted its entire 2026 AI coding tools budget by April — four months in — after Claude Code and Cursor adoption hit 84% of its 5,000 engineers, with heavy users running $500–$2,000/month.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/sections/world/) The U.S. and Iran have agreed to a new 60-day negotiation phase, with the U.S. lifting restrictions on ships entering and exiting Iranian ports while the two countries work toward a lasting deal.
+
+- [NPR](https://www.npr.org/sections/world/) Andy Burnham, mayor of Greater Manchester, won a UK Parliament by-election, placing him in position to challenge Prime Minister Keir Starmer for Labour leadership.
