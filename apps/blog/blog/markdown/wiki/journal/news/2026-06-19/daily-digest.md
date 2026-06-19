@@ -29,3 +29,27 @@ last_verified: 2026-06-19
 ## Just for You
 
 - [GitHub](https://github.com/chopratejas/headroom) chopratejas/headroom is #1 on GitHub weekly trending with 10,159 stars this week (36,176 total) — a library, proxy, and MCP server that compresses tool outputs, logs, files, and RAG chunks by 60–95% before they reach the LLM.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/seoul-office-partnerships-korean-ai-ecosystem) Anthropic opened its Seoul office on June 17, its third in Asia-Pacific after Tokyo and Bengaluru. Announced at launch: NAVER is rolling out Claude Code to its full engineering organization, Samsung SDS is deploying Claude Cowork and Claude Code across Samsung Electronics, and LG CNS is bringing Claude across LG Group. Nexon, Hanwha Solutions, and Channel Corp (230,000+ businesses) are also named as launch partners.
+
+- [TechCrunch](https://techcrunch.com/2026/06/11/anthropic-taps-tcs-to-scale-its-enterprise-ai-deployments/) Anthropic and Tata Consultancy Services announced a global strategic partnership. TCS will stand up a dedicated business unit around Claude models and jointly go to market with Anthropic in regulated sectors including financial services, healthcare, and life sciences.
+
+- [Yahoo Finance](https://finance.yahoo.com/sectors/technology/articles/google-unveils-ai-search-overhaul-181601127.html) Google reports Gemini now has 900 million monthly active users, up from 400 million a year ago, with 350 million paid subscribers. AI Mode in Google Search crossed 1 billion monthly active users globally as of May, and AI Overviews now reaches 2.5 billion users monthly.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/microsoft-patches-record-206-flaws.html) Microsoft's June 2026 Patch Tuesday addressed 208 CVEs including CVE-2026-45657, a wormable critical remote code execution flaw in the Windows Kernel TCP/IP stack (CVSS 9.8). An unauthenticated attacker can send specially crafted packets to achieve SYSTEM-level code execution with no user interaction. Microsoft rates exploitation as "Less Likely" but security researchers note the patch-to-exploit window could be days.
+
+## Local
+
+- [Toronto FIFA](https://www.toronto.ca/explore-enjoy/festivals-events/fifa-world-cup-26/) The FIFA World Cup 2026 is underway in Toronto. Canada drew 1-1 with Bosnia-Herzegovina in its first-ever home World Cup match, with Cyle Larin scoring a late equalizer. Toronto Stadium hosts Germany vs. Côte d'Ivoire on June 20; city matches continue through July 2.
+
+## Just for You
+
+- [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare released a major Agents SDK update adding safer browser automation, resumable Codemode execution, stronger Think delegation, and voice output device selection. The Developer Platform also added dashboard management for Artifacts namespaces and Git-compatible storage with scoped access controls.
