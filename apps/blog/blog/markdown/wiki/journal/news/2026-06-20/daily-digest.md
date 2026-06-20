@@ -77,3 +77,15 @@ last_verified: 2026-06-20
 - [Google Cloud](https://cloud.google.com/alloydb/omni/kubernetes/current/docs/overview) AlloyDB Omni 16.8.0 for Kubernetes is now GA, pairing PostgreSQL 16.8 support with a production-ready Kubernetes operator and Active Directory authentication. Relevant to PostgreSQL and Kubernetes coverage.
 
 - [Releasebot](https://releasebot.io/updates/cloudflare) Cloudflare AI Gateway added user agent capture and filtering to AI logs this week, and deployed managed protection against CVE-2026-26980, a critical SQL injection in Ghost CMS. Workers tracing gained custom span support via tracing.enterSpan() with OpenTelemetry export.
+
+---
+
+## Update — 22:00 UTC
+
+## Local
+
+- [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/6/20/germany-vs-ivory-coast-live-world-cup-2026) Germany defeated Ivory Coast 2-1 at BMO Field in Toronto in Group E of the 2026 FIFA World Cup. Ivory Coast opened scoring through Franck Kessie; Deniz Undav equalized before Germany scored a second-half winner. Germany advances with six points from two matches.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/temporary-accounts/) Cloudflare launched Temporary Accounts for AI agent deployments on June 19. Agents can now run `wrangler deploy --temporary` to get a live Worker URL valid for 60 minutes without any prior account setup or OAuth flow. A human can claim the account during that window to make it permanent. Supported products include Workers, KV, D1, Durable Objects, and Queues.
