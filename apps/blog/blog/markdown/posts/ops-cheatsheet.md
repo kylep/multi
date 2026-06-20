@@ -191,6 +191,26 @@ ping -M do -s 8900 <remote server>
 
 ---
 
+# Capture network traffic with tcpdump
+
+Quick one-liners for sniffing traffic on a host:
+
+```bash
+# Listen on all interfaces, filter to a specific host
+tcpdump -i any 'host <ip address>'
+
+# Filter to a port
+tcpdump 'tcp port 5000'
+
+# Print packets in ASCII
+tcpdump -A -i any 'tcp port 5000'
+```
+
+For filtering combinations, tshark HTTP capture, and more examples, see the
+[Packet Tracing Reference](/packet-tracing-reference.html).
+
+---
+
 # Find big files on Mac OS
 
 My SSD is always almost full. Here are useful commands for cleaning up:
