@@ -49,3 +49,31 @@ last_verified: 2026-06-20
 ## Just for You
 
 - [GitHub](https://github.com/DeusData/codebase-memory-mcp) DeusData/codebase-memory-mcp is a new MCP server on weekly trending — indexes a full repo into a knowledge graph for sub-millisecond queries, dropping LLM token use by 99%. Relevant to MCP server and AI coding tool coverage.
+
+---
+
+## Update — 18:30 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5) Anthropic released Claude Fable 5 on June 9 — the first Mythos-class model available to the general public — alongside Claude Mythos 5, a restricted version for vetted cybersecurity use. Fable 5 scores 88% on FrontierMath Tier 4, 13 points ahead of GPT-5.5. Free for Pro/Max/Team/Enterprise users through June 22; priced at $10/$50 per million input/output tokens after that.
+
+- [HeyGoTrade](https://www.heygotrade.com/en/news/google-io-2026-gemini-deepmind-contextual-ai/) Google launched Gemini 3.5 Flash at I/O 2026 and cut the Ultra subscription from $250 to $200 per month. Monthly Gemini users reached 900 million. DeepMind also hired more than 20 Contextual AI researchers in an $80–90 million licensing deal.
+
+## AI Tooling
+
+- [Devin.ai](https://devin.ai/blog/windsurf-is-now-devin-desktop) Cognition rebranded Windsurf as Devin Desktop on June 2. The rebrand ships Devin Local (a Rust-rewritten Cascade successor) and adds Agent Client Protocol (ACP) support for running any compatible agent inside any ACP editor. Cascade reaches end-of-life July 1; CI pipelines invoking it must migrate before that date.
+
+## Open Source
+
+- [Redis.io](https://redis.io/blog/redis-82-ga/) Redis 8.2 is generally available, delivering up to 49% throughput improvement with 8 I/O threads and optimizing more than 70 commands. BITCOUNT is 35% faster; list operations (LINSERT, LREM, LPOS) see more than 25% latency reduction each.
+
+## Security
+
+- [Zero Day Initiative](https://www.zerodayinitiative.com/blog/2026/6/9/the-june-2026-security-update-review) CVE-2026-45657, a critical Windows Kernel RCE with CVSS 9.8, allows remote unauthenticated attackers to execute code at SYSTEM level via a crafted TCP/IP packet, with no user interaction required. The flaw is considered wormable. Patched in Microsoft's June 2026 Patch Tuesday.
+
+## Just for You
+
+- [Google Cloud](https://cloud.google.com/alloydb/omni/kubernetes/current/docs/overview) AlloyDB Omni 16.8.0 for Kubernetes is now GA, pairing PostgreSQL 16.8 support with a production-ready Kubernetes operator and Active Directory authentication. Relevant to PostgreSQL and Kubernetes coverage.
+
+- [Releasebot](https://releasebot.io/updates/cloudflare) Cloudflare AI Gateway added user agent capture and filtering to AI logs this week, and deployed managed protection against CVE-2026-26980, a critical SQL injection in Ghost CMS. Workers tracing gained custom span support via tracing.enterSpan() with OpenTelemetry export.
