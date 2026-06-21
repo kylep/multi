@@ -35,3 +35,27 @@ last_verified: 2026-06-21
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby: 24°C high, 13°C low, mix of sun and cloud with 30% chance of afternoon showers. Southwest 20 km/h. UV index 8 (very high). No alerts.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/05/28/anthropic-raises-65-billion-nears-1t-valuation-ahead-of-ipo/) Anthropic closed a $65B Series H round at a $965B post-money valuation led by Altimeter Capital, Dragoneer, Greenoaks, and Sequoia, eclipsing OpenAI's reported $852B mark. The company simultaneously filed confidential IPO paperwork with a potential October 2026 listing window; run-rate revenue crossed $47B.
+
+## AI Tooling
+
+- [Releasebot / Anthropic](https://releasebot.io/updates/anthropic) Anthropic reversed a June 15 billing change that would have metered Claude Agent SDK and Claude Code GitHub Actions usage separately from interactive Claude Code sessions. Self-hosted sandboxes (public beta) and MCP tunnels (research preview) also launched on the Claude Platform, letting agent tool execution run on operator-configured infrastructure while Anthropic handles orchestration.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/agentjacking-attack-tricks-ai-coding.html) Tenet Security disclosed "Agentjacking" on June 9: attackers plant malicious instructions inside Sentry error events via public DSNs, then wait for a developer to ask Claude Code, Cursor, or Codex to fix the fake bug. The agent retrieves the injected event through the Sentry MCP server and cannot distinguish it from legitimate error data, achieving an 85% success rate across a tested pool of 2,388 organizations and silently exfiltrating AWS keys, GitHub tokens, and git credentials.
+
+## Geopolitics
+
+- [Élysée / EU Council](https://www.elysee.fr/en/G7evian/2026/06/17/the-outcomes-of-the-evian-g7-summit) G7 leaders at the Évian summit (June 15-17) pledged increased deliveries of air defense systems and long-range capabilities to Ukraine, committed over $1B to the Ebola response in line with UN efforts, and agreed to coordinate on AI safety measures for children across member states.
+
+## Just for You
+
+- [Cloudflare](https://releasebot.io/updates/cloudflare) Cloudflare Workers added `connect()` support for VPC Network bindings, letting Workers open raw TCP connections to private services — including Redis, MQTT, and custom protocols — without exposing them publicly.
