@@ -59,3 +59,29 @@ last_verified: 2026-06-21
 ## Just for You
 
 - [Cloudflare](https://releasebot.io/updates/cloudflare) Cloudflare Workers added `connect()` support for VPC Network bindings, letting Workers open raw TCP connections to private services — including Redis, MQTT, and custom protocols — without exposing them publicly.
+
+---
+
+## Update — 22:03 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/seoul-office-partnerships-korean-ai-ecosystem) Anthropic opened its Seoul office on June 17-18, its third Asia-Pacific location after Tokyo and Bengaluru. Enterprise deployments span NAVER (Claude Code across its engineering org), Samsung SDS, LG CNS, and Nexon. Anthropic signed an AI safety memorandum of understanding with Korea's Ministry of Science and ICT and will provide Claude access to up to 60 researchers at the National AI Research Lab consortium.
+
+- [Anthropic / Fortune](https://fortune.com/2026/06/13/anthropic-disables-fable-mythos-export-controls-national-security-threat/) The US government issued an export control directive on June 12 suspending all access to Fable 5 and Mythos 5 for any foreign national, including Anthropic's own employees, citing a discovered jailbreak technique that could expose Mythos-class cybersecurity capabilities. Anthropic complied at 5:21 p.m. ET but publicly objected to applying this standard to commercially deployed models, noting it would effectively halt new frontier releases industry-wide.
+
+## AI Tooling
+
+- [OpenAI](https://developers.openai.com/codex/record-and-replay) Codex for macOS shipped Record & Replay on June 18 for ChatGPT Plus, Pro, Business, and Enterprise subscribers outside the EEA, UK, and Switzerland. A user records a workflow once and Codex generates a natural-language SKILL.md that the agent can replay autonomously on demand without pixel-coordinate scripts or re-recording.
+
+## Security
+
+- [TechTimes](https://www.techtimes.com/articles/318669/20260618/github-malicious-repositories-10000-trojan-clones-evade-detection-over-year.htm) A campaign of roughly 10,000 trojan-cloned GitHub repositories targeting AI agents has evaded automated detection for over a year by rotating commits to mimic routine maintenance. Attackers clone popular projects, inject credential-stealing malware derived from BlackCap-Grabber, and re-upload them with identical names so fake repos outrank originals in search results.
+
+## Geopolitics
+
+- [Elysée / Reuters](https://en.wikipedia.org/wiki/2026_Iran_war_ceasefire) The US and Iran signed a memorandum of understanding on June 17 extending their ceasefire by 60 days to negotiate final terms. New ceasefire conditions had been agreed June 12; fighting has paused while diplomatic negotiations continue.
+
+## Local
+
+- [FIFA](https://www.fifa.com/en/match-centre/match/17/285023/289273/400021465) Ecuador 0-0 Curaçao in Group E of the 2026 World Cup. Curaçao goalkeeper Eloy Room made 15 saves — the most in a World Cup match without conceding since 1966 — earning the island nation its first-ever World Cup point.
