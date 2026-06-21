@@ -135,6 +135,10 @@ problems. A few examples of what I mean by "other problems":
 - **Tool-enabled plugins.** Skills with non-markdown capabilities (real scripts, MCP servers, hooks).
 - **High-signal methodology.** Short, low-token guidance that goes beyond coding advice.
 
+The [v4 redesign of this blog](/add-blog-redesign.html) is a concrete example of
+`frontend-design` and `context7` earning their keep on a Tailwind v4 design-system
+build, if you want to see what a few of these look like in practice.
+
 
 ## How I Evaluated These
 
