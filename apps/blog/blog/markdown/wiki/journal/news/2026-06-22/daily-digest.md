@@ -63,3 +63,23 @@ last_verified: 2026-06-22
 - [Perplexity Blog](https://www.perplexity.ai/hub/blog/perplexity-is-open-sourcing-bumblebee) Perplexity open-sourced Bumblebee, a read-only supply chain scanner for developer endpoints covering npm, PyPI, Go modules, editor extensions, browser extensions, and MCP server configs. The tool was motivated by the March 2026 ContextCrush incident, in which a tampered MCP server config delivered attacker-controlled instructions directly into an AI agent's working memory.
 
 - [AWS News Blog](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-eks-capabilities-logging/) Amazon EKS Capabilities (which provides fully managed ArgoCD, AWS Controllers for Kubernetes, and KRO) can now be configured as log delivery sources using CloudWatch Vended Logs, enabling monitoring of the managed controllers without customer-managed infrastructure.
+
+---
+
+## Update — 22:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/06/08/following-anthropic-openai-files-confidentially-for-ipo/) OpenAI filed a confidential S-1 with the SEC on June 8, one week after Anthropic's June 1 filing. Anthropic is running $47B in annualized revenue at a $965B post-money valuation; OpenAI was last valued at $852B. Both companies say IPO timing is uncertain.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/06/01/windows-netlogon-rce-exploited-cve-2026-41089/) CVE-2026-41089, a CVSS 9.8 stack-based buffer overflow in Windows Netlogon, is now actively exploited in the wild. Belgium's Centre for Cybersecurity issued an urgent advisory; attackers can send crafted Netlogon requests to execute arbitrary code with SYSTEM privileges on unpatched domain controllers, no authentication required.
+
+## Geopolitics
+
+- [Washington Post](https://www.washingtonpost.com/business/2026/06/22/china-us-sanctions-military-defense-tech-dualuse/78e3aa90-6dee-11f1-8730-e7fd0e2a6404_story.html) China sanctioned 10 US defense firms — including Ball Aerospace, L3Harris, Oshkosh Defense, and MP Materials — and barred government procurement from 46 more US companies including Lockheed Martin and Raytheon subsidiaries. The move is a direct response to Washington adding Alibaba and Baidu to its military-linked firms list.
+
+## Just for You
+
+- [The Mirror US](https://www.themirror.com/tech/breaking-massive-cloudflare-outage-kicks-1900148) A fiber cut in Eastern North America triggered a Cloudflare outage on June 22 beginning around 8:35 AM ET, causing widespread timeouts across X, Reddit, AWS, Teams, and other major platforms. Cloudflare rerouted traffic and restored service by midday with minor residual impact.
