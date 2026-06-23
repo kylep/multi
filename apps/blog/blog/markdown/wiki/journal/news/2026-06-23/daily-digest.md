@@ -59,3 +59,27 @@ last_verified: 2026-06-23
 ## Just for You
 
 - [Cloudflare](https://developers.cloudflare.com/workers/platform/changelog/) Cloudflare Durable Objects now stay alive for the duration of active outbound connections (via connect() or WebSocket), closing a gap where objects were evicted after 70–140 seconds of no inbound traffic even with open LLM or agent streams running.
+
+---
+
+## Update — 21:30 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/fable-mythos-access) The US government issued a legally binding export control directive on June 12 suspending all access to Fable 5 and Mythos 5 by any foreign national, including foreign national Anthropic employees, citing a narrow jailbreak that could elicit code vulnerability analysis. Anthropic complied but disputed the order, arguing the same jailbreak works on other publicly available models including GPT-5.5 that face no equivalent restrictions.
+
+## AI Tooling
+
+- [Google](https://sumatosolutions.com/blog-google-ai-updates-2026-gemini-flash-agentic-app-builder/) The Gemini CLI reached end-of-life on June 18 and is replaced by the Agentic 2.0 CLI, which supports automated multi-step workflows including analytics extraction, report generation, and scheduled content distribution without requiring a user to be present.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/arystinger-malware-infects-4300-legacy.html) AryStinger is a new botnet targeting legacy D-Link and QNAP routers built on Realtek RTL819X chips from 2012–2015. At least 4,300 devices are infected and repurposed as a distributed reconnaissance and proxy network — performing DNS mass scanning, service fingerprinting, subdomain enumeration, and traffic tunneling — rather than the typical DDoS use. A Go-based NAS variant also runs internal recon tools including fscan, ksubdomain, and httpx.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/06/18/nx-s1-5863027/us-iran-trump-memorandum-of-understanding-full-text) The US and Iran signed a 14-point MOU on June 18 extending the ceasefire, reopening the Strait of Hormuz for 60 days, lifting the US naval blockade of Iranian ports, and committing to a $300 billion reconstruction fund. Iran's nuclear program and ballistic missiles are deferred to later talks. As of June 23, Trump and Tehran are publicly at odds over what concessions Iran actually made.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/power-of-attorney-fraud-ontario-95-year-old-9.7245886) A 62-year-old Whitby man has been charged with power of attorney fraud after allegedly transferring nearly $900,000 from a 95-year-old victim without authorization.
