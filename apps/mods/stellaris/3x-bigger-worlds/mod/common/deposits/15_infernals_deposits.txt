@@ -140,28 +140,28 @@ d_cd_ancient_tunnels = {
 	
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = cosmic_dawn_tunnel_foundry_flag
+			has_carrier_flag = cosmic_dawn_tunnel_foundry_flag
 		}
 		foundry_jobs_bonus_workforce_mult = 0.01
 		mult = cd_pods_var 
 	}
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = cosmic_dawn_tunnel_bureaucrat_flag
+			has_carrier_flag = cosmic_dawn_tunnel_bureaucrat_flag
 		}
 		bureaucrat_jobs_bonus_workforce_mult = 0.01
 		mult = cd_pods_var 
 	}
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = cosmic_dawn_tunnel_researcher_flag
+			has_carrier_flag = cosmic_dawn_tunnel_researcher_flag
 		}
 		researcher_jobs_bonus_workforce_mult = 0.01
 		mult = cd_pods_var 
 	}
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = cosmic_dawn_tunnel_worker_flag
+			has_carrier_flag = cosmic_dawn_tunnel_worker_flag
 		}
 		pop_cat_worker_bonus_workforce_mult = 0.01
 		mult = cd_pods_var 

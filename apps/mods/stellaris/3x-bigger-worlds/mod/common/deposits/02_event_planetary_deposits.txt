@@ -11,13 +11,6 @@
 #   `upkeep = { ... }` blocks (net deposit output therefore skews
 #   3x-favorable on deposits with upkeep; see README).
 
-## Possible Deposit Variables ##
-# resources, resource and amount
-# potential trigger (planet scope)
-# blocked_modifier - applied to planet
-# planet_modifier - applied to planet always
-# station = station class in orbit to gather
-
 d_metal_boneyard = {
 	is_for_colonizable = yes
 	category = deposit_cat_rare
@@ -1037,35 +1030,35 @@ d_portal_research_zone = {
 
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = dportal_closed
+			has_carrier_flag = dportal_closed
 		}
 		planet_physicists_physics_research_produces_add = -3
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = dportal_energy
+			has_carrier_flag = dportal_energy
 		}
 		planet_physicists_energy_produces_add = 3
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = dportal_void
+			has_carrier_flag = dportal_void
 		}
 		planet_physicists_sr_dark_matter_produces_add = 0.1
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = dportal_void2
+			has_carrier_flag = dportal_void2
 		}
 		planet_physicists_sr_dark_matter_produces_add = 0.5
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = dportal_hell
+			has_carrier_flag = dportal_hell
 			exists = owner
 			owner = { is_gestalt = no }
 		}
@@ -1082,7 +1075,7 @@ d_portal_research_zone = {
 
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = dportal_hell
+			has_carrier_flag = dportal_hell
 			exists = owner
 			owner = { is_hive_empire = yes }
 		}
@@ -1099,7 +1092,7 @@ d_portal_research_zone = {
 
 	triggered_planet_modifier = {
 		potential = {
-			has_planet_flag = dportal_hell
+			has_carrier_flag = dportal_hell
 			exists = owner
 			owner = { is_machine_empire = yes }
 		}
@@ -1865,7 +1858,7 @@ d_ancient_manufactorium_working = {
 		potential = {
 			exists = owner
 			owner = { is_gestalt = no }
-			planet = { has_planet_flag = manufactorium_memorialists }
+			planet = { has_carrier_flag = manufactorium_memorialists }
 		}
 		modifier = {
 			job_bureaucrat_add = 100
@@ -1875,7 +1868,7 @@ d_ancient_manufactorium_working = {
 		potential = {
 			exists = owner
 			owner = { is_gestalt = yes }
-			planet = { has_planet_flag = manufactorium_memorialists }
+			planet = { has_carrier_flag = manufactorium_memorialists }
 		}
 		modifier = {
 			job_coordinator_add = 100
@@ -1885,7 +1878,7 @@ d_ancient_manufactorium_working = {
 		potential = {
 			exists = owner
 			owner = { is_gestalt = no }
-			planet = { has_planet_flag = manufactorium_aristocrats }
+			planet = { has_carrier_flag = manufactorium_aristocrats }
 		}
 		modifier = {
 			job_politician_add = 100
@@ -1895,7 +1888,7 @@ d_ancient_manufactorium_working = {
 		potential = {
 			exists = owner
 			owner = { is_gestalt = no }
-			planet = { has_planet_flag = manufactorium_traders }
+			planet = { has_carrier_flag = manufactorium_traders }
 		}
 		modifier = {
 			job_trader_add = 100
@@ -2525,6 +2518,22 @@ d_geocentric_experiment = {
 			owner = { is_gestalt = yes }
 		}
 		job_calculator_physicist_add = 200
+	}
+
+	drop_weight = {
+		weight = 0
+	}
+}
+
+# Nomads - The Sacred Path - Mechsiah
+d_mechsiah_mainframe = {
+	is_for_colonizable = yes
+	category = deposit_cat_rare
+	icon = d_glitchy_matrix
+
+	planet_modifier = {
+		planet_stability_add = 10
+		pop_government_ethic_attraction = 1
 	}
 
 	drop_weight = {

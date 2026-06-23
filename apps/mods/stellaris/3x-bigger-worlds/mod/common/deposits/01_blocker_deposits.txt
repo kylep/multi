@@ -11,16 +11,6 @@
 #   `upkeep = { ... }` blocks (net deposit output therefore skews
 #   3x-favorable on deposits with upkeep; see README).
 
-## Possible Deposit Variables ##
-# resources, resource and amount
-# potential trigger (planet scope)
-# planet_modifier - applied to planet only when deposit blocker has been cleared
-# constant_modifier - applied to planet always
-# station = station class in orbit to gather
-# ai_weight = AI willingness to clear blocker. Note: weight 1 is default and is treated specially -
-#	it is set to weight 0 if the planet has no need of more max districts or of districts
-#   of the type gained from clearing the blocker.
-
 @blocker_high = 10
 @blocker_low = 5
 @evopred_large_blocker_progress = 40
