@@ -43,3 +43,4 @@ This project includes the following posts.
 | 2020-01-08  | [Lambda basics](/aws-lambda.html) |
 | 2020-01-09  | [IAM for Lambda](/aws-lambda-iam.html) |
 | 2020-01-21  | [IAM Authentication using API Gateway](/aws-api-gateway-iam.html) |
+| 2020-01-27  | [CodeBuild CI/CD pipeline for Lambda](/aws-labmda-cicd.html) |
