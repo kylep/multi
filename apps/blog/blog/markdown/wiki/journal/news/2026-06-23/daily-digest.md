@@ -31,3 +31,31 @@ last_verified: 2026-06-23
 ## Weather
 
 - Whitby: 26°C high, 13°C low, mainly sunny. No alerts.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [NVIDIA Blog](https://blogs.nvidia.com/blog/top500-green500-supercomputers-isc-2026/) NVIDIA technology powers 81% of the TOP500 supercomputers in the June 2026 rankings released at ISC in Hamburg. NVIDIA also announced the Vera Rubin platform, delivering over 7 exaflops of AI compute and capable of matching a full TOP500 system in a single rack.
+
+- [Pulse2](https://pulse2.com/openai-noam-shazeer-to-join-company-after-leaving-google/) Noam Shazeer, Gemini co-lead and co-author of the 2017 "Attention Is All You Need" transformer paper, announced on June 18 he is leaving Google for OpenAI to become Lead for Architecture Research. Google had spent $2.7 billion to bring him back in 2024; Alphabet shares fell roughly 7% on the news.
+
+- [NPR](https://www.npr.org/2026/06/22/nx-s1-5856359/ai-anthropic-congress-spending-openai-midterms-election) Groups affiliated with OpenAI and Anthropic have collectively spent more than $15 million on midterm election messaging, backing candidates and ballot measures tied to AI regulation.
+
+## AI Tooling
+
+- [Windows Central](https://www.windowscentral.com/microsoft/microsoft-cancels-claude-code-licenses-shifting-developers-to-github-copilot-cli-a-move-likely-driven-by-financial-motives) Microsoft is canceling Claude Code licenses for its Experiences + Devices division — Windows, Microsoft 365, Teams, and Surface teams — by June 30, redirecting thousands of engineers to GitHub Copilot CLI. Per-engineer API costs reached $500–$2,000 per month by April, well over original projections.
+
+- [OpenAI](https://openai.com/index/gpt-5-5-with-trusted-access-for-cyber/) OpenAI's Daybreak cybersecurity initiative expands with GPT-5.5-Cyber moving to full release on June 23. The model is available to vetted security defenders for vulnerability detection, malware analysis, binary reverse engineering, and patch generation.
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/fortibleed-86000-fortinet-device-credentials-compromised/) FortiBleed: an active campaign has harvested credentials from over 86,000 Fortinet FortiGate firewalls and VPN gateways across 194 countries. Attackers combined previously disclosed CVEs with AI-accelerated brute force against devices lacking MFA; no new zero-day is involved.
+
+- [The Hacker News](https://thehackernews.com/2026/06/29-year-old-squid-proxy-bug-squidbleed.html) Squidbleed (CVE-2026-47729) is a 29-year-old heap overread in Squid Proxy's FTP gateway that leaks other users' HTTP Authorization headers, cookies, and session tokens to any trusted client who can route the proxy to an attacker-controlled FTP server. A patch is due in Squid 7.7; disabling FTP on the proxy eliminates the attack surface entirely.
+
+## Just for You
+
+- [Cloudflare](https://developers.cloudflare.com/workers/platform/changelog/) Cloudflare Durable Objects now stay alive for the duration of active outbound connections (via connect() or WebSocket), closing a gap where objects were evicted after 70–140 seconds of no inbound traffic even with open LLM or agent streams running.
