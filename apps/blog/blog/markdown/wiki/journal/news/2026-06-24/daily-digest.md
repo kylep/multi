@@ -71,3 +71,23 @@ mattpocock/skills debuts at #1 with 11,784 weekly stars, bumping Agent-Reach fro
 - [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) A young child was hospitalized after a coyote bite in Whitby on Monday. Durham Region police are investigating and residents in the affected area are advised to keep children and pets supervised outdoors.
 
 - [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) A 24-year-old man died early Sunday morning following a single-vehicle crash on a Highway 412 ramp in Whitby. Ontario Provincial Police are investigating.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-24/google-poised-to-lose-two-more-high-profile-ai-staffers-to-anthropic) Two more senior Google DeepMind researchers — Jonas Adler (AI coding) and Alexander Pritzel (pretraining/model training) — are set to leave for Anthropic. Their exits follow John Jumper (to Anthropic) and Noam Shazeer (to OpenAI), continuing a run of high-profile departures that rattled Alphabet shares on June 24.
+
+- [NPR](https://www.npr.org/2026/06/22/nx-s1-5856359/ai-anthropic-congress-spending-openai-midterms-election) AI industry groups have steered over $185 million into 2026 U.S. midterm campaigns. OpenAI-linked and Anthropic-linked PACs alone account for more than $23 million, backing opposing positions: the OpenAI-aligned Leading the Future (backed by Andreessen Horowitz) pushes light-touch federal standards while Anthropic-aligned Public First supports stricter guardrails.
+
+## Security
+
+- [CVEBrief](https://cvebrief.com/) Three critical RCE vulnerabilities were publicly disclosed June 24 targeting AI/ML self-hosted tooling: Flowise CVE-2026-56274 (CVSS 9.9) enables unauthenticated code execution on AI workflow servers; Crawl4AI CVE-2026-53753 (CVSS 9.8) allows RCE via a crafted Docker hooks parameter; Feast CVE (CVSS 9.8) contains unsafe deserialization in the ML feature store. Critical CVEs in this disclosure batch rose 76% week-over-week to 30.
+
+## Local
+
+- [CTV News](https://www.ctvnews.ca/toronto/politics/queens-park/article/exclusive-ontario-raising-speed-limits-on-more-highways/) Ontario is raising speed limits to 110 km/h on an additional 938 km of provincial highways starting June 26, covering sections of the 401, 416, QEW, 400, 402, 403, and 417. When fully implemented by September 30, nearly 89% of controlled-access highway network will operate at the higher limit.
+
+- [CPAC](https://www.cpac.ca/headline-politics/episode/ontario-premier-ford-infrastructure-funding-for-toronto--june-23-2026?id=1c149220-cf6a-4ea7-846e-808c53ca7b7a) Premier Ford announced $1.5 billion in federal infrastructure funding for Toronto, tied to the city committing to reduce residential development charges by 40–60% through 2029 under the federal Housing Accelerator Fund.
