@@ -49,3 +49,25 @@ last_verified: 2026-06-24
 ## GitHub Trending
 
 mattpocock/skills debuts at #1 with 11,784 weekly stars, bumping Agent-Reach from #1 to #4. NVIDIA/SkillSpector and OpenCut-app/OpenCut drop off the list. penpot/penpot enters at #8 with 3,423 weekly stars. Agent skills collections and real-world coding tooling dominate the top five for a second week running.
+
+---
+
+## Update — 17:30 UTC
+
+## AI Tooling
+
+- [Anthropic / Releasebot](https://releasebot.io/updates/anthropic) Anthropic launched Claude Tag, a Slack integration in beta for Enterprise and Team customers. Teams can @-mention Claude in channels, and the model builds context from channel history and interacts with everyone in the channel. Ambient mode enables proactive updates. Runs on Opus 4.8.
+
+- [Anthropic / Releasebot](https://releasebot.io/updates/anthropic) Claude Code 2.1.187 ships sandbox credential blocking to prevent access to sensitive files, adds organization-level model restrictions in the model picker, and enables mouse click support in fullscreen select menus. Also fixes structured output handling and remote MCP tool calls.
+
+## Security
+
+- [SecurityWeek](https://www.securityweek.com/hackers-exploiting-cisco-unified-cm-vulnerability/) CVE-2026-20230 in Cisco Unified Communications Manager is being actively exploited as of June 24. Patches shipped June 3, but SSD Secure Disclosure subsequently published a proof-of-concept, enabling attacks. An unauthenticated remote attacker can conduct SSRF, write arbitrary files to the OS, and escalate to root when the WebDialer service is enabled. This is the second Cisco Unified CM vulnerability exploited in 2026.
+
+- [SecurityWeek](https://www.securityweek.com/splunk-enterprise-vulnerability-exploited-in-attacks-days-after-disclosure/) CVE-2026-20253 in Splunk Enterprise (versions 10.0 before 10.0.7 and 10.2 before 10.2.4) allows unauthenticated remote code execution via an unauthenticated PostgreSQL sidecar endpoint. CISA added it to the Known Exploited Vulnerabilities catalog June 18 — the first Splunk flaw on the KEV list — giving federal agencies three days to patch. Active exploitation confirmed by Splunk the same day.
+
+## Local
+
+- [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) A young child was hospitalized after a coyote bite in Whitby on Monday. Durham Region police are investigating and residents in the affected area are advised to keep children and pets supervised outdoors.
+
+- [CTV News Durham](https://www.ctvnews.ca/toronto/local/durham/) A 24-year-old man died early Sunday morning following a single-vehicle crash on a Highway 412 ramp in Whitby. Ontario Provincial Police are investigating.
