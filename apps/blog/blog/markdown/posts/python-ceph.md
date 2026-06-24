@@ -141,3 +141,6 @@ image.close()
 rbd_inst.remove(ioctx, rbd_name)
 ```
 
+For the CLI equivalents of these operations, see the
+[Ceph Reference Page](/ceph-reference.html).
+
