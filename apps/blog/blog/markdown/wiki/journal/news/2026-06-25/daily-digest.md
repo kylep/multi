@@ -71,3 +71,21 @@ last_verified: 2026-06-25
 - [CBC Sports](https://www.cbc.ca/sports/soccer/worldcup/fifa-canada-world-cup-canada-switzerland-recap-june-24-9.7246842) Canada lost 2-1 to Switzerland on June 24 at BMO Field, with goals from Rubén Vargas and Johan Manzambi. Canada finishes second in Group B and advances to play South Africa in the Round of 32.
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/power-of-attorney-fraud-ontario-95-year-old-9.7245886) A 62-year-old Whitby man has been charged with fraud after transferring nearly $900,000 from a 95-year-old man without his knowledge using power of attorney.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/06/24/openai-unveils-its-first-custom-chip-built-by-broadcom/) OpenAI and Broadcom unveiled Jalapeño, OpenAI's first custom AI inference chip. Designed specifically for LLM inference workloads, it went from initial design to manufacturing in nine months. Initial deployment is planned for end of 2026 in gigawatt-scale data centers with Microsoft, reducing OpenAI's dependence on Nvidia.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-24/google-poised-to-lose-two-more-high-profile-ai-staffers-to-anthropic) Google Gemini researchers Jonas Adler and Alexander Pritzel are joining Anthropic, adding to the exodus of Nobel Prize winner John Jumper (June 19) and Noam Shazeer (to OpenAI, June 24). Four senior AI leaders departed Google in six days; Bloomberg reports pre-IPO equity at both Anthropic and OpenAI is the primary draw.
+
+## AI Tooling
+
+- [Microsoft 365 Blog](https://www.microsoft.com/en-us/microsoft-365/blog/2026/06/25/copilot-in-excel-built-for-the-era-of-frontier-finance/) Microsoft launched a set of finance-focused Copilot in Excel capabilities today, including pre-built financial workflow skills, Copilot connectors for external financial data, and attribution tracing in Show Changes. Available now for Microsoft 365 Copilot subscribers.
+
+## Security
+
+- [CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) CISA added CVE-2025-67038 (CVSS 9.8) to its Known Exploited Vulnerabilities catalog — a code injection flaw in Lantronix EDS5000 Series devices that allows unauthenticated remote command execution with elevated privileges. Federal civilian agencies must patch by June 26.
