@@ -137,3 +137,11 @@ firebase deploy
 
 The deploy command will print a Hosting URL. The Hello World site can be loaded
 from there.
+
+---
+
+# Next Steps
+
+Now that your app is deployed, automate future releases with continuous
+delivery. See [CircleCI: Continuous Delivery for Firebase](/firebase-circleci-cd.html)
+for a step-by-step guide to auto-deploying on every commit.
