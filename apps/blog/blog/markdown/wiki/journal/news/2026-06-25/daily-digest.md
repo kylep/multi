@@ -51,3 +51,23 @@ last_verified: 2026-06-25
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898,-78.939) Whitby: 19°C high, 14°C low, cloudy with 60% chance of showers and risk of an afternoon thunderstorm. No alerts.
+
+---
+
+## Update — 16:04 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/06/24/anthropic-alibaba-distillation-campaign.html) Anthropic sent a letter to the Senate Banking Committee accusing Alibaba of running the largest known distillation attack on its models — 28.8 million exchanges through roughly 25,000 fraudulent accounts between April 22 and June 5, targeting the coding and agentic reasoning capabilities of Mythos Preview. Anthropic is asking the US government to take action against the operation.
+
+- [CNBC](https://www.cnbc.com/2026/06/18/google-gemini-co-lead-noam-shazeer-leaves-for-openai.html) Noam Shazeer, Google VP of Engineering and co-lead of Gemini, announced he is leaving for OpenAI. Shazeer co-authored the 2017 "Attention Is All You Need" paper that introduced the Transformer architecture. Google paid $2.7B to recruit him back from Character.AI less than two years ago. Alphabet shares fell roughly 5% on the announcement.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/06/08/check-point-cve-2026-50751-qilin-ransomware/) CVE-2026-50751 is an authentication bypass in Check Point Remote Access VPN affecting deployments using the deprecated IKEv1 key exchange (CVSS 9.3). A Qilin ransomware affiliate exploited it beginning May 7 before public disclosure. CISA issued an emergency directive June 21 and added it to the KEV catalog. A hotfix is available from Check Point.
+
+## Local
+
+- [CBC Sports](https://www.cbc.ca/sports/soccer/worldcup/fifa-canada-world-cup-canada-switzerland-recap-june-24-9.7246842) Canada lost 2-1 to Switzerland on June 24 at BMO Field, with goals from Rubén Vargas and Johan Manzambi. Canada finishes second in Group B and advances to play South Africa in the Round of 32.
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/power-of-attorney-fraud-ontario-95-year-old-9.7245886) A 62-year-old Whitby man has been charged with fraud after transferring nearly $900,000 from a 95-year-old man without his knowledge using power of attorney.
