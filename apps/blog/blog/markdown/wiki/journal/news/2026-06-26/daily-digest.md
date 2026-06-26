@@ -45,3 +45,23 @@ last_verified: 2026-06-26
 ## Security
 
 - [JFrog Security Research](https://research.jfrog.com/post/dissecting-and-exploiting-linux-lpe-variant-dirtyclone-cve-2026-43503/) DirtyClone (CVE-2026-43503, CVSS 8.8) is a Linux kernel local privilege escalation flaw affecting Debian, Ubuntu, and Fedora when unprivileged user namespaces are enabled. JFrog published a working exploit on June 25. The fix is in kernel v7.1-rc5; setting `kernel.unprivileged_userns_clone=0` mitigates unpatched systems. Kubernetes clusters and multi-tenant cloud environments are at highest risk.
+
+---
+
+## Update — 22:02 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/fable-mythos-access) The US government issued an export control directive on June 12 ordering Anthropic to suspend all access to Claude Fable 5 and Mythos 5 for any foreign national, including foreign national Anthropic employees. Anthropic disabled both models globally by midnight to ensure compliance, citing an inability to filter foreign nationals from domestic users in real time. Access to all other Claude models is unaffected. Anthropic publicly disagreed with the directive, stating a narrow jailbreak finding should not justify recalling a commercially deployed model.
+
+## AI Tooling
+
+- [Devin Docs](https://docs.devin.ai/desktop/devin-desktop-faq) Windsurf officially rebranded to Devin Desktop on June 2 via an over-the-air update. The new version ships Devin Local (a Rust-rewritten Cascade successor), Agent Client Protocol (ACP) support for connecting AI agents to code editors, and an agent command center with kanban-style multi-agent management. Cascade, the previous local agent, reaches end-of-life July 1.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/cisa-warns-critical-lantronix-eds5000.html) CVE-2025-67038 (CVSS 9.8) is a code injection flaw in Lantronix EDS5000 Series serial-to-ethernet converters that lets an unauthenticated attacker execute arbitrary OS commands as root via an unsanitized username parameter. CISA added it to the KEV catalog June 23 and set a federal patch deadline of today, June 26. Exploitation can cut control of downstream industrial and OT assets. Upgrade to EDS5000 firmware 2.2.0.0R1.
+
+## Geopolitics
+
+- [CBS News](https://www.cbsnews.com/live-updates/iran-us-war-talks-suspended-trump-mou-israel-lebanon-hezbollah-fighting/) Trump stated today that Iran fired four one-way attack drones at the Strait of Hormuz, with one striking a cargo vessel, which he characterized as a violation of the ceasefire MOU signed June 17. Gulf Cooperation Council foreign ministers simultaneously released a statement declaring any final deal with Tehran must include limits on Iran's missile capabilities.
