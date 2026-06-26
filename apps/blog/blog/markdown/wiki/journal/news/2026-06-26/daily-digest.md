@@ -28,3 +28,20 @@ last_verified: 2026-06-26
 
 - [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare added support for ML-DSA post-quantum certificates on connections between its edge and origin servers, enabling end-to-end post-quantum authentication via X25519MLKEM768.
 - [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare Tunnels and Mesh now support granular per-instance permissions, allowing administrators to delegate read or write access to specific private networking resources without granting account-wide control.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-26/openai-weighs-ipo-in-2027-after-expected-anthropic-public-debut) OpenAI is tilting toward a 2027 IPO, expecting Anthropic to list first. Anthropic filed a confidential S-1 on June 1 and is targeting an October Nasdaq debut at a $965B valuation; OpenAI had previously been aiming for a fall 2026 listing before CFO Sarah Friar pushed internally for the delay.
+
+## AI Tooling
+
+- [GitHub Changelog](https://github.blog/changelog/2026-06-22-new-features-and-claude-as-agent-provider-preview-in-jetbrains-ides/) GitHub Copilot now supports Claude Code CLI as an agent provider in JetBrains IDEs (public preview). The June 22 update also adds organization-level agents, per-turn AI credit indicators, a `/models` slash command, and Cloud agent general availability.
+- [Google Developers Blog](https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/) Gemini CLI reached end-of-life on June 18 and is replaced by Antigravity CLI, a closed-source Go binary invoked via `agy`. Enterprise Gemini Code Assist license holders retain access indefinitely; all other users must migrate.
+
+## Security
+
+- [JFrog Security Research](https://research.jfrog.com/post/dissecting-and-exploiting-linux-lpe-variant-dirtyclone-cve-2026-43503/) DirtyClone (CVE-2026-43503, CVSS 8.8) is a Linux kernel local privilege escalation flaw affecting Debian, Ubuntu, and Fedora when unprivileged user namespaces are enabled. JFrog published a working exploit on June 25. The fix is in kernel v7.1-rc5; setting `kernel.unprivileged_userns_clone=0` mitigates unpatched systems. Kubernetes clusters and multi-tenant cloud environments are at highest risk.
