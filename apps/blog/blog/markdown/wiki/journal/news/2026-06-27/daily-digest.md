@@ -49,3 +49,23 @@ last_verified: 2026-06-27
 - [Developer Tech](https://www.developer-tech.com/news/cloudflares-agent-cloud-brings-openclaw-to-the-enterprise/) Cloudflare expanded Agent Cloud to bring OpenClaw-style agentic workflows to enterprise environments. The platform deploys multiple concurrent agent instances and manages their lifecycle through Cloudflare's edge infrastructure.
 
 - [Releasebot / Anthropic](https://releasebot.io/updates/anthropic/claude) Claude gains support for Apple's Foundation Models framework on iOS 27, iPadOS 27, macOS 27, and visionOS 27, available tomorrow per Anthropic's release notes.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [The Decoder](https://the-decoder.com/openais-gpt-5-6-rollout-now-requires-us-government-approval-on-a-customer-by-customer-basis/) OpenAI previewed GPT-5.6 Sol, Terra, and Luna but gated access behind US government approval on a customer-by-customer basis. The restriction was requested by the Office of the National Cyber Director and OSTP. Sam Altman told staff this is not OpenAI's preferred long-term model for releases.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-06-26/openai-weighs-ipo-in-2027-after-expected-anthropic-public-debut) OpenAI is weighing a 2027 IPO, expecting Anthropic to go public first — potentially as early as October. Both companies have already filed confidentially with the SEC.
+
+## AI Tooling
+
+- [GitHub Changelog](https://github.blog/changelog/2026-06-23-copilot-cli-new-terminal-interface-is-generally-available/) GitHub Copilot CLI's redesigned terminal interface is now generally available. The new layout adds tabs for Issues, Pull Requests, and Gists without leaving the terminal, and replaces manual config-file editing with guided in-session MCP server setup via `/mcp add`.
+
+- [GitHub Changelog](https://github.blog/changelog/2026-06-26-github-desktop-3-6-worktrees-and-deeper-copilot-integration/) GitHub Desktop 3.6 adds native worktrees support for parallel branch work across isolated sessions. Copilot commit message generation now reads `.github/copilot-instructions.md` and `AGENTS.md`, and can suggest merge conflict resolutions.
+
+## Security
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/security/mandiant-reveals-how-cisco-sd-wan-zero-day-attacks-gained-root-access/) Mandiant published the full attack chain behind CVE-2026-20245 in Cisco Catalyst SD-WAN. Attackers uploaded a malicious CSV file through the tenant-upload CLI feature to escalate to root, then created a persistent rogue account and erased forensic traces before discovery.
