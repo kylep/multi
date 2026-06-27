@@ -69,3 +69,23 @@ last_verified: 2026-06-27
 ## Security
 
 - [BleepingComputer](https://www.bleepingcomputer.com/news/security/mandiant-reveals-how-cisco-sd-wan-zero-day-attacks-gained-root-access/) Mandiant published the full attack chain behind CVE-2026-20245 in Cisco Catalyst SD-WAN. Attackers uploaded a malicious CSV file through the tenant-upload CLI feature to escalate to root, then created a persistent rogue account and erased forensic traces before discovery.
+
+---
+
+## Update — 20:30 UTC
+
+## AI Tooling
+
+- [Claude Code Docs](https://code.claude.com/docs/en/whats-new) Claude Code Week 26 (v2.1.185–v2.1.193) ships `claude mcp login` for authenticating MCP servers from the shell without using the interactive `/mcp` menu. Shell mode now explains command output without a second prompt, `/rewind` can resume a session from before `/clear` was run, and background subagents now surface permission prompts in the main session instead of auto-denying.
+
+## Open Source
+
+- [devFlokers](https://www.devflokers.com/blog/open-source-ai-roundup-june-2026) MiniMax released M3, an open-weight model with a 1-million-token context window, native multimodal computer use, and a 59% score on SWE-Bench Pro — outperforming GPT-5.5 and Gemini 3.1 Pro on that benchmark. It uses a sparse attention architecture and supports direct OS interface interaction.
+
+## Geopolitics
+
+- [Fox News](https://www.foxnews.com/live-news/iran-war-strait-of-hormuz-drones-bahrain-israel-lebanon-june-27-2026) Iran launched drone attacks targeting Bahrain on June 27; Bahrain's Foreign Ministry condemned the strike as a blatant violation of sovereignty. The incident escalates Strait of Hormuz tensions following Iran's attack on a commercial vessel June 25 and subsequent US retaliatory airstrikes.
+
+## Just for You
+
+- [Google Cloud](https://docs.cloud.google.com/kubernetes-engine/security-bulletins) GKE bulletin GCP-2026-037 patches five containerd vulnerabilities (CVE-2026-50195, -53488, -53492, -53489, -47262) in Container-Optimized OS node images across Kubernetes 1.30 through 1.36. Patched versions were released June 18–20; Ubuntu node images were still pending at time of publication.
