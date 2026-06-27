@@ -1,0 +1,51 @@
+---
+title: "Daily Digest: 2026-06-27"
+summary: "News digest covering AI, open source, security, geopolitics, and local news."
+keywords:
+  - daily-digest
+  - 2026-06-27
+related:
+  - wiki/journal
+scope: "Multi-topic news digest. No analysis or commentary."
+last_verified: 2026-06-27
+---
+
+## AI Industry
+
+- [9to5Mac / Semafor](https://9to5mac.com/2026/06/26/anthropic-cleared-to-release-claude-mythos-5-to-over-100-us-institutions/) Commerce Secretary Howard Lutnick authorized a partial lift of the June 12 export control directive blocking Claude Mythos 5. Anthropic is now cleared to release the model to more than 100 US companies and government agencies. Claude Fable 5 remains restricted with no timeline for general availability.
+
+- [NVIDIA Newsroom](https://nvidianews.nvidia.com/news/meta-builds-ai-infrastructure-with-nvidia) Meta and NVIDIA announced a multiyear, multigenerational infrastructure partnership. Meta will build hyperscale data centers using millions of NVIDIA Blackwell and Rubin GPUs alongside expanded NVIDIA CPU and Spectrum-X Ethernet deployments, covering both training and inference at scale.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news) Anthropic launched Claude Tag on Slack in beta — a multiplayer workspace where teams can @Claude in channels, delegate tasks, and connect tools, data, and codebases. The integration adds context memory, proactive updates, and async task handling for Enterprise and Team customers.
+
+- [Anthropic Support](https://support.claude.com/en/articles/12138966-release-notes) Claude adds admin permission grants to custom roles in Enterprise plans. Members can now be given access to billing or privacy settings without requiring Owner-level access.
+
+- [OpenClaw Changelog](https://releasebot.io/updates/openclaw) OpenClaw 2026.6.11 ships stronger channel control across Discord, Slack, Mattermost, Telegram, and WhatsApp. The update preserves richer progress and reasoning output in threads, handles structured send errors, supports Slack shortcuts, and records canonical sent threads more reliably.
+
+- [Space Daily](https://spacedaily.com/n-microsoft-is-canceling-claude-code-licenses-across-its-experiences-devices-division-by-june-30-steering-thousands-of-engineers-toward-github-copilot-while-uber-burned-through-its-entire-2026-ai-bu/) Microsoft is canceling Claude Code licenses for its Experiences and Devices division by June 30, directing engineers to transition to GitHub Copilot CLI. The move follows Uber burning through its full 2026 AI tools budget in four months due to Claude Code and Cursor adoption velocity.
+
+## Open Source
+
+- [GitHub](https://github.com/calesthio/OpenMontage) OpenMontage added 17,249 stars this week (24,296 total), making it the most active repo on GitHub trending for a second consecutive day. The project is an open-source agentic video production system built around AI coding assistants.
+
+- [GitHub](https://github.com/google-labs-code/design.md) google-labs-code/design.md entered the GitHub weekly trending top 8 with 4,618 new stars. The repo defines a DESIGN.md specification that gives coding agents a persistent, structured understanding of a project's design system.
+
+## Local
+
+- [Toronto Police Service](https://www.tps.ca/media-centre/news-releases/66269/) Pride Toronto Dyke March takes place today with a rally at 1 p.m. at Hayden and Church Streets, stepping off at 2 p.m. Full road closures in the Church Street corridor remain in effect until approximately 6 p.m.
+
+- [Town Brewery / Whitby](https://townbrewery.ca/blogs/events/whitby-music-fest-june-25-27) Whitby Music Fest closes tonight with Indie and Alternative Night at Celebration Square (405 Dundas St W). The Rural Alberta Advantage, Shad, Kiwi Jr., Casper Skulls, and Spirit headline the free outdoor main stage.
+
+## Weather
+
+- Whitby: 26°C high, 14°C low. Mainly sunny, humidex 29, UV index 8 (very high). Fog patches developing overnight. No alerts.
+
+## Just for You
+
+- [GitHub](https://github.com/paperclipinc/openclaw-operator) paperclipinc released an OpenClaw Kubernetes operator for deploying and managing OpenClaw AI agent instances on your own infrastructure. Provides network isolation, secret management, persistent storage, health monitoring, optional browser automation, and config rollouts.
+
+- [Developer Tech](https://www.developer-tech.com/news/cloudflares-agent-cloud-brings-openclaw-to-the-enterprise/) Cloudflare expanded Agent Cloud to bring OpenClaw-style agentic workflows to enterprise environments. The platform deploys multiple concurrent agent instances and manages their lifecycle through Cloudflare's edge infrastructure.
+
+- [Releasebot / Anthropic](https://releasebot.io/updates/anthropic/claude) Claude gains support for Apple's Foundation Models framework on iOS 27, iPadOS 27, macOS 27, and visionOS 27, available tomorrow per Anthropic's release notes.
