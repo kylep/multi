@@ -35,3 +35,19 @@ last_verified: 2026-06-28
 ## Weather
 
 - Whitby: 28°C high, 16°C low, sunny with morning fog patches clearing. Humidex 31, UV index 9. No alerts.
+
+---
+
+## Update — 16:04 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-corps) Anthropic launched Claude Corps, a national fellowship program committing $150 million to place 1,000 early-career fellows at US nonprofits for one-year paid positions. Fellows earn $85,000 and receive Claude API access; applications for the first cohort of 100 close July 17, with the program starting October 2026.
+
+## AI Tooling
+
+- [OpenClaw](https://github.com/openclaw/openclaw/releases/tag/v2026.6.10) OpenClaw 2026.6.10 stable shipped June 26, adding automatic fast mode for short conversational turns that reverts to normal mode for longer work, improved channel progress handling, tighter Zai model synthesis and Zhipu GLM failover, and stronger trusted tool policies.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/rollbacks-for-workflows/) Cloudflare Workflows now supports saga-pattern rollbacks: developers pass a `rollback` function alongside each `step.do()` call, and if a later step fails the engine executes compensating actions in reverse order automatically.
