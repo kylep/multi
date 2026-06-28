@@ -51,3 +51,15 @@ last_verified: 2026-06-28
 ## Just for You
 
 - [Cloudflare Blog](https://blog.cloudflare.com/rollbacks-for-workflows/) Cloudflare Workflows now supports saga-pattern rollbacks: developers pass a `rollback` function alongside each `step.do()` call, and if a later step fails the engine executes compensating actions in reverse order automatically.
+
+---
+
+## Update — 22:02 UTC
+
+## Security
+
+- [CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) Today is the federal patching deadline for two actively exploited CVEs: CVE-2026-12569, an improper access control flaw in Ubiquiti UniFi OS that lets a local-network attacker make unauthorized system changes without credentials, and CVE-2026-20230, an improper input validation bug in PTC Windchill and FlexPLM that allows an unauthenticated remote attacker to execute arbitrary code via a malicious network request.
+
+## Just for You
+
+- [Anthropic](https://www.anthropic.com/news) Anthropic is hosting "The Briefing: AI for Science" on June 30 at 10 a.m. PST, featuring Claude leadership and pharmaceutical partnership announcements. Nobel laureate John Jumper is expected to make his first public appearance alongside the company. The event covers biotech research infrastructure applications.
