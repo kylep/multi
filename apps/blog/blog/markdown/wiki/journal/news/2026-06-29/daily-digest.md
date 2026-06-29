@@ -25,3 +25,15 @@ last_verified: 2026-06-29
 ## Weather
 
 - Whitby: 29°C high, 19°C low, sunny becoming partly cloudy, humidex 32, UV index 9. 40% chance of showers overnight with risk of thunderstorm. Heat alert in effect through July 3.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [Fortune](https://fortune.com/2026/06/27/anthropic-mythos-5-ai-model-us-commerce-department-clearance-fable/) The US Commerce Department cleared roughly 200 companies — including Apple, Google, Cisco, NVIDIA, and Microsoft — to access Anthropic's Mythos 5 model after a two-week export control suspension. Fable 5, the consumer-facing model built on Mythos, remains restricted while Anthropic seeks broader deployment approval.
+
+## Security
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/critical-windows-netlogon-remote-code-execution-flaw-now-exploited-in-attacks/) CVE-2026-41089, a critical stack buffer overflow in Windows Netlogon (CVSS 9.8), is actively exploited in the wild. Unauthenticated attackers can achieve SYSTEM-level code execution on domain controllers with no credentials or user interaction required. Microsoft patched it in May 2026 Patch Tuesday; Belgium's Centre for Cybersecurity issued an urgent warning for immediate patching of all Windows Server versions.
