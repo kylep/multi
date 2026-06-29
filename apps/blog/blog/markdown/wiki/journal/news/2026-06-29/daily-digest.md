@@ -37,3 +37,15 @@ last_verified: 2026-06-29
 ## Security
 
 - [BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/critical-windows-netlogon-remote-code-execution-flaw-now-exploited-in-attacks/) CVE-2026-41089, a critical stack buffer overflow in Windows Netlogon (CVSS 9.8), is actively exploited in the wild. Unauthenticated attackers can achieve SYSTEM-level code execution on domain controllers with no credentials or user interaction required. Microsoft patched it in May 2026 Patch Tuesday; Belgium's Centre for Cybersecurity issued an urgent warning for immediate patching of all Windows Server versions.
+
+---
+
+## Update — 19:45 UTC
+
+## AI Tooling
+
+- [TechTimes](https://www.techtimes.com/articles/319201/20260627/openai-codex-remote-goes-live-all-plans-phone-control-now-secured-qr-relay.htm) OpenAI Codex Remote is now generally available on all ChatGPT plans. Users can start or continue work on a connected Mac or Windows host from their phone, with remote control secured by one-to-one QR pairing between each mobile device and each host machine.
+
+## Local
+
+- [Global News](https://globalnews.ca/news/11942036/toronto-pride-parade-mark-carney-attends-2026/) Prime Minister Mark Carney marched in Toronto's Pride Parade on June 28, his first as PM. Carney was doused by water-gun-wielding revellers on Yonge Street. Pride Toronto included a memorial for victims of the Pulse nightclub shooting, marking the 10th anniversary of that attack.
