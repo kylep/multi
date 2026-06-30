@@ -35,3 +35,21 @@ last_verified: 2026-06-30
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby: 34°C high, 24°C low, 40% chance of showers, possible thunderstorms overnight. Heat warning in effect — temperatures 31–36°C with little overnight relief. Heat advisory runs through July 3.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Tooling
+
+- [Anthropic](https://releasebot.io/updates/anthropic) Claude Code 2.1.196 shipped today with org-level default model configuration, readable session names, clickable file attachments (Cmd/Ctrl-click opens in Finder/Explorer), and a 37% CPU reduction during streaming. MCP server approval workflows received security hardening.
+
+- [Anthropic](https://releasebot.io/updates/anthropic) Fast mode was removed for Claude Opus 4.6 on June 29 — requests to that model now run at standard speed and standard billing rates. API rate limits were also consolidated on June 26: Claude Sonnet and Haiku now match Opus limits across three tiers (Start, Build, Scale).
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/new-dirtyclone-linux-kernel-flaw-lets.html) DirtyClone (CVE-2026-43503, CVSS 8.8) is a Linux kernel local privilege escalation flaw that lets any unprivileged local user gain root by exploiting a dropped safety flag during socket buffer packet cloning. JFrog published a working exploit walkthrough on June 25. The attack modifies only the in-memory page cache, not disk, so file-integrity monitoring reports binaries as clean even after compromise. Fix is kernel v7.1-rc5 or distribution backport; affected distros include Debian, Fedora, and Ubuntu 24.04 and earlier.
+
+## Just for You
+
+- [LocalStack Blog](https://blog.localstack.cloud/localstack-for-aws-release-2026-06-0/) LocalStack for AWS 2026.06.0 released with EKS support for Kubernetes 1.36, S3 replication emulation, Service Control Policy enforcement in the IAM policy engine, and first-time Aurora DSQL control plane support.
