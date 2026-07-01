@@ -27,3 +27,19 @@ last_verified: 2026-07-01
 ## Weather
 
 - Whitby: 34°C high, 24°C low, 40% chance of showers. Orange heat warning in effect — maximum temperatures 31–34°C with some areas potentially reaching 37°C. Heat warning continues through July 3.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-sonnet-5) Claude Sonnet 5 launched June 30 and became the default model for free and Pro plans today. It delivers agentic performance close to Opus 4.8 — planning, browser and terminal use, autonomous task execution — at the same price as Sonnet 4.6. Introductory pricing is $2/$10 per million tokens through August 31, rising to $3/$15 after.
+
+## Security
+
+- [BleepingComputer](https://www.bleepingcomputer.com/news/security/oracle-mitigates-peoplesoft-zero-day-exploited-in-data-theft-attacks/) Oracle issued emergency mitigations for CVE-2026-35273, a CVSS 9.8 unauthenticated RCE zero-day in PeopleSoft PeopleTools 8.61 and 8.62. ShinyHunters exploited the flaw against over 300 instances across 100+ organizations — 68% of them in higher education. A full patch is forthcoming; organizations should restrict access to vulnerable endpoints and monitor for webshells.
+
+## Geopolitics
+
+- [NPR](https://www.npr.org/2026/06/29/g-s1-130793/up-first-newsletter-iran-war-ceasefire-venezuela-earthquakes-ice-lance-schroyer) Iran's Revolutionary Guard launched drone and missile strikes on Bahrain and Kuwait despite the June 17 US-Iran memorandum of understanding, the most significant escalation since the ceasefire framework was signed. Ongoing negotiations for a lasting end to the conflict are now in jeopardy.
