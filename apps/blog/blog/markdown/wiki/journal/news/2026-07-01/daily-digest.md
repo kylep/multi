@@ -43,3 +43,25 @@ last_verified: 2026-07-01
 ## Geopolitics
 
 - [NPR](https://www.npr.org/2026/06/29/g-s1-130793/up-first-newsletter-iran-war-ceasefire-venezuela-earthquakes-ice-lance-schroyer) Iran's Revolutionary Guard launched drone and missile strikes on Bahrain and Kuwait despite the June 17 US-Iran memorandum of understanding, the most significant escalation since the ceasefire framework was signed. Ongoing negotiations for a lasting end to the conflict are now in jeopardy.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [Windows News AI](https://windowsnews.ai/article/meta-plans-ai-cloud-assault-with-gpu-rentals-and-model-hosting-challenging-microsoft-azure-and-aws.432981) Meta announced "Meta AI Infrastructure Services," an AI cloud business targeting late 2026 GA with a private beta in August. Offerings include bare-metal H100 GPU instances at $1.89/hour, LLaMA API endpoints at $0.49 per million tokens, and managed Kubernetes clusters pre-loaded with AI toolchains — pricing roughly half that of Azure and AWS equivalents.
+
+## AI Tooling
+
+- [AI Weekly](https://aiweekly.co/alerts/anthropic-redeploys-fable-5-with-cross-lab-jailbreak-rubric) Alongside the Fable 5 redeployment, Anthropic published a four-axis jailbreak severity rubric co-developed with Amazon, Microsoft, Google, and Glasswing partners. It scores findings on capability gain, breadth of impact, ease of weaponization, and independent discoverability, and commits Anthropic to immediate patch deployment for the highest-severity cases.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/critical-cursor-flaws-could-let-prompt.html) Two critical RCE flaws in Cursor IDE — CVE-2026-50548 and CVE-2026-50549, both CVSS 9.8 — were publicly disclosed today. Named DuneSlide by Cato AI Labs, the vulnerabilities allow zero-click prompt injection to escape the terminal sandbox via symlink bypass or working-directory path manipulation, reaching unsandboxed RCE without user interaction. All Cursor versions before 3.0 are affected; 3.0 (released April 2) contains the fix.
+
+- [The Hacker News](https://thehackernews.com/2026/07/latest-progress-kemp-loadmaster-pre.html) Active exploitation of CVE-2026-8037 — a pre-auth RCE in Progress Kemp LoadMaster rated CVSS 9.8 — began June 29 according to eSentire. The OS command injection flaw in the escape_quotes() function affects GA ≤7.2.63.1 and LTSF ≤7.2.54.17 when the API feature is enabled. Patches are available: GA 7.2.63.2 and LTSF 7.2.54.18.
+
+## Weather
+
+- Whitby: A severe thunderstorm warning is now in effect alongside the existing heat advisory, with wind gusts forecast up to 100 km/h and 20–40 mm of rain possible this evening. The orange heat warning (31–37°C) continues through July 3.
