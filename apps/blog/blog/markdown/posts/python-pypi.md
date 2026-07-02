@@ -36,8 +36,9 @@ At a high level, the steps to upload a package to PyPi are as follows:
 # Write the project code
 
 
-I'm not going to cover how to build a python project in this post, but here's
-the very small and simple project I used when learning this procedure:
+I'm not going to cover how to build a python project in this post, but the
+[Python Reference Page](/python-cheat-sheet.html) has common snippets if you
+need them. Here's the small project I used when learning this procedure:
 [GitHub: kylep/jsc2f](https://github.com/kylep/jsc2f).
 
 
