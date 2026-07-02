@@ -61,3 +61,19 @@ last_verified: 2026-07-02
 ## Local
 
 - [CBC News](https://www.cbc.ca/news/canada/toronto/toronto-two-weather-alerts-canada-day-9.7255415) FIFA World Cup 2026 brings Portugal versus Croatia to Toronto Stadium on July 2. The City cancelled all public match screenings at Nathan Phillips Square due to the ongoing orange heat warning, with temperatures reaching 34-37°C.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/07/02/anthropic-is-discussing-a-new-custom-chip-with-samsung/) Anthropic is in early discussions with Samsung about a custom AI chip, approximately one week after OpenAI announced its Jalapeño inference ASIC with Broadcom. No details have been confirmed on the chip's purpose, architecture, or timeline.
+
+- [Fortune](https://fortune.com/2026/07/02/anthropic-fable-and-mythos-are-restored-but-us-ai-policy-is-still-a-mess/) The U.S. government lifted export controls on Anthropic's Claude Fable 5 and Mythos 5 models, restoring global access roughly two weeks after controls were imposed. Anthropic is now partnering with Amazon, Microsoft, and Google on a government framework for assessing jailbreak risks in frontier models.
+
+- [Eastern Herald](https://easternherald.com/2026/07/02/meta-compute-cloud-business-excess-ai-capacity-coreweave-nebius-2026/) Meta launched Meta Compute, a cloud service offering GPU clusters and hosted Llama model instances to enterprise customers. Pricing is targeted at a minimum 20% discount versus comparable AWS and Azure GPU instances, putting Meta in direct competition with the major hyperscalers.
+
+## Just for You
+
+- [Cloudflare Blog](https://blog.cloudflare.com/content-independence-day-ai-options/) Cloudflare announced granular AI traffic controls for all customers, including free tier. Starting September 15, 2026, Training and Agent bots will be blocked by default on ad-serving pages for new domains; Search bots remain allowed. Enterprise customers gain access to BotBase, a searchable classified-bot database.
