@@ -35,3 +35,29 @@ last_verified: 2026-07-02
 ## Just for You
 
 - [GitHub](https://github.com/DeusData/codebase-memory-mcp) codebase-memory-mcp holds at #2 on GitHub trending with 9,697 weekly stars. It is a single-binary MCP server that indexes any codebase into a persistent knowledge graph across 158 languages with sub-millisecond query latency and no external dependencies.
+
+---
+
+## Update — 15:00 UTC
+
+## AI Industry
+
+- [Fortune](https://fortune.com/2026/07/02/sam-altman-new-world-order-ai-openai-google-anthropic/) ChatGPT's share of generative AI traffic fell below 50% for the first time in May. Anthropic has overtaken OpenAI in business subscriptions and projects $47B in annualized revenue versus OpenAI's $25-33B range.
+
+- [Fortune](https://fortune.com/2026/07/02/sam-altman-new-world-order-ai-openai-google-anthropic/) Sam Altman called for a U.S.-led international AI governance forum modeled on aviation safety standards and the IAEA, citing OpenAI's weakening competitive position as context for the proposal.
+
+## AI Tooling
+
+- [GitHub](https://releasebot.io/updates/github) GitHub Copilot added Claude Sonnet 5 as a generally available model on June 30 for Pro, Pro+, Max, Business, and Enterprise tiers across VS Code, JetBrains, and GitHub.com — all under Zero Data Retention. Claude Opus 4.8 fast mode also entered preview.
+
+- [TechCrunch](https://techcrunch.com/2026/07/01/gemini-spark-googles-agentic-assistant-is-now-available-on-mac/) Gemini Spark, Google's background AI agent, is now available in the Mac desktop Gemini app for Google AI Ultra subscribers in the U.S. It can track topics in real time and connect to Google Tasks and Google Keep.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/sharepoint-rce-cve-2026-45659-added-to.html) CISA added CVE-2026-45659 (CVSS 8.8) to its Known Exploited Vulnerabilities catalog after active exploitation in the wild. The SharePoint deserialization flaw affects Server 2016, 2019, and Subscription Edition; any user with Site Member permissions can exploit it remotely. Microsoft patched it in May; U.S. agencies must apply the fix by July 4. Threat actor Storm-2603 has previously used SharePoint flaws to deploy Warlock ransomware.
+
+- [The Hacker News](https://thehackernews.com/2026/07/unpatched-argo-cd-repo-server-flaw.html) An unpatched flaw in Argo CD's repo-server (no CVE assigned) lets unauthenticated attackers on the internal network execute arbitrary code by abusing the kustomize `--helm-command` option via a malicious Git repository. Exploitation can lead to full Kubernetes cluster takeover. No patched release exists; network policies isolating the repo-server port are the primary mitigation. Researchers reported the issue to maintainers in January 2025.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/toronto/toronto-two-weather-alerts-canada-day-9.7255415) FIFA World Cup 2026 brings Portugal versus Croatia to Toronto Stadium on July 2. The City cancelled all public match screenings at Nathan Phillips Square due to the ongoing orange heat warning, with temperatures reaching 34-37°C.
