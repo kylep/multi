@@ -239,6 +239,9 @@ conn.commit() # if it was a write action
 conn.close()
 ```
 
+For a complete example of reading and writing JSON data stored in a MariaDB
+column, see [Working with JSON SQL values in Python](/python-raw-sql-json.html).
+
 
 ---
 
