@@ -1,8 +1,6 @@
 ---
 title: "Applying Research to Claude Agents"
-summary: Research-backed guidance on getting coding agents to do
-  useful work, applied to rebuild a 7-agent roster from Anthropic's
-  published advice and three deep research reports.
+summary: "Research-backed Claude Code agent best practices: fix specification failures, teach delegation, route models by risk, and use deny-by-default permissions."
 slug: using-agents-better
 category: dev
 tags: Claude-Code, AI-Agents, MCP
