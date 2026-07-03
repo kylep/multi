@@ -18,7 +18,7 @@ keywords:
 ---
 
 
-**This post is linked to from the [Automated Emails Project](/project-email.html)**
+**This post is linked to from the [Automated Emails Project](/automated-emails.html)**
 
 # What is SPF?
 
