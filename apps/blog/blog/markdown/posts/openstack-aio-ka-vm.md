@@ -311,6 +311,9 @@ post-deploy step.
 source /etc/kolla/admin-openrc.sh
 ```
 
+If the `openstack` command fails with `No module named queue`, see
+[Fixing the OpenStack CLI python2 queue error](/openstack-fix-cli.html).
+
 
 ---
 
