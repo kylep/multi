@@ -112,3 +112,6 @@ Back in the Python terminal, you can then push the data back up.
 ```python
 update_from_file(filename='/home/kyle/sqldata.json')
 ```
+
+For more Python snippets and database patterns, see the
+[Python Reference Page](/python.html).
