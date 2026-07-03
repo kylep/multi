@@ -63,3 +63,27 @@ last_verified: 2026-07-03
 ## Just for You
 
 - [Cloudflare Blog](https://blog.cloudflare.com/content-independence-day-ai-options/) Cloudflare introduced granular AI bot controls for all customers, splitting crawlers into three categories: Search, Agent, and Training. Starting September 15, new defaults will block Training and Agent bots on ad-supported pages. A new enterprise feature called BotBase gives full visibility into tracked bot activity. Site owners can also tag content with usage levels — immediate, reference, or full — that apply across the Cloudflare network.
+
+---
+
+## Update — 21:15 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/claude-sonnet-5) Claude Sonnet 5 launched June 30 as Anthropic's most capable mid-tier model, with a 1M-token context window and 128k max output. It is now the default model for Free and Pro plans on claude.ai. Introductory API pricing is $2/$10 per million input/output tokens through August 31, rising to $3/$15 at standard rates.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-01/meta-is-building-a-cloud-business-to-sell-excess-ai-compute) Meta is building Meta Compute, a cloud GPU rental service that will sell excess AI compute and hosted Llama models to outside customers, competing directly with AWS, Azure, and Google Cloud. Meta stock rose 9% on the July 1 announcement.
+
+- [Axios](https://www.axios.com/2026/05/20/ai-trump-executive-order-white-house-infighting) The White House is in advanced talks with OpenAI, Google, and Anthropic on voluntary AI release standards, with a public announcement expected in early July. The underlying June 2 executive order asks labs to submit frontier models for US government testing up to 30 days before public release.
+
+## AI Tooling
+
+- [TechCrunch](https://techcrunch.com/2026/07/01/gemini-spark-googles-agentic-assistant-is-now-available-on-mac/) Gemini Spark, Google's desktop AI agent, launched in beta on macOS on July 1. It supports local file access, real-time topic tracking, and custom MCP server connections, putting it in direct competition with Claude Desktop and OpenClaw. Available only to US Google AI Ultra subscribers at $100/month.
+
+## Security
+
+- [Arctic Wolf](https://arcticwolf.com/resources/blog/cve-2026-48558-critical-authentication-bypass-vulnerability-in-simplehelp-rmm-exploited-for-credential-theft-and-malware-delivery/) CVE-2026-48558 (CVSS 10.0) is a critical authentication bypass in SimpleHelp RMM's OIDC implementation. Unauthenticated attackers can forge identity tokens to gain technician-level access and have been observed deploying the Djinn Stealer infostealer. CISA added it to the KEV catalog with a July 2 remediation deadline; upgrade to SimpleHelp 5.5.16 or 6.0 RC2.
+
+## Geopolitics
+
+- [Modern Diplomacy](https://moderndiplomacy.eu/2026/07/03/us-iran-war-losses-still-trail-the-1979-oil-shock-in-total-economic-impact/) The IEA released a record 400 million barrels from strategic reserves as the US-Iran conflict continues to disrupt Gulf crude output and roughly one-fifth of global LNG production from Qatar. Cumulative supply losses have surpassed 1 billion barrels.
