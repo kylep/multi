@@ -59,6 +59,7 @@ This project includes the following posts.
 | 2019-12-03  | [Operating OpenStack from Ansible](/openstack-ansible.html)                  |
 | 2020-01-25  | [OpenStack Cloud-Init Powershell Example](/openstack-cloudinit-powershell.html) |
 | 2019-12-17  | [Injecting KVM Drivers into Windows](/windows-kvm-drivers.html)              |
+| 2020-06-05  | [Create Windows KVM VM from Command Line](/windows-kvm-command-line.html)    |
 | 2020-10-21  | [Adding Virtio Drivers to RHEL's initrd for KVM](/rhel-virtio-initrd.html)   |
 
 ---
