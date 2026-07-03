@@ -160,3 +160,15 @@ for this static site instead I've used the built-in HTTPS feature of
 CloudFlare's free CDN solution.
 
 **[Using Cloudflare to provide HTTPS to an HTTP static site](/cloudflare-https.html)**
+
+
+---
+
+
+# What Came Next
+
+This describes the blog as first built in 2019: Pelican, GCP, and Cloud Build.
+The site has been redesigned a few times since. The current version is a
+Next.js app built with Tailwind v4, Storybook, and AI-native tooling:
+
+**[Blog Redesign 4 and an AI-First Design System](/add-blog-redesign.html)**
