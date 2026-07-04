@@ -65,3 +65,25 @@ last_verified: 2026-07-04
 ## Just for You
 
 - [AWS / DEV Community](https://dev.to/aws/aws-open-source-newsletter-218-3e3m) AWS Lambda now natively supports Avro and Protobuf formatted events from Amazon MSK (Apache Kafka), integrating directly with AWS Glue Schema Registry. Previously required custom deserialization code in each Lambda function.
+
+---
+
+## Update — 22:01 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-02/openai-proposes-giving-the-us-government-a-5-stake-ft-says) OpenAI is in early discussions about granting the US government a 5% equity stake worth roughly $42.6 billion, as part of a broader proposal where each leading US AI lab would contribute the same share to an Alaska-style public wealth fund. Sam Altman has raised the idea directly with Trump, Commerce Secretary Lutnick, and Treasury Secretary Bessent. No deal terms are finalized and congressional action may be required.
+
+- [Bloomberg / Windows News](https://windowsnews.ai/article/meta-compute-metas-ai-cloud-service-targets-azure-aws-with-july-2026-launch.433833) Meta is preparing to launch Meta Compute, a cloud service offering GPU instances and hosted Llama model APIs, targeting enterprise customers and competing directly with AWS, Azure, and Google Cloud. Bloomberg cited people familiar with internal plans; pricing is expected to undercut existing cloud GPU rates by 20–30%. Meta has not publicly confirmed the launch timeline.
+
+## AI Tooling
+
+- [Google AI / Vertex AI](https://ai.google.dev/gemini-api/docs/changelog) Gemini 3.5 Pro is rolling out to enterprise preview customers on Vertex AI and the Gemini developer platform after a delayed launch from its June target. The model targets advanced reasoning, multi-step coding, and long-horizon agent workflows.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/unpatched-argo-cd-repo-server-flaw.html) Synacktiv disclosed an unpatched RCE in Argo CD's repo-server component on July 1, 2026, eighteen months after first reporting it to maintainers. The repo-server's internal gRPC endpoint has no authentication; an attacker who reaches it can execute arbitrary commands, steal the Redis password, and poison Argo CD's deployment cache to take over the Kubernetes cluster on next sync. No CVE has been assigned and no patch is available. Mitigation: enable the Kubernetes NetworkPolicies provided by Argo CD — Helm chart deployments leave them off by default.
+
+## Local
+
+- [ESPN](https://www.espn.com/soccer/match/_/gameId/760502/morocco-canada) Canada lost 0–3 to Morocco in the FIFA World Cup Round of 16 in Houston. Ounahi scored twice and Rahimi added a third in the second half. Canada became the first co-host eliminated in the round of 16.
