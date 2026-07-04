@@ -43,3 +43,25 @@ last_verified: 2026-07-04
 ## Just for You
 
 - [GitHub](https://github.com/usestrix/strix) strix enters GitHub weekly trending at #4 (7,567 weekly stars, 35k total) — open-source AI penetration testing tool for finding and fixing application vulnerabilities. Displaces Agent-Reach from the top 8.
+
+---
+
+## Update — 14:00 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/06/30/anthropic-says-trump-admin-has-lifted-export-controls-on-claude-fable-5-and-mythos-5.html) The Trump administration lifted US export controls on Anthropic's Claude Fable 5 and Mythos 5 models. Anthropic restored global access on July 1 across Claude Platform, Claude.ai, Claude Code, and Claude Cowork. The 19-day shutdown followed a June 12 security directive; Anthropic agreed to proactively detect risks and report malicious activity to the Commerce Department.
+
+- [Anthropic](https://www.anthropic.com/news/claude-sonnet-5) Claude Sonnet 5 launched June 30 on Claude.ai, the API, Amazon Bedrock, and Microsoft Foundry. It is Anthropic's most capable Sonnet-series model for agentic tasks, performs near Opus 4.8 levels, and is now the default model on Free and Pro plans. Introductory API pricing is $2 per million input tokens and $10 per million output tokens through August 31.
+
+- [TechCrunch](https://techcrunch.com/2026/07/01/gemini-spark-googles-agentic-assistant-is-now-available-on-mac/) Google's Gemini Spark agentic assistant launched on macOS on July 1. It can read and act on local files, automate tasks on a schedule, and integrates with Canva, Dropbox, Google Tasks, and Google Keep. Currently in beta for Google AI Ultra subscribers ($99/month) in the US.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/sharepoint-rce-cve-2026-45659-added-to.html) CISA added CVE-2026-45659 (CVSS 8.8) to its Known Exploited Vulnerabilities catalog on July 1. The SharePoint Server RCE triggers via deserialization of untrusted data; any user with Site Member permissions can exploit it. Federal agencies faced a July 4 patch deadline. Microsoft patched it in May 2026 for Subscription Edition, 2019, and 2016.
+
+- [The Hacker News](https://thehackernews.com/2026/07/critical-cursor-flaws-could-let-prompt.html) Cato AI Labs disclosed two critical RCE vulnerabilities in Cursor IDE — CVE-2026-50548 and CVE-2026-50549 (both CVSS 9.8), collectively named DuneSlide. Both flaws allow prompt injection via MCP or web search results to escape Cursor's sandbox and execute arbitrary commands on the host. Patched in Cursor 3.0 (released April 2); all earlier versions are affected.
+
+## Just for You
+
+- [AWS / DEV Community](https://dev.to/aws/aws-open-source-newsletter-218-3e3m) AWS Lambda now natively supports Avro and Protobuf formatted events from Amazon MSK (Apache Kafka), integrating directly with AWS Glue Schema Registry. Previously required custom deserialization code in each Lambda function.
