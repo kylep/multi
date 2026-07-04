@@ -10,7 +10,7 @@ import yfinance
 def history_df_to_dict(df) -> dict:
     """Create a dict from daily history"""
     history = {}
-    for date, row in df.T.iteritems():
+    for date, row in df.T.items():
         history[str(date.date())] = dict(row)
     return history
 
