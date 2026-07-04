@@ -21,7 +21,7 @@ d_georadiation_displacement = {
 
 	potential = { always = no }
 	can_be_cleared = {
-		NOT = { has_planet_flag = toxifying_planet }
+		NOT = { has_carrier_flag = toxifying_planet }
 	}
 
 	planet_modifier = {

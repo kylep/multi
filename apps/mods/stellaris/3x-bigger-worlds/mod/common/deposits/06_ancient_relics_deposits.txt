@@ -11,14 +11,6 @@
 #   `upkeep = { ... }` blocks (net deposit output therefore skews
 #   3x-favorable on deposits with upkeep; see README).
 
-## Possible Deposit Variables ##
-# resources, resource and amount
-# potential trigger (planet scope)
-# blocked_modifier - applied to planet only when deposit blocker has been cleared
-# constant_modifier - applied to planet always
-# blocker = <key/any/none> - default any
-# station = station class in orbit to gather
-
 ###############################
 #	Ancient Relics Deposits	#
 ###############################
@@ -47,6 +39,7 @@ d_collapsed_spire = {
 	on_cleared = {
 		custom_tooltip = add_zone_central_spire_tt
 		hidden_effect = {
+			set_carrier_flag = central_spire_cleared
 			add_zone = {
 				district = 0
 				zone = zone_central_spire

@@ -11,20 +11,6 @@
 #   `upkeep = { ... }` blocks (net deposit output therefore skews
 #   3x-favorable on deposits with upkeep; see README).
 
-## Possible Deposit Variables ##
-# resources, resource and amount
-# potential trigger (planet scope)
-# blocked_modifier - applied to planet
-# constant_modifier - applied to planet always
-# station = station class in orbit to gather
-# blocker_swap_types = {}
-# all_blocker_swap_types = yes/no
-# use_weights_for_blocker_swap_types = yes/no
-# terraforming_swap_types = { }
-# should_swap_deposit_on_terraforming = yes/no
-# all_terraforming_swap_types = yes/no
-# use_weights_for_terraforming_swap_types = yes/no
-
 ###############
 #### ENERGY ###
 ###############
