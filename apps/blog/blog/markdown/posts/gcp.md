@@ -47,3 +47,5 @@ as time goes on.
 | 2019-08-05  | [Google Container Registry: Basics](/google-container-registry.html) |
 |             | **Cloud Storage**                                          |
 | 2019-08-09  | [Hosting websites on Cloud Storage](/google-cloud-storage-website.html) |
+|             | **Firebase**                                               |
+| 2020-01-11  | [Firebase Basics: Hello World](/firebase-basics.html)      |
