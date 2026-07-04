@@ -57,6 +57,4 @@ token.json
 **/.playwright-mcp/
 **/test-results/
 
-# Xcode project Claude config
-apps/games/sillyapp/sillyapp.xcodeproj/.claude/
 infra/ai-agents/pai-responder/.venv/
