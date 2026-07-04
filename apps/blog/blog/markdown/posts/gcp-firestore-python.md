@@ -307,3 +307,8 @@ being pointed at a new iterator. The old iterator gets gc'd by Python as usual.
 ```
 
 It will work as expected.
+
+---
+
+**See also:** [Python Reference Page](/python.html) for common Python snippets:
+list comprehensions, Jinja2 templating, MySQL queries, and more.
