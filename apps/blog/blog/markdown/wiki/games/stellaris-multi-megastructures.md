@@ -28,7 +28,7 @@ Two pieces:
 
 ## Links
 
-- Repo: `apps/mods/stellaris/multi-megastructures/`
+- Repo: `~/gh/multi-sandbox/mods/stellaris/multi-megastructures/`
 - Steam Workshop: *(not yet uploaded)*
 
 ## Build
@@ -36,7 +36,7 @@ Two pieces:
 Generates the megastructure overrides from your local Stellaris install:
 
 ```bash
-python3 apps/mods/stellaris/multi-megastructures/scripts/build.py
+python3 ~/gh/multi-sandbox/mods/stellaris/multi-megastructures/scripts/build.py
 ```
 
 Reads from `~/Library/Application Support/Steam/steamapps/common/Stellaris/common/megastructures/`. Edit `VANILLA_DIR` in the script if your install is elsewhere.
@@ -44,15 +44,15 @@ Reads from `~/Library/Application Support/Steam/steamapps/common/Stellaris/commo
 ## Pre-game verification
 
 ```bash
-python3 apps/mods/stellaris/multi-megastructures/scripts/preflight.py
+python3 ~/gh/multi-sandbox/mods/stellaris/multi-megastructures/scripts/preflight.py
 ```
 
-Twelve automated checks against the locally installed vanilla files: brace balance, leaked limit-flag reads, vanilla key drift, tech-ID and on_action existence, event-ref resolution, localisation BOM, descriptor sanity, deploy symlink integrity, Workshop thumbnail validity, and read/write sentinel isolation (catches the same-flag-for-read-and-write bug class). No dotnet / CWTools required. Full test plan in `apps/mods/stellaris/multi-megastructures/TESTING.md`.
+Twelve automated checks against the locally installed vanilla files: brace balance, leaked limit-flag reads, vanilla key drift, tech-ID and on_action existence, event-ref resolution, localisation BOM, descriptor sanity, deploy symlink integrity, Workshop thumbnail validity, and read/write sentinel isolation (catches the same-flag-for-read-and-write bug class). No dotnet / CWTools required. Full test plan in `~/gh/multi-sandbox/mods/stellaris/multi-megastructures/TESTING.md`.
 
 ## Deploy
 
 ```bash
-apps/mods/stellaris/multi-megastructures/scripts/deploy.sh
+~/gh/multi-sandbox/mods/stellaris/multi-megastructures/scripts/deploy.sh
 ```
 
 Creates a symlink `~/Documents/Paradox Interactive/Stellaris/mod/multi-megastructures` → repo's `mod/` folder, plus the outer `multi-megastructures.mod` launcher descriptor with an absolute `path=` line. Idempotent. Because the deployed copy is a symlink, re-running `build.py` is picked up by the launcher with no re-deploy.

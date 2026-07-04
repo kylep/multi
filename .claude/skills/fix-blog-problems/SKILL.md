@@ -92,6 +92,21 @@ If you need to verify production builds, kill dev first.
 
 Fix: standard recipe.
 
+### Symptom: nearly ALL Playwright tests fail (even homepage), only a11y tests pass
+
+Cause: another dev server is squatting on port 3000 (e.g. kytrade's
+CRA `npm start`, which survives a plain `kill` of the npm wrapper).
+`playwright.config.ts` has `reuseExistingServer: true`, so the whole
+suite runs against the wrong app. The standard recipe does NOT fix
+this — `.next` was never the problem.
+
+Verify: `curl -s http://localhost:3000/ | head -c 300` — if you see
+create-react-app boilerplate (or anything that isn't the blog), it's
+this.
+
+Fix: `lsof -ti :3000 | xargs kill`, confirm `lsof -ti :3000` is empty,
+re-run the suite.
+
 ### Symptom: Playwright MCP fails with "Browser is already in use"
 
 Cause: a previous Chrome for Testing instance crashed without releasing

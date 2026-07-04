@@ -49,13 +49,13 @@ When Stellaris patches, re-run `scripts/build.py` and `scripts/preflight.py`. Th
 
 ## Links
 
-- Repo: `apps/mods/stellaris/3x-bigger-worlds/`
+- Repo: `~/gh/multi-sandbox/mods/stellaris/3x-bigger-worlds/`
 - Steam Workshop: *(not yet uploaded)*
 
 ## Build
 
 ```bash
-python3 apps/mods/stellaris/3x-bigger-worlds/scripts/build.py
+python3 ~/gh/multi-sandbox/mods/stellaris/3x-bigger-worlds/scripts/build.py
 ```
 
 Reads from `~/Library/Application Support/Steam/steamapps/common/Stellaris/common/`. The multiplier is a single constant at the top of `build.py` (`MULTIPLIER = 3`); change it for a 2x or 5x variant and re-run.
@@ -63,15 +63,15 @@ Reads from `~/Library/Application Support/Steam/steamapps/common/Stellaris/commo
 ## Pre-game verification
 
 ```bash
-python3 apps/mods/stellaris/3x-bigger-worlds/scripts/preflight.py
+python3 ~/gh/multi-sandbox/mods/stellaris/3x-bigger-worlds/scripts/preflight.py
 ```
 
-Nine automated checks against the local vanilla install: brace balance, vanilla key coverage per deposit file, scripted-variables completeness at the expected multiplier, **exact-multiplier verification of every generated district modifier and produces value**, negative-value preservation, localisation BOM, descriptor sanity, deploy symlink integrity, and Workshop thumbnail validity (real PNG bytes, 512×512, no alpha, <1 MB — the same failure class that broke the first Multi-Megastructures Workshop upload). Full test plan in `apps/mods/stellaris/3x-bigger-worlds/TESTING.md`.
+Nine automated checks against the local vanilla install: brace balance, vanilla key coverage per deposit file, scripted-variables completeness at the expected multiplier, **exact-multiplier verification of every generated district modifier and produces value**, negative-value preservation, localisation BOM, descriptor sanity, deploy symlink integrity, and Workshop thumbnail validity (real PNG bytes, 512×512, no alpha, <1 MB — the same failure class that broke the first Multi-Megastructures Workshop upload). Full test plan in `~/gh/multi-sandbox/mods/stellaris/3x-bigger-worlds/TESTING.md`.
 
 ## Deploy
 
 ```bash
-apps/mods/stellaris/3x-bigger-worlds/scripts/deploy.sh
+~/gh/multi-sandbox/mods/stellaris/3x-bigger-worlds/scripts/deploy.sh
 ```
 
 Creates a symlink `~/Documents/Paradox Interactive/Stellaris/mod/3x-bigger-worlds` → repo's `mod/` folder, plus the outer `3x-bigger-worlds.mod` launcher descriptor with an absolute `path=` line. Idempotent. Because the deployed copy is a symlink, re-running `build.py` is picked up by the launcher with no re-deploy.

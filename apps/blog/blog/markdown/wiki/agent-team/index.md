@@ -1,6 +1,6 @@
 ---
 title: "Agent Team"
-summary: "AI agent team with 12 roles defined in .claude/agents/."
+summary: "AI agent team with 16 active roles (plus one deprecated) defined in .claude/agents/."
 keywords:
   - agent-team
   - ai-agents
@@ -19,10 +19,11 @@ keywords:
 related:
   - wiki/history
 scope: "Source of truth for the agent team: roles, models, tools, coordination, and invocation."
-last_verified: 2026-05-10
+last_verified: 2026-07-04
 ---
 
-Twelve Claude Code agents defined in `.claude/agents/`.
+Seventeen Claude Code agent definitions in `.claude/agents/` — sixteen
+active plus the deprecated healthcheck.
 
 ## Roles
 
@@ -35,7 +36,12 @@ Twelve Claude Code agents defined in `.claude/agents/`.
 | [Synthesizer](/wiki/agent-team/synthesizer.html) | Opus | Read, Edit, Glob, Grep, Agent | Compare and contrast Deep Research reports |
 | [PRD Writer](/wiki/agent-team/prd-writer.html) | Opus | Read, Write, Edit, Glob, Grep, WebSearch, WebFetch, Agent | Interview, research, write PRDs |
 | [Design Doc Writer](/wiki/agent-team/design-doc-writer.html) | Opus | Read, Write, Edit, Glob, Grep, WebSearch, WebFetch, Agent | Interview, architect, write design docs from PRDs |
-| [Journalist](/wiki/agent-team/journalist.html) | Haiku | Read, Write, Bash, Glob, Grep, WebFetch, WebSearch | Daily AI news digests to wiki journal |
+| [Journalist](/wiki/agent-team/journalist.html) | Sonnet | Read, Write, Glob, Grep, WebFetch, WebSearch, google-news, discord | Daily AI news digests to wiki journal |
+| Autolearn | Opus | Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch, Agent | Linear-driven SDLC loop: writes PRDs, design docs, implements issues |
+| Seo-Bot | Sonnet | Read, Write, Edit, Bash, gsc, analytics, linear, discord | Nightly SEO optimizer: GSC/GA4 data → one improvement → PR |
+| Interviewee | Sonnet | Read, Glob, Grep | Answers PRD/design-doc interview questions from repo context |
+| Pai Recaller | Sonnet | pai-memory | Pre-reply active memory recall for Pai (subagent) |
+| Healthcheck (deprecated) | Sonnet | Bash, Read, openobserve, linear | Superseded by Pai Self-Improver; kept for ad-hoc runs |
 | [Researcher](/wiki/agent-team/researcher.html) | Sonnet | Read, Glob, Grep, WebFetch, WebSearch | Gather sourced facts, return research brief |
 | [Reviewer](/wiki/agent-team/reviewer.html) | Opus | Read, Glob, Grep | Check style, substance, frontmatter, sourcing |
 | [QA](/wiki/agent-team/qa.html) | Sonnet | Bash, Read, Glob, Grep, Playwright MCP | Build, render, and link verification |
@@ -43,9 +49,11 @@ Twelve Claude Code agents defined in `.claude/agents/`.
 
 ## Top-level vs subagent
 
-Pai, Publisher, Analyst, Synthesizer, Journalist, PRD Writer, and Design Doc Writer
-are invoked directly. Researcher, Reviewer, QA, and Security Auditor are
-subagents called by Publisher during its pipeline.
+Pai, Publisher, Analyst, Synthesizer, Journalist, PRD Writer, Design Doc
+Writer, Autolearn, Seo-Bot, and Pai Self-Improver are invoked directly
+(interactively or by CronJob). Researcher, Reviewer, QA, and Security
+Auditor are subagents called by Publisher during its pipeline;
+Interviewee serves the PRD/design-doc writers; Pai Recaller serves Pai.
 
 ## Invocation
 

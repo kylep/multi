@@ -12,79 +12,58 @@ related:
   - wiki/devops/bootstrap
   - wiki/custom-tools
 scope: "Single-page summary of the current system. Not a tutorial or runbook — those live in DevOps wiki pages. Updated when the stack changes."
-last_verified: 2026-04-01
+last_verified: 2026-07-04
 ---
+
+## Repo split (2026-07-04)
+
+- **kylep/multi** — production: only maintained projects (blog, kytrade,
+  robot-battle, xmasblocks, mcp-servers, pai docs/tf, live infra).
+  Branch protection, PRs to main, zero-vuln dependency policy.
+- **kylep/multi-sandbox** (private) — experiments and archived projects
+  (llm-client, Stellaris mods, retired games, aws/mac-setup/openclaw
+  infra, attic). Nothing there is maintained; commits go straight to main.
 
 ## Languages and runtimes
 
-- **Go**: Agent controller (deprecated, not deployed), planned for future orchestration
-- **TypeScript / JavaScript**: Blog (Next.js 14 static export), blog tooling
-- **Python**: Wiki-RAG tool, utility scripts (always use `apps/blog/.venv/bin/python`)
-- **Bash**: Glue scripts, CronJob entrypoints, bootstrap automation
-- **Swift**: iOS app (sillyapp, inactive)
-- **Java**: Minecraft mods (inactive)
+- **TypeScript / JavaScript**: Blog (Next.js 15 static export), robot-battle (Vite), MCP servers
+- **Python**: kytrade api (Poetry/Flask 3), xmasblocks, wiki-RAG and utility scripts (always use `apps/blog/.venv/bin/python`)
+- **Go**: agent-controller (in-repo, not deployed)
+- **Bash**: Glue scripts, CronJob entrypoints
 
-## Kubernetes
+## Kubernetes (verified 2026-07-04 on the laptop cluster)
 
-- **Distribution**: K3s via Rancher Desktop on 2 Mac machines
-- **Clusters**: pai-m1 (always-on server), kyle-m2 (gaming laptop, sometimes off)
-- **Namespace**: `ai-agents` for all agent workloads
-- **Security**: Pod Security Standards enforced, NetworkPolicy in place, ResourceQuota set
-- **Sandbox isolation**: gVisor planned but not yet deployed
-
-## GitOps and deployment
-
-- **ArgoCD**: Runs on pai-m1, watches `main` branch, auto-syncs both clusters
-- **ApplicationSets**: Cluster generator creates one Application per cluster per release
-- **Helm releases**: vault, cronjobs, pai-responder
-- **Helmfile**: Used for bootstrap and ArgoCD fallback, not primary deploy method
-- **CI/CD**: Minimal — only auto-merge-wiki GitHub Actions workflow. No image build pipeline.
-- **Production deploys**: Manual, Kyle only. Never automated.
-- **Docker images**: Built and pushed manually. Runtime image: `kpericak/ai-agent-runtime`
+- **Distribution**: K3s via Rancher Desktop on the Mac laptop; context `rancher-desktop`
+- **Deployed**: Vault (`vault` namespace, agent-injector + statefulset), `ai-agents` namespace with two CronJobs — journalist and pai-morning — both currently **suspended**
+- **Not present on this cluster**: ArgoCD, OpenObserve, pai-responder, Traefik ingress
+- **pai-m1 (M1 server)**: not reachable from this machine; its state (ArgoCD, OpenObserve, pai-responder described in older wiki pages) is unverified as of 2026-07-04 — treat those pages as historical until re-verified
 
 ## Secrets
 
-- **Vault**: HashiCorp Vault with GCP KMS auto-unseal
-- **Delivery**: Vault Agent Injector writes secrets to in-memory tmpfs at `/vault/secrets/`
-- **No plain-text K8s Secrets** — everything goes through Vault
+- **Vault**: HashiCorp Vault with GCP KMS auto-unseal, Vault Agent Injector → tmpfs `/vault/secrets/`
+- **No plain-text K8s Secrets**
 - **Secret paths**: `secret/ai-agents/{discord,github,anthropic,pai,openrouter}`
-
-## Observability
-
-- **Logs**: OpenObserve deployed on pai-m1 (standalone, 10Gi PVC). Log ingestion incomplete (DaemonSet not yet deployed).
-- **Agent activity**: Discord #log channel — agents post tool call summaries via PostToolUse hook
-- **Health checks**: Healthcheck agent CronJob queries pod status and OpenObserve
-- **Metrics**: No Prometheus or Grafana. No application-level metrics instrumentation.
-- **Alerting**: Not configured.
+- **Repo secrets**: `secrets/` is gitignored except `.SAMPLE` templates
 
 ## Agent runtime
 
-- **Image**: `kpericak/ai-agent-runtime` (Playwright base, Claude Code CLI, Python, Git, kubectl)
+- **Image**: `kpericak/ai-agent-runtime` (Playwright base, Claude Code CLI, Python, Git, kubectl), built from `infra/ai-agents/ai-agent-runtime/`
 - **Execution model**: CronJob pods — Vault init → optional GitHub token init → agent container → push
-- **Scheduled agents**: journalist (daily 8am ET), pai-morning (daily 8:30am ET)
-- **Long-running**: pai-responder (Discord polling Deployment, pai-m1 only)
-- **Agent definitions**: `.claude/agents/*.md` (12 agents: publisher, analyst, researcher, reviewer, qa, security-auditor, synthesizer, prd-writer, design-doc-writer, pai, journalist, healthcheck)
+- **Agent definitions**: `.claude/agents/*.md` — analyst, autolearn, design-doc-writer, healthcheck (deprecated), interviewee, journalist, pai, pai-recaller, pai-self-improver, prd-writer, publisher, qa, researcher, reviewer, security-auditor, seo-bot, synthesizer
 
 ## Blog platform
 
-- **Framework**: Next.js 14, static HTML export
-- **Hosting**: Google Cloud Storage, served via GCS website
-- **Content**: Markdown posts in `apps/blog/blog/markdown/posts/`
-- **Wiki**: Markdown in `apps/blog/blog/markdown/wiki/` (119 pages, 15 sections)
+- **Framework**: Next.js 15, static HTML export; Terminal design system (Tailwind v4) in progress on PER-135
+- **Hosting**: Google Cloud Storage static site
+- **Content**: `apps/blog/blog/markdown/posts/`; wiki at `apps/blog/blog/markdown/wiki/`
 - **Internal links**: Must end in `.html`
-- **Dev server**: `npm run dev` on port 3000
-
-## Networking
-
-- **Ingress**: Cloudflare Tunnel → Traefik → K8s services
-- **Domains**: kyle.pericak.com (blog), pai.pericak.com (internal services)
-- **Cloudflare Access**: Protects internal services (OpenObserve, ArgoCD)
+- **Dev server**: `npm run dev` on port 3000; tests: `npx playwright test` from `apps/blog/blog/`
 
 ## Conventions
 
-- **Git**: Branch protection on `main`, all changes through PRs, assign to kylep
+- **Git**: Branch protection on `main`, all changes through PRs, assign to kylep, one PR per effort
 - **Branch naming**: `kyle/<linear-id>-short-description` or `kyle/descriptive-name`
 - **Testing**: Test before merging (kubectl apply, helm template, docker build, agent runs). No merge-to-test.
-- **Security scanning**: semgrep, trivy, gitleaks via `kpericak/ai-security-toolkit-1` Docker image
+- **Security scanning**: semgrep, trivy, gitleaks via `kpericak/ai-security-toolkit-1` image; zero-vuln policy on active projects (achieved 2026-07-04, PR #507)
 - **Pre-commit**: gitleaks hook for secret detection
-- **Monorepo**: Each directory in `apps/` and `games/` is independent. No cross-project imports.
+- **Monorepo**: Each directory in `apps/` is independent. No cross-project imports.

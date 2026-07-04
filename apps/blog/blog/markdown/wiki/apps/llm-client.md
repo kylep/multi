@@ -24,7 +24,10 @@ endpoint — [llama-server](https://github.com/ggerganov/llama.cpp/tree/master/t
 [OpenRouter](https://openrouter.ai), etc. Chats and settings live in
 `localStorage`; there is no server-side storage.
 
-Source: `apps/llm-client/`.
+Source: `llm-client/` in
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox)
+(demoted from multi on 2026-07-04; unmaintained, but the deployed
+copy stays live).
 
 ## Tech stack
 
