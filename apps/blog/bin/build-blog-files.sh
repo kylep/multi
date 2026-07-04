@@ -80,7 +80,9 @@ fi
 if [ -n "$sb_deployed_hash" ] && [ "$sb_deployed_hash" = "$sb_hash" ]; then
   echo "Storybook inputs unchanged; restoring deployed copy."
   mkdir -p out/storybook
-  if ! gsutil -m rsync -r "$SB_BUCKET" out/storybook; then
+  # Single-process (no -m): gsutil multiprocessing crashes Python on macOS
+  # (bugs.python.org/issue33725). Still multithreaded; fine for ~80 small files.
+  if ! gsutil -o "GSUtil:parallel_process_count=1" rsync -r "$SB_BUCKET" out/storybook; then
     echo "Restore failed; rebuilding Storybook."
     rebuild_storybook || { echo "Storybook build failed"; exit 1; }
   fi
