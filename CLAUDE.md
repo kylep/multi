@@ -1,77 +1,19 @@
 
 
-<!-- Agent definitions in .claude/agents/*.md -->
-
-# Testing without merging
-
-Do not rely on merge-and-deploy to verify changes. Merging requires
-human approval and is the slowest feedback loop available. Instead:
-
-- **K8s manifests**: `kubectl apply -f` directly, test, then revert
-  with `kubectl apply` of the original. Only open the PR after
-  confirming the fix works.
-- **Helm charts**: `helm template` to verify rendering, then
-  `kubectl apply` the rendered output to test in-cluster.
-- **Docker images**: build and push the image first, update the
-  running deployment directly, verify, then commit the Dockerfile
-  and tag change.
-- **Agent prompts**: run the agent locally with `claude --agent X`
-  to test the new prompt before committing.
-
-The only time merge-to-test is acceptable is when you are
-specifically testing merge automation itself (CI triggers,
-ArgoCD sync behavior, GitHub Actions).
-
-# Verify your work
-
-Never present work to the user without verifying it first. If you edit
-a config file, run it. If you write code, build/test it. If you change
-a playbook, run it. The user should not have to ask "did you test this?"
-— verification is your responsibility before reporting completion.
-
-# Investigate before asking
-
-Always do what you can on your own before asking the user for input.
-Read logs, exec probes into running pods, query the cluster, search
-the codebase, run tests. Form a hypothesis from evidence, not from a
-guess you ask the user to confirm.
-
-If you genuinely need user help (credentials, an irreversible action,
-or you've exhausted the cheap diagnostic moves), lead with what you
-already tried and ruled out. "Pai didn't reply — could be A, B, or C,
-which is it?" is not acceptable when you could have checked the logs
-yourself in five seconds.
-
-# Bash rules
-
-Never use `sleep` commands longer than 30 seconds. If you need to wait
-for something, use `run_in_background` and check later, or poll with
-short intervals. Long sleeps block the conversation and waste time.
-
-When running background tasks (`run_in_background`), **poll task output
-every 15 seconds** using `TaskOutput` with `block: false` and
-`timeout: 15000`. Never block indefinitely on a background task — if
-it hasn't produced output after 15–30 seconds, check status and report
-progress to the user. Tasks that require interactive input (like
-`gh auth login`) will hang forever; detect this early by polling and
-kill the process if stuck.
+<!-- Source: .ruler/agents.md -->
 
 # Agent Team
 
-This repo has 11 Claude Code agents defined in `.claude/agents/`.
+This repo has 7 Claude Code agents defined in `.claude/agents/`.
 Use them instead of doing everything yourself.
 
 ## When to use which agent
 
 | Agent | When to use | Invocation |
 |-------|------------|------------|
-| Pai | Discord communication, wiki coordination, delegating to agents | `claude --agent pai` |
 | Publisher | Writing or editing blog posts (full pipeline) | `claude --agent publisher` |
 | Analyst | Ingesting external research, proposing system improvements | `claude --agent analyst` |
 | Synthesizer | Comparing/contrasting multiple Deep Research reports | `claude --agent synthesizer` |
-| PRD Writer | Scoping a product idea into a well-defined PRD | `claude --agent prd-writer` |
-| Design Doc Writer | Taking an approved PRD and producing a technical design doc | `claude --agent design-doc-writer` |
-| Interviewee | Answering interview questions from repo context (auto-interview mode) | Subagent (auto-delegated) |
 | Researcher | Gathering sourced facts for blog posts or validating claims | Subagent (auto-delegated) |
 | Reviewer | Checking style, substance, frontmatter, sourcing | Subagent (auto-delegated) |
 | QA | Verifying a blog post is production-ready | Subagent (auto-delegated) |
@@ -84,8 +26,8 @@ field with trigger phrases that tell you when to invoke it. When a task
 matches an agent's description, delegate to it as a subagent rather than
 doing the work yourself.
 
-Pai, Publisher, Analyst, Synthesizer, PRD Writer, and Design Doc Writer are top-level agents
-(run via `claude --agent <name>`). Interviewee, Researcher, Reviewer, QA, and Security Auditor
+Publisher, Analyst, and Synthesizer are top-level agents (run via
+`claude --agent <name>`). Researcher, Reviewer, QA, and Security Auditor
 are subagents that Publisher calls during its pipeline.
 
 
@@ -153,14 +95,8 @@ No review needed for markdown-only blog post changes.
 
 ## Branching
 
-Branch protection is enabled on `main`. All changes must go through pull requests.
-Never commit directly to `main`.
-
-When creating PRs, always assign them to `kylep`:
-
-```bash
-gh pr create --base main --assignee kylep
-```
+Never commit directly to `main`. Always create a new branch and open a PR against
+`main` for review instead.
 
 ## One PR per effort
 
@@ -199,6 +135,29 @@ gh pr create --base main
 
 
 
+<!-- Source: .ruler/design-system.md -->
+
+# Blog design system (apps/blog/blog/design-system/)
+
+The blog uses a token-driven **Terminal** design system (PER-135). When
+working on blog UI:
+
+- All visual values come from `apps/blog/blog/design-system/tokens.css`
+  (Tailwind v4 `@theme`). **Never write raw hex or raw px** (except 0/1px)
+  in component code — use token utilities (`bg-canvas`, `text-default`,
+  `text-accent`, `border-border`, …).
+- New design-system components are **TypeScript** (`.tsx`) under
+  `components/ui` (shadcn-owned, Radix + cva) and `components/primitives`.
+  Legacy pages stay `.js` until migrated.
+- Tailwind **preflight is omitted** during MUI coexistence; reset native
+  elements per-component.
+- Document/iterate components in Storybook (`npm run storybook`); it uses
+  `@storybook/nextjs` (webpack), not vite.
+- Verify any change with `apps/blog/bin/verify-design-system.sh` (exits 0).
+- Full guide: `apps/blog/blog/design-system/README.md`.
+
+
+
 <!-- Source: .ruler/monorepo.md -->
 
 # Monorepo rules
@@ -229,7 +188,7 @@ docker run --rm -v "$(pwd):/workspace:ro" \
 ```bash
 docker run --rm -v "$(pwd):/workspace:ro" \
   kpericak/ai-security-toolkit-1:0.2 \
-  -c "trivy fs --scanners vuln,secret,misconfig --skip-dirs samples,apps/kytrade,infra/aws,infra/local-k8s /workspace"
+  -c "trivy fs --scanners vuln,secret,misconfig --skip-dirs .claude,infra/local-k8s /workspace"
 ```
 
 ## Container image scanning (trivy)
