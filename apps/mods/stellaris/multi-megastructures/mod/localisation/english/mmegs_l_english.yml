@@ -1,5 +1,0 @@
-﻿l_english:
- mmegs_mod_name: "Multi-Megastructures + Free Tech"
- mmegs_mod_desc: "Lifts the one-per-empire and one-per-system megastructure caps, grants every empire (player and AI) every megastructure technology at game start, and adds a repeatable society technology that raises the simultaneous megastructure construction limit."
- tech_mmegs_megastructure_capacity:0 "Megastructure Construction Capacity"
- tech_mmegs_megastructure_capacity_desc:0 "Advances in gigastructural project management let your empire keep one additional megastructure under construction at the same time. Each level raises the simultaneous megastructure build limit by one."
