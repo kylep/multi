@@ -14,9 +14,11 @@ last_verified: 2026-07-04
 
 ## Game mods
 
-Published mods stay live on Steam Workshop; mod source moved to
-[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox) on 2026-07-04.
+Maintained mods, published on Steam Workshop (source: `apps/mods/`):
 
 - [Stellaris: 3x Bigger Worlds](/wiki/games/stellaris-3x-bigger-worlds.html) — Stellaris mod.
 - [Stellaris: Multi-Megastructures + Free Tech](/wiki/games/stellaris-multi-megastructures.html) — Stellaris mod.
 - [HOI4: Canada Overpowered](/wiki/games/hoi4-canada-overpowered.html) — Hearts of Iron 4 mod.
+
+An old Minecraft mod moved to
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox) (unmaintained).

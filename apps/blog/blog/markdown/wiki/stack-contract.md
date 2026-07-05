@@ -18,16 +18,17 @@ last_verified: 2026-07-04
 ## Repo split (2026-07-04)
 
 - **kylep/multi** — production: only maintained projects (blog, kytrade,
-  robot-battle, xmasblocks, mcp-servers, pai docs/tf, live infra).
-  Branch protection, PRs to main, zero-vuln dependency policy.
-- **kylep/multi-sandbox** (private) — experiments and archived projects
-  (llm-client, Stellaris mods, retired games, aws/mac-setup/openclaw
-  infra, attic). Nothing there is maintained; commits go straight to main.
+  robot-battle, llm-client, game mods, xmasblocks, mcp-servers,
+  pai docs/tf, live infra). Branch protection, PRs to main, zero-vuln
+  dependency policy.
+- **kylep/multi-sandbox** — experiments and archived projects (retired
+  games, Minecraft mod, aws/mac-setup/openclaw infra, attic). Nothing
+  there is maintained; commits go straight to main.
 
 ## Languages and runtimes
 
-- **TypeScript / JavaScript**: Blog (Next.js 15 static export), robot-battle (Vite), MCP servers
-- **Python**: kytrade api (Poetry/Flask 3), xmasblocks, wiki-RAG and utility scripts (always use `apps/blog/.venv/bin/python`)
+- **TypeScript / JavaScript**: Blog (Next.js 15 static export), llm-client (Next.js 16), robot-battle (Vite), 5 of 8 MCP servers (bitwarden, cc-usage, google-news, openrouter, screenshot)
+- **Python**: kytrade api (Poetry/Flask 3), xmasblocks, 3 of 8 MCP servers (discord, google-search-console, openobserve), wiki-RAG and utility scripts (always use `apps/blog/.venv/bin/python`)
 - **Go**: agent-controller (in-repo, not deployed)
 - **Bash**: Glue scripts, CronJob entrypoints
 
@@ -42,7 +43,7 @@ last_verified: 2026-07-04
 
 - **Vault**: HashiCorp Vault with GCP KMS auto-unseal, Vault Agent Injector → tmpfs `/vault/secrets/`
 - **No plain-text K8s Secrets**
-- **Secret paths**: `secret/ai-agents/{discord,github,anthropic,pai,openrouter}`
+- **Secret paths**: `secret/ai-agents/{discord,github,anthropic,pai,openrouter}` plus service-specific paths (bluesky, cloudflare, gcs, mastodon, openobserve, twitter, webhook — see `infra/ai-agents` manifests)
 - **Repo secrets**: `secrets/` is gitignored except `.SAMPLE` templates
 
 ## Agent runtime
@@ -53,7 +54,7 @@ last_verified: 2026-07-04
 
 ## Blog platform
 
-- **Framework**: Next.js 15, static HTML export; Terminal design system (Tailwind v4) in progress on PER-135
+- **Framework**: Next.js 15, static HTML export; Terminal design system (Tailwind v4, PER-135, merged 2026-06-14)
 - **Hosting**: Google Cloud Storage static site
 - **Content**: `apps/blog/blog/markdown/posts/`; wiki at `apps/blog/blog/markdown/wiki/`
 - **Internal links**: Must end in `.html`

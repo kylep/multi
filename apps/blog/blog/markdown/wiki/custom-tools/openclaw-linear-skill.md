@@ -16,7 +16,9 @@ A markdown-based OpenClaw skill that gives agents step-by-step
 `curl` commands for managing Linear issues, projects, and comments
 via the Linear GraphQL API.
 
-Source: `apps/openclaw-skills/linear/SKILL.md`
+Source: `openclaw-skills/linear/SKILL.md` in
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox)
+(demoted 2026-07-04; unmaintained)
 
 ## Why not ClawHub?
 

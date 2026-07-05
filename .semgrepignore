@@ -1,8 +1,4 @@
-# Old sample/learning projects
-samples/
-
-# Legacy infra (not in production)
-infra/aws/
+# Local K8s manifests (helm noise)
 infra/local-k8s/
 
 # Vendored third-party JS

@@ -18,8 +18,10 @@ this repo's git history).
 | [blog](apps/blog/) | Static blog + wiki for [kyle.pericak.com](https://kyle.pericak.com), including the agent-facing wiki | Next.js (static export), Tailwind, Playwright |
 | [kytrade](apps/kytrade/) | Personal trading tools: API + CLI + React front-end | Python/Flask/Poetry, CRA, PostgreSQL, Helm |
 | [robot-battle](apps/games/robot-battle/) | Web robot-battle game built with Oliver | TypeScript, Vite, Vitest |
+| [llm-client](apps/llm-client/) | Browser chat UI for llama-server / OpenRouter, live at kyle.pericak.com/apps/llm-client | Next.js 16, Tailwind v4, pnpm |
+| [mods](apps/mods/) | Stellaris mods (3x Bigger Worlds, Multi-Megastructures) and a HOI4 mod, published on Steam Workshop | Paradox script, Python build tooling |
 | [xmasblocks](apps/xmasblocks/) | Find funny word combos from scrambled Christmas letter blocks | Python, OpenAI API |
-| [mcp-servers](apps/mcp-servers/) | MCP servers wired into local Claude Code config (discord, bitwarden, google-news, google-search-console, openrouter, cc-usage, screenshot) | TypeScript |
+| [mcp-servers](apps/mcp-servers/) | 8 MCP servers wired into local Claude Code config (bitwarden, cc-usage, discord, google-news, google-search-console, openobserve, openrouter, screenshot) | TypeScript + Python |
 | [pai](apps/pai/) | Docs, backup and Terraform for the Pai agent system | Terraform, Markdown |
 
 ## Infrastructure
@@ -65,4 +67,6 @@ Each project has its own README. The short version:
 - **blog**: `npm install` in `apps/blog/blog` — see [apps/blog/README.md](apps/blog/README.md)
 - **kytrade**: `docker-compose up` from the kytrade dir — see [apps/kytrade/README.md](apps/kytrade/README.md)
 - **robot-battle**: `npm install && npm run dev` — see [apps/games/robot-battle/](apps/games/robot-battle/)
+- **llm-client**: `pnpm install && pnpm dev` — see [apps/llm-client/README.md](apps/llm-client/README.md)
+- **mods**: build scripts per mod — see [apps/mods/](apps/mods/)
 - **xmasblocks**: `pip install -r requirements.txt` — see [apps/xmasblocks/README.md](apps/xmasblocks/README.md)

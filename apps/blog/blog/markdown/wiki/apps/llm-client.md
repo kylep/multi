@@ -11,11 +11,12 @@ scope: "llm-client app: where it lives online, how to develop, how it deploys."
 last_verified: 2026-04-17
 ---
 
-## Live
+## Deployment
 
-[kyle.pericak.com/apps/llm-client/](https://kyle.pericak.com/apps/llm-client/)
-
-Static export hosted under the main blog bucket (`gs://kyle.pericak.com/apps/llm-client`).
+Static export intended for `gs://kyle.pericak.com/apps/llm-client`
+(under the main blog bucket) via `bin/prod-deploy.sh`. **Not currently
+deployed** — the URL 404s and the bucket path is empty (verified
+2026-07-04). Deploys are manual and Kyle-only.
 
 ## What it is
 
@@ -24,10 +25,7 @@ endpoint — [llama-server](https://github.com/ggerganov/llama.cpp/tree/master/t
 [OpenRouter](https://openrouter.ai), etc. Chats and settings live in
 `localStorage`; there is no server-side storage.
 
-Source: `llm-client/` in
-[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox)
-(demoted from multi on 2026-07-04; unmaintained, but the deployed
-copy stays live).
+Source: `apps/llm-client/`.
 
 ## Tech stack
 

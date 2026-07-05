@@ -17,6 +17,12 @@ scope: "Covers full Mac setup from factory reset, K8s stack bootstrapping, Vault
 last_verified: 2026-03-18
 ---
 
+> **Archived 2026-07-04**: the mac-setup Ansible playbook and
+> `bootstrap.sh` this page describes moved to
+> [kylep/multi-sandbox](https://github.com/kylep/multi-sandbox)
+> (`infra/mac-setup/`) and are no longer maintained. The raw
+> `github.com/kylep/multi/.../bootstrap.sh` URL below no longer
+> resolves. Kept as a historical runbook.
 
 ## From factory reset to running stack
 

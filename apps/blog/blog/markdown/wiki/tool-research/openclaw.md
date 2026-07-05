@@ -370,6 +370,6 @@ unscanned supply chain.
   [K8s hardening](/openclaw-k8s.html),
   [Linear skill](/openclaw-linear-skill.html)
 - In-house skill:
-  [`apps/openclaw-skills/linear/`](https://github.com/kylep/multi/tree/main/apps/openclaw-skills/linear)
+  [`openclaw-skills/linear/`](https://github.com/kylep/multi-sandbox/tree/main/openclaw-skills/linear)
   ([wiki entry](/wiki/custom-tools/openclaw-linear-skill.html))
 - Container image: `ghcr.io/openclaw/openclaw`
