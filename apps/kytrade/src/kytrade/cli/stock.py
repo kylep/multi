@@ -58,7 +58,11 @@ def prices(
     if as_json:
         print(json.dumps(history, indent=2))
         return
-    table = Table("date", "open", "high", "low", "close", "volume", title=symbol.upper())
+    table = Table(
+        "date", "open", "high", "low", "close", "volume", title=symbol.upper()
+    )
     for day, row in history.items():
-        table.add_row(day, *(_cell(row.get(field)) for field in yahoo.PRICE_FIELDS.values()))
+        table.add_row(
+            day, *(_cell(row.get(field)) for field in yahoo.PRICE_FIELDS.values())
+        )
     console.print(table)

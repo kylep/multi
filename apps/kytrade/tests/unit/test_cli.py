@@ -30,8 +30,20 @@ def test_stock_prices_json(fake_store: dict):
     stocks.set_prices(
         "AAPL",
         {
-            "2026-01-03": {"open": 2.0, "high": 2.0, "low": 2.0, "close": 2.0, "volume": 2},
-            "2026-01-02": {"open": 1.0, "high": 1.0, "low": 1.0, "close": 1.0, "volume": 1},
+            "2026-01-03": {
+                "open": 2.0,
+                "high": 2.0,
+                "low": 2.0,
+                "close": 2.0,
+                "volume": 2,
+            },
+            "2026-01-02": {
+                "open": 1.0,
+                "high": 1.0,
+                "low": 1.0,
+                "close": 1.0,
+                "volume": 1,
+            },
         },
     )
     result = runner.invoke(app, ["stock", "prices", "AAPL", "--json"])

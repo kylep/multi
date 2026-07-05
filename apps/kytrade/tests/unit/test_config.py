@@ -30,7 +30,9 @@ def test_settings_defaults(monkeypatch: pytest.MonkeyPatch):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("POSTGRES_PASSWORD", "hunter2")
     settings = config.settings()
-    assert settings.db_url == "postgresql+psycopg://kytrade:hunter2@127.0.0.1:5432/kytrade"
+    assert (
+        settings.db_url == "postgresql+psycopg://kytrade:hunter2@127.0.0.1:5432/kytrade"
+    )
     assert settings.echo_sql is False
 
 
@@ -42,7 +44,9 @@ def test_settings_reads_env_overrides(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("DATABASE_NAME", "prices")
     monkeypatch.setenv("SQLA_ECHO", "true")
     settings = config.settings()
-    assert settings.db_url == "postgresql+psycopg://trader:pw@db.example.com:5433/prices"
+    assert (
+        settings.db_url == "postgresql+psycopg://trader:pw@db.example.com:5433/prices"
+    )
     assert settings.echo_sql is True
 
 
