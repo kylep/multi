@@ -60,6 +60,7 @@ take `--json` for machine-readable output.
 | `POSTGRES_PORT` | `5432` | Database port |
 | `POSTGRES_USER` | `kytrade` | Database user |
 | `DATABASE_NAME` | `kytrade` | Database name |
+| `SQLA_DRIVER` | `postgresql+psycopg` | SQLAlchemy driver string |
 | `SQLA_ECHO` | `false` | Log SQL statements |
 | `KT_DEBUG` | `false` | Debug logging |
 
@@ -74,7 +75,7 @@ uv run pytest
 
 ## Layout
 
-```
+```text
 src/kytrade/      the package: config, db, stocks, yahoo, etl, cli/
 tests/unit/       pytest suite (no database needed)
 bin/              hydrate-db.sh, reset-database.sh

@@ -48,7 +48,7 @@ def _cell(value: float | None) -> str:
 @app.command()
 def prices(
     symbol: Annotated[str, typer.Argument(help="Ticker to read")],
-    tail: Annotated[int, typer.Option(help="Only the most recent N days")] = 0,
+    tail: Annotated[int, typer.Option(min=0, help="Only the most recent N days")] = 0,
     as_json: Annotated[bool, typer.Option("--json", help="Emit JSON")] = False,
 ) -> None:
     """Print the stored daily prices for a symbol."""

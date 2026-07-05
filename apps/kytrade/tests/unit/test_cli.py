@@ -66,6 +66,11 @@ def test_stock_prices_tail(fake_store: dict):
     assert list(history) == ["2026-01-03", "2026-01-04"]
 
 
+def test_stock_prices_rejects_negative_tail(fake_store: dict):
+    result = runner.invoke(app, ["stock", "prices", "AAPL", "--tail", "-3"])
+    assert result.exit_code != 0
+
+
 def test_stock_save_history_rejects_symbol_and_all():
     result = runner.invoke(app, ["stock", "save-history", "--symbol", "AAPL", "--all"])
     assert result.exit_code == 1

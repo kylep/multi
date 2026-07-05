@@ -55,6 +55,16 @@ def test_load_sp500_preserves_existing_metadata(fake_store: dict, sp500_df):
     assert merged["last_updated"] == "2026-01-01"
 
 
+def test_load_sp500_keeps_known_currency_when_rerun_lacks_it(
+    fake_store: dict, sp500_df
+):
+    metadata = stocks.new_symbol_metadata()
+    metadata["currency"] = "USD"
+    fake_store[stocks.SYMBOLS_DOC] = {"MYST": metadata}
+    etl.load_sp500("fake.xlsx")
+    assert stocks.get_symbols()["MYST"]["currency"] == "USD"
+
+
 def test_load_sp500_is_idempotent(fake_store: dict, sp500_df):
     etl.load_sp500("fake.xlsx")
     etl.load_sp500("fake.xlsx")

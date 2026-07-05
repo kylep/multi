@@ -29,7 +29,9 @@ def load_sp500(path: Path | str) -> int:
         metadata = symbols.setdefault(ticker, stocks.new_symbol_metadata())
         metadata["indexes"] = sorted(set(metadata["indexes"]) | {"S&P 500"})
         metadata["etfs"] = sorted(set(metadata["etfs"]) | {"SPY"})
-        metadata["currency"] = _clean(row.get("Local Currency"))
+        currency = _clean(row.get("Local Currency"))
+        if currency:
+            metadata["currency"] = currency
         if sector:
             metadata["sectors"] = sorted(set(metadata["sectors"]) | {sector})
             members = sectors.setdefault(sector, [])
