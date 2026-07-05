@@ -52,11 +52,18 @@ README/DATA.md rewritten, per-project CLAUDE.md with conventions.
 Verified: unit tests plus `kt` E2E against docker-compose postgres
 (hydrate → save-history → read back).
 
-### Phase 2 — Data layer hardening
-Provider interface (`lib/providers/yahoo.py` behind a thin protocol),
-`kt data pull <symbol>` with incremental fetch (only missing dates),
-S&P 500 backfill command, data-quality scrubbing at the boundary.
-Optional: daily-pull CronJob in k8s via the existing helm chart.
+### Phase 2 — Data layer hardening (done 2026-07-05)
+`PriceProvider` protocol (`providers/base.py`) with `YahooProvider`
+behind it; `kt data pull` with incremental fetch (only dates newer
+than stored; `--full` re-downloads, needed occasionally because
+auto-adjusted history drifts on splits/dividends); live S&P 500
+membership from Wikipedia (`kt data load-sp500`, bs4 parser, tickers
+normalized to Yahoo style; the 2022 xlsx stays as `--file` offline
+fallback); `kt data backfill-sp500`. CLI consolidated: `stock`/`etl`
+groups retired into `data`. The daily-pull k8s CronJob was deferred to
+Phase 4 — it needs a container image and the deploy story lives there.
+Also in this PR: orphaned `infra/containers` base image removed
+(migrated to multi-sandbox).
 
 ### Phase 3 — Toolkit core: experiments & backtesting
 Portfolio/position/order primitives; a Strategy protocol
@@ -67,8 +74,9 @@ as `experiment/<name>` documents. CLI: `kt backtest run`,
 
 ### Phase 4 — API: FastAPI on k8s
 FastAPI (fresh app; the empty Flask one died in Phase 1) with OpenAPI: prices, symbols,
-experiments, backtest trigger. Deployed to the local cluster via the
-refreshed helm chart. Written Mangum-compatible so a later
+experiments, backtest trigger. Deployed to the local cluster via a
+new helm chart, along with the daily-pull CronJob deferred from
+Phase 2. Written Mangum-compatible so a later
 Lambda/Cloud Run port is a packaging change, not a rewrite. Auth:
 none needed cluster-local; when exposed, front with Cloudflare Access
 (already in use) instead of building auth.
