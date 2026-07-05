@@ -71,3 +71,13 @@ last_verified: 2026-07-05
 - [CBC Sports](https://www.cbc.ca/sports/livestory/canada-vs-morocco-july-4-live-updates-fifa-world-cup-2026-9.7257729) Canada lost 0-3 to Morocco in the FIFA World Cup Round of 16 on July 4, eliminated as the first co-host country to exit the tournament. Azzedine Ounahi scored twice in the second half; Morocco advances to face France in the quarterfinals on July 9.
 
 - [Whitby Ribfest](https://whitbyribfest.com/) Whitby Ribfest returns July 10–12 at Victoria Fields. The Friday night concert featuring The Trews is ticketed; Saturday and Sunday are free and open to all with full ribfest programming.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/06/30/anthropic-launches-ai-drug-discovery-program-claude-science.html) Anthropic launched Claude Science on June 30, a research workbench integrating 60+ scientific databases across genomics, proteomics, and cheminformatics for biopharma researchers. Anthropic is also running its own drug-discovery program targeting neglected diseases. Available in beta to Pro, Max, Team, and Enterprise subscribers, with up to $30,000 in compute credits for qualifying research projects.
+
+- [OpenAI](https://openai.com/index/previewing-gpt-5-6-sol/) OpenAI previewed GPT-5.6 as a three-tier family — Sol (flagship), Terra (balanced), and Luna (fast/affordable) — but limited access to roughly 20 government-vetted organizations via API and Codex while a White House-requested national-security cybersecurity review completes. Pricing: Sol $5/$30, Terra $2.50/$15, Luna $1/$6 per 1M input/output tokens. Sol will also launch on Cerebras at up to 750 tokens/second in July.
