@@ -1,25 +1,45 @@
-"""Yahoo Finance
-- Appropriate for small-batch daily checks
-- Rate-limited to 2,000 requests per hour per IP, 48,000 requests a day
-"""
-import datetime
+"""Yahoo Finance price data.
 
+Suitable for small-batch daily pulls; Yahoo rate-limits aggressively.
+"""
+
+import logging
+import math
+
+import pandas as pd
 import yfinance
 
+logger = logging.getLogger(__name__)
 
-def history_df_to_dict(df) -> dict:
-    """Create a dict from daily history"""
-    history = {}
-    for date, row in df.T.items():
-        history[str(date.date())] = dict(row)
+PRICE_FIELDS = {
+    "Open": "open",
+    "High": "high",
+    "Low": "low",
+    "Close": "close",
+    "Volume": "volume",
+}
+
+type DailyPrices = dict[str, dict[str, float | None]]
+
+
+def history_df_to_dict(df: pd.DataFrame) -> DailyPrices:
+    """Convert a yfinance history frame to a JSON-safe, date-keyed dict."""
+    history: DailyPrices = {}
+    for timestamp, row in df.iterrows():
+        day: dict[str, float | None] = {}
+        for column, field in PRICE_FIELDS.items():
+            value = row.get(column)
+            day[field] = None if value is None or math.isnan(value) else float(value)
+        if all(value is None for value in day.values()):
+            continue
+        if day["volume"] is not None:
+            day["volume"] = int(day["volume"])
+        history[str(timestamp.date())] = day
     return history
 
 
-def download_daily_stock_history(symbol: str) -> dict:
-    """Use yahoo finance to download daily stock data, ordered oldest to newest"""
-    start = datetime.datetime(1900, 1, 1)
-    end = datetime.date.today()
-    df = yfinance.download(
-        tickers=[symbol], start=start, end=end, progress=False, auto_adjust=True
-    )
+def download_daily_history(symbol: str) -> DailyPrices:
+    """Download the full daily history for a symbol, oldest first."""
+    logger.debug("downloading daily history for %s", symbol)
+    df = yfinance.Ticker(symbol).history(period="max", auto_adjust=True)
     return history_df_to_dict(df)

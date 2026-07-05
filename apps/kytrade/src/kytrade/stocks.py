@@ -1,80 +1,111 @@
-"""Stocks data - I don't really like any of this, db cleanup later
-In the meantime it's suitably abstracted
-"""
-from kytrade.lib.db.common import get_document, set_document
-from kytrade.lib.common import debug
+"""Stock documents: symbols, indexes, ETFs, sectors, and per-symbol price history."""
 
-STOCK_INDEXES = "stock/indexes"
-STOCK_SYMBOLS = "stock/symbols"
-STOCK_ETFS = "stock/etfs"
-STOCK_SECTORS = "stock/sectors"
-STOCK_PRICES = "stock/prices"
+import logging
+from datetime import date
+from typing import Any
+
+from kytrade import db, yahoo
+
+logger = logging.getLogger(__name__)
+
+INDEXES_DOC = "stock/indexes"
+SYMBOLS_DOC = "stock/symbols"
+ETFS_DOC = "stock/etfs"
+SECTORS_DOC = "stock/sectors"
+PRICES_DOC_PREFIX = "stock/prices"
+
+type SymbolMetadata = dict[str, Any]
 
 
-def get_indexes() -> list:
-    """Get the indexes"""
-    debug(f"DB:R {STOCK_INDEXES}")
-    return get_document(STOCK_INDEXES)
+def new_symbol_metadata() -> SymbolMetadata:
+    """Return empty metadata for a symbol not seen before."""
+    return {
+        "indexes": [],
+        "etfs": [],
+        "sectors": [],
+        "currency": None,
+        "last_updated": None,
+    }
+
+
+def _merge_unique(doc_name: str, new_values: list[str]) -> None:
+    """Union new_values into a sorted list document."""
+    merged = set(db.get_document(doc_name) or []) | set(new_values)
+    db.set_document(doc_name, sorted(merged))
+
+
+def get_indexes() -> list[str]:
+    """Return the known index names."""
+    return db.get_document(INDEXES_DOC) or []
 
 
 def add_index(name: str) -> None:
-    """Add an index to the list, noop if already exists"""
-    indexes = set(get_indexes())
-    indexes.add(name)
-    debug(f"DB:W {STOCK_INDEXES}")
-    set_document(STOCK_INDEXES, list(indexes))
+    """Add an index name; no-op if already known."""
+    _merge_unique(INDEXES_DOC, [name])
 
 
-def get_symbols() -> dict:
-    """Get the symbols and their metadata"""
-    debug(f"DB:R {STOCK_SYMBOLS}")
-    return get_document(STOCK_SYMBOLS)
+def get_etfs() -> list[str]:
+    """Return the known ETF tickers."""
+    return db.get_document(ETFS_DOC) or []
 
 
-def _add_unique_to_list_document(doc_name: str, new_values: list) -> None:
-    """Add the unique elements of new_values to the list document"""
-    current_values = set(get_document(doc_name))
-    current_values |= set(new_values)
-    debug(f"DB:W {doc_name}")
-    set_document(doc_name, list(new_values))
+def add_etfs(etfs: list[str]) -> None:
+    """Add ETF tickers, keeping the list unique."""
+    _merge_unique(ETFS_DOC, etfs)
 
 
-def set_symbols(symbols: dict) -> None:
-    """Add symbols to the list, remove dupes"""
-    debug(f"DB:W {STOCK_SYMBOLS}")
-    set_document(STOCK_SYMBOLS, symbols)
+def get_sectors() -> dict[str, list[str]]:
+    """Return sector name mapped to its member tickers."""
+    return db.get_document(SECTORS_DOC) or {}
 
 
-def get_etfs() -> list:
-    debug(f"DB:R {STOCK_ETFS}")
-    return get_document(STOCK_ETFS)
+def set_sectors(sectors: dict[str, list[str]]) -> None:
+    """Replace the sector membership document."""
+    db.set_document(SECTORS_DOC, sectors)
 
 
-def add_etfs(etfs: list) -> None:
-    """Add ETFs to the list, remove dupes"""
-    _add_unique_to_list_document(STOCK_ETFS, etfs)
+def get_symbols() -> dict[str, SymbolMetadata]:
+    """Return ticker mapped to metadata for every known symbol."""
+    return db.get_document(SYMBOLS_DOC) or {}
 
 
-def get_sectorss() -> list:
-    """Get the list of unique sectors"""
-    debug(f"DB:R {STOCK_SECTORS}")
-    return get_document(STOCK_SECTORS)
+def set_symbols(symbols: dict[str, SymbolMetadata]) -> None:
+    """Replace the symbols document."""
+    db.set_document(SYMBOLS_DOC, symbols)
 
 
-def add_sectors(sectors: list) -> None:
-    """Add sectors to the list, remove dupes"""
-    _add_unique_to_list_document(STOCK_SECTORS, sectors)
+def get_prices(symbol: str) -> yahoo.DailyPrices:
+    """Return the stored date-keyed price history for a symbol."""
+    return db.get_document(f"{PRICES_DOC_PREFIX}/{symbol}") or {}
 
 
-def get_prices(symbol: str) -> dict:
-    """Return a date-keyed dict of prices for a given stock"""
-    document = f"{STOCK_PRICES}/{symbol}"
-    debug(f"DB:R {document}")
-    return get_document(document)
+def set_prices(symbol: str, prices: yahoo.DailyPrices) -> None:
+    """Store the date-keyed price history for a symbol."""
+    db.set_document(f"{PRICES_DOC_PREFIX}/{symbol}", prices)
 
 
-def set_prices(symbol: str, prices: dict) -> None:
-    """Set the date-keyed dict of prices for a given stock"""
-    document = f"{STOCK_PRICES}/{symbol}"
-    debug(f"DB:W {document}")
-    return set_document(document, prices)
+def save_price_history(
+    symbol: str, symbols: dict[str, SymbolMetadata] | None = None
+) -> None:
+    """Download and store the full daily history for one symbol."""
+    if symbols is None:
+        symbols = get_symbols()
+    today = date.today().isoformat()
+    metadata = symbols.setdefault(symbol, new_symbol_metadata())
+    if metadata["last_updated"] == today:
+        logger.info("%s already updated today, skipping", symbol)
+        return
+    set_prices(symbol, yahoo.download_daily_history(symbol))
+    metadata["last_updated"] = today
+    set_symbols(symbols)
+
+
+def save_all_price_histories() -> None:
+    """Download and store the daily history for every known symbol."""
+    symbols = get_symbols()
+    for i, symbol in enumerate(sorted(symbols), start=1):
+        logger.info("%d/%d %s", i, len(symbols), symbol)
+        try:
+            save_price_history(symbol, symbols)
+        except Exception:
+            logger.exception("failed to save history for %s", symbol)

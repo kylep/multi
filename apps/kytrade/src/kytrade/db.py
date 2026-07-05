@@ -1,88 +1,66 @@
-"""Common database functions"""
-import sqlalchemy
-from sqlalchemy.orm import declarative_base, Session
+"""Postgres JSON-document store."""
 
-import kytrade.const as const
-import kytrade.lib.db.models as models
+import logging
+from functools import cache
+from typing import Any
 
+from sqlalchemy import JSON, Engine, String, create_engine, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
-ENGINE = sqlalchemy.create_engine(
-    const.SQL_CONN_STRING,
-    echo=const.SQLA_ECHO,
-    future=False,
-    pool_size=20,
-    max_overflow=0,
-)
+from kytrade.config import settings
+
+logger = logging.getLogger(__name__)
 
 
-def init_create_tables():
-    """Create the ORM-defined tables"""
-    models.BASE.metadata.create_all(ENGINE)
+class Base(DeclarativeBase):
+    """Declarative base for all kytrade tables."""
 
 
-def get_session() -> Session:
-    """Get a session for this engine"""
-    return Session(bind=ENGINE, expire_on_commit=False)
+class Document(Base):
+    """A named JSON blob; the whole schema until relational tables are warranted."""
+
+    __tablename__ = "documents"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(512), unique=True)
+    data: Mapped[Any] = mapped_column(JSON)
+
+    def __repr__(self) -> str:
+        return f"Document(id={self.id!r}, name={self.name!r})"
 
 
-def commit(orm_object) -> None:
-    """Commit an ORM object"""
-    session = Session.object_session(orm_object)
-    if not session:
-        session = get_session()
-        session.add(orm_object)
-    session.commit()
+@cache
+def engine() -> Engine:
+    return create_engine(settings().db_url, echo=settings().echo_sql)
 
 
-def delete(orm_object) -> None:
-    """Delete an ORM object"""
-    session = Session.object_session(orm_object)
-    session.delete(orm_object)
-    session.commit()
+def init_tables() -> None:
+    """Create all ORM-defined tables."""
+    Base.metadata.create_all(engine())
 
 
-def get_all_documents() -> dict:
-    """Fetch all the documents at once!"""
-    query = sqlalchemy.select(models.Document)
-    session = get_session()
-    try:
-        result = session.execute(query).all()
-    finally:
-        session.close()
-    documents = {}
-    for row in result:
-        documents[row[0].name] = row[0].data
-    return documents
+def list_documents() -> list[str]:
+    """Return every stored document name."""
+    logger.debug("db:list documents")
+    with Session(engine()) as session:
+        return list(session.scalars(select(Document.name).order_by(Document.name)))
 
 
-def get_document(name: str) -> dict:
-    """Get a document's data else {}"""
-    documents = {}
-    query = sqlalchemy.select(models.Document).where(models.Document.name == name)
-    session = get_session()
-    try:
-        result = session.execute(query).one_or_none()
-    finally:
-        session.close()
-    if result:
-        return result[0].data
-    return {}
+def get_document(name: str) -> Any:
+    """Return a document's data, or None if it does not exist."""
+    logger.debug("db:get %s", name)
+    with Session(engine()) as session:
+        doc = session.scalar(select(Document).where(Document.name == name))
+        return doc.data if doc else None
 
 
-def set_document(name: str, data: dict) -> None:
-    """Write a document's data"""
-    session = get_session()
-    try:
-        select_query = sqlalchemy.select(models.Document).where(
-            models.Document.name == name
-        )
-        select_result = session.execute(select_query).one_or_none()
-        if select_result:
-            document = select_result[0]
-            document.data = data
+def set_document(name: str, data: Any) -> None:
+    """Insert or update a document."""
+    logger.debug("db:set %s", name)
+    with Session(engine()) as session:
+        doc = session.scalar(select(Document).where(Document.name == name))
+        if doc is None:
+            session.add(Document(name=name, data=data))
         else:
-            document = models.Document(name=name, data=data)
-        session.add(document)
+            doc.data = data
         session.commit()
-    finally:
-        session.close()
