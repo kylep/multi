@@ -15,7 +15,8 @@ def wikipedia_df(monkeypatch: pytest.MonkeyPatch) -> pd.DataFrame:
             {"Symbol": "XOM", "GICS Sector": "Energy"},
         ]
     )
-    monkeypatch.setattr(sp500.pd, "read_html", lambda url, **kwargs: [df])
+    monkeypatch.setattr(sp500, "_fetch_html", lambda url: "<html></html>")
+    monkeypatch.setattr(sp500.pd, "read_html", lambda html, **kwargs: [df])
     return df
 
 
@@ -30,6 +31,11 @@ def excel_df(monkeypatch: pytest.MonkeyPatch) -> pd.DataFrame:
     )
     monkeypatch.setattr(sp500.pd, "read_excel", lambda path: df)
     return df
+
+
+def test_fetch_html_rejects_non_https():
+    with pytest.raises(ValueError):
+        sp500._fetch_html("http://example.com/")
 
 
 def test_fetch_membership_parses_wikipedia(wikipedia_df):

@@ -2,10 +2,13 @@
 
 import logging
 from dataclasses import dataclass
+from io import StringIO
 from pathlib import Path
 
 import pandas as pd
+import requests
 
+import kytrade
 from kytrade import stocks
 
 logger = logging.getLogger(__name__)
@@ -33,9 +36,22 @@ def _normalize_ticker(ticker: str) -> str:
     return ticker.strip().upper().replace(".", "-")
 
 
+def _fetch_html(url: str) -> str:
+    """GET a page with a real User-Agent; Wikipedia 403s the default one."""
+    if not url.startswith("https://"):
+        raise ValueError(f"refusing non-https URL: {url}")
+    response = requests.get(
+        url,
+        headers={"User-Agent": f"kytrade/{kytrade.__version__} (kyle@pericak.com)"},
+        timeout=30,
+    )
+    response.raise_for_status()
+    return response.text
+
+
 def fetch_membership(url: str = WIKIPEDIA_URL) -> list[Member]:
     """Fetch current S&P 500 membership from Wikipedia's constituents table."""
-    df = pd.read_html(url, flavor="bs4")[0]
+    df = pd.read_html(StringIO(_fetch_html(url)), flavor="bs4")[0]
     logger.info("fetched %d S&P 500 constituents from %s", len(df), url)
     return [
         Member(

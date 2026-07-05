@@ -98,7 +98,8 @@ def test_data_load_sp500_from_wikipedia(
     from kytrade import sp500
 
     df = pd.DataFrame([{"Symbol": "AAPL", "GICS Sector": "Information Technology"}])
-    monkeypatch.setattr(sp500.pd, "read_html", lambda url, **kwargs: [df])
+    monkeypatch.setattr(sp500, "_fetch_html", lambda url: "<html></html>")
+    monkeypatch.setattr(sp500.pd, "read_html", lambda html, **kwargs: [df])
     result = runner.invoke(app, ["data", "load-sp500"])
     assert result.exit_code == 0
     assert "loaded 1 symbols" in result.output
