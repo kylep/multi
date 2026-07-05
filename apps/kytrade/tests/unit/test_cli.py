@@ -22,11 +22,30 @@ def test_help_needs_no_env_vars(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.delenv("POSTGRES_PASSWORD", raising=False)
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    for group in ("stock", "db", "etl"):
+    for group in ("data", "db"):
         assert group in result.output
 
 
-def test_stock_prices_json(fake_store: dict):
+def test_data_pull_reports_new_days(fake_store: dict, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(
+        stocks, "pull_price_history", lambda symbol, full=False, **kwargs: 42
+    )
+    result = runner.invoke(app, ["data", "pull", "-s", "AAPL"])
+    assert result.exit_code == 0
+    assert "42 new days" in result.output
+
+
+def test_data_pull_rejects_symbol_and_all():
+    result = runner.invoke(app, ["data", "pull", "--symbol", "AAPL", "--all"])
+    assert result.exit_code == 1
+
+
+def test_data_pull_requires_symbol_or_all():
+    result = runner.invoke(app, ["data", "pull"])
+    assert result.exit_code == 1
+
+
+def test_data_prices_json(fake_store: dict):
     stocks.set_prices(
         "AAPL",
         {
@@ -46,13 +65,13 @@ def test_stock_prices_json(fake_store: dict):
             },
         },
     )
-    result = runner.invoke(app, ["stock", "prices", "AAPL", "--json"])
+    result = runner.invoke(app, ["data", "prices", "AAPL", "--json"])
     assert result.exit_code == 0
     history = json.loads(result.output)
     assert list(history) == ["2026-01-02", "2026-01-03"]
 
 
-def test_stock_prices_tail(fake_store: dict):
+def test_data_prices_tail(fake_store: dict):
     stocks.set_prices(
         "AAPL",
         {
@@ -61,24 +80,29 @@ def test_stock_prices_tail(fake_store: dict):
             "2026-01-04": {"open": 3.0},
         },
     )
-    result = runner.invoke(app, ["stock", "prices", "AAPL", "--tail", "2", "--json"])
+    result = runner.invoke(app, ["data", "prices", "AAPL", "--tail", "2", "--json"])
     history = json.loads(result.output)
     assert list(history) == ["2026-01-03", "2026-01-04"]
 
 
-def test_stock_prices_rejects_negative_tail(fake_store: dict):
-    result = runner.invoke(app, ["stock", "prices", "AAPL", "--tail", "-3"])
+def test_data_prices_rejects_negative_tail(fake_store: dict):
+    result = runner.invoke(app, ["data", "prices", "AAPL", "--tail", "-3"])
     assert result.exit_code != 0
 
 
-def test_stock_save_history_rejects_symbol_and_all():
-    result = runner.invoke(app, ["stock", "save-history", "--symbol", "AAPL", "--all"])
-    assert result.exit_code == 1
+def test_data_load_sp500_from_wikipedia(
+    fake_store: dict, monkeypatch: pytest.MonkeyPatch
+):
+    import pandas as pd
 
+    from kytrade import sp500
 
-def test_stock_save_history_requires_symbol_or_all():
-    result = runner.invoke(app, ["stock", "save-history"])
-    assert result.exit_code == 1
+    df = pd.DataFrame([{"Symbol": "AAPL", "GICS Sector": "Information Technology"}])
+    monkeypatch.setattr(sp500.pd, "read_html", lambda url, **kwargs: [df])
+    result = runner.invoke(app, ["data", "load-sp500"])
+    assert result.exit_code == 0
+    assert "loaded 1 symbols" in result.output
+    assert "AAPL" in stocks.get_symbols()
 
 
 def test_db_list_json(fake_store: dict):

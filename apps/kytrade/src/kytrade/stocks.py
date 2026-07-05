@@ -1,10 +1,12 @@
 """Stock documents: symbols, indexes, ETFs, sectors, and per-symbol price history."""
 
 import logging
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
-from kytrade import db, yahoo
+from kytrade import db
+from kytrade.providers import DailyPrices, PriceProvider
+from kytrade.providers.yahoo import YahooProvider
 
 logger = logging.getLogger(__name__)
 
@@ -74,38 +76,59 @@ def set_symbols(symbols: dict[str, SymbolMetadata]) -> None:
     db.set_document(SYMBOLS_DOC, symbols)
 
 
-def get_prices(symbol: str) -> yahoo.DailyPrices:
+def get_prices(symbol: str) -> DailyPrices:
     """Return the stored date-keyed price history for a symbol."""
     return db.get_document(f"{PRICES_DOC_PREFIX}/{symbol}") or {}
 
 
-def set_prices(symbol: str, prices: yahoo.DailyPrices) -> None:
+def set_prices(symbol: str, prices: DailyPrices) -> None:
     """Store the date-keyed price history for a symbol."""
     db.set_document(f"{PRICES_DOC_PREFIX}/{symbol}", prices)
 
 
-def save_price_history(
-    symbol: str, symbols: dict[str, SymbolMetadata] | None = None
-) -> None:
-    """Download and store the full daily history for one symbol."""
+def pull_price_history(
+    symbol: str,
+    *,
+    full: bool = False,
+    provider: PriceProvider | None = None,
+    symbols: dict[str, SymbolMetadata] | None = None,
+) -> int:
+    """Pull daily history for one symbol; return the number of new days stored.
+
+    Incremental by default: only dates after the newest stored row are
+    fetched. Use full=True to re-download everything — worth doing
+    occasionally, since auto-adjusted historical prices shift after
+    splits and dividends.
+    """
+    provider = provider or YahooProvider()
     if symbols is None:
         symbols = get_symbols()
     today = date.today().isoformat()
     metadata = symbols.setdefault(symbol, new_symbol_metadata())
-    if metadata["last_updated"] == today:
+    if not full and metadata["last_updated"] == today:
         logger.info("%s already updated today, skipping", symbol)
-        return
-    set_prices(symbol, yahoo.download_daily_history(symbol))
+        return 0
+    stored = {} if full else get_prices(symbol)
+    start = None
+    if stored:
+        start = date.fromisoformat(max(stored)) + timedelta(days=1)
+    fetched = provider.daily_history(symbol, start=start)
+    new_days = len(fetched.keys() - stored.keys())
+    if fetched:
+        set_prices(symbol, dict(sorted((stored | fetched).items())))
     metadata["last_updated"] = today
     set_symbols(symbols)
+    logger.info("%s: %d new days", symbol, new_days)
+    return new_days
 
 
-def save_all_price_histories() -> None:
-    """Download and store the daily history for every known symbol."""
+def pull_all_price_histories(*, full: bool = False) -> None:
+    """Pull daily history for every known symbol, continuing past failures."""
     symbols = get_symbols()
+    provider = YahooProvider()
     for i, symbol in enumerate(sorted(symbols), start=1):
         logger.info("%d/%d %s", i, len(symbols), symbol)
         try:
-            save_price_history(symbol, symbols)
+            pull_price_history(symbol, full=full, provider=provider, symbols=symbols)
         except Exception:
-            logger.exception("failed to save history for %s", symbol)
+            logger.exception("failed to pull history for %s", symbol)

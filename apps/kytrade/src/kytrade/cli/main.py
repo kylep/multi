@@ -6,12 +6,11 @@ from typing import Annotated
 import typer
 
 import kytrade
-from kytrade.cli import db, etl, stock
+from kytrade.cli import data, db
 
 app = typer.Typer(no_args_is_help=True)
-app.add_typer(stock.app, name="stock")
+app.add_typer(data.app, name="data")
 app.add_typer(db.app, name="db")
-app.add_typer(etl.app, name="etl")
 
 
 @app.callback()

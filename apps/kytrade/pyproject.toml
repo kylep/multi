@@ -1,11 +1,13 @@
 [project]
 name = "kytrade"
-version = "3.0.0"
+version = "3.1.0"
 description = "Personal trading toolkit: run experiments, explore transaction decisions, test strategies"
 authors = [{ name = "Kyle Pericak", email = "kyle@pericak.com" }]
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "html5lib>=1.1",
     "openpyxl>=3.1.5",
     "pandas>=3.0.3",
     "psycopg[binary]>=3.3.4",

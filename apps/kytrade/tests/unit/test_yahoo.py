@@ -1,10 +1,10 @@
-"""Tests for kytrade.yahoo."""
+"""Tests for kytrade.providers.yahoo."""
 
 import json
 
 import pandas as pd
 
-from kytrade import yahoo
+from kytrade.providers import yahoo
 
 
 def make_history_df(rows: dict) -> pd.DataFrame:
