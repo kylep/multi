@@ -52,8 +52,10 @@ Sub-project rules:
 | `apps/blog/blog/markdown/posts/.ruler/style.md` | Blog post writing style and formatting |
 | `apps/blog/blog/tests/.ruler/testing.md` | Playwright test conventions |
 | `infra/ai-security-toolkit-1/.ruler/versioning.md` | Toolkit image versioning |
-| `apps/games/kid-bot-battle-sim/features/.ruler/interfaces.md` | Game interface contracts |
-| `apps/games/sillyapp/.ruler/build.md` | SillyApp build rules |
+
+(kid-bot-battle-sim and sillyapp ruler files moved to
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox) with
+their projects, 2026-07-04.)
 
 ## Usage
 

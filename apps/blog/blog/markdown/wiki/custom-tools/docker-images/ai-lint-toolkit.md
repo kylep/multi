@@ -15,7 +15,7 @@ last_verified: 2026-03-15
 ---
 
 **Image:** `kpericak/ai-lint-toolkit:0.1`
-**Source:** `infra/ai-lint-toolkit/`
+**Source:** `infra/ai-lint-toolkit/` in [kylep/multi-sandbox](https://github.com/kylep/multi-sandbox) (demoted 2026-07-04)
 **Base:** Alpine 3.21
 
 Multi-stage build bundling four linters.

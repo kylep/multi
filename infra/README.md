@@ -1,11 +1,20 @@
 # Infrastructure
 
-The main reason for moving everything into this monorepo was to share infrastructure.
-
-## [aws](aws/)
-This is sort of "production", but I tear it down pretty often because its expensive. Once I go
-"live" I might keep it up but EKS can easily be over $80/month which isn't great.
-
+Everything here runs on or supports the Rancher Desktop cluster on the
+Mac laptop.
 
 ## [local-k8s](local-k8s/)
-A little K8s cluster I run from home on an Intel Nuc
+Bootstrap for the local cluster (Vault etc.).
+
+## [ai-agents](ai-agents/)
+Agent workloads: the `ai-agent-runtime` image, cronjob Helm charts
+(journalist, pai-morning), and the Go agent-controller.
+
+## [ai-security-toolkit-1](ai-security-toolkit-1/)
+semgrep + trivy + gitleaks scan image used by this repo's pre-PR checks.
+
+## [containers](containers/)
+Shared base image; kytrade's Dockerfiles build FROM it.
+
+Retired infra (aws, mac-setup, openclaw-k8s, ai-lint-toolkit) moved to
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox).

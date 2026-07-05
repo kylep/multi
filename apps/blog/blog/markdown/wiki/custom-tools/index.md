@@ -22,7 +22,9 @@ and scanners. MCP servers have moved to their own section:
 
 ## Skills
 
-Source: `apps/openclaw-skills/`
+Source: `openclaw-skills/` in
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox)
+(demoted 2026-07-04; unmaintained)
 
 | Skill | Requires | Purpose |
 |-------|----------|---------|

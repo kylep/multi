@@ -15,12 +15,14 @@ last_verified: 2026-04-17
 A single-file Python script that walks a macOS home directory and reports
 where disk space is going. It prints a report; it never deletes anything.
 
-Source: `apps/macos-utils/cleanup-scan.py`.
+Source: `macos-utils/cleanup-scan.py` in
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox)
+(demoted from multi on 2026-07-04; unmaintained).
 
 ## Run it
 
 ```bash
-python3 apps/macos-utils/cleanup-scan.py
+python3 ~/gh/multi-sandbox/macos-utils/cleanup-scan.py
 ```
 
 No dependencies beyond the stdlib. Colors are auto-disabled when stdout

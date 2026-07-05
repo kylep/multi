@@ -49,10 +49,10 @@ On failure the script also posts a 🔴 message to
 
 The bucket, service account, IAM binding, lifecycle rule, and
 service-account key are all declared in `apps/pai/tf/backup.tf`.
-You drive Terraform from your workstation. The `terraform` CLI
-ships from `hashicorp/tap/terraform` in the mac-setup Ansible
-playbook — re-run
-`ansible-playbook infra/mac-setup/playbook.yml` if it's missing.
+You drive Terraform from your workstation. Install the `terraform`
+CLI with `brew install hashicorp/tap/terraform` if it's missing
+(the old mac-setup Ansible playbook now lives in
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox)).
 Also expects `gcloud auth application-default login` already done.
 
 All paths below are relative to the repo root. The TF lives in
