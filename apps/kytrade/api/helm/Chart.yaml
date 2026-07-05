@@ -1,6 +1,0 @@
-apiVersion: v2
-name: kytrade-api
-description: Python APU for Kytrade
-type: application
-version: 1.0.0
-appVersion: ""
