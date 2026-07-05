@@ -1,44 +1,85 @@
 # kytrade
 
-- My personal trading tools and automation.
-- Open source, but I'd advise against using any of this without talking to me.
-- Kytrade 1, or just Kytrade, is an extant trading CLI that I wrote a while ago.
-- Eventually I'll merge the old CLI into this and rename kytrade2 to kytrade
+Personal trading toolkit: the platform I build trading software in — run
+experiments, explore transaction decisions, test and eventually automate
+strategies. Open source, but built for me; talk to me before using it.
 
+The roadmap lives in the wiki:
+[Kytrade Modernization Roadmap](../blog/blog/markdown/wiki/design-docs/kytrade-modernization.md).
 
-## Dev
+## Stack
 
-Start the dev env
-```
-mkdir -p postgres-data
-docker-compose up
-```
+- Python 3.14, managed with [uv](https://docs.astral.sh/uv/)
+- Typer CLI (`kt`) — the primary interface, for humans and Claude alike
+- Postgres JSON-document store (SQLAlchemy 2 + psycopg 3), schema in
+  [DATA.md](DATA.md)
+- Price data from Yahoo Finance via yfinance
 
-First time you start it, also create the database
-```
-docker exec -it kytrade2-postgres-1 psql -U kytrade
-```
+## Quickstart
 
-## Prod
+Postgres wants credentials in the environment:
 
-Check the `multi/infra` dir to set up a K8s cluster.
-
-### Deploying the app to K8s
-
-Make sure you have helmfile and helm-diff installed.
-
-```
-helmfile apply
+```bash
+export POSTGRES_PASSWORD=devpassword   # the only required var
 ```
 
+Start the database and hydrate it:
 
----
-
-# Hydrating the database
-
-Particuarly for local dev, you'll want to load some data before things are useful.
-
-```
-bin/hydrade-db.sh
+```bash
+docker compose up -d postgres
+uv sync
+bin/hydrate-db.sh
 ```
 
+Pull and inspect some prices:
+
+```bash
+uv run kt stock save-history -s AAPL
+uv run kt stock prices AAPL --tail 10
+uv run kt stock prices AAPL --tail 10 --json
+```
+
+## CLI
+
+`kt --help` is the source of truth. The groups:
+
+- `kt stock` — download and read daily price history
+- `kt db` — init tables, list/get/set raw documents
+- `kt etl` — bulk loads (S&P 500 membership from a holdings spreadsheet)
+- `kt version`
+
+`--debug/-d` (or `KT_DEBUG=true`) enables debug logging. Read commands
+take `--json` for machine-readable output.
+
+## Environment variables
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `POSTGRES_PASSWORD` | (required) | Database password |
+| `POSTGRES_HOST` | `127.0.0.1` | Database host |
+| `POSTGRES_PORT` | `5432` | Database port |
+| `POSTGRES_USER` | `kytrade` | Database user |
+| `DATABASE_NAME` | `kytrade` | Database name |
+| `SQLA_DRIVER` | `postgresql+psycopg` | SQLAlchemy driver string |
+| `SQLA_ECHO` | `false` | Log SQL statements |
+| `KT_DEBUG` | `false` | Debug logging |
+
+Nothing is read at import time; a variable is only required by the
+commands that use it.
+
+## Tests
+
+```bash
+uv run pytest
+```
+
+## Layout
+
+```text
+src/kytrade/      the package: config, db, stocks, yahoo, etl, cli/
+tests/unit/       pytest suite (no database needed)
+bin/              hydrate-db.sh, reset-database.sh
+raw-data/         static input files (S&P 500 holdings snapshot)
+docker-compose.yml   local postgres
+helmfile.yaml     postgres on the k8s cluster
+```

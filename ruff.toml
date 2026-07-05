@@ -2,7 +2,6 @@ force-exclude = true
 
 extend-exclude = [
     "apps/games",
-    "apps/kytrade",
     "apps/mods",
     "apps/xmasblocks",
 ]

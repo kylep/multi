@@ -1,50 +1,16 @@
-version: "3.8"
 services:
-
-  kytrade-api:
-    build:
-      context: .
-    image: kpericak/kytrade:${KYTRADE_RELEASE}
-    ports:
-      - "5000:5000"
-    expose:
-      - 5000
-    command: bin/start-api
-    volumes:
-      - ./:/app
-    environment:
-      ENV: dev
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?err}
-      POSTGRES_USER: ${POSTGRES_USER:?err}
-
-  kytrade-client:
-    image: kpericak/kytrade:${KYTRADE_RELEASE}
-    ports:
-      - "8000:8000"
-    expose:
-      - 8000
-    command: bin/start-client-dev
-    volumes:
-      - ./:/app
-    environment:
-      ENV: dev
-      API_FQDN: ${API_FQDN:?err}
-
   postgres:
-    image: postgres
+    image: postgres:17
     ports:
       - "5432:5432"
-    expose:
-      - 5432
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kytrade}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?err}
-      POSTGRES_USER: ${POSTGRES_USER:?err}
-
-
-# not yet...
-#  redis:
-#    image: redis
-#    expose:
-#      - 6379
+      POSTGRES_DB: ${DATABASE_NAME:-kytrade}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kytrade}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

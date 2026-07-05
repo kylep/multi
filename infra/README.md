@@ -14,7 +14,8 @@ Agent workloads: the `ai-agent-runtime` image, cronjob Helm charts
 semgrep + trivy + gitleaks scan image used by this repo's pre-PR checks.
 
 ## [containers](containers/)
-Shared base image; kytrade's Dockerfiles build FROM it.
+Shared base image. Currently unused — kytrade's 2022 Dockerfiles were
+its last consumer. Demotion candidate.
 
 Retired infra (aws, mac-setup, openclaw-k8s, ai-lint-toolkit) moved to
 [kylep/multi-sandbox](https://github.com/kylep/multi-sandbox).
