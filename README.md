@@ -54,10 +54,11 @@ source secrets/export-kytrade.sh
 
 ### Pre-commit hooks
 
-Runs [gitleaks](https://gitleaks.io/) on commit and push to detect secrets.
+Runs [gitleaks](https://gitleaks.io/) on commit and push to detect secrets
+(plus ruff, biome, and semgrep on commit).
 
 ```bash
-pre-commit install
+pre-commit install --hook-type pre-commit --hook-type pre-push
 ```
 
 ### Per-project setup

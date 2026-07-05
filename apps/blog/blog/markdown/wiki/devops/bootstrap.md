@@ -29,18 +29,22 @@ last_verified: 2026-03-18
 On a factory-reset Mac, two things are needed: this bootstrap script
 and `exports.sh` from the old machine (USB drive, AirDrop, etc.).
 
-### 1. Run the Mac bootstrap
+### 1. Run the Mac bootstrap (historical — paths now in multi-sandbox)
+
+The commands as they worked when this runbook was current, updated to
+the script's new home in multi-sandbox (unmaintained — review before
+running):
 
 ```bash
 source exports.sh
-sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/kylep/multi/main/infra/mac-setup/bootstrap.sh)"
+sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/kylep/multi-sandbox/main/infra/mac-setup/bootstrap.sh)"
 ```
 
-Or if the repo is already cloned:
+Or if the sandbox repo is already cloned:
 
 ```bash
 source ~/gh/multi/apps/blog/exports.sh
-sudo bash ~/gh/multi/infra/mac-setup/bootstrap.sh
+sudo bash ~/gh/multi-sandbox/infra/mac-setup/bootstrap.sh
 ```
 
 This installs (idempotent — safe to re-run):

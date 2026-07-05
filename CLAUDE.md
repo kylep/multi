@@ -188,7 +188,7 @@ docker run --rm -v "$(pwd):/workspace:ro" \
 ```bash
 docker run --rm -v "$(pwd):/workspace:ro" \
   kpericak/ai-security-toolkit-1:0.2 \
-  -c "trivy fs --scanners vuln,secret,misconfig --skip-dirs .claude,infra/local-k8s /workspace"
+  -c "trivy fs --scanners vuln,secret,misconfig --skip-dirs .claude/worktrees,infra/local-k8s /workspace"
 ```
 
 ## Container image scanning (trivy)
