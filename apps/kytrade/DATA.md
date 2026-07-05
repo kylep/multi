@@ -1,105 +1,73 @@
-# Documents
-Documents are sort of a stop-gap data format that I'll need to probably replace with
-a relational structure once there's enough data that this gets slow.
+# Data model
 
-```
-# kt db documents list
-```
+Everything lives in one Postgres table, `documents` (`name` → JSON `data`).
+It's a deliberate stop-gap: simple until there's enough data that range
+scans hurt, then the relational migration tracked in the
+[roadmap](../blog/blog/markdown/wiki/design-docs/kytrade-modernization.md)
+kicks in.
 
+Inspect any of these with `kt db get <name>`.
 
 ## stock/symbols
 
-A flat list of all known symbols
-```
+Ticker → metadata for every known symbol.
+
+```json
 {
-  <symbol>: {
-    "Name": <name>,
-    "Identifier": <numeric id, purpose unknown>,
-    "SEDOL": <another number, only used in uk/ireland>,
-    "weight": <number indicating % of the index>,
-    "Sector": "<sector name>",
-    "Shares Held": <# of shares held in this index's ETF (SPY...)>,
-    "Local Currency": "<currency name, ex USD"
+  "AAPL": {
+    "indexes": ["S&P 500"],
+    "etfs": ["SPY"],
+    "sectors": ["Information Technology"],
+    "currency": "USD",
+    "last_updated": "2026-07-04"
   }
 }
 ```
 
+`last_updated` is the date price history was last saved, used to skip
+re-downloads within the same day.
 
 ## stock/indexes
-A flat list of all known indexes
-```
-[
-  <symbol n>,
-  ...
-]
+
+Sorted list of known index names.
+
+```json
+["S&P 500"]
 ```
 
 ## stock/etfs
-A flat list of known ETFs
-```
-[
-  <symbol n>,
-  ...
-]
+
+Sorted list of known ETF tickers.
+
+```json
+["SPY"]
 ```
 
 ## stock/sectors
-A flat list of known sectors
-```
-[
-  <sector name>,
-  ...
-]
-```
 
----
+Sector name → sorted list of member tickers.
 
-```
+```json
 {
-  <index name>: {
-    <symbol>: {
-      "Name": <name>,
-      "Identifier": <numeric id, purpose unknown>,
-      "SEDOL": <another number, only used in uk/ireland>,
-      "weight": <number indicating % of the index>,
-      "Sector": "<sector name>",
-      "Shares Held": <# of shares held in this index's ETF (SPY...)>,
-      "Local Currency": "<currency name, ex USD"
-    }
+  "Energy": ["CVX", "XOM"],
+  "Information Technology": ["AAPL", "MSFT"]
+}
+```
+
+## stock/prices/&lt;symbol&gt;
+
+Date → OHLCV for one symbol, oldest date first. Values are
+JSON-safe: floats (or null where Yahoo had no data), volume is an
+integer, and all-null rows are dropped at ingest.
+
+```json
+{
+  "2026-07-03": {
+    "open": 212.15,
+    "high": 214.65,
+    "low": 211.81,
+    "close": 213.55,
+    "volume": 34955800
   }
-}
-```
-
-
-## stock/symbol/(symbol)/history
-
-An ordered list of stock values by date
-```
-{
-  "<YYYY-MM-DD>": {
-    "open": <$x.yy>,
-    "close": <$x.yy>,
-    "volume": <$x.yy>,
-  }
-}
-```
-
-
-## stock/sectors
-
-A flat list of all known sectors
-```
-{
-  "<sector name>": ["<symbol>", "<symbol>"],
-  ...
-}
-```
-
-## stock/etfs
-A flat list of all known sectors
-```
-{
-  "<sector name>": [],
-  ...
 }
 ```

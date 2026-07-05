@@ -28,7 +28,7 @@ last_verified: 2026-07-04
 ## Languages and runtimes
 
 - **TypeScript / JavaScript**: Blog (Next.js 15 static export), llm-client (Next.js 16), robot-battle (Vite), 5 of 8 MCP servers (bitwarden, cc-usage, google-news, openrouter, screenshot)
-- **Python**: kytrade api (Poetry/Flask 3), xmasblocks, 3 of 8 MCP servers (discord, google-search-console, openobserve), wiki-RAG and utility scripts (always use `apps/blog/.venv/bin/python`)
+- **Python**: kytrade (Python 3.14/uv, CLI-only since the Phase 1 rebuild — see [Kytrade Modernization Roadmap](/wiki/design-docs/kytrade-modernization.html)), xmasblocks, 3 of 8 MCP servers (discord, google-search-console, openobserve), wiki-RAG and utility scripts (always use `apps/blog/.venv/bin/python`)
 - **Go**: agent-controller (in-repo, not deployed)
 - **Bash**: Glue scripts, CronJob entrypoints
 

@@ -9,7 +9,7 @@ related:
   - wiki/prds
   - wiki/devops
 scope: "Index of design documents. Each doc captures the technical approach, trade-offs, and rationale for a significant system change."
-last_verified: 2026-05-08
+last_verified: 2026-07-05
 ---
 
 Technical design documents for significant architecture decisions.
@@ -38,3 +38,4 @@ section feeds directly into Claude Code's plan mode for implementation.
 - [Security Improvement Log](security-improvement-log.html) — Structured log of autonomous security improvements
 - [Pai Improvements](pai-improvements.html) — Markdown-backed memory MCP, active recall via pai-recaller sub-agent, 1-min commitment scheduler, browser automation. Single-user Discord assistant on Claude Max OAuth (draft, 2026-05-08)
 - [Blog Redesign: Agent-Native Design System](blog-design-system.html) — Token-driven Tailwind v4 `@theme` system, Radix + shadcn owned components in TSX, Storybook 10 workshop/docs/visual-tests, dark mode by token swap, autonomous verification gate; replaces MUI/Emotion/styled-components (draft, 2026-06-13)
+- [Kytrade Modernization Roadmap](kytrade-modernization.html) — Phased rebuild of the personal trading toolkit: purge 2022 WIP onto Python 3.14/uv, data layer, backtesting, FastAPI on k8s, Claude skill, web UI (active, 2026-07-05)

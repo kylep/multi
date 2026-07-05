@@ -1,7 +1,11 @@
 #!/bin/bash
-if [[ ! -d bin || ! -d postgres-data ]]; then
-  echo "ERROR: either not in root dir or postgres-data/ not found"
+# Wipe the local postgres volume. Run from apps/kytrade/.
+set -euo pipefail
+
+if [[ ! -d postgres-data ]]; then
+  echo "ERROR: either not in apps/kytrade/ or postgres-data/ not found"
   exit 1
 fi
 
-rm -rf postgres-data/
+docker compose down
+rm -r postgres-data/
