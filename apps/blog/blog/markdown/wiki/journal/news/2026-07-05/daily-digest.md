@@ -57,3 +57,17 @@ last_verified: 2026-07-05
 - [GitHub Trending](https://github.com/DeusData/codebase-memory-mcp) DeusData/codebase-memory-mcp is the #2 trending repo this week with 9,517 stars. It is an MCP server that indexes codebases into a persistent knowledge graph, supports 158 languages, and returns sub-millisecond query results with a single static binary.
 
 - [GitHub Trending](https://github.com/diegosouzapw/OmniRoute) diegosouzapw/OmniRoute entered the GitHub weekly top 8 with 4,133 stars this week. It is a free AI gateway that routes Claude Code, Cursor, Codex, and Copilot to 231+ providers including free-tier Claude and GPT endpoints, with MCP/A2A protocol support.
+
+---
+
+## Update — 16:00 UTC
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/unpatched-argo-cd-repo-server-flaw.html) An unpatched flaw in ArgoCD's internal repo-server gRPC port allows any attacker with network access to execute arbitrary commands on the cluster. Synacktiv disclosed the issue on July 1, 2026, after first reporting it to maintainers in January 2025 with no patch released. The recommended mitigation is strict Kubernetes network policies blocking untrusted pods from reaching the repo-server and Redis services.
+
+## Local
+
+- [CBC Sports](https://www.cbc.ca/sports/livestory/canada-vs-morocco-july-4-live-updates-fifa-world-cup-2026-9.7257729) Canada lost 0-3 to Morocco in the FIFA World Cup Round of 16 on July 4, eliminated as the first co-host country to exit the tournament. Azzedine Ounahi scored twice in the second half; Morocco advances to face France in the quarterfinals on July 9.
+
+- [Whitby Ribfest](https://whitbyribfest.com/) Whitby Ribfest returns July 10–12 at Victoria Fields. The Friday night concert featuring The Trews is ticketed; Saturday and Sunday are free and open to all with full ribfest programming.
