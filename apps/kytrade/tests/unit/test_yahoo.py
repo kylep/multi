@@ -91,5 +91,27 @@ def test_history_df_to_dict_casts_volume_to_int():
     assert type(volume) is int
 
 
+def test_history_df_to_dict_rounds_float32_noise():
+    df = make_history_df(
+        {
+            "2026-01-02": {
+                "Open": 293.44000244140625,
+                "High": 296.5899963378906,
+                "Low": 289.20001220703125,
+                "Close": 294.3800048828125,
+                "Volume": 100.0,
+            }
+        }
+    )
+    day = yahoo.history_df_to_dict(df)["2026-01-02"]
+    assert day == {
+        "open": 293.44,
+        "high": 296.59,
+        "low": 289.2,
+        "close": 294.38,
+        "volume": 100,
+    }
+
+
 def test_history_df_to_dict_empty_frame():
     assert yahoo.history_df_to_dict(pd.DataFrame()) == {}

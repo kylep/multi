@@ -23,13 +23,18 @@ type DailyPrices = dict[str, dict[str, float | None]]
 
 
 def history_df_to_dict(df: pd.DataFrame) -> DailyPrices:
-    """Convert a yfinance history frame to a JSON-safe, date-keyed dict."""
+    """Convert a yfinance history frame to a JSON-safe, date-keyed dict.
+
+    Prices are rounded to 4 decimals to shed float32 conversion noise.
+    """
     history: DailyPrices = {}
     for timestamp, row in df.iterrows():
         day: dict[str, float | None] = {}
         for column, field in PRICE_FIELDS.items():
             value = row.get(column)
-            day[field] = None if value is None or math.isnan(value) else float(value)
+            day[field] = (
+                None if value is None or math.isnan(value) else round(float(value), 4)
+            )
         if all(value is None for value in day.values()):
             continue
         if day["volume"] is not None:
