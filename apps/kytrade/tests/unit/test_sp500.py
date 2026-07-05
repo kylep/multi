@@ -94,6 +94,30 @@ def test_apply_membership_keeps_known_currency_when_new_is_missing(fake_store: d
     assert stocks.get_symbols()["MYST"]["currency"] == "USD"
 
 
+def test_apply_membership_untags_departed_symbols(fake_store: dict):
+    sp500.apply_membership(
+        [sp500.Member(ticker="OLD", sector="Energy", currency="USD")]
+    )
+    stocks.set_prices("OLD", {"2026-01-02": {"open": 1.0}})
+    sp500.apply_membership(
+        [sp500.Member(ticker="NEW", sector="Energy", currency="USD")]
+    )
+    departed = stocks.get_symbols()["OLD"]
+    assert "S&P 500" not in departed["indexes"]
+    assert "SPY" not in departed["etfs"]
+    assert stocks.get_sectors() == {"Energy": ["NEW"]}
+    assert stocks.get_prices("OLD") == {"2026-01-02": {"open": 1.0}}
+
+
+def test_apply_membership_moves_resectored_symbols(fake_store: dict):
+    sp500.apply_membership([sp500.Member(ticker="ACME", sector="Tech", currency="USD")])
+    sp500.apply_membership(
+        [sp500.Member(ticker="ACME", sector="Energy", currency="USD")]
+    )
+    assert stocks.get_symbols()["ACME"]["sectors"] == ["Energy"]
+    assert stocks.get_sectors() == {"Energy": ["ACME"]}
+
+
 def test_apply_membership_is_idempotent(fake_store: dict, wikipedia_df):
     members = sp500.fetch_membership()
     sp500.apply_membership(members)

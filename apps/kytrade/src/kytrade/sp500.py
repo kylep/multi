@@ -79,11 +79,22 @@ def load_membership_from_excel(path: Path | str) -> list[Member]:
 
 
 def apply_membership(members: list[Member]) -> int:
-    """Merge membership into the symbol/sector documents; return the member count."""
+    """Reconcile the symbol/sector documents with membership; return the count.
+
+    Symbols that left the index lose their index/ETF tags (price history
+    stays), a member's sector list is replaced with its current GICS
+    sector, and the sectors document is rebuilt from this membership.
+    """
     stocks.add_index(INDEX_NAME)
     stocks.add_etfs([INDEX_ETF])
     symbols = stocks.get_symbols()
-    sectors = stocks.get_sectors()
+    current = {member.ticker for member in members}
+    for ticker, metadata in symbols.items():
+        if ticker not in current and INDEX_NAME in metadata["indexes"]:
+            logger.info("%s left the %s", ticker, INDEX_NAME)
+            metadata["indexes"] = [i for i in metadata["indexes"] if i != INDEX_NAME]
+            metadata["etfs"] = [e for e in metadata["etfs"] if e != INDEX_ETF]
+    sectors: dict[str, list[str]] = {}
     for member in members:
         metadata = symbols.setdefault(member.ticker, stocks.new_symbol_metadata())
         metadata["indexes"] = sorted(set(metadata["indexes"]) | {INDEX_NAME})
@@ -91,10 +102,8 @@ def apply_membership(members: list[Member]) -> int:
         if member.currency:
             metadata["currency"] = member.currency
         if member.sector:
-            metadata["sectors"] = sorted(set(metadata["sectors"]) | {member.sector})
-            tickers = sectors.setdefault(member.sector, [])
-            if member.ticker not in tickers:
-                tickers.append(member.ticker)
+            metadata["sectors"] = [member.sector]
+            sectors.setdefault(member.sector, []).append(member.ticker)
     stocks.set_symbols(symbols)
     stocks.set_sectors({name: sorted(tickers) for name, tickers in sectors.items()})
     return len(members)
