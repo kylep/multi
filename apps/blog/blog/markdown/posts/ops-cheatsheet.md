@@ -280,6 +280,8 @@ For those who don't use vim, a quick reminder:
 
 ## Spell-Check commands
 
+See also: [Vim Spell-Check](/vim-spellcheck.html)
+
 ```text
 # enable/disable
 :set spell spelllang=en_ca
