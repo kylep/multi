@@ -34,19 +34,25 @@ bin/hydrate-db.sh
 Pull and inspect some prices:
 
 ```bash
-uv run kt stock save-history -s AAPL
-uv run kt stock prices AAPL --tail 10
-uv run kt stock prices AAPL --tail 10 --json
+uv run kt data pull -s AAPL
+uv run kt data prices AAPL --tail 10
+uv run kt data prices AAPL --tail 10 --json
 ```
 
 ## CLI
 
 `kt --help` is the source of truth. The groups:
 
-- `kt stock` — download and read daily price history
+- `kt data` — pull daily price history (incremental; `--full` re-downloads),
+  read prices, load live S&P 500 membership from Wikipedia
+  (`load-sp500`, with `--file` for the offline spreadsheet), and
+  `backfill-sp500` to load membership and pull every symbol
 - `kt db` — init tables, list/get/set raw documents
-- `kt etl` — bulk loads (S&P 500 membership from a holdings spreadsheet)
 - `kt version`
+
+Pulls are incremental: only dates newer than what's stored are fetched.
+Run `kt data pull --all --full` occasionally — auto-adjusted historical
+prices shift after splits and dividends.
 
 `--debug/-d` (or `KT_DEBUG=true`) enables debug logging. Read commands
 take `--json` for machine-readable output.
@@ -76,10 +82,10 @@ uv run pytest
 ## Layout
 
 ```text
-src/kytrade/      the package: config, db, stocks, yahoo, etl, cli/
+src/kytrade/      the package: config, db, stocks, sp500, providers/, cli/
 tests/unit/       pytest suite (no database needed)
 bin/              hydrate-db.sh, reset-database.sh
-raw-data/         static input files (S&P 500 holdings snapshot)
+raw-data/         offline fallback (S&P 500 holdings snapshot, Oct 2022)
 docker-compose.yml   local postgres
 helmfile.yaml     postgres on the k8s cluster
 ```

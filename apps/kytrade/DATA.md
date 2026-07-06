@@ -25,7 +25,11 @@ Ticker → metadata for every known symbol.
 ```
 
 `last_updated` is the date price history was last saved, used to skip
-re-downloads within the same day.
+re-downloads within the same day (`--full` ignores it).
+
+Data written before kytrade 3.x uses an incompatible shape
+(`ETFs` key, sector→metadata sectors document) — rerun
+`bin/hydrate-db.sh` instead of migrating.
 
 ## stock/indexes
 
@@ -45,7 +49,10 @@ Sorted list of known ETF tickers.
 
 ## stock/sectors
 
-Sector name → sorted list of member tickers.
+Sector name → sorted list of member tickers. Rebuilt from the current
+membership on every `kt data load-sp500`; symbols that leave the index
+also lose their `S&P 500`/`SPY` tags in `stock/symbols` (their price
+history is kept).
 
 ```json
 {
@@ -59,6 +66,10 @@ Sector name → sorted list of member tickers.
 Date → OHLCV for one symbol, oldest date first. Values are
 JSON-safe: floats (or null where Yahoo had no data), volume is an
 integer, and all-null rows are dropped at ingest.
+
+`kt data pull` extends this incrementally (only dates after the newest
+stored row). Prices are auto-adjusted, so history drifts after splits
+and dividends — an occasional `kt data pull --all --full` re-baselines.
 
 ```json
 {

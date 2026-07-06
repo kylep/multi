@@ -1,13 +1,16 @@
-"""Yahoo Finance price data.
+"""Yahoo Finance price provider.
 
 Suitable for small-batch daily pulls; Yahoo rate-limits aggressively.
 """
 
 import logging
 import math
+from datetime import date
 
 import pandas as pd
 import yfinance
+
+from kytrade.providers.base import DailyPrices
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +21,6 @@ PRICE_FIELDS = {
     "Close": "close",
     "Volume": "volume",
 }
-
-type DailyPrices = dict[str, dict[str, float | None]]
 
 
 def history_df_to_dict(df: pd.DataFrame) -> DailyPrices:
@@ -43,8 +44,15 @@ def history_df_to_dict(df: pd.DataFrame) -> DailyPrices:
     return history
 
 
-def download_daily_history(symbol: str) -> DailyPrices:
-    """Download the full daily history for a symbol, oldest first."""
-    logger.debug("downloading daily history for %s", symbol)
-    df = yfinance.Ticker(symbol).history(period="max", auto_adjust=True)
-    return history_df_to_dict(df)
+class YahooProvider:
+    """PriceProvider backed by yfinance."""
+
+    def daily_history(self, symbol: str, start: date | None = None) -> DailyPrices:
+        """Return daily OHLCV for a symbol from start, or all time if start is None."""
+        logger.debug("yahoo history for %s start=%s", symbol, start)
+        ticker = yfinance.Ticker(symbol)
+        if start is None:
+            df = ticker.history(period="max", auto_adjust=True)
+        else:
+            df = ticker.history(start=start, auto_adjust=True)
+        return history_df_to_dict(df)
