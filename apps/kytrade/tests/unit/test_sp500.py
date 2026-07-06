@@ -60,8 +60,10 @@ def test_load_membership_from_excel_skips_blank_and_nan_rows(excel_df):
 
 
 def test_apply_membership_writes_documents(fake_store: dict, wikipedia_df):
-    count = sp500.apply_membership(sp500.fetch_membership())
-    assert count == 3
+    diff = sp500.apply_membership(sp500.fetch_membership())
+    assert diff.total == 3
+    assert diff.added == ["AAPL", "BRK-B", "XOM"]
+    assert diff.removed == []
     symbols = stocks.get_symbols()
     assert symbols["AAPL"] == {
         "indexes": ["S&P 500"],
@@ -121,6 +123,21 @@ def test_apply_membership_moves_resectored_symbols(fake_store: dict):
 def test_apply_membership_is_idempotent(fake_store: dict, wikipedia_df):
     members = sp500.fetch_membership()
     sp500.apply_membership(members)
-    sp500.apply_membership(members)
+    diff = sp500.apply_membership(members)
     assert stocks.get_sectors()["Energy"] == ["XOM"]
     assert stocks.get_symbols()["AAPL"]["indexes"] == ["S&P 500"]
+    assert diff.added == [] and diff.removed == []
+
+
+def test_membership_changes_are_logged(fake_store: dict):
+    sp500.apply_membership(
+        [sp500.Member(ticker="OLD", sector="Energy", currency="USD")]
+    )
+    assert sp500.membership_log() == []
+    sp500.apply_membership(
+        [sp500.Member(ticker="NEW", sector="Energy", currency="USD")]
+    )
+    log = sp500.membership_log()
+    assert len(log) == 1
+    assert log[0].added == ["NEW"]
+    assert log[0].removed == ["OLD"]

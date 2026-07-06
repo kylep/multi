@@ -46,6 +46,14 @@ def list_documents() -> list[str]:
         return list(session.scalars(select(Document.name).order_by(Document.name)))
 
 
+def get_documents(prefix: str) -> dict[str, Any]:
+    """Return name → data for every document whose name starts with prefix."""
+    logger.debug("db:get prefix %s", prefix)
+    with Session(engine()) as session:
+        docs = session.scalars(select(Document).where(Document.name.startswith(prefix)))
+        return {doc.name: doc.data for doc in docs}
+
+
 def get_document(name: str) -> Any:
     """Return a document's data, or None if it does not exist."""
     logger.debug("db:get %s", name)

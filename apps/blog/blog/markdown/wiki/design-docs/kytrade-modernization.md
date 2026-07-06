@@ -1,6 +1,6 @@
 ---
 title: "Kytrade Modernization Roadmap"
-summary: "Phased plan to turn kytrade into Kyle's personal trading toolkit: purge 2022 WIP, harden the data layer, add backtesting, FastAPI on k8s, Claude skill, then web UI."
+summary: "Phased, prompt-first rebuild of kytrade: purged 2022 WIP, hardened data layer, twin FastAPI+CLI interfaces with Claude skills; backtesting, k8s deploy, and web UI ahead."
 keywords:
   - kytrade
   - trading
@@ -13,14 +13,22 @@ scope: "Architecture and phasing for the kytrade rebuild. Each phase is one bran
 last_verified: 2026-07-05
 ---
 
-## Vision (Kyle, 2026-07-04)
+## Vision (Kyle, 2026-07-04; scope expanded 2026-07-05)
 
 Kytrade is the personal trading toolkit: the platform for building
 trading software — run experiments, explore transaction decisions,
-test and eventually automate strategies. Operated primarily via CLI
-(human and Claude), later via a small API and web UI. Runs in the
-local k8s cluster like everything else; the API layer may move to
-serverless (Lambda / Cloud Run) later if auth is squared away.
+test and eventually automate strategies. Runs in the local k8s
+cluster like everything else; the API layer may move to serverless
+(Lambda / Cloud Run) later if auth is squared away.
+
+Development is **prompt-first** (Kyle, 2026-07-05): a feature is a
+prompt that works. `apps/kytrade/PROMPTS.md` is the feature spec —
+Supported prompts map 1:1 to business-layer functions; Roadmap
+prompts queue future phases. The interfaces are thin twins: a FastAPI
+ingress (committed OpenAPI spec) and the Typer CLI accept the same
+argument types and call the same functions; business logic lives in
+its own modules with unit and integration tests. Claude operates the
+toolkit through `kytrade` skills published in kylep/claude-plugins.
 
 ## Decisions locked (2026-07-04)
 
@@ -28,18 +36,23 @@ serverless (Lambda / Cloud Run) later if auth is squared away.
   its own phase (Vite or Next, matching the other apps).
 - **Slack: dropped.** Discord notifications come later via the
   existing bot infrastructure.
-- **Claude access: CLI + Claude Code skills** (pai-tools pattern)
-  operating through the CLI/API. No MCP server.
 - **Data store: keep the Postgres JSON-document store for now.** No
   new infra. The relational migration is tracked below, not built.
 - **Toolchain: Python 3.14 + uv** (Poetry retired), src layout,
   PEP 621 metadata, ruff-clean at the repo root config.
+- **Prompt-first development (2026-07-05).** PROMPTS.md is the feature
+  spec; a feature ships when its prompt works end to end.
+- **Twin interfaces (2026-07-05).** FastAPI + Typer over one function
+  layer, identical argument types, no business logic in either; the
+  OpenAPI spec is committed and drift-guarded.
+- **Claude access: skills in kylep/claude-plugins** operating through
+  the CLI/API (supersedes the repo-local-skill plan; still no MCP).
 
 ## Phases (one branch + PR each)
 
 ### Phase 1 — Purge & foundation (done 2026-07-05)
 Deleted: `front-end/`, Slack, Reddit, the empty Flask app +
-gunicorn/helm chart/Dockerfile (Phase 4 builds the API fresh), Alembic
+gunicorn/helm chart/Dockerfile (a real API returned in Phase 3), Alembic
 (returns with the relational schema), `cli/typermain.py`,
 WHERE_I_LEFT_OFF.md (superseded by this doc). Rebuilt on Python 3.14 +
 uv with a src layout; SQLAlchemy 2 + psycopg 3. Fixed: import-time
@@ -61,34 +74,41 @@ membership from Wikipedia (`kt data load-sp500`, bs4 parser, tickers
 normalized to Yahoo style; the 2022 xlsx stays as `--file` offline
 fallback); `kt data backfill-sp500`. CLI consolidated: `stock`/`etl`
 groups retired into `data`. The daily-pull k8s CronJob was deferred to
-Phase 4 — it needs a container image and the deploy story lives there.
+Phase 5 — it needs a container image and the deploy story lives there.
 Also in this PR: orphaned `infra/containers` base image removed
 (migrated to multi-sandbox).
 
-### Phase 3 — Toolkit core: experiments & backtesting
-Portfolio/position/order primitives; a Strategy protocol
-(`on_day(date, prices, portfolio)`); a backtest runner over stored
-history; metrics (CAGR, max drawdown, Sharpe); experiments persisted
-as `experiment/<name>` documents. CLI: `kt backtest run`,
-`kt experiment list|show` — all with `--json`.
+### Phase 3 — Prompt-driven interfaces (done 2026-07-05)
+The scope-change phase. PROMPTS.md written (20 prompts: 10 Supported,
+10 Roadmap). Business layer for prompts 1–10: `analysis.py`
+(performance, compare, movers, sectors, near-extreme screener,
+volatility), `ops.py` (status/staleness, staleness-aware refresh,
+bootstrap with `.env` secret generation), membership diff + dated log.
+FastAPI ingress with committed `openapi.json` (drift-guarded by a unit
+test); CLI extended to exact parity (`kt analyze`, `kt status`,
+`kt refresh`, `kt bootstrap`). Integration suite against the
+docker-compose postgres (`bin/integration-test.sh`). `kytrade` skills
+published to kylep/claude-plugins and installed here. Version 4.0.0.
 
-### Phase 4 — API: FastAPI on k8s
-FastAPI (fresh app; the empty Flask one died in Phase 1) with OpenAPI: prices, symbols,
-experiments, backtest trigger. Deployed to the local cluster via a
-new helm chart, along with the daily-pull CronJob deferred from
-Phase 2. Written Mangum-compatible so a later
-Lambda/Cloud Run port is a packaging change, not a rewrite. Auth:
-none needed cluster-local; when exposed, front with Cloudflare Access
-(already in use) instead of building auth.
+### Phase 4 — Toolkit core: experiments & backtesting
+Prompts 11–16. Portfolio/position/order primitives; a Strategy
+protocol (`on_day(date, prices, portfolio)`); a backtest runner over
+stored history; metrics (CAGR, max drawdown, Sharpe); experiments
+persisted as `experiment/<name>` documents. New functions surface
+through both interfaces per the twin rule, plus skill recipes.
 
-### Phase 5 — Claude skill + Discord notifications
-A Claude Code skill (pai-tools style) that teaches agents to operate
-kytrade via the JSON CLI and API. Discord notifications for cron
-results and strategy signals through the existing bot.
+### Phase 5 — k8s deploy: API, cron, watchlists, Discord
+Prompts 17–19. Container image + helm chart; the API on the local
+cluster; the daily-pull CronJob deferred from Phase 2; watchlists and
+signal checks with Discord notifications through the existing bot.
+API stays Mangum-compatible so a later Lambda/Cloud Run port is a
+packaging change. Auth: none cluster-local; when exposed, front with
+Cloudflare Access (already in use) instead of building auth.
 
 ### Phase 6 — Web UI (later)
 Fresh static UI (Vite or Next) against the API through Cloudflare
-Access. Only after the API surface stabilizes.
+Access. Only after the API surface stabilizes. Prompt 20 (blog-ready
+market recaps) can land any time after Phase 4 as a skill.
 
 ## Tracked but deliberately not built now
 
