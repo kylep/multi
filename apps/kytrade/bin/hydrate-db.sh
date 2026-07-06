@@ -1,6 +1,5 @@
 #!/bin/bash
 # Create tables and load current S&P 500 membership. Run from apps/kytrade/.
-# Offline fallback: uv run kt data load-sp500 --file raw-data/indexes/spy-oct17-2022.xlsx
 set -euo pipefail
 
 if [[ ! -d src ]]; then
@@ -9,4 +8,7 @@ if [[ ! -d src ]]; then
 fi
 
 uv run kt db init
-uv run kt data load-sp500
+uv run kt data load-sp500 || {
+  echo "WARN: live fetch failed, using the bundled Oct 2022 snapshot"
+  uv run kt data load-sp500 --file raw-data/indexes/spy-oct17-2022.xlsx
+}
