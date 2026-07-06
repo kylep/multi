@@ -31,11 +31,15 @@ class NotEnoughData(Exception):
 
 
 def _closes(history: DailyPrices, days: int | None = None) -> list[tuple[str, float]]:
-    """Return (date, close) pairs sorted by date, optionally windowed."""
+    """Return (date, close) pairs sorted by date, optionally windowed.
+
+    Non-positive closes are treated as bad vendor data and dropped so
+    ratio math can never divide by zero.
+    """
     points = [
         (day, row["close"])
         for day, row in sorted(history.items())
-        if row.get("close") is not None
+        if row.get("close") is not None and row["close"] > 0
     ]
     if days is not None and points:
         cutoff = (date.fromisoformat(points[-1][0]) - timedelta(days=days)).isoformat()
@@ -77,6 +81,7 @@ def performance(symbol: str, days: int = 90) -> Performance:
         for day, row in history.items()
         if day in window_days and row.get("volume") is not None
     ]
+    closes = [close for _, close in points]
     return Performance(
         symbol=symbol,
         days=days,
@@ -85,8 +90,8 @@ def performance(symbol: str, days: int = 90) -> Performance:
         start_close=points[0][1],
         end_close=points[-1][1],
         return_pct=_return_pct(points),
-        high=max(highs),
-        low=min(lows),
+        high=max(highs) if highs else max(closes),
+        low=min(lows) if lows else min(closes),
         avg_volume=int(sum(volumes) / len(volumes)) if volumes else 0,
     )
 
@@ -190,6 +195,8 @@ def near_extreme(
 
 def volatility(symbol: str, window_days: int = 21) -> VolatilityReport:
     """Daily-return volatility for a symbol and its worst rolling window."""
+    if window_days < 2:
+        raise ValueError("window_days must be at least 2")
     points = _closes(stocks.get_prices(symbol))
     if len(points) <= window_days:
         raise NotEnoughData(f"{symbol}: need more than {window_days} stored closes")

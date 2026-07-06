@@ -18,17 +18,19 @@ The long-term plan lives in the wiki:
 ## Quickstart
 
 ```bash
-docker compose up -d postgres   # uses .env, created next if missing
 uv sync
-uv run kt bootstrap             # secrets, tables, live S&P 500 membership
+uv run kt bootstrap             # first run: generates .env with a password
+docker compose up -d postgres   # reads the same .env
+uv run kt bootstrap             # idempotent: tables + live S&P 500 membership
 uv run kt refresh               # pull daily history for all 503 symbols
 uv run kt analyze movers --days 30
 ```
 
 `kt bootstrap` generates a `POSTGRES_PASSWORD` into a git-ignored
-`.env` (mode 600) if none is configured; docker compose and the CLI
-both read it. Bring your own via the environment or `.env` to skip
-generation.
+`.env` (mode 600) if none is configured — that's why it runs before
+compose on a fresh checkout. Bring your own password via the
+environment or `.env` and the first bootstrap+compose collapse into
+one step.
 
 ## CLI features
 

@@ -86,13 +86,16 @@ def pull(body: PullIn) -> PullOut:
     """Pull daily history for one symbol, or all symbols (incremental by default)."""
     if body.all_symbols == bool(body.symbol):
         raise HTTPException(422, "provide exactly one of symbol or all_symbols")
-    if body.all_symbols:
-        stocks.pull_all_price_histories(full=body.full)
-        return PullOut(symbol=None, new_days=None)
-    return PullOut(
-        symbol=body.symbol,
-        new_days=stocks.pull_price_history(body.symbol, full=body.full),
-    )
+    try:
+        if body.all_symbols:
+            stocks.pull_all_price_histories(full=body.full)
+            return PullOut(symbol=None, new_days=None)
+        return PullOut(
+            symbol=body.symbol,
+            new_days=stocks.pull_price_history(body.symbol, full=body.full),
+        )
+    except Exception as err:
+        raise HTTPException(502, f"price provider error: {err}") from err
 
 
 @app.get("/data/prices/{symbol}")
@@ -113,7 +116,11 @@ def symbols() -> dict[str, Any]:
 @app.post("/membership/load-sp500")
 def load_sp500() -> MembershipDiff:
     """Load current S&P 500 membership from Wikipedia and reconcile."""
-    return sp500.apply_membership(sp500.fetch_membership())
+    try:
+        members = sp500.fetch_membership()
+    except Exception as err:
+        raise HTTPException(502, f"membership fetch failed: {err}") from err
+    return sp500.apply_membership(members)
 
 
 @app.get("/membership/log")
@@ -195,8 +202,19 @@ def get_document(name: str) -> Any:
     return data
 
 
+RESERVED_DOC_PREFIX = "stock/"
+
+
 @app.put("/db/documents/{name:path}")
 def set_document(name: str, body: DocumentIn) -> Any:
-    """Insert or replace a document."""
+    """Insert or replace a document outside the reserved stock/ namespace.
+
+    Stock documents carry invariants the data/membership routes enforce;
+    raw writes to them are CLI-only (`kt db set`, a local operator tool).
+    """
+    if name.startswith(RESERVED_DOC_PREFIX):
+        raise HTTPException(
+            403, f"{RESERVED_DOC_PREFIX}* documents are managed by the data routes"
+        )
     db.set_document(name, body.data)
     return db.get_document(name)

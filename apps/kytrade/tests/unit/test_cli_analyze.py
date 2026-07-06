@@ -90,6 +90,15 @@ def test_status_exits_nonzero_when_db_down(monkeypatch: pytest.MonkeyPatch):
     assert result.exit_code == 1
 
 
+def test_status_json_still_exits_nonzero_when_unhealthy(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr(ops, "_db_reachable", lambda: False)
+    result = runner.invoke(app, ["status", "--json"])
+    assert result.exit_code == 1
+    assert json.loads(result.output)["db_ok"] is False
+
+
 def test_refresh_reports(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(
         ops,

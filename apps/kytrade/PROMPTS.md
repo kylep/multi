@@ -16,9 +16,12 @@ to one function in the business layer, exposed identically by the
 | 5 | "Find stocks within 5% of their 52-week high" | `kt analyze near-extreme --kind high --threshold-pct 5` | `GET /analysis/near-extreme?kind=high&threshold_pct=5` |
 | 6 | "What was TSLA's most volatile month last year?" | `kt analyze volatility TSLA --window-days 21` | `GET /analysis/volatility/TSLA?window_days=21` |
 | 7 | "Refresh my market data" | `kt refresh` | `POST /refresh` |
-| 8 | "Who joined or left the S&P 500 since my last update?" | `kt data load-sp500` then `kt data membership-log` | `POST /membership/load-sp500`, `GET /membership/log` |
+| 8 | "Who joined or left the S&P 500 since my last update?" | `kt data load-sp500 --json` (returns the diff) | `POST /membership/load-sp500` |
 | 9 | "Is kytrade healthy? How stale is my data?" | `kt status` | `GET /status` |
 | 10 | "Set up kytrade from scratch on this machine" | `kt bootstrap` (generates a `.env` password if none is configured) | `POST /bootstrap` |
+
+Past changes from prompt 8 accumulate in a dated history:
+`kt data membership-log` / `GET /membership/log`.
 
 Every read command takes `--json`; every route returns the same
 pydantic model the CLI prints. Prompts compose: "which Energy stock

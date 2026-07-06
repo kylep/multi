@@ -41,8 +41,11 @@ def version() -> None:
 def status(as_json: JsonFlag = False) -> None:
     """Toolkit health: database, tables, and data staleness."""
     report = ops.status()
+    healthy = report.db_ok and report.tables_ok
     if as_json:
         print(report.model_dump_json(indent=2))
+        if not healthy:
+            raise typer.Exit(code=1)
         return
     if not report.db_ok:
         console.print(

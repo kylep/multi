@@ -1205,7 +1205,7 @@
         "summary": "Get Document"
       },
       "put": {
-        "description": "Insert or replace a document.",
+        "description": "Insert or replace a document outside the reserved stock/ namespace.\n\nStock documents carry invariants the data/membership routes enforce;\nraw writes to them are CLI-only (`kt db set`, a local operator tool).",
         "operationId": "set_document_db_documents__name__put",
         "parameters": [
           {

@@ -104,6 +104,33 @@ def test_refresh_route(monkeypatch: pytest.MonkeyPatch):
     assert client.post("/refresh").json()["new_days"] == 3
 
 
+def test_pull_translates_provider_errors_to_502(
+    fake_store: dict, monkeypatch: pytest.MonkeyPatch
+):
+    def explode(symbol, full=False, **kwargs):
+        raise ConnectionError("yahoo down")
+
+    monkeypatch.setattr(stocks, "pull_price_history", explode)
+    response = client.post("/data/pull", json={"symbol": "AAPL"})
+    assert response.status_code == 502
+
+
+def test_load_sp500_translates_fetch_errors_to_502(monkeypatch: pytest.MonkeyPatch):
+    from kytrade import sp500
+
+    def explode():
+        raise ConnectionError("wikipedia down")
+
+    monkeypatch.setattr(sp500, "fetch_membership", explode)
+    assert client.post("/membership/load-sp500").status_code == 502
+
+
+def test_put_rejects_reserved_stock_namespace(fake_store: dict):
+    response = client.put("/db/documents/stock/symbols", json={"data": {}})
+    assert response.status_code == 403
+    assert "stock/symbols" not in fake_store
+
+
 def test_document_routes(fake_store: dict):
     put = client.put("/db/documents/config/greeting", json={"data": {"hi": "there"}})
     assert put.status_code == 200

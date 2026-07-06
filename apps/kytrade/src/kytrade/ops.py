@@ -105,7 +105,8 @@ def ensure_env(path: Path | None = None) -> tuple[Path, bool]:
         return path, False
     password = secrets.token_urlsafe(24)
     existing = path.read_text() if path.is_file() else ""
-    with path.open("a") as env_file:
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+    with os.fdopen(fd, "a") as env_file:
         if existing and not existing.endswith("\n"):
             env_file.write("\n")
         env_file.write(f"POSTGRES_PASSWORD={password}\n")

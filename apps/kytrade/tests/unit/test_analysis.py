@@ -128,6 +128,46 @@ def test_volatility_finds_worst_window(fake_store: dict):
     assert report.overall_daily_stddev_pct > 0
 
 
+def test_zero_closes_are_dropped_not_divided_by(fake_store: dict):
+    seed(
+        fake_store, "BAD", {"2026-06-01": 0.0, "2026-06-02": 100.0, "2026-07-01": 110.0}
+    )
+    report = analysis.performance("BAD", days=90)
+    assert report.start_date == "2026-06-02"
+    assert report.return_pct == 10.0
+    screener = analysis.near_extreme(kind="low", threshold_pct=100.0)
+    assert all(hit.extreme > 0 for hit in screener.hits)
+
+
+def test_performance_falls_back_to_closes_when_high_low_missing(fake_store: dict):
+    fake_store[f"{stocks.PRICES_DOC_PREFIX}/AAPL"] = {
+        "2026-06-01": {
+            "open": None,
+            "high": None,
+            "low": None,
+            "close": 100.0,
+            "volume": None,
+        },
+        "2026-07-01": {
+            "open": None,
+            "high": None,
+            "low": None,
+            "close": 120.0,
+            "volume": None,
+        },
+    }
+    report = analysis.performance("AAPL", days=90)
+    assert report.high == 120.0
+    assert report.low == 100.0
+    assert report.avg_volume == 0
+
+
+def test_volatility_rejects_window_below_two(fake_store: dict):
+    seed(fake_store, "AAPL", {f"2026-06-{i:02d}": 100.0 + i for i in range(1, 10)})
+    with pytest.raises(ValueError):
+        analysis.volatility("AAPL", window_days=1)
+
+
 def test_volatility_rejects_thin_history(fake_store: dict):
     seed(fake_store, "AAPL", {"2026-07-01": 100.0, "2026-07-02": 101.0})
     with pytest.raises(analysis.NotEnoughData):
