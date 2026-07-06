@@ -88,8 +88,10 @@ def load_sp500(
         members = sp500.load_membership_from_excel(file)
     else:
         members = sp500.fetch_membership()
-    count = sp500.apply_membership(members)
-    console.print(f"[green]loaded {count} symbols[/green]")
+    diff = sp500.apply_membership(members)
+    console.print(f"[green]loaded {diff.total} symbols[/green]")
+    if diff.added or diff.removed:
+        console.print(f"joined: {diff.added} left: {diff.removed}")
 
 
 @app.command()
@@ -99,6 +101,6 @@ def backfill_sp500(
     ] = False,
 ) -> None:
     """Load current S&P 500 membership, then pull history for every symbol."""
-    count = sp500.apply_membership(sp500.fetch_membership())
-    console.print(f"[green]loaded {count} symbols, pulling histories...[/green]")
+    diff = sp500.apply_membership(sp500.fetch_membership())
+    console.print(f"[green]loaded {diff.total} symbols, pulling histories...[/green]")
     stocks.pull_all_price_histories(full=full)

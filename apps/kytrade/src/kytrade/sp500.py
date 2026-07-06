@@ -2,6 +2,7 @@
 
 import logging
 from dataclasses import dataclass
+from datetime import date
 from io import StringIO
 from pathlib import Path
 
@@ -9,13 +10,15 @@ import pandas as pd
 import requests
 
 import kytrade
-from kytrade import stocks
+from kytrade import db, stocks
+from kytrade.models import MembershipDiff, MembershipLogEntry
 
 logger = logging.getLogger(__name__)
 
 WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
 INDEX_NAME = "S&P 500"
 INDEX_ETF = "SPY"
+MEMBERSHIP_LOG_DOC = "stock/membership-log"
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,22 +81,28 @@ def load_membership_from_excel(path: Path | str) -> list[Member]:
     ]
 
 
-def apply_membership(members: list[Member]) -> int:
-    """Reconcile the symbol/sector documents with membership; return the count.
+def apply_membership(members: list[Member]) -> MembershipDiff:
+    """Reconcile the symbol/sector documents with membership; return the diff.
 
     Symbols that left the index lose their index/ETF tags (price history
     stays), a member's sector list is replaced with its current GICS
     sector, and the sectors document is rebuilt from this membership.
+    Non-empty diffs are appended to the membership log document.
     """
     stocks.add_index(INDEX_NAME)
     stocks.add_etfs([INDEX_ETF])
     symbols = stocks.get_symbols()
     current = {member.ticker for member in members}
-    for ticker, metadata in symbols.items():
-        if ticker not in current and INDEX_NAME in metadata["indexes"]:
-            logger.info("%s left the %s", ticker, INDEX_NAME)
-            metadata["indexes"] = [i for i in metadata["indexes"] if i != INDEX_NAME]
-            metadata["etfs"] = [e for e in metadata["etfs"] if e != INDEX_ETF]
+    previous = {
+        ticker
+        for ticker, metadata in symbols.items()
+        if INDEX_NAME in metadata["indexes"]
+    }
+    for ticker in previous - current:
+        logger.info("%s left the %s", ticker, INDEX_NAME)
+        metadata = symbols[ticker]
+        metadata["indexes"] = [i for i in metadata["indexes"] if i != INDEX_NAME]
+        metadata["etfs"] = [e for e in metadata["etfs"] if e != INDEX_ETF]
     sectors: dict[str, list[str]] = {}
     for member in members:
         metadata = symbols.setdefault(member.ticker, stocks.new_symbol_metadata())
@@ -106,4 +115,26 @@ def apply_membership(members: list[Member]) -> int:
             sectors.setdefault(member.sector, []).append(member.ticker)
     stocks.set_symbols(symbols)
     stocks.set_sectors({name: sorted(tickers) for name, tickers in sectors.items()})
-    return len(members)
+    diff = MembershipDiff(
+        index=INDEX_NAME,
+        added=sorted(current - previous),
+        removed=sorted(previous - current),
+        total=len(members),
+    )
+    if previous and (diff.added or diff.removed):
+        _log_membership_change(diff)
+    return diff
+
+
+def _log_membership_change(diff: MembershipDiff) -> None:
+    log = db.get_document(MEMBERSHIP_LOG_DOC) or []
+    log.append(
+        {"date": date.today().isoformat(), "added": diff.added, "removed": diff.removed}
+    )
+    db.set_document(MEMBERSHIP_LOG_DOC, log)
+
+
+def membership_log() -> list[MembershipLogEntry]:
+    """Return the dated membership changes recorded by past loads."""
+    entries = db.get_document(MEMBERSHIP_LOG_DOC) or []
+    return [MembershipLogEntry(**entry) for entry in entries]
