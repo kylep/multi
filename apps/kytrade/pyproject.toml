@@ -1,6 +1,6 @@
 [project]
 name = "kytrade"
-version = "3.1.0"
+version = "4.0.0"
 description = "Personal trading toolkit: run experiments, explore transaction decisions, test strategies"
 authors = [{ name = "Kyle Pericak", email = "kyle@pericak.com" }]
 readme = "README.md"
@@ -38,3 +38,7 @@ packages = ["src/kytrade"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not integration'"
+markers = [
+    "integration: needs the docker-compose postgres (run via bin/integration-test.sh)",
+]
