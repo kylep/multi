@@ -61,3 +61,31 @@ last_verified: 2026-07-06
 ## Just for You
 
 - [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare Wrangler's June 2026 release adds declarative Durable Object exports, OAuth keyring encryption, and auth profiles. Cloudflare Mesh gained hostname-based routing alongside CIDR routes, and a unified Routes page now consolidates all connector, Tunnel, WAN, and Magic Transit routes in one view.
+
+---
+
+## Update — 20:30 UTC
+
+## AI Industry
+
+- [Build Fast With AI](https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026) The inaugural UN Global Dialogue on AI Governance opened in Geneva on July 6 with delegates from 169 countries. The two-day session runs through July 7 and is immediately followed by the ITU AI for Good Global Summit.
+
+- [Build Fast With AI](https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026) China's new AI companion law is forcing agent shutdowns across platforms, directly affecting 345 million Doubao users. Alibaba announced no migration path for Qwen users with existing agent configurations, meaning users who miss the deadline face permanent data loss.
+
+- [Build Fast With AI](https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026) Alibaba consolidated five previously separate AI units into a single organization called Alibaba Token Hub.
+
+## AI Tooling
+
+- [Build Fast With AI](https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026) Gemini 3.5 Pro has begun a gradual developer platform rollout as of early July, moving out of limited Vertex AI enterprise preview. The model features a 2-million-token context window.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/threat-actors-probe-gitea-docker-flaw.html) Active exploitation attempts have been detected against CVE-2026-20896 (CVSS 9.8) in Gitea Docker images — a flaw where the default configuration trusts any "X-WEBAUTH-USER" HTTP header, giving full admin access to any caller. Approximately 6,200 internet-facing Gitea instances are exposed. Patch to version 1.26.3 or later.
+
+## Local
+
+- [CTV News](https://www.ctvnews.ca/toronto/local/durham/article/second-toddler-attacked-by-coyote-in-whitby-left-with-serious-injuries/) A two-year-old boy was bitten in the face by a coyote at Vanier Park near Brock Street North and Rossland Road East in Whitby on Sunday evening. Durham Regional Police issued a public warning; it is the second unprovoked coyote attack on a young child in Whitby in two weeks.
+
+## Weather
+
+- Whitby: 25°C at 6 PM EDT, sunny; overnight low 19°C, partly cloudy. No active alerts. Source: [weather.gc.ca](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939)
