@@ -82,6 +82,7 @@ def load_sp500(
             exists=True, help="Offline SPY holdings .xlsx instead of Wikipedia"
         ),
     ] = None,
+    as_json: Annotated[bool, typer.Option("--json", help="Emit JSON")] = False,
 ) -> None:
     """Load current S&P 500 membership (Wikipedia by default)."""
     if file:
@@ -89,9 +90,49 @@ def load_sp500(
     else:
         members = sp500.fetch_membership()
     diff = sp500.apply_membership(members)
+    if as_json:
+        print(diff.model_dump_json(indent=2))
+        return
     console.print(f"[green]loaded {diff.total} symbols[/green]")
     if diff.added or diff.removed:
         console.print(f"joined: {diff.added} left: {diff.removed}")
+
+
+@app.command()
+def symbols(
+    as_json: Annotated[bool, typer.Option("--json", help="Emit JSON")] = False,
+) -> None:
+    """Every known symbol and its metadata."""
+    known = stocks.get_symbols()
+    if as_json:
+        print(json.dumps(known, indent=2))
+        return
+    table = Table("symbol", "sectors", "currency", "last updated")
+    for ticker, metadata in sorted(known.items()):
+        table.add_row(
+            ticker,
+            ", ".join(metadata["sectors"]),
+            metadata["currency"] or "",
+            metadata["last_updated"] or "never",
+        )
+    console.print(table)
+
+
+@app.command("membership-log")
+def membership_log(
+    as_json: Annotated[bool, typer.Option("--json", help="Emit JSON")] = False,
+) -> None:
+    """Dated membership changes recorded by past loads."""
+    entries = sp500.membership_log()
+    if as_json:
+        print(json.dumps([entry.model_dump() for entry in entries], indent=2))
+        return
+    for entry in entries:
+        console.print(
+            f"{entry.date}: joined {entry.added or '[]'} left {entry.removed or '[]'}"
+        )
+    if not entries:
+        console.print("no membership changes recorded")
 
 
 @app.command()

@@ -1,0 +1,1378 @@
+{
+  "components": {
+    "schemas": {
+      "BootstrapReport": {
+        "description": "Result of bootstrapping the toolkit.",
+        "properties": {
+          "db_ok": {
+            "title": "Db Ok",
+            "type": "boolean"
+          },
+          "env_file": {
+            "title": "Env File",
+            "type": "string"
+          },
+          "password_generated": {
+            "title": "Password Generated",
+            "type": "boolean"
+          },
+          "symbols_loaded": {
+            "title": "Symbols Loaded",
+            "type": "integer"
+          },
+          "tables_created": {
+            "title": "Tables Created",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "env_file",
+          "password_generated",
+          "db_ok",
+          "tables_created",
+          "symbols_loaded"
+        ],
+        "title": "BootstrapReport",
+        "type": "object"
+      },
+      "Comparison": {
+        "description": "Window returns for several symbols, best first.",
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/ComparisonEntry"
+            },
+            "title": "Entries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days",
+          "entries"
+        ],
+        "title": "Comparison",
+        "type": "object"
+      },
+      "ComparisonEntry": {
+        "description": "One symbol's line in a comparison.",
+        "properties": {
+          "end_close": {
+            "title": "End Close",
+            "type": "number"
+          },
+          "return_pct": {
+            "title": "Return Pct",
+            "type": "number"
+          },
+          "start_close": {
+            "title": "Start Close",
+            "type": "number"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "return_pct",
+          "start_close",
+          "end_close"
+        ],
+        "title": "ComparisonEntry",
+        "type": "object"
+      },
+      "DailyPrices": {
+        "additionalProperties": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": "object"
+        },
+        "type": "object"
+      },
+      "DocumentIn": {
+        "properties": {
+          "data": {
+            "title": "Data"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DocumentIn",
+        "type": "object"
+      },
+      "ExtremeHit": {
+        "description": "A symbol trading near its lookback extreme.",
+        "properties": {
+          "close": {
+            "title": "Close",
+            "type": "number"
+          },
+          "distance_pct": {
+            "title": "Distance Pct",
+            "type": "number"
+          },
+          "extreme": {
+            "title": "Extreme",
+            "type": "number"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "close",
+          "extreme",
+          "distance_pct"
+        ],
+        "title": "ExtremeHit",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "MembershipDiff": {
+        "description": "Symbols that joined or left an index during a membership load.",
+        "properties": {
+          "added": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Added",
+            "type": "array"
+          },
+          "index": {
+            "title": "Index",
+            "type": "string"
+          },
+          "removed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Removed",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "index",
+          "added",
+          "removed",
+          "total"
+        ],
+        "title": "MembershipDiff",
+        "type": "object"
+      },
+      "MembershipLogEntry": {
+        "description": "One dated membership change.",
+        "properties": {
+          "added": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Added",
+            "type": "array"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "removed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Removed",
+            "type": "array"
+          }
+        },
+        "required": [
+          "date",
+          "added",
+          "removed"
+        ],
+        "title": "MembershipLogEntry",
+        "type": "object"
+      },
+      "Movers": {
+        "description": "Best and worst window returns across the known universe.",
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "gainers": {
+            "items": {
+              "$ref": "#/components/schemas/ComparisonEntry"
+            },
+            "title": "Gainers",
+            "type": "array"
+          },
+          "losers": {
+            "items": {
+              "$ref": "#/components/schemas/ComparisonEntry"
+            },
+            "title": "Losers",
+            "type": "array"
+          },
+          "universe": {
+            "title": "Universe",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days",
+          "gainers",
+          "losers",
+          "universe"
+        ],
+        "title": "Movers",
+        "type": "object"
+      },
+      "Performance": {
+        "description": "Window performance for one symbol.",
+        "properties": {
+          "avg_volume": {
+            "title": "Avg Volume",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "end_close": {
+            "title": "End Close",
+            "type": "number"
+          },
+          "end_date": {
+            "title": "End Date",
+            "type": "string"
+          },
+          "high": {
+            "title": "High",
+            "type": "number"
+          },
+          "low": {
+            "title": "Low",
+            "type": "number"
+          },
+          "return_pct": {
+            "title": "Return Pct",
+            "type": "number"
+          },
+          "start_close": {
+            "title": "Start Close",
+            "type": "number"
+          },
+          "start_date": {
+            "title": "Start Date",
+            "type": "string"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "days",
+          "start_date",
+          "end_date",
+          "start_close",
+          "end_close",
+          "return_pct",
+          "high",
+          "low",
+          "avg_volume"
+        ],
+        "title": "Performance",
+        "type": "object"
+      },
+      "PullIn": {
+        "properties": {
+          "all_symbols": {
+            "default": false,
+            "title": "All Symbols",
+            "type": "boolean"
+          },
+          "full": {
+            "default": false,
+            "title": "Full",
+            "type": "boolean"
+          },
+          "symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symbol"
+          }
+        },
+        "title": "PullIn",
+        "type": "object"
+      },
+      "PullOut": {
+        "properties": {
+          "new_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Days"
+          },
+          "symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symbol"
+          }
+        },
+        "required": [
+          "symbol",
+          "new_days"
+        ],
+        "title": "PullOut",
+        "type": "object"
+      },
+      "RefreshReport": {
+        "description": "Result of a staleness-aware refresh.",
+        "properties": {
+          "failed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Failed",
+            "type": "array"
+          },
+          "new_days": {
+            "title": "New Days",
+            "type": "integer"
+          },
+          "pulled": {
+            "title": "Pulled",
+            "type": "integer"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pulled",
+          "skipped",
+          "failed",
+          "new_days"
+        ],
+        "title": "RefreshReport",
+        "type": "object"
+      },
+      "ScreenerReport": {
+        "description": "Symbols within threshold of their lookback high or low.",
+        "properties": {
+          "hits": {
+            "items": {
+              "$ref": "#/components/schemas/ExtremeHit"
+            },
+            "title": "Hits",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lookback_days": {
+            "title": "Lookback Days",
+            "type": "integer"
+          },
+          "threshold_pct": {
+            "title": "Threshold Pct",
+            "type": "number"
+          },
+          "universe": {
+            "title": "Universe",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "threshold_pct",
+          "lookback_days",
+          "hits",
+          "universe"
+        ],
+        "title": "ScreenerReport",
+        "type": "object"
+      },
+      "SectorPerformance": {
+        "description": "Average member return for one sector.",
+        "properties": {
+          "return_pct": {
+            "title": "Return Pct",
+            "type": "number"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          },
+          "symbols": {
+            "title": "Symbols",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sector",
+          "return_pct",
+          "symbols"
+        ],
+        "title": "SectorPerformance",
+        "type": "object"
+      },
+      "SectorReport": {
+        "description": "Sector performance over a window, best first.",
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "sectors": {
+            "items": {
+              "$ref": "#/components/schemas/SectorPerformance"
+            },
+            "title": "Sectors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days",
+          "sectors"
+        ],
+        "title": "SectorReport",
+        "type": "object"
+      },
+      "Staleness": {
+        "description": "How fresh the stored price data is, by symbol count.",
+        "properties": {
+          "never": {
+            "title": "Never",
+            "type": "integer"
+          },
+          "older": {
+            "title": "Older",
+            "type": "integer"
+          },
+          "today": {
+            "title": "Today",
+            "type": "integer"
+          },
+          "week": {
+            "title": "Week",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "today",
+          "week",
+          "older",
+          "never"
+        ],
+        "title": "Staleness",
+        "type": "object"
+      },
+      "StatusReport": {
+        "description": "Health of the toolkit.",
+        "properties": {
+          "db_ok": {
+            "title": "Db Ok",
+            "type": "boolean"
+          },
+          "documents": {
+            "title": "Documents",
+            "type": "integer"
+          },
+          "priced_symbols": {
+            "title": "Priced Symbols",
+            "type": "integer"
+          },
+          "staleness": {
+            "$ref": "#/components/schemas/Staleness"
+          },
+          "symbols": {
+            "title": "Symbols",
+            "type": "integer"
+          },
+          "tables_ok": {
+            "title": "Tables Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "db_ok",
+          "tables_ok",
+          "documents",
+          "symbols",
+          "priced_symbols",
+          "staleness"
+        ],
+        "title": "StatusReport",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VersionOut": {
+        "properties": {
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "VersionOut",
+        "type": "object"
+      },
+      "VolatilityReport": {
+        "description": "Volatility for one symbol: overall and the worst rolling window.",
+        "properties": {
+          "overall_daily_stddev_pct": {
+            "title": "Overall Daily Stddev Pct",
+            "type": "number"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          },
+          "window_days": {
+            "title": "Window Days",
+            "type": "integer"
+          },
+          "worst_window": {
+            "$ref": "#/components/schemas/VolatilityWindow"
+          }
+        },
+        "required": [
+          "symbol",
+          "window_days",
+          "overall_daily_stddev_pct",
+          "worst_window"
+        ],
+        "title": "VolatilityReport",
+        "type": "object"
+      },
+      "VolatilityWindow": {
+        "description": "A dated window with its daily-return standard deviation.",
+        "properties": {
+          "daily_stddev_pct": {
+            "title": "Daily Stddev Pct",
+            "type": "number"
+          },
+          "end_date": {
+            "title": "End Date",
+            "type": "string"
+          },
+          "start_date": {
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date",
+          "daily_stddev_pct"
+        ],
+        "title": "VolatilityWindow",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Personal trading toolkit: prices, S&P 500 membership, and analysis over a Postgres document store. The kt CLI is a twin of this API.",
+    "title": "kytrade",
+    "version": "3.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/_live": {
+      "get": {
+        "description": "Liveness probe.",
+        "operationId": "live__live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Live  Live Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Live"
+      }
+    },
+    "/analysis/compare": {
+      "get": {
+        "description": "Window returns for several symbols, best first.",
+        "operationId": "compare_analysis_compare_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "symbols",
+            "required": true,
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "title": "Symbols",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 365,
+              "exclusiveMinimum": 0,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comparison"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare"
+      }
+    },
+    "/analysis/movers": {
+      "get": {
+        "description": "Best and worst window returns across the stored universe.",
+        "operationId": "movers_analysis_movers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "exclusiveMinimum": 0,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "title": "Top",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Movers"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Movers"
+      }
+    },
+    "/analysis/near-extreme": {
+      "get": {
+        "description": "Symbols trading within threshold of their lookback high or low.",
+        "operationId": "near_extreme_analysis_near_extreme_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "default": "high",
+              "enum": [
+                "high",
+                "low"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "threshold_pct",
+            "required": false,
+            "schema": {
+              "default": 5.0,
+              "minimum": 0,
+              "title": "Threshold Pct",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lookback_days",
+            "required": false,
+            "schema": {
+              "default": 365,
+              "exclusiveMinimum": 0,
+              "title": "Lookback Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScreenerReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Near Extreme"
+      }
+    },
+    "/analysis/performance/{symbol}": {
+      "get": {
+        "description": "Window performance for one symbol.",
+        "operationId": "performance_analysis_performance__symbol__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "title": "Symbol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 90,
+              "exclusiveMinimum": 0,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Performance"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Performance"
+      }
+    },
+    "/analysis/sectors": {
+      "get": {
+        "description": "Average member return per sector, best first.",
+        "operationId": "sectors_analysis_sectors_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 90,
+              "exclusiveMinimum": 0,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectorReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sectors"
+      }
+    },
+    "/analysis/volatility/{symbol}": {
+      "get": {
+        "description": "Daily-return volatility and the worst rolling window.",
+        "operationId": "volatility_analysis_volatility__symbol__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "title": "Symbol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window_days",
+            "required": false,
+            "schema": {
+              "default": 21,
+              "exclusiveMinimum": 1,
+              "title": "Window Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolatilityReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Volatility"
+      }
+    },
+    "/bootstrap": {
+      "post": {
+        "description": "Prepare the toolkit: secrets, tables, and S&P 500 membership.",
+        "operationId": "bootstrap_bootstrap_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BootstrapReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Bootstrap"
+      }
+    },
+    "/data/prices/{symbol}": {
+      "get": {
+        "description": "Stored daily prices for a symbol, oldest first.",
+        "operationId": "prices_data_prices__symbol__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "title": "Symbol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tail",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Tail",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyPrices"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Prices"
+      }
+    },
+    "/data/pull": {
+      "post": {
+        "description": "Pull daily history for one symbol, or all symbols (incremental by default).",
+        "operationId": "pull_data_pull_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PullIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PullOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pull"
+      }
+    },
+    "/data/symbols": {
+      "get": {
+        "description": "Every known symbol and its metadata.",
+        "operationId": "symbols_data_symbols_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Symbols Data Symbols Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Symbols"
+      }
+    },
+    "/db/documents": {
+      "get": {
+        "description": "Stored document names.",
+        "operationId": "documents_db_documents_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Documents Db Documents Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Documents"
+      }
+    },
+    "/db/documents/{name}": {
+      "get": {
+        "description": "One document's data.",
+        "operationId": "get_document_db_documents__name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Document Db Documents  Name  Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Document"
+      },
+      "put": {
+        "description": "Insert or replace a document.",
+        "operationId": "set_document_db_documents__name__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Set Document Db Documents  Name  Put"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Document"
+      }
+    },
+    "/membership/load-sp500": {
+      "post": {
+        "description": "Load current S&P 500 membership from Wikipedia and reconcile.",
+        "operationId": "load_sp500_membership_load_sp500_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipDiff"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Load Sp500"
+      }
+    },
+    "/membership/log": {
+      "get": {
+        "description": "Dated membership changes recorded by past loads.",
+        "operationId": "membership_log_membership_log_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MembershipLogEntry"
+                  },
+                  "title": "Response Membership Log Membership Log Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Membership Log"
+      }
+    },
+    "/refresh": {
+      "post": {
+        "description": "Pull every known symbol that isn't already fresh today.",
+        "operationId": "refresh_refresh_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "full",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Full",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh"
+      }
+    },
+    "/status": {
+      "get": {
+        "description": "Toolkit health: database, tables, and data staleness.",
+        "operationId": "status_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Status"
+      }
+    },
+    "/version": {
+      "get": {
+        "description": "Installed kytrade version.",
+        "operationId": "version_version_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Version"
+      }
+    }
+  }
+}
