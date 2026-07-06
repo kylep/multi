@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
 import kytrade
-from kytrade import analysis, db, ops, sp500, stocks
+from kytrade import analysis, db, indexes, ops, stocks
 from kytrade.models import (
     BootstrapReport,
     Comparison,
@@ -113,20 +113,43 @@ def symbols() -> dict[str, Any]:
     return stocks.get_symbols()
 
 
-@app.post("/membership/load-sp500")
-def load_sp500() -> MembershipDiff:
-    """Load current S&P 500 membership from Wikipedia and reconcile."""
-    try:
-        members = sp500.fetch_membership()
-    except Exception as err:
-        raise HTTPException(502, f"membership fetch failed: {err}") from err
-    return sp500.apply_membership(members)
+class TrackEtfIn(BaseModel):
+    ticker: str
+    currency: str | None = None
+
+
+class TrackEtfOut(BaseModel):
+    ticker: str
+    created: bool
+
+
+@app.post("/membership/load/{index}")
+def load_index(index: Literal["sp500", "tsx60", "all"]) -> list[MembershipDiff]:
+    """Load current index membership from Wikipedia and reconcile."""
+    specs = (
+        list(indexes.INDEXES.values()) if index == "all" else [indexes.INDEXES[index]]
+    )
+    diffs = []
+    for spec in specs:
+        try:
+            members = indexes.fetch_membership(spec)
+        except Exception as err:
+            raise HTTPException(502, f"membership fetch failed: {err}") from err
+        diffs.append(indexes.apply_membership(spec, members))
+    return diffs
+
+
+@app.post("/data/track-etf")
+def track_etf(body: TrackEtfIn) -> TrackEtfOut:
+    """Track an ETF's prices like any symbol."""
+    created = indexes.track_etf(body.ticker, body.currency)
+    return TrackEtfOut(ticker=body.ticker.strip().upper(), created=created)
 
 
 @app.get("/membership/log")
 def membership_log() -> list[MembershipLogEntry]:
     """Dated membership changes recorded by past loads."""
-    return sp500.membership_log()
+    return indexes.membership_log()
 
 
 @app.get("/analysis/performance/{symbol}")

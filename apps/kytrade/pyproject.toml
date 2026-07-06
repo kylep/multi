@@ -1,6 +1,6 @@
 [project]
 name = "kytrade"
-version = "4.0.0"
+version = "5.0.0"
 description = "Personal trading toolkit: run experiments, explore transaction decisions, test strategies"
 authors = [{ name = "Kyle Pericak", email = "kyle@pericak.com" }]
 readme = "README.md"

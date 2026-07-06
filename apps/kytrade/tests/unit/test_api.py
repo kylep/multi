@@ -115,14 +115,29 @@ def test_pull_translates_provider_errors_to_502(
     assert response.status_code == 502
 
 
-def test_load_sp500_translates_fetch_errors_to_502(monkeypatch: pytest.MonkeyPatch):
-    from kytrade import sp500
+def test_load_index_translates_fetch_errors_to_502(monkeypatch: pytest.MonkeyPatch):
+    from kytrade import indexes
 
-    def explode():
+    def explode(spec):
         raise ConnectionError("wikipedia down")
 
-    monkeypatch.setattr(sp500, "fetch_membership", explode)
-    assert client.post("/membership/load-sp500").status_code == 502
+    monkeypatch.setattr(indexes, "fetch_membership", explode)
+    assert client.post("/membership/load/sp500").status_code == 502
+
+
+def test_load_index_rejects_unknown_index():
+    assert client.post("/membership/load/dow30").status_code == 422
+
+
+def test_track_etf_route(fake_store: dict):
+    response = client.post(
+        "/data/track-etf", json={"ticker": "xiu.to", "currency": "CAD"}
+    )
+    assert response.json() == {"ticker": "XIU.TO", "created": True}
+    assert client.post("/data/track-etf", json={"ticker": "XIU.TO"}).json() == {
+        "ticker": "XIU.TO",
+        "created": False,
+    }
 
 
 def test_put_rejects_reserved_stock_namespace(fake_store: dict):

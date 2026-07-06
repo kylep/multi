@@ -120,6 +120,7 @@ def test_bootstrap_reports_db_down(monkeypatch: pytest.MonkeyPatch):
             db_ok=False,
             tables_created=False,
             symbols_loaded=0,
+            etfs_tracked=[],
         ),
     )
     result = runner.invoke(app, ["bootstrap"])

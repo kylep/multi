@@ -8,7 +8,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from kytrade import sp500, stocks
+from kytrade import indexes, stocks
 from kytrade.providers import yahoo
 
 app = typer.Typer(no_args_is_help=True)
@@ -74,28 +74,59 @@ def prices(
     console.print(table)
 
 
+def _specs_for(index: str) -> list[indexes.IndexSpec]:
+    if index == "all":
+        return list(indexes.INDEXES.values())
+    if index not in indexes.INDEXES:
+        console.print(
+            f"[red]unknown index {index!r}; use {'|'.join(indexes.INDEXES)}|all[/red]"
+        )
+        raise typer.Exit(code=1)
+    return [indexes.INDEXES[index]]
+
+
 @app.command()
-def load_sp500(
+def load_index(
+    index: Annotated[str, typer.Argument(help="sp500, tsx60, or all")] = "all",
     file: Annotated[
         Path | None,
         typer.Option(
-            exists=True, help="Offline SPY holdings .xlsx instead of Wikipedia"
+            exists=True,
+            help="Offline SPY holdings .xlsx (sp500 only) instead of Wikipedia",
         ),
     ] = None,
     as_json: Annotated[bool, typer.Option("--json", help="Emit JSON")] = False,
 ) -> None:
-    """Load current S&P 500 membership (Wikipedia by default)."""
-    if file:
-        members = sp500.load_membership_from_excel(file)
-    else:
-        members = sp500.fetch_membership()
-    diff = sp500.apply_membership(members)
+    """Load current index membership (Wikipedia by default)."""
+    specs = _specs_for(index)
+    if file and specs != [indexes.SP500]:
+        console.print("[red]--file only applies to the sp500 index[/red]")
+        raise typer.Exit(code=1)
+    diffs = []
+    for spec in specs:
+        if file:
+            members = indexes.load_membership_from_excel(file)
+        else:
+            members = indexes.fetch_membership(spec)
+        diffs.append(indexes.apply_membership(spec, members))
     if as_json:
-        print(diff.model_dump_json(indent=2))
+        print(json.dumps([diff.model_dump() for diff in diffs], indent=2))
         return
-    console.print(f"[green]loaded {diff.total} symbols[/green]")
-    if diff.added or diff.removed:
-        console.print(f"joined: {diff.added} left: {diff.removed}")
+    for diff in diffs:
+        console.print(f"[green]{diff.index}: loaded {diff.total} symbols[/green]")
+        if diff.added or diff.removed:
+            console.print(f"joined: {diff.added} left: {diff.removed}")
+
+
+@app.command()
+def track_etf(
+    ticker: Annotated[str, typer.Argument(help="Yahoo-style ticker, e.g. XIU.TO")],
+    currency: Annotated[str | None, typer.Option(help="Currency, e.g. CAD")] = None,
+) -> None:
+    """Track an ETF's prices like any symbol (SPY, QQQ, XIU.TO by default)."""
+    created = indexes.track_etf(ticker, currency)
+    verb = "now tracking" if created else "already tracking"
+    console.print(f"[green]{verb} {ticker.upper()}[/green]")
 
 
 @app.command()
@@ -123,25 +154,30 @@ def membership_log(
     as_json: Annotated[bool, typer.Option("--json", help="Emit JSON")] = False,
 ) -> None:
     """Dated membership changes recorded by past loads."""
-    entries = sp500.membership_log()
+    entries = indexes.membership_log()
     if as_json:
         print(json.dumps([entry.model_dump() for entry in entries], indent=2))
         return
     for entry in entries:
         console.print(
-            f"{entry.date}: joined {entry.added or '[]'} left {entry.removed or '[]'}"
+            f"{entry.date} {entry.index}: joined {entry.added or '[]'} "
+            f"left {entry.removed or '[]'}"
         )
     if not entries:
         console.print("no membership changes recorded")
 
 
 @app.command()
-def backfill_sp500(
+def backfill(
+    index: Annotated[str, typer.Argument(help="sp500, tsx60, or all")] = "all",
     full: Annotated[
         bool, typer.Option("--full", help="Re-download all history, not just new days")
     ] = False,
 ) -> None:
-    """Load current S&P 500 membership, then pull history for every symbol."""
-    diff = sp500.apply_membership(sp500.fetch_membership())
-    console.print(f"[green]loaded {diff.total} symbols, pulling histories...[/green]")
+    """Load index membership and house ETFs, then pull history for every symbol."""
+    for spec in _specs_for(index):
+        diff = indexes.apply_membership(spec, indexes.fetch_membership(spec))
+        console.print(f"[green]{diff.index}: loaded {diff.total} symbols[/green]")
+    indexes.track_default_etfs()
+    console.print("pulling histories...")
     stocks.pull_all_price_histories(full=full)

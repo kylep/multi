@@ -90,20 +90,38 @@ def test_data_prices_rejects_negative_tail(fake_store: dict):
     assert result.exit_code != 0
 
 
-def test_data_load_sp500_from_wikipedia(
-    fake_store: dict, monkeypatch: pytest.MonkeyPatch
-):
+def test_data_load_index_sp500(fake_store: dict, monkeypatch: pytest.MonkeyPatch):
     import pandas as pd
 
-    from kytrade import sp500
+    from kytrade import indexes
 
     df = pd.DataFrame([{"Symbol": "AAPL", "GICS Sector": "Information Technology"}])
-    monkeypatch.setattr(sp500, "_fetch_html", lambda url: "<html></html>")
-    monkeypatch.setattr(sp500.pd, "read_html", lambda html, **kwargs: [df])
-    result = runner.invoke(app, ["data", "load-sp500"])
+    monkeypatch.setattr(indexes, "_fetch_html", lambda url: "<html></html>")
+    monkeypatch.setattr(indexes.pd, "read_html", lambda html, **kwargs: [df])
+    result = runner.invoke(app, ["data", "load-index", "sp500"])
     assert result.exit_code == 0
     assert "loaded 1 symbols" in result.output
     assert "AAPL" in stocks.get_symbols()
+
+
+def test_data_load_index_rejects_unknown(fake_store: dict):
+    result = runner.invoke(app, ["data", "load-index", "dow30"])
+    assert result.exit_code == 1
+
+
+def test_data_load_index_rejects_file_for_tsx60(fake_store: dict, tmp_path):
+    xlsx = tmp_path / "holdings.xlsx"
+    xlsx.write_text("stub")
+    result = runner.invoke(app, ["data", "load-index", "tsx60", "--file", str(xlsx)])
+    assert result.exit_code == 1
+
+
+def test_data_track_etf(fake_store: dict):
+    result = runner.invoke(app, ["data", "track-etf", "xiu.to", "--currency", "CAD"])
+    assert result.exit_code == 0
+    assert "now tracking XIU.TO" in result.output
+    result = runner.invoke(app, ["data", "track-etf", "XIU.TO"])
+    assert "already tracking" in result.output
 
 
 def test_db_list_json(fake_store: dict):

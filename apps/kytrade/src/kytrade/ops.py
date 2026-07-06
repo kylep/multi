@@ -8,7 +8,7 @@ from pathlib import Path
 
 import sqlalchemy
 
-from kytrade import config, db, sp500, stocks
+from kytrade import config, db, indexes, stocks
 from kytrade.models import BootstrapReport, RefreshReport, Staleness, StatusReport
 
 logger = logging.getLogger(__name__)
@@ -117,7 +117,7 @@ def ensure_env(path: Path | None = None) -> tuple[Path, bool]:
 
 
 def bootstrap() -> BootstrapReport:
-    """Prepare the toolkit: secrets, tables, and S&P 500 membership.
+    """Prepare the toolkit: secrets, tables, index membership, house ETFs.
 
     Requires a reachable Postgres (docker compose up -d postgres). Prices
     are not pulled here — run a refresh afterwards.
@@ -131,20 +131,30 @@ def bootstrap() -> BootstrapReport:
             db_ok=False,
             tables_created=False,
             symbols_loaded=0,
+            etfs_tracked=[],
         )
     db.init_tables()
     symbols_loaded = 0
-    if not stocks.get_symbols():
+    known = stocks.get_symbols()
+    for spec in indexes.INDEXES.values():
+        if any(spec.name in metadata["indexes"] for metadata in known.values()):
+            continue
         try:
-            members = sp500.fetch_membership()
+            members = indexes.fetch_membership(spec)
         except Exception:
+            if spec is not indexes.SP500:
+                logger.exception("%s membership fetch failed, skipping", spec.name)
+                continue
             logger.exception("live membership fetch failed, using bundled snapshot")
-            members = sp500.load_membership_from_excel(BUNDLED_SNAPSHOT)
-        symbols_loaded = sp500.apply_membership(members).total
+            members = indexes.load_membership_from_excel(BUNDLED_SNAPSHOT)
+        symbols_loaded += indexes.apply_membership(spec, members).total
+        known = stocks.get_symbols()
+    etfs_tracked = indexes.track_default_etfs()
     return BootstrapReport(
         env_file=str(env_path),
         password_generated=generated,
         db_ok=True,
         tables_created=True,
         symbols_loaded=symbols_loaded,
+        etfs_tracked=etfs_tracked,
     )
