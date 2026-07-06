@@ -121,6 +121,7 @@ def test_data_track_etf(fake_store: dict):
     assert result.exit_code == 0
     assert "now tracking XIU.TO" in result.output
     result = runner.invoke(app, ["data", "track-etf", "XIU.TO"])
+    assert result.exit_code == 0
     assert "already tracking" in result.output
 
 

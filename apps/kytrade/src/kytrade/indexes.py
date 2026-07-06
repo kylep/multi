@@ -190,6 +190,12 @@ def apply_membership(spec: IndexSpec, members: list[Member]) -> MembershipDiff:
     return diff
 
 
+def load_and_apply(specs: list[IndexSpec]) -> list[MembershipDiff]:
+    """Fetch every index first, then apply — no partial writes on fetch failure."""
+    fetched = [(spec, fetch_membership(spec)) for spec in specs]
+    return [apply_membership(spec, members) for spec, members in fetched]
+
+
 def _log_membership_change(diff: MembershipDiff) -> None:
     log = db.get_document(MEMBERSHIP_LOG_DOC) or []
     log.append(

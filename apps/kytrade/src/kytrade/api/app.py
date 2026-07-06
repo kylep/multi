@@ -2,6 +2,7 @@
 the CLI exposes the same functions with the same argument types.
 """
 
+import logging
 from typing import Annotated, Any, Literal
 
 from fastapi import FastAPI, HTTPException, Query
@@ -23,6 +24,8 @@ from kytrade.models import (
     VolatilityReport,
 )
 from kytrade.providers import DailyPrices
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="kytrade",
@@ -125,18 +128,19 @@ class TrackEtfOut(BaseModel):
 
 @app.post("/membership/load/{index}")
 def load_index(index: Literal["sp500", "tsx60", "all"]) -> list[MembershipDiff]:
-    """Load current index membership from Wikipedia and reconcile."""
+    """Load current index membership from Wikipedia and reconcile.
+
+    Every index is fetched before anything is applied, so a fetch
+    failure writes nothing.
+    """
     specs = (
         list(indexes.INDEXES.values()) if index == "all" else [indexes.INDEXES[index]]
     )
-    diffs = []
-    for spec in specs:
-        try:
-            members = indexes.fetch_membership(spec)
-        except Exception as err:
-            raise HTTPException(502, f"membership fetch failed: {err}") from err
-        diffs.append(indexes.apply_membership(spec, members))
-    return diffs
+    try:
+        return indexes.load_and_apply(specs)
+    except Exception as err:
+        logger.exception("membership load failed for %s", index)
+        raise HTTPException(502, f"membership fetch failed for {index}") from err
 
 
 @app.post("/data/track-etf")

@@ -102,13 +102,15 @@ def load_index(
     if file and specs != [indexes.SP500]:
         console.print("[red]--file only applies to the sp500 index[/red]")
         raise typer.Exit(code=1)
-    diffs = []
-    for spec in specs:
-        if file:
-            members = indexes.load_membership_from_excel(file)
-        else:
-            members = indexes.fetch_membership(spec)
-        diffs.append(indexes.apply_membership(spec, members))
+    if file:
+        members = indexes.load_membership_from_excel(file)
+        diffs = [indexes.apply_membership(indexes.SP500, members)]
+    else:
+        try:
+            diffs = indexes.load_and_apply(specs)
+        except Exception as err:
+            console.print(f"[red]membership fetch failed: {err}[/red]")
+            raise typer.Exit(code=1) from err
     if as_json:
         print(json.dumps([diff.model_dump() for diff in diffs], indent=2))
         return
@@ -175,8 +177,12 @@ def backfill(
     ] = False,
 ) -> None:
     """Load index membership and house ETFs, then pull history for every symbol."""
-    for spec in _specs_for(index):
-        diff = indexes.apply_membership(spec, indexes.fetch_membership(spec))
+    try:
+        diffs = indexes.load_and_apply(_specs_for(index))
+    except Exception as err:
+        console.print(f"[red]membership fetch failed: {err}[/red]")
+        raise typer.Exit(code=1) from err
+    for diff in diffs:
         console.print(f"[green]{diff.index}: loaded {diff.total} symbols[/green]")
     indexes.track_default_etfs()
     console.print("pulling histories...")

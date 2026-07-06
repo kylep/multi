@@ -129,6 +129,23 @@ def test_load_index_rejects_unknown_index():
     assert client.post("/membership/load/dow30").status_code == 422
 
 
+def test_load_all_writes_nothing_when_any_fetch_fails(
+    fake_store: dict, monkeypatch: pytest.MonkeyPatch
+):
+    from kytrade import indexes
+
+    def fetch(spec):
+        if spec is indexes.SP500:
+            return [indexes.Member(ticker="AAPL", sector="Tech", currency="USD")]
+        raise ConnectionError("tsx60 fetch down")
+
+    monkeypatch.setattr(indexes, "fetch_membership", fetch)
+    response = client.post("/membership/load/all")
+    assert response.status_code == 502
+    assert "tsx60 fetch down" not in response.json()["detail"]
+    assert fake_store == {}
+
+
 def test_track_etf_route(fake_store: dict):
     response = client.post(
         "/data/track-etf", json={"ticker": "xiu.to", "currency": "CAD"}

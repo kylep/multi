@@ -146,7 +146,11 @@ def bootstrap() -> BootstrapReport:
                 logger.exception("%s membership fetch failed, skipping", spec.name)
                 continue
             logger.exception("live membership fetch failed, using bundled snapshot")
-            members = indexes.load_membership_from_excel(BUNDLED_SNAPSHOT)
+            try:
+                members = indexes.load_membership_from_excel(BUNDLED_SNAPSHOT)
+            except Exception:
+                logger.exception("bundled snapshot failed, skipping %s", spec.name)
+                continue
         symbols_loaded += indexes.apply_membership(spec, members).total
         known = stocks.get_symbols()
     etfs_tracked = indexes.track_default_etfs()

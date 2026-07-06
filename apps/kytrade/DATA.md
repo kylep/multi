@@ -8,6 +8,11 @@ kicks in.
 
 Inspect any of these with `kt db get <name>`.
 
+The store assumes a single writer: reconciliation and ETF tracking are
+read-modify-write over whole documents, so concurrent membership loads
+can drop each other's updates. Fine for a one-operator toolkit; a
+transactional story arrives with the relational migration below.
+
 ## stock/symbols
 
 Ticker → metadata for every known symbol.
