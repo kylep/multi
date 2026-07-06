@@ -1,13 +1,26 @@
-"""Fixtures for integration tests: a real (disposable) postgres via docker compose."""
+"""Fixtures for integration tests: a real postgres via docker compose.
+
+Tests truncate the documents table, so they refuse to run against
+anything but a *_test database — bin/integration-test.sh sets one up.
+"""
 
 import pytest
 import sqlalchemy
 
-from kytrade import db, ops
+from kytrade import config, db, ops
 
 
 @pytest.fixture(scope="session", autouse=True)
-def require_db():
+def require_test_db():
+    try:
+        database = config.settings().database
+    except config.MissingEnvVar:
+        pytest.skip("no database credentials — run bin/integration-test.sh")
+    if not database.endswith("_test"):
+        pytest.skip(
+            f"refusing to truncate {database!r} — integration tests only run "
+            "against a *_test database (use bin/integration-test.sh)"
+        )
     if not ops._db_reachable():
         pytest.skip("postgres unreachable — run bin/integration-test.sh")
 
