@@ -90,6 +90,18 @@ test); CLI extended to exact parity (`kt analyze`, `kt status`,
 docker-compose postgres (`bin/integration-test.sh`). `kytrade` skills
 published to kylep/claude-plugins and installed here. Version 4.0.0.
 
+### Phase 3 addendum — TSX 60 + ETF tracking (done 2026-07-06)
+`sp500.py` generalized into `indexes.py`: an `IndexSpec` registry
+(S&P 500, S&P/TSX 60) with per-index Wikipedia table selection and
+exchange-suffix ticker normalization (`CTC.A` → `CTC-A.TO`). The
+sectors document is now derived from all current index members, so
+loading one index never wipes another's sectors. House ETFs (SPY, QQQ,
+XIU.TO) are tracked like any symbol via `track_etf` — no index tags,
+so reconciliation never untags them. CLI/API: `kt data load-index`,
+`kt data backfill`, `kt data track-etf`; `POST /membership/load/{index}`,
+`POST /data/track-etf` (the sp500-specific commands retired —
+version 5.0.0).
+
 ### Phase 4 — Toolkit core: experiments & backtesting
 Prompts 11–16. Portfolio/position/order primitives; a Strategy
 protocol (`on_day(date, prices, portfolio)`); a backtest runner over

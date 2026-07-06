@@ -21,8 +21,8 @@ The long-term plan lives in the wiki:
 uv sync
 uv run kt bootstrap             # first run: generates .env with a password
 docker compose up -d postgres   # reads the same .env
-uv run kt bootstrap             # idempotent: tables + live S&P 500 membership
-uv run kt refresh               # pull daily history for all 503 symbols
+uv run kt bootstrap             # idempotent: tables, S&P 500 + TSX 60, house ETFs
+uv run kt refresh               # pull daily history for every tracked symbol
 uv run kt analyze movers --days 30
 ```
 
@@ -37,14 +37,15 @@ one step.
 `kt --help` is the source of truth; every read command takes `--json`.
 
 - `kt status` — health: database, tables, document counts, data staleness
-- `kt bootstrap` — secrets + tables + live S&P 500 membership, idempotent
+- `kt bootstrap` — secrets + tables + index membership (S&P 500, TSX 60) + house ETFs (SPY, QQQ, XIU.TO), idempotent
 - `kt refresh [--full]` — staleness-aware incremental pull of every symbol
 - `kt data pull -s SYMBOL | --all [--full]` — incremental price pull
 - `kt data prices SYMBOL [--tail N]` — stored daily OHLCV
 - `kt data symbols` — known symbols and metadata
-- `kt data load-sp500 [--file xlsx]` — reconcile membership (Wikipedia live)
+- `kt data load-index [sp500|tsx60|all] [--file xlsx]` — reconcile index membership (Wikipedia live)
+- `kt data track-etf TICKER [--currency]` — track an ETF's prices like any symbol
 - `kt data membership-log` — dated joins/leaves recorded by past loads
-- `kt data backfill-sp500` — membership + full history pull
+- `kt data backfill [sp500|tsx60|all]` — membership + ETFs + full history pull
 - `kt analyze performance SYMBOL [--days N]` — window return, high/low, volume
 - `kt analyze compare SYM SYM... [--days N]` — multi-symbol returns, best first
 - `kt analyze movers [--days N] [--top N]` — gainers/losers across the universe
@@ -95,7 +96,7 @@ bin/integration-test.sh    # function layer + API against docker-compose postgre
 ## Layout
 
 ```text
-src/kytrade/         config, db, stocks, sp500, analysis, ops, models
+src/kytrade/         config, db, stocks, indexes, analysis, ops, models
 src/kytrade/providers/   PriceProvider protocol + YahooProvider
 src/kytrade/api/     FastAPI ingress (thin routes)
 src/kytrade/cli/     Typer CLI (thin commands)

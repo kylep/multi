@@ -16,7 +16,7 @@ this repo's git history).
 | Project | Description | Tech |
 |---------|-------------|------|
 | [blog](apps/blog/) | Static blog + wiki for [kyle.pericak.com](https://kyle.pericak.com), including the agent-facing wiki | Next.js (static export), Tailwind, Playwright |
-| [kytrade](apps/kytrade/) | Personal trading tools: API + CLI, Claude-integrated | Python/FastAPI/Poetry, CRA, PostgreSQL, Helm |
+| [kytrade](apps/kytrade/) | Personal trading tools: API + CLI, Claude-integrated | Python 3.14/uv, FastAPI, Typer, PostgreSQL |
 | [robot-battle](apps/games/robot-battle/) | Web robot-battle game built with Oliver | TypeScript, Vite, Vitest |
 | [llm-client](apps/llm-client/) | Browser chat UI for llama-server / OpenRouter, live at kyle.pericak.com/apps/llm-client | Next.js 16, Tailwind v4, pnpm |
 | [mods](apps/mods/) | Stellaris mods (3x Bigger Worlds, Multi-Megastructures) and a HOI4 mod, published on Steam Workshop | Paradox script, Python build tooling |
@@ -34,7 +34,6 @@ agent system. `infra/` holds what deploys to it, plus supporting images:
 | [infra/local-k8s](infra/local-k8s/) | Local cluster bootstrap (Vault etc.) |
 | [infra/ai-agents](infra/ai-agents/) | Agent workloads: ai-agent-runtime image, cronjob Helm charts (journalist, pai-morning), agent-controller (Go) |
 | [infra/ai-security-toolkit-1](infra/ai-security-toolkit-1/) | semgrep + trivy + gitleaks scan image used by this repo's pre-PR checks |
-| [infra/containers](infra/containers/) | Shared base image (kytrade builds FROM it) |
 
 Also: `bin/` (scripts used by agents, e.g. `github-trending.py` for the
 journalist cronjob), `.claude/agents/` (the Claude Code agent team),

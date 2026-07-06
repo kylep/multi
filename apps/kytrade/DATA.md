@@ -50,7 +50,7 @@ Sorted list of known ETF tickers.
 ## stock/sectors
 
 Sector name → sorted list of member tickers. Rebuilt from the current
-membership on every `kt data load-sp500`; symbols that leave the index
+membership on every `kt data load-index`; symbols that leave an index
 also lose their `S&P 500`/`SPY` tags in `stock/symbols` (their price
 history is kept).
 
