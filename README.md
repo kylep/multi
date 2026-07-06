@@ -16,7 +16,7 @@ this repo's git history).
 | Project | Description | Tech |
 |---------|-------------|------|
 | [blog](apps/blog/) | Static blog + wiki for [kyle.pericak.com](https://kyle.pericak.com), including the agent-facing wiki | Next.js (static export), Tailwind, Playwright |
-| [kytrade](apps/kytrade/) | Personal trading tools: API + CLI + React front-end | Python/Flask/Poetry, CRA, PostgreSQL, Helm |
+| [kytrade](apps/kytrade/) | Personal trading tools: API + CLI, Claude-integrated | Python/FastAPI/Poetry, CRA, PostgreSQL, Helm |
 | [robot-battle](apps/games/robot-battle/) | Web robot-battle game built with Oliver | TypeScript, Vite, Vitest |
 | [llm-client](apps/llm-client/) | Browser chat UI for llama-server / OpenRouter, live at kyle.pericak.com/apps/llm-client | Next.js 16, Tailwind v4, pnpm |
 | [mods](apps/mods/) | Stellaris mods (3x Bigger Worlds, Multi-Megastructures) and a HOI4 mod, published on Steam Workshop | Paradox script, Python build tooling |
