@@ -36,8 +36,6 @@ toolkit through `kytrade` skills published in kylep/claude-plugins.
   its own phase (Vite or Next, matching the other apps).
 - **Slack: dropped.** Discord notifications come later via the
   existing bot infrastructure.
-- **Claude access: CLI + Claude Code skills** (pai-tools pattern)
-  operating through the CLI/API. No MCP server.
 - **Data store: keep the Postgres JSON-document store for now.** No
   new infra. The relational migration is tracked below, not built.
 - **Toolchain: Python 3.14 + uv** (Poetry retired), src layout,
