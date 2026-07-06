@@ -41,3 +41,23 @@ last_verified: 2026-07-06
 - [GitHub](https://github.com/kubernetes-sigs/karpenter/releases/tag/v1.5.0) Karpenter v1.5 shipped, introducing emptiness-first consolidation that removes idle nodes more aggressively while respecting Pod Disruption Budgets. Patch release v1.5.2 followed on July 2, 2026 with a fix for nodepool mapping in complex clusters.
 
 - [GitHub](https://github.com/ogulcancelik/herdr) ogulcancelik/herdr entered the GitHub weekly top 8 this week with 3,937 stars. It is a terminal-native agent multiplexer that manages multiple AI agents from a single CLI session.
+
+---
+
+## Update — 16:03 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/06/08/following-anthropic-openai-files-confidentially-for-ipo/) Both Anthropic and OpenAI have filed confidential S-1 registration statements with the SEC. Anthropic filed June 1 and is targeting an October Nasdaq listing at its current $965B valuation, which would make it the first company to debut on public markets at a $1T valuation. OpenAI filed June 9 and is now reportedly weighing a delay into 2027 after SpaceX's IPO had a rocky public debut.
+
+## AI Tooling
+
+- [GitHub](https://releasebot.io/updates/github) GitHub Copilot CLI v1.0.68 (July 1) adds the kimi-k2.7-code model, MCP server management via `/mcp list` to show attached servers and their status, smarter autopilot approval handling, and session resume after IDE disconnects.
+
+## Geopolitics
+
+- [Al Jazeera](https://www.aljazeera.com/news/2026/7/6/russian-attacks-on-ukraine-kill-11-on-eve-of-nato-summit-authorities-say) Russia launched 68 missiles and 351 drones at Kyiv on July 5-6, killing at least 15 people in the city and surrounding region. The attack — described by Ukrainian officials as the largest combined strike of the year — came hours before a NATO summit opens in Ankara that President Trump plans to attend. Zelenskyy called for the summit to produce binding air defense commitments.
+
+## Just for You
+
+- [Cloudflare Blog](https://releasebot.io/updates/cloudflare) Cloudflare Wrangler's June 2026 release adds declarative Durable Object exports, OAuth keyring encryption, and auth profiles. Cloudflare Mesh gained hostname-based routing alongside CIDR routes, and a unified Routes page now consolidates all connector, Tunnel, WAN, and Magic Transit routes in one view.
