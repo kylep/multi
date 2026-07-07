@@ -47,3 +47,29 @@ last_verified: 2026-07-07
 - [GitHub](https://github.com/diegosouzapw/OmniRoute) diegosouzapw/OmniRoute holds #8 on GitHub weekly trending (4,594 new stars, 12,836 total). It is a free AI gateway providing a single endpoint across 231+ providers with MCP/A2A support, auto-fallback, and direct compatibility with Claude Code, Codex, Cursor, and Copilot.
 
 - [GitHub](https://github.com/Zackriya-Solutions/meetily) Zackriya-Solutions/meetily enters GitHub weekly trending at #5 (5,769 new stars, 19,956 total). It is a fully local AI meeting assistant using Parakeet or Whisper for transcription, speaker diarization, and Ollama for summarization — no cloud, macOS and Windows.
+
+---
+
+## Update — 15:00 UTC
+
+## AI Industry
+
+- [SiliconANGLE](https://siliconangle.com/2026/07/06/anthropic-inks-19b-ai-data-center-lease-terawulf/) Anthropic signed a 20-year, $19 billion lease with TeraWulf to build a 401-megawatt data center campus on a former aluminum smelting site in Hawesville, Kentucky. First power is expected in the second half of 2027, with the full campus online by early 2028.
+
+- [Fox News](https://www.foxnews.com/science/trump-puts-brakes-openais-newest-ai-model) OpenAI is limiting initial access to GPT-5.6 Sol to a small group of government-vetted trusted partners ahead of a broader public rollout. OpenAI previewed the model with the U.S. government before release and is honoring a government request to gate access during initial launch.
+
+- [BigGo Finance](https://finance.biggo.com/news/6f0c6bb2-795f-4c57-9d09-6db691d7638a) Google DeepMind pushed Gemini 3.5 Pro to July 17, scrapping the Gemini 2.5 Pro architecture entirely in favor of a new pre-training run targeting mathematical reasoning and image quality. The rebuilt model will carry a 2-million-token context window and a Deep Think Reasoning Layer.
+
+## Security
+
+- [Sysdig](https://www.sysdig.com/blog/jadepuffer-agentic-ransomware-for-automated-database-extortion) Sysdig's threat research team documented JADEPUFFER, the first confirmed autonomous ransomware campaign driven end-to-end by an LLM agent. The attack exploited a Langflow RCE flaw (CVE-2025-3248), pivoted to a production MySQL database, and encrypted 1,342 configuration items without any human operator involvement.
+
+- [The Hacker News](https://thehackernews.com/2026/07/unpatched-argo-cd-repo-server-flaw.html) An unpatched RCE vulnerability in Argo CD's repo-server allows unauthenticated attackers to achieve full Kubernetes cluster takeover via a crafted kustomize request. Synacktiv disclosed the issue to maintainers in January 2025; no CVE and no patch exist as of July 2026. Mitigation: enable Kubernetes network policies to isolate repo-server and Redis ports — both are disabled by default in Helm chart deployments.
+
+- [Innovate Cybersecurity](https://innovatecybersecurity.com/security-threat-advisory/top-10-cybersecurity-news-july-07-2026-sysdig-documents-first-end-to-end-ai-agent-ransomware-attack-dhs-confirms-breach-of-homeland-security-information-network-and-more/) DHS confirmed a cyberattack on the Homeland Security Information Network (HSIN), a platform shared by federal, state, local, and private partners, believed to have occurred between late May and early June 2026. No attribution has been determined and it is unclear whether documents were exfiltrated.
+
+- [The Hacker News](https://thehackernews.com/2026/07/sharepoint-rce-cve-2026-45659-added-to.html) CISA added CVE-2026-45659 (CVSS 8.8) to its Known Exploited Vulnerabilities catalog — an RCE in Microsoft SharePoint Server caused by deserialization of untrusted data. Patch immediately.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/business/rogers-buying-mlse-9.7259583) Rogers Communications is buying the remaining 25% of Maple Leaf Sports & Entertainment from Kilmer Sports for $4.35 billion, giving Rogers 100% ownership. The deal values MLSE at $17.4 billion, covers the Maple Leafs, Raptors, Toronto FC, Argos, Marlies, and Scotiabank Arena, and is expected to close in Q4 2026.
