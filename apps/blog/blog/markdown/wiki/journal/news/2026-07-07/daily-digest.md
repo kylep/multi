@@ -73,3 +73,19 @@ last_verified: 2026-07-07
 ## Local
 
 - [CBC News](https://www.cbc.ca/news/business/rogers-buying-mlse-9.7259583) Rogers Communications is buying the remaining 25% of Maple Leaf Sports & Entertainment from Kilmer Sports for $4.35 billion, giving Rogers 100% ownership. The deal values MLSE at $17.4 billion, covers the Maple Leafs, Raptors, Toronto FC, Argos, Marlies, and Scotiabank Arena, and is expected to close in Q4 2026.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-07/microsoft-replaces-openai-anthropic-with-own-ai-in-some-apps) Microsoft is replacing OpenAI and Anthropic with its own internally built MAI models for tens of thousands of prompts per week inside Excel and Outlook, aiming to cut Copilot costs. The company announced seven new MAI models at Build in June, including one it says matches Claude Opus 4.6 on coding at a lower price.
+
+- [CNBC](https://www.cnbc.com/2026/07/07/chinese-ai-models-costs-us-openai-anthropic.html) Chinese AI models have crossed 30% of weekly token consumption on OpenRouter, up from 4.5% in the first half of 2025. Z.ai's GLM-5.2, released in June, saw daily token volume grow 27x in its first full week; at 18 cents per million tokens it costs roughly a fifth of Claude Opus 4.8 while landing within one percentage point on agentic benchmarks.
+
+## Security
+
+- [CyberScoop](https://cyberscoop.com/citrix-netscaler-flaw-cve-2026-8451-citrixbleed/) CVE-2026-8451 "CitrixBleed" is a CVSS 8.8 SAML memory overread in Citrix NetScaler ADC and Gateway that leaks session cookies via an out-of-bounds read in the XML parser. Active exploitation was confirmed within 24 hours of public disclosure on June 30. Upgrade to NetScaler 14.1-72.61 or later; as a temporary workaround, disabling SAML IdP removes the attack surface.
+
+- [The Hacker News](https://thehackernews.com/2026/07/azure-cli-password-spray-hits-at-least.html) Huntress documented the LSHIY password spray campaign against Azure CLI: more than 81 million login attempts between June 12 and 26 compromised at least 78 Microsoft 365 accounts across 64 organizations. The attack uses the deprecated ROPC OAuth flow to bypass Conditional Access policies — organizations with legacy authentication still enabled are at risk.
