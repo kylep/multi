@@ -63,3 +63,27 @@ last_verified: 2026-07-08
 ## Local
 
 - [Whitby Ribfest](https://whitbyribfest.com/) Whitby Ribfest runs July 10–12 at Victoria Fields, organized by the Rotary Club of Whitby Sunrise. The Trews headline a Friday night concert July 10; Saturday and Sunday are free. With Oshawa Ribfest on pause this year, this is the only local event of its kind in the region.
+
+---
+
+## Update — 20:15 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/07/08/spacexai-releases-grok-4-5-which-elon-describes-as-an-opus-class-model/) SpaceXAI released Grok 4.5 on July 8, a 1.5-trillion-parameter model trained across tens of thousands of NVIDIA GB300 GPUs. Elon Musk describes it as "Opus-class," targeting coding, agentic tasks, and knowledge work. Priced at $2/$6 per million input/output tokens; EU availability expected mid-July.
+
+## Security
+
+- [Bleeping Computer](https://www.bleepingcomputer.com/news/security/max-severity-adobe-coldfusion-flaw-now-exploited-in-attacks/) CVE-2026-48282 (CVSS 10.0) in Adobe ColdFusion is under active exploitation via a path traversal flaw in the RDS component that allows unauthenticated RCE. Exploitation began July 2, within minutes of a public technical writeup. CISA added it to KEV with a July 10 federal patch deadline. Approximately 750 internet-facing ColdFusion servers are currently tracked by Shadowserver. Patch: ColdFusion 2025 Update 10 or ColdFusion 2023 Update 21.
+
+## Geopolitics
+
+- [Washington Post](https://www.washingtonpost.com/world/2026/07/07/tanker-fire-after-being-struck-strait-hormuz-british-military-says/) Iran's IRGC attacked three commercial vessels in the Strait of Hormuz on July 7–8, prompting the US to reinstate oil sanctions and launch strikes on over 80 Iranian military sites via CENTCOM. Iran counterattacked US bases in Bahrain and Kuwait. Trump declared the ceasefire — signed under the Islamabad Memorandum — is over.
+
+## Local
+
+- [CTV News](https://www.ctvnews.ca/toronto/local/durham/article/second-toddler-attacked-by-coyote-in-whitby-left-with-serious-injuries/) A 2-year-old was bitten in the face by a coyote at Vanier Park playground in Whitby on July 6 in an unprovoked attack, the second such incident in Whitby in under a month. The child was treated for serious but non-life-threatening injuries. The town's dashboard shows 96 coyote sightings in the last 30 days.
+
+## Just for You
+
+- [The Hacker News](https://thehackernews.com/2026/07/unpatched-argo-cd-repo-server-flaw.html) An unpatched flaw in Argo CD's repo-server gRPC endpoint allows an attacker with internal network access to retrieve the Redis password, manipulate cached deployment data, and push malicious manifests to production — no CVE assigned. Synacktiv disclosed it July 1 after reporting it to maintainers 18 months prior. Network policies that would block the attack vector are not enabled by default in Helm chart deployments.
