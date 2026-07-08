@@ -47,3 +47,19 @@ last_verified: 2026-07-08
 - [GitHub](https://github.com/asgeirtj/system_prompts_leaks) asgeirtj/system_prompts_leaks enters the GitHub weekly top 8 at #7 (5,337 new stars this week, 53,512 total) — regularly updated repository of extracted system prompts from Claude Fable 5, Opus 4.8, Claude Code, ChatGPT 5.5, Codex, Gemini 3.5, Grok, Cursor, Copilot, VS Code, and Perplexity.
 
 - [GitHub](https://github.com/MadsLorentzen/ai-job-search) MadsLorentzen/ai-job-search enters the weekly top 8 at #6 (5,363 new stars this week, 12,946 total) — Claude Code-based job application framework that evaluates listings, tailors CVs, writes cover letters, and prepares interview answers from a personal profile.
+
+---
+
+## Update — 16:03 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/previewing-gpt-5-6-sol/) OpenAI confirmed the full public launch of GPT-5.6 Sol, Terra, and Luna for Thursday July 9, following the limited-preview release on June 26. Sol runs on Cerebras hardware at up to 750 tokens per second; a new "ultra mode" delegates sub-tasks to specialized agents for complex multi-step work.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-sonnet-5) Claude Sonnet 5 is now the default model in Claude Code, replacing Sonnet 4.6. It ships with a native 1M-token context window, 128k max output, and adaptive thinking. Introductory API pricing is $2/$10 per million input/output tokens through August 31, rising to $3/$15 afterward.
+
+## Local
+
+- [Whitby Ribfest](https://whitbyribfest.com/) Whitby Ribfest runs July 10–12 at Victoria Fields, organized by the Rotary Club of Whitby Sunrise. The Trews headline a Friday night concert July 10; Saturday and Sunday are free. With Oshawa Ribfest on pause this year, this is the only local event of its kind in the region.
