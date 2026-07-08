@@ -310,3 +310,13 @@ Now pip works again.
 
 As an aside, if `subprocess32` really was your problem, updating pip didn't
 help. For some reason you have to use apt to install `python-subprocess32`.
+
+
+---
+
+
+# Publishing a Python Package to PyPI
+
+If you want to go the other direction and publish your own pip-installable
+package, see [Upload a Python Package to PyPi](/python-pypi.html). It covers
+setup.py, setup.cfg, and uploading with twine.
