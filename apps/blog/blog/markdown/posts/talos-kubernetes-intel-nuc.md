@@ -77,18 +77,41 @@ below is against the
 
 # Getting the ISO from the Image Factory
 
-I already downloaded the metal amd64 ISO from the
+The ISO comes from the
 [Talos Image Factory](https://factory.talos.dev/?platform=metal&target=metal).
-That's the one deliberate choice worth explaining before going further.
+You can grab a plain ISO straight from the GitHub releases page instead, and it
+boots and works, but the Factory lets you bake system extensions into the image.
+On an immutable OS with no package manager, build time is when you pick these.
 
-You can grab a plain ISO straight from the GitHub releases page. It boots and it
-works. But the Factory lets you bake in system extensions, and for an Intel box
-I want `siderolabs/intel-ucode`, the Intel microcode extension. Microcode gets
-loaded before CPU init, so baking it into the image is the clean way to ship it
-on an immutable OS where you can't `apt install` it later.
+The wizard walks you through more choices than I expected, so here's what I
+picked for the NUC and why:
+
+1. **Hardware type**: Bare-metal Machine.
+2. **Version**: 1.13.5, the current stable.
+3. **Machine architecture**: amd64. Leave SecureBoot off; enrolling custom
+   keys in a NUC's firmware is its own project and this ISO won't boot with
+   stock Secure Boot enabled.
+4. **System extensions**: `siderolabs/intel-ucode` only. See below.
+5. **Customization** (extra kernel args): none.
+
+The extension list is long, but almost all of it targets hardware this NUC
+doesn't have or workloads I don't run: USB modems, gamepad HID devices, NetApp
+iSCSI tooling. The two worth a thought for an Intel box:
+
+- `siderolabs/intel-ucode`: Intel CPU microcode, loaded early at boot. Errata
+  and vulnerability fixes for a CPU that's had years to accumulate both. This
+  is the one I actually want.
+- `siderolabs/i915`: firmware and modules for the Intel iGPU. Only useful if
+  pods will touch the GPU (media transcoding, mostly). This node is a headless
+  k8s box, so I skipped it. It can be added later by updating the schematic
+  and upgrading.
+
+The NUC's wired NIC needs nothing, its `e1000e` driver is in the kernel. And
+the NUC's Wi-Fi card is dead weight here: Talos doesn't support Wi-Fi, which
+is fine for a server that lives on a cable.
 
 The Factory works off a schematic: a small YAML file listing your extensions and
-kernel args. For a NUC the schematic is this short:
+kernel args. The UI builds it from your picks. For this NUC it's this short:
 
 ```yaml
 # schematic.yaml
@@ -108,10 +131,8 @@ https://factory.talos.dev/image/<schematic-id>/v1.13.5/metal-amd64.iso
 
 The schematic ID is the part that pays off later. It's preserved across upgrades,
 so when I upgrade the node the installer keeps the same extension set instead of
-silently dropping my microcode. The UI at
-[factory.talos.dev](https://factory.talos.dev/?platform=metal&target=metal) walks
-you through the extension picker and hands you the ID and download link. Pick
-"Bare-metal Machine" and amd64.
+silently dropping my microcode. The last wizard page hands you the ID and the
+ISO download link.
 
 
 # Writing the ISO to a USB stick from macOS
