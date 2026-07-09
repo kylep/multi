@@ -57,17 +57,14 @@ and the [k3s docs](https://docs.k3s.io/installation/configuration).
 # The autoinstall file
 
 Grab `ubuntu-26.04-live-server-amd64.iso` from
-[releases.ubuntu.com/26.04](https://releases.ubuntu.com/26.04/). It's in the
-same directory as the desktop image and easy to miss. While it downloads,
-write the autoinstall config. This is the file that makes the OS install
-declarative: the installer reads it and asks nothing.
+[releases.ubuntu.com/26.04/ubuntu-26.04-live-server-amd64.iso](https://releases.ubuntu.com/26.04/ubuntu-26.04-live-server-amd64.iso).
 
 You need a SHA-512 hash of your login password first. macOS ships a real
-OpenSSL these days, so this works locally:
+OpenSSL these days, so this works locally. Run it with no password argument
+so the plaintext never lands in your shell history:
 
 ```bash
-openssl passwd -6 'your-login-password'
-# $6$PTX3IiYn1DIpe3Gc$0YmW63yykdesVjhtUw1BC...
+openssl passwd -6 | pbcopy   # prompts twice, hash goes to the clipboard
 ```
 
 Then the config. Two files, `user-data` and `meta-data`. The `meta-data`
@@ -83,7 +80,7 @@ autoinstall:
     realname: 'Kyle'
     username: kyle
     hostname: nuc
-    # from: openssl passwd -6 'your-login-password'
+    # from: openssl passwd -6   (interactive prompt)
     password: '<your-sha512-crypt-hash>'
   ssh:
     install-server: true
