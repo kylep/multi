@@ -232,6 +232,10 @@ ntpd -gq
 service ntp start
 ```
 
+NTP drift also causes the AWS ECR `InvalidSignatureException: Signature expired`
+error. See the [Error Messages Reference](/errors.html) for that and other
+ops error codes and fixes.
+
 
 ---
 
