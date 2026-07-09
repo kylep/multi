@@ -30,7 +30,7 @@ The server will host 192.168.0.1 and act as a gateway for the wired servers.
 It will do NAT just like a home router does to ensure there are no routing
 problems with the upstream layer 3 devices.
 
-This setup begins where my [Ubuntu WiFi Guide](ubuntu-bionic-wifi) left off.
+This setup begins where my [Ubuntu WiFi Guide](/ubuntu-bionic-wifi.html) left off.
 Check it out if you're not sure how to connect to the WiFi from an Ubuntu
 server.
 
