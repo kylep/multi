@@ -7,7 +7,6 @@ tags: Talos, Kubernetes, Intel-NUC, homelab, bare-metal
 date: 2026-07-08
 modified: 2026-07-08
 status: published
-image: talos-kubernetes-intel-nuc.png
 thumbnail: talos-kubernetes-intel-nuc-thumb.png
 imgprompt: A simple flat vector mini-PC box with the Kubernetes helm wheel
   floating above it, minimal lines, solid pastel colors, no shading, clean
@@ -21,8 +20,10 @@ keywords:
 ---
 
 
-I have one Intel NUC and I want Kubernetes on it. I went with Talos for fun, k8s would
-have worked too. These are the 'works on my machine' (today) steps.
+I have one Intel NUC and I want Kubernetes on it. I went with Talos for fun: k3s or
+regular kubeadm-based installs would have worked too, I just wanted to try Talos.
+
+These are the 'works on my machine' (today) steps.
 
 
 # Why Talos and not k3s or kubeadm
@@ -33,10 +34,10 @@ drop into. You manage the machine through a single gRPC API (`apid`, mTLS, clien
 cert required) using `talosctl`. The entire node is described by one machine
 config file, which is the declarative source of truth for the box.
 
-That last part is the reason I care. On a k3s or kubeadm host you still have a
+On a k3s or kubeadm host you still have a
 Linux system underneath with its own lifecycle: SSH keys, a package manager,
-config files you edited at 2am and forgot about, drift. Talos deletes that whole
-category of problem. There is no host to drift because there is no host you can
+config files, etc.
+There is no host to drift because there is no host you can
 log into. The node is whatever the config says it is, and changing it means
 changing the config and re-applying.
 
