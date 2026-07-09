@@ -71,3 +71,39 @@ last_verified: 2026-07-09
 - [CTV News](https://www.ctvnews.ca/toronto/local/durham/article/second-toddler-attacked-by-coyote-in-whitby-left-with-serious-injuries/) A second toddler was attacked by a coyote in Whitby on July 6, leaving the child with serious injuries. Durham Region police issued a public safety warning; residents are advised to keep children and pets supervised outdoors.
 
 - [Durham Radio News](https://www.durhamradionews.com/archives/214564) Whitby Ribfest runs July 10–12 with free public access to the rib zone and a ticketed concert headlined by The Trews on Friday evening.
+
+---
+
+## Update — 22:02 UTC
+
+## AI Industry
+
+- [Axios](https://www.axios.com/2026/07/08/spacexai-grok-new-model) SpaceXAI (xAI rebranded following its acquisition of Cursor) launched Grok 4.5, a coding and agentic-work model trained on Cursor IDE data. Priced at $2/$6 per million input/output tokens, available in Cursor on all plans and the SpaceXAI console; not yet available in the EU.
+
+- [Anthropic](https://claude.com/blog/bringing-claude-code-and-claude-cowork-to-government) Claude Code and Claude Cowork entered public beta through Claude for Government Desktop on July 7, running in a FedRAMP High authorized environment with department-level administration, audit logs, and ATO-support documentation.
+
+- [BigGo Finance](https://finance.biggo.com/news/6f0c6bb2-795f-4c57-9d09-6db691d7638a) Google delayed Gemini 3.5 Pro to July 17 after scrapping the existing 2.5 Pro architecture for a complete rebuild. The model has now missed its June general availability commitment by more than five weeks, with GPT-5.6 and Grok 4.5 both publicly available in the interim.
+
+## AI Tooling
+
+- [Anthropic](https://support.claude.com/en/articles/12138966-release-notes) Claude web and Desktop gained a monthly recap showing topics covered, most active day, and peak work hour, alongside new focus settings for customizing Claude's behavior per session.
+
+- [Releasebot](https://releasebot.io/updates/anthropic/claude) GitHub Copilot's vision capabilities moved to general availability on July 4, and Moonshot AI's K2.7 Code model was added to Copilot's model roster.
+
+- [Windows Forum](https://windowsforum.com/threads/dataverse-expands-coding-agent-plugin-to-claude-cursor-and-copilot-with-mcp-governance.435235/) Microsoft Dataverse extended its coding-agent plugin to Claude, Cursor, and GitHub Copilot on July 6, adding MCP certification and governance controls across Microsoft's AI stack.
+
+## Open Source
+
+- [Kubernetes Blog](https://kubernetes.io/blog/2026/07/08/announcing-etcd-3.7/) etcd v3.7.0 shipped July 8 with the long-awaited RangeStream feature for streaming large range results in chunks, full removal of the legacy v2store, a protobuf overhaul, and updated core dependencies bbolt v1.5.0 and raft v3.7.0.
+
+## Geopolitics
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-09/us-iran-trade-attacks-for-second-day-testing-fragile-ceasefire) US Central Command struck approximately 90 Iran targets on July 9, a second consecutive day of strikes, while Iran expanded retaliation to Jordan — the IRGC hit the Al-Azraq air base with 10 ballistic missiles in addition to earlier strikes on bases in Kuwait, Bahrain, and Qatar. Tanker traffic through the Strait of Hormuz has essentially halted. Trump, speaking at the NATO summit in Ankara, declared the ceasefire "over" and described further negotiations as "a waste of time."
+
+## Weather
+
+- Whitby: Severe thunderstorm watch now in effect for Durham Region. Conditions are favourable for severe thunderstorms producing localized rainfall up to 60 mm and wind gusts up to 90 km/h this afternoon and early evening. Roof and fence damage possible. Source: Environment Canada.
+
+## Just for You
+
+- [Build Fast With AI](https://www.buildfastwithai.com/blogs/ai-news-today-july-9-2026) Tesla imposed $200/week per-employee caps on AI tool spending as of early July, the first major company to publicly cap AI coding tool costs even as Musk simultaneously launches new AI models through SpaceXAI.
