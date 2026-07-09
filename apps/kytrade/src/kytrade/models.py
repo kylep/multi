@@ -136,6 +136,7 @@ class MembershipLogEntry(BaseModel):
     """One dated membership change."""
 
     date: str
+    index: str = "S&P 500"
     added: list[str]
     removed: list[str]
 
@@ -148,3 +149,4 @@ class BootstrapReport(BaseModel):
     db_ok: bool
     tables_created: bool
     symbols_loaded: int
+    etfs_tracked: list[str]

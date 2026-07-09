@@ -8,6 +8,11 @@ kicks in.
 
 Inspect any of these with `kt db get <name>`.
 
+The store assumes a single writer: reconciliation and ETF tracking are
+read-modify-write over whole documents, so concurrent membership loads
+can drop each other's updates. Fine for a one-operator toolkit; a
+transactional story arrives with the relational migration below.
+
 ## stock/symbols
 
 Ticker → metadata for every known symbol.
@@ -50,7 +55,7 @@ Sorted list of known ETF tickers.
 ## stock/sectors
 
 Sector name → sorted list of member tickers. Rebuilt from the current
-membership on every `kt data load-sp500`; symbols that leave the index
+membership on every `kt data load-index`; symbols that leave an index
 also lose their `S&P 500`/`SPY` tags in `stock/symbols` (their price
 history is kept).
 

@@ -4,7 +4,7 @@ from datetime import date
 
 import pytest
 
-from kytrade import analysis, ops, sp500, stocks
+from kytrade import analysis, indexes, ops, stocks
 
 pytestmark = pytest.mark.integration
 
@@ -42,11 +42,12 @@ def test_pull_is_incremental_through_real_store(clean_db):
 
 
 def test_membership_and_analysis_over_real_store(clean_db):
-    sp500.apply_membership(
+    indexes.apply_membership(
+        indexes.SP500,
         [
-            sp500.Member(ticker="AAA", sector="Tech", currency="USD"),
-            sp500.Member(ticker="BBB", sector="Energy", currency="USD"),
-        ]
+            indexes.Member(ticker="AAA", sector="Tech", currency="USD"),
+            indexes.Member(ticker="BBB", sector="Energy", currency="USD"),
+        ],
     )
     stocks.set_prices(
         "AAA", {"2026-06-01": day_row(100.0), "2026-07-01": day_row(120.0)}
