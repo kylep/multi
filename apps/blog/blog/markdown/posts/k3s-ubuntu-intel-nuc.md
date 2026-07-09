@@ -22,25 +22,14 @@ keywords:
 ---
 
 
-I have one Intel NUC and I want Kubernetes on it. The plan was Talos Linux,
-and I'd written most of that post before hitting a wall: the NUC lives on
-Wi-Fi, and Talos ships no 802.11 support at all. Not missing firmware,
-missing kernel stack. The upstream request to add it was
-[closed as not planned](https://github.com/siderolabs/talos/issues/11185).
-
-So, k3s on Ubuntu Server. The consolation prize is smaller than I expected,
-because the parts of Talos I actually wanted (the machine described by config,
-not by hands on a keyboard) mostly survive the pivot. The lesson I'm taking:
-check your hard requirements against the OS before writing the build log.
-
-These are the 'works on my machine' (today) steps.
-
+Time to rebuild the homelab. Keeping it simple and best-practice, I was feeling Talos
+but my Nuc uses Wifi and Talos doesn't support it. Keeping it simple with K3s on
+Ubuntu server.
 
 # The declarative stack on a mutable OS
 
-Talos's pitch is that the whole node is one config file. Stock Ubuntu plus
-k3s gets surprisingly close with three layers, each of which is a file I can
-keep in version control:
+Declarative infra is good infra. A few considerations that help avoid imperative
+configs.
 
 - **The OS install**: Ubuntu's autoinstall. A YAML file on the install USB
   answers every installer question, so the OS install is unattended and
@@ -49,27 +38,6 @@ keep in version control:
   would take on the CLI lives in a YAML file instead.
 - **The workloads**: k3s watches `/var/lib/rancher/k3s/server/manifests` and
   applies whatever lands there, on startup and on file change.
-
-What you don't get is immutability. Nothing stops 2am me from SSHing in and
-hand-editing something unrecorded. Talos enforces the discipline; here the
-discipline is mine.
-
-For scale, Sidero Labs (who make Talos) published
-[benchmarks of the small Kubernetes distros](https://www.siderolabs.com/blog/which-kubernetes-is-the-smallest).
-Their headline numbers (data by Justin Garrison, Sidero Labs, July 2025):
-
-| Distro | Avg memory | Avg CPU | Avg disk r/w | Total disk |
-|---|---|---|---|---|
-| talos | 779.7 MB | 1.7% | 104.3 MiB/s | 2.7 GiB |
-| kubeadm | 856.9 MB | 1.9% | 205.4 MiB/s | 6.4 GiB |
-| k0s | 891.5 MB | 1.2% | 354.8 MiB/s | 5.8 GiB |
-| kairos | 924.5 MB | 1.5% | 177.3 MiB/s | 115.8 GiB |
-| k3s | 1.1 GB | 1.2% | 372.7 MiB/s | 6.0 GiB |
-| rke2 | 1.2 GB | 3.7% | 498.0 MiB/s | 8.5 GiB |
-| canonical-k8s | 1.7 GB | 2.2% | 1.2 GiB/s | 8.1 GiB |
-
-Talos wins the benchmark it can't compete in. k3s at 1.1 GB idle is a
-rounding error on a 32 GB NUC.
 
 
 # The versions I'm building against
@@ -88,8 +56,9 @@ and the [k3s docs](https://docs.k3s.io/installation/configuration).
 
 # The autoinstall file
 
-Grab the Ubuntu Server 26.04 amd64 ISO from
-[releases.ubuntu.com](https://releases.ubuntu.com/). While it downloads,
+Grab `ubuntu-26.04-live-server-amd64.iso` from
+[releases.ubuntu.com/26.04](https://releases.ubuntu.com/26.04/). It's in the
+same directory as the desktop image and easy to miss. While it downloads,
 write the autoinstall config. This is the file that makes the OS install
 declarative: the installer reads it and asks nothing.
 
