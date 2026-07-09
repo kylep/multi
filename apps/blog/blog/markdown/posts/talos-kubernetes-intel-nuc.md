@@ -1,14 +1,14 @@
 ---
 title: "Installing Talos and Kubernetes on my Intel NUC"
-summary: A follow-along build log for a single-node Talos Linux cluster on an
-  Intel NUC, from the Image Factory ISO through apply-config, bootstrap, and a
-  working kubectl.
+summary: How I installed Talos Linux from .iso for K8s on my homelab NUC
 slug: talos-kubernetes-intel-nuc
 category: kubernetes
 tags: Talos, Kubernetes, Intel-NUC, homelab, bare-metal
 date: 2026-07-08
 modified: 2026-07-08
 status: published
+image: talos-kubernetes-intel-nuc.png
+thumbnail: talos-kubernetes-intel-nuc-thumb.png
 imgprompt: A simple flat vector mini-PC box with the Kubernetes helm wheel
   floating above it, minimal lines, solid pastel colors, no shading, clean
   geometric shapes on a plain background
@@ -21,14 +21,8 @@ keywords:
 ---
 
 
-I have one Intel NUC and I want Kubernetes on it. The easy answer is k3s: one
-curl command and you have a cluster. I'm not doing that. I'm running Talos
-Linux, because it's the better-practice route and, honestly, because it's cool.
-
-This is the build log, written before I run it on hardware. The commands are
-imperative and the expected behavior comes from the Talos docs, not from a
-finished run. I'll validate it on the real NUC afterward and drop corrections
-inline as `Note:` asides where the hardware disagrees with the docs.
+I have one Intel NUC and I want Kubernetes on it. I went with Talos for fun, k8s would
+have worked too. These are the 'works on my machine' (today) steps.
 
 
 # Why Talos and not k3s or kubeadm

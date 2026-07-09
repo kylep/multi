@@ -9,6 +9,8 @@ tags: macOS, networking, NAT, WiFi, Internet-Sharing
 date: 2026-07-08
 modified: 2026-07-08
 status: published
+image: macbook-ethernet-bridge.png
+thumbnail: macbook-ethernet-bridge-thumb.png
 imgprompt: A simple flat vector laptop linked by a cable to a small server box,
   minimal lines, solid pastel colors, no shading, clean geometric shapes on a
   plain background
