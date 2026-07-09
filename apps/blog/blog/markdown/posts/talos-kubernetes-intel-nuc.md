@@ -20,13 +20,15 @@ keywords:
 ---
 
 
-I have one Intel NUC and I want Kubernetes on it. I went with Talos for fun: k3s or
-regular kubeadm-based installs would have worked too, I just wanted to try Talos.
 
 These are the 'works on my machine' (today) steps.
 
 
 # Why Talos and not k3s or kubeadm
+
+...Mostly, I went with Talos for fun. k3s or
+kubeadm based installs would have worked too, I just wanted to try Talos.
+There are some neat differences, though.
 
 Talos Linux is an immutable, API-managed OS that exists to run Kubernetes and
 nothing else. There is no SSH, no shell, no package manager, no `/bin/bash` to
@@ -41,16 +43,26 @@ There is no host to drift because there is no host you can
 log into. The node is whatever the config says it is, and changing it means
 changing the config and re-applying.
 
-The tradeoff is real. When something breaks you debug it through the API, not by
-SSHing in and poking around. If your instinct is "I'll just log in and check,"
-Talos will frustrate you. That constraint is the point: it forces every change to
+The tradeoff is that when something breaks you debug it through the API, not by
+SSHing in and poking around. Upside being that it forces every change to
 go through the declarative config instead of an untracked live edit.
 
 Sidero Labs (who make Talos) publish [a comparison against
 K3s](https://www.siderolabs.com/blog/talos-linux-vs-k3s) and
 [resource benchmarks against kubeadm](https://www.siderolabs.com/blog/which-kubernetes-is-the-smallest).
-Those are vendor numbers, so weight them accordingly. The design argument stands
-on its own without the benchmarks.
+
+Their headline numbers, re-typed from that benchmark post (data by Justin
+Garrison, Sidero Labs, July 2025):
+
+| Distro | Avg memory | Avg CPU | Avg disk r/w | Total disk |
+|---|---|---|---|---|
+| talos | 779.7 MB | 1.7% | 104.3 MiB/s | 2.7 GiB |
+| kubeadm | 856.9 MB | 1.9% | 205.4 MiB/s | 6.4 GiB |
+| k0s | 891.5 MB | 1.2% | 354.8 MiB/s | 5.8 GiB |
+| kairos | 924.5 MB | 1.5% | 177.3 MiB/s | 115.8 GiB |
+| k3s | 1.1 GB | 1.2% | 372.7 MiB/s | 6.0 GiB |
+| rke2 | 1.2 GB | 3.7% | 498.0 MiB/s | 8.5 GiB |
+| canonical-k8s | 1.7 GB | 2.2% | 1.2 GiB/s | 8.1 GiB |
 
 
 # The versions I'm building against
