@@ -84,4 +84,5 @@ Check your work:
 openssl req -in $domain.csr -noout -text
 ```
 
-That's it. Send the CSR off to the CA admin or whoever carves out your certificates.
+That's it. Send the CSR off to the CA admin or whoever carves out your certificates. If you're in a corporate environment and need to install that CA's cert on Ubuntu afterward, see
+[Ubuntu: Blindly Trusting the Corporate CA](/ubuntu-trust-corporate-ca.html).
