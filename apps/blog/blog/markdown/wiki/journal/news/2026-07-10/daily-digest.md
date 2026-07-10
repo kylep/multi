@@ -49,3 +49,45 @@ last_verified: 2026-07-10
 - [GitHub](https://github.com/alibaba/page-agent) alibaba/page-agent enters the weekly top 8 (4,459 stars this week, 25,670 total) — a JavaScript in-page GUI agent that controls web interfaces via natural language prompts.
 
 - [GitHub](https://github.com/stablyai/orca) stablyai/orca enters the weekly top 8 (4,111 stars this week, 15,598 total) — a desktop and mobile app for running fleets of parallel coding agents on your own subscriptions.
+
+---
+
+## Update — 16:02 UTC
+
+## AI Industry
+
+- [BigGo Finance](https://finance.biggo.com/news/6f0c6bb2-795f-4c57-9d09-6db691d7638a) Google DeepMind postponed Gemini 3.5 Pro to July 17, scrapping the existing architecture for a ground-up rebuild. The new model targets a 2M token context window, a Deep Think reasoning layer, and improved SVG and image quality to compete with GPT-5.6 and Fable 5.
+
+- [CNBC](https://www.cnbc.com/2026/07/01/meta-stock-cloud-ai-compute.html) Meta is launching Meta Compute, a cloud infrastructure unit selling spare AI compute capacity to external customers. The move puts Meta in direct competition with AWS, Azure, and Google Cloud.
+
+- [Mezha](https://mezha.net/eng/bukvy/e43b4ad9_openai_confirms_gpt-5-6/) Microsoft 365 Copilot now offers Claude as a selectable model alongside its own options, following a broader July update wave. Microsoft also confirmed GPT-5.6 powers the Copilot suite as M365 Copilot reaches 20 million paid seats.
+
+- [MacRumors](https://www.macrumors.com/2026/07/09/openai-chatgpt-work/) OpenAI's GPT-5.6 family ships three tiers: Sol (flagship), Terra (balanced for routine workloads), and Luna (fastest, lowest cost). Free users get Terra; Plus, Pro, Business, and Enterprise get Sol.
+
+## AI Tooling
+
+- [Anthropic Releasebot](https://releasebot.io/updates/anthropic/claude-code) Claude Code sets Claude Sonnet 5 as the default model, with a native 1M-token context window and promotional pricing of $2/$10 per Mtok through August 31. Version 2.1.206 also adds smarter navigation, login expiry warnings, and worktree safety improvements.
+
+- [Anthropic Releasebot](https://releasebot.io/updates/anthropic/claude) Claude Reflect launched July 9 in beta across Free, Pro, and Max plans — a monthly recap at Settings > Reflect showing topics worked on, peak hours, and most active days, plus break reminders and quiet hours controls.
+
+- [Anthropic Releasebot](https://releasebot.io/updates/anthropic/claude) Claude's Microsoft 365 connector now includes write access: users can draft and send email, manage calendar events, update OneDrive and SharePoint files. Teams access remains read-only.
+
+- [Anthropic Releasebot](https://releasebot.io/updates/anthropic/claude) Claude Enterprise added an Analytics API for exporting usage data to platforms like Datadog, model-level entitlements for role-based model access, and spend alerts at 75% and 90% of configured limits.
+
+- [MacRumors](https://www.macrumors.com/2026/07/10/openais-chatgpt-atlas-browser-shutting-down/) OpenAI is shutting down its ChatGPT Atlas browser. Deprecation takes effect August 9.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/unpatched-argo-cd-repo-server-flaw.html) Synacktiv disclosed an unpatched flaw in ArgoCD's repo-server (reported January 2025, still no CVE or patch). An attacker with internal network access can execute arbitrary commands via a kustomize flag, retrieve the Redis password, and inject malicious manifests into auto-syncing clusters. Mitigation: enforce Kubernetes network policies to isolate repo-server and Redis ports.
+
+- [CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) CVE-2026-48282 (CVSS 10.0): Adobe ColdFusion path traversal vulnerability enabling arbitrary code execution, added to CISA's Known Exploited Vulnerabilities catalog on July 8. Federal agencies must remediate immediately.
+
+## Local
+
+- [INdurham](https://durham.insauga.com/region/whitby/) Whitby Ribfest runs July 10–12 at Victoria Fields — ribs, live entertainment, and family activities.
+
+- [CTV News](https://www.ctvnews.ca/toronto/local/durham/article/second-toddler-attacked-by-coyote-in-whitby-left-with-serious-injuries/) Durham police issued a public warning after a second toddler was bitten in the face by a coyote in Whitby, leaving the child with serious injuries. Residents are advised to keep children close and avoid leaving pets unattended outdoors.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby update 16:00 UTC: 28°C high, 19°C low, 30% chance of afternoon showers with a risk of thunderstorms. Severe thunderstorm watch from this morning has cleared — no active alerts.
