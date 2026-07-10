@@ -91,3 +91,25 @@ last_verified: 2026-07-10
 ## Weather
 
 - [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby update 16:00 UTC: 28°C high, 19°C low, 30% chance of afternoon showers with a risk of thunderstorms. Severe thunderstorm watch from this morning has cleared — no active alerts.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Tooling
+
+- [GitHub Changelog](https://github.blog/changelog/2026-07-09-openais-gpt-5-6-sol-terra-and-luna-are-now-available-in-github-copilot/) GitHub Copilot now offers all three GPT-5.6 tiers: Sol for complex reasoning over large codebases (Pro+, Max, Business, Enterprise only), Terra as the default for everyday coding, and Luna as the lightweight low-cost option. All three are billed at provider list pricing under Usage Based Billing.
+
+## Security
+
+- [JetBrains](https://www.jetbrains.com/privacy-security/issues-fixed/) JetBrains patched three vulnerabilities on July 10: CVE-2026-59792 (CVSS 9.6) in IntelliJ IDEA before 2026.1.4 enables remote code execution via path traversal in project workspace ID handling; CVE-2026-59793 allows arbitrary file access in TeamCity via a Perforce VCS integration flaw; CVE-2026-59794 is a stored XSS in TeamCity. All three are fixed in the latest releases.
+
+## Geopolitics
+
+- [Washington Post](https://www.washingtonpost.com/world/2026/07/10/trump-says-us-iran-will-keep-talking-declares-ceasefire-over/) Trump declared the US-Iran ceasefire "OVER" on Friday while leaving diplomatic talks open, saying the US will not adhere to the ceasefire terms. The announcement followed fresh US strikes on Iranian targets and retaliatory Iranian strikes on Bahrain and Kuwait at the NATO Ankara summit close.
+
+- [Al Jazeera](https://www.aljazeera.com/video/newsfeed/2026/7/7/ukrainian-drones-hit-russian-fuel-tankers) Ukraine's drone campaign against Russia's shadow tanker fleet reached what commanders described as an "industrial scale" — 36 vessels struck in four days across the Black Sea and Sea of Azov, including 32 oil tankers, causing fuel shortages and emergency rationing in Crimea and driving Moscow to ban diesel exports.
+
+## Weather
+
+- [Environment Canada](https://weather.gc.ca/en/location/index.html?coords=43.898%2C-78.939) Whitby update 20:00 UTC: 26°C, partly cloudy this evening with a 30% chance of showers and risk of thunderstorm overnight, low 17°C. No active alerts.
