@@ -36,3 +36,25 @@ last_verified: 2026-07-11
 
 - [GitHub](https://github.com/addyosmani/agent-skills) addyosmani/agent-skills enters the weekly top 8 at #2 (7,944 stars this week, 77,078 total) — a curated set of production-grade engineering skills for AI coding agents.
 - [GitHub](https://github.com/iOfficeAI/OfficeCLI) iOfficeAI/OfficeCLI enters the weekly top 8 at #5 (5,789 stars this week, 14,783 total) — free open-source single binary that lets AI agents read, edit, and automate Word, Excel, and PowerPoint files without an Office installation.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [Geeky Gadgets](https://www.geeky-gadgets.com/gemini-pro-scraps-base-model/) Google delayed Gemini 3.5 Pro to July 17, scrapping the existing 2.5 Pro architecture for a full rebuild. Enterprise testers flagged excessive token use in agentic tasks and reasoning gaps; the new architecture targets a 2M token context window and an upgraded math reasoning layer.
+
+- [OpenAI](https://openai.com/index/openai-broadcom-jalapeno-inference-chip/) OpenAI and Broadcom unveiled Jalapeño on June 24 — OpenAI's first custom inference processor. The reticle-sized ASIC went from initial design to tape-out in nine months and is optimized around LLM inference memory patterns; deployment begins late 2026.
+
+- [Anthropic](https://www.anthropic.com/news) Anthropic rolled out a beta reflection dashboard for Claude, letting Free, Pro, and Max users with Memory enabled track usage patterns, set quiet hours, and review stored context. Separately, Cowork — shared sessions with background tasks and mobile approvals — is expanding to mobile and web, rolling out to Max users first.
+
+## Security
+
+- [Help Net Security](https://www.helpnetsecurity.com/2026/06/30/simplehelp-vulnerability-exploited-cve-2026-48558/) CVE-2026-48558 (CVSS 10.0) in SimpleHelp RMM is under active exploitation: attackers forge OIDC tokens to gain unauthenticated technician-level access, then drop Djinn Stealer across managed endpoints. CISA added it to KEV; the federal remediation deadline was July 7. Fix: upgrade to 5.5.16 or 6.0 RC2. Roughly 1,000 of ~14,000 exposed servers remain unpatched.
+
+## Just for You
+
+- [Cloudflare](https://releases.sh/cloudflare/releases) Cloudflare One's Linux client reached GA this week, shipping RPM dependency fixes and a Zero Trust Networks API update that replaces CIDR-encoded route paths with route_id-based endpoints.
+
+- [Kubernetes.dev](https://www.kubernetes.dev/resources/release/) Kubernetes v1.37 hit feature blog freeze on July 10; code freeze is scheduled for July 23.
