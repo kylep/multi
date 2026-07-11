@@ -58,3 +58,27 @@ last_verified: 2026-07-11
 - [Cloudflare](https://releases.sh/cloudflare/releases) Cloudflare One's Linux client reached GA this week, shipping RPM dependency fixes and a Zero Trust Networks API update that replaces CIDR-encoded route paths with route_id-based endpoints.
 
 - [Kubernetes.dev](https://www.kubernetes.dev/resources/release/) Kubernetes v1.37 hit feature blog freeze on July 10; code freeze is scheduled for July 23.
+
+---
+
+## Update — 21:00 UTC
+
+## AI Industry
+
+- [OpenAI](https://openai.com/index/previewing-gpt-5-6-sol/) OpenAI launched GPT-5.6 on July 9 with three tiers: Luna (fast, $1/$6 per M tokens), Terra (balanced, $2.50/$15), and Sol (most capable, $5/$30). Sol adds a new "ultra" mode that spawns subagents for complex work and is tuned for biology, chemistry, and cybersecurity tasks.
+
+- [Meta AI](https://ai.meta.com/blog/introducing-muse-spark-meta-model-api/) Meta Superintelligence Labs shipped Muse Spark 1.1 on July 9 — the company's first paid model. The multimodal agentic model has a 1M-token context window, native multi-agent orchestration, and computer use. The Meta Model API entered public preview at $1.25/$4.25 per million input/output tokens.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-10/apple-sues-openai-for-trade-secret-theft-in-blockbuster-case) Apple filed a trade-secret lawsuit against OpenAI on July 10, alleging that OpenAI's hardware chief (former Apple VP Tang Tan) directed job candidates to share Apple confidential information during interviews. Apple is seeking damages and an injunction blocking use of its trade secrets.
+
+## AI Tooling
+
+- [GitHub Changelog](https://github.blog/changelog/2026-07-07-kimi-k2-7-now-available-for-copilot-business-and-enterprise/) Kimi K2.7 Code from Moonshot AI is now available in GitHub Copilot Business and Enterprise, becoming the first open-weight model in Copilot's model picker. The 1T-parameter MoE model activates 32B parameters per token and is hosted by GitHub on Azure.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/07/critical-zimbra-flaw-could-let-crafted_0483473395.html) Zimbra is urging customers to patch a stored XSS flaw in its Classic Web Client that lets specially crafted emails execute scripts in a recipient's active session, potentially exposing mailbox data and session tokens. No CVE assigned yet; the fix is Zimbra Collaboration Suite 10.1.19.
+
+## Geopolitics
+
+- [ABC News](https://abcnews.com/Politics/us-iran-ceasefire-mou-broke-timeline/story?id=134622392) The US-Iran ceasefire signed in June collapsed on July 7-8 after Iran struck Saudi and Qatari tankers transiting the Strait of Hormuz. President Trump declared the truce "over"; the US responded with what it termed "offensive" strikes on Iran, and Iran retaliated with strikes on Jordan. Technical-level talks are still scheduled for July 11.
