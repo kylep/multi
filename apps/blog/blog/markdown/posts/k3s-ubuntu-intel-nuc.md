@@ -24,9 +24,9 @@ keywords:
 
 Time to rebuild the homelab. Keeping it simple and best-practice, I was feeling Talos
 but my Nuc uses Wifi and Talos doesn't support it. Keeping it simple with K3s on
-Ubuntu server.
+Ubuntu server. I was using Rancher on my M1 macbook so its consistent.
 
-# The declarative stack on a mutable OS
+# The declarative setup
 
 Declarative infra is good infra. A few considerations that help avoid imperative
 configs.
@@ -54,22 +54,32 @@ Commands are verified against the
 and the [k3s docs](https://docs.k3s.io/installation/configuration).
 
 
-# The autoinstall file
+# OS Install
 
+## Download the ISO
 Grab `ubuntu-26.04-live-server-amd64.iso` from
 [releases.ubuntu.com/26.04/ubuntu-26.04-live-server-amd64.iso](https://releases.ubuntu.com/26.04/ubuntu-26.04-live-server-amd64.iso).
+
+
 
 You need a SHA-512 hash of your login password first. macOS ships a real
 OpenSSL these days, so this works locally. Run it with no password argument
 so the plaintext never lands in your shell history:
 
+For all of this, I have a private repo I use that stores this specific env config.
+
 ```bash
+mkdir autoinstall
+touch autoinstall/user-data
 openssl passwd -6 | pbcopy   # prompts twice, hash goes to the clipboard
 ```
 
 Then the config. Two files, `user-data` and `meta-data`. The `meta-data`
 file is empty but required. Here's my `user-data`, secrets swapped for
 placeholders:
+
+
+`vi autoinstall/user-data`
 
 ```yaml
 # user-data -- cloud-init NoCloud + Ubuntu autoinstall
