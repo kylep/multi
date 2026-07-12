@@ -39,3 +39,33 @@ last_verified: 2026-07-12
 - [Cloudflare Changelog](https://developers.cloudflare.com/changelog/post/2026-07-07-wrangler-deploy-upload-dependencies-metadata/) Cloudflare Wrangler now collects npm dependency metadata (name, declared version range, exact installed version) during `wrangler deploy`, enabling future supply chain vulnerability alerting for Workers. Opt out via `dependencies_instrumentation.enabled = false` in wrangler config.
 
 - [GitHub](https://github.com/bradautomates/claude-video) bradautomates/claude-video enters the weekly top 8 (4,399 new stars, 7,672 total) — a Claude Code skill that downloads any video, extracts frames, transcribes audio, and passes all of it to Claude via a `/watch` command.
+
+---
+
+## Update — 18:00 UTC
+
+## AI Industry
+
+- [TechCrunch](https://techcrunch.com/2026/07/10/apple-sues-openai-over-alleged-trade-secret-theft/) Apple filed suit against OpenAI on July 10 in Northern District of California, alleging trade secret theft. The complaint names OpenAI hardware chief Tang Tan, a former Apple VP, who is accused of directing job candidates to bring physical Apple device components to interviews as "show and tell." Apple also alleges OpenAI coached departing employees on evading exit security procedures.
+
+- [TechCrunch](https://techcrunch.com/2026/07/09/openai-launches-its-new-family-of-models-with-gpt-5-6/) OpenAI released GPT-5.6 on July 9 after a government safety review by the Department of Commerce cleared a wider rollout. The model ships as a three-variant family: Luna (speed), Terra (balanced), and Sol (most capable, 54% more token-efficient on coding tasks than previous versions).
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/claude-sonnet-5) Claude Sonnet 5 launched June 30 and became the default model for all Free and Pro users on July 1, replacing Sonnet 4.6. The model ships with a 1M-token context window and near-Opus performance at introductory pricing of $2/$10 per million input/output tokens through August 31.
+
+- [Cursor](https://www.havoptic.com/tools/cursor) Cursor v3.11 ships side chats and conversation search, allowing users to run parallel conversations and locate past exchanges by keyword.
+
+## Security
+
+- [The Hacker News](https://thehackernews.com/2026/06/attackers-exploit-simplehelp-cve-2026.html) CVE-2026-48558 (CVSS 10.0) in SimpleHelp RMM allows unauthenticated attackers to forge OIDC tokens, create admin-privileged technician accounts, and bypass MFA. CISA added it to the Known Exploited Vulnerabilities catalog June 29; attackers are actively deploying Djinn Stealer through compromised instances. Approximately 14,000 SimpleHelp servers are exposed to the internet. Upgrade to 5.5.16 or 6.0 RC2.
+
+## Geopolitics
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-08/us-military-launches-strikes-on-iran-for-second-straight-day) A mid-June US-Iran memorandum of understanding has effectively collapsed. The US struck more than 80 targets in Iran on July 7–8 following Iranian attacks on commercial vessels in the Strait of Hormuz; Iran launched missiles and drones at 85 US military sites in Bahrain and Kuwait in response. President Trump told reporters at the NATO summit in Ankara the MoU is "over" and reimposed oil sanctions.
+
+- [CNN](https://www.cnn.com/2026/07/06/china/china-tests-submarine-launched-ballistic-missile-intl-hnk-ml) China conducted its first-ever submarine-launched ballistic missile test into international Pacific waters on July 6, drawing condemnation from the US, Japan, Australia, and New Zealand. The People's Liberation Army Navy launched the missile from a nuclear-powered submarine and released a statement calling the test routine and legal under international practice.
+
+## Just for You
+
+- [Kubernetes Blog](https://kubernetes.io/blog/) etcd v3.7.0 released July 8 — the first minor release of the distributed key-value store that underpins Kubernetes. Key addition is RangeStream, which allows clients to stream large range query results instead of receiving them as a single in-memory payload.
