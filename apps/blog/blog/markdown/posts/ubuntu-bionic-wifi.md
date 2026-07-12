@@ -140,3 +140,7 @@ After that, you can connect to the wireless IP and don't need the wired one.
 # Reference Links
 - [AskUbuntu post about wpasupplicant](https://askubuntu.com/questions/138472/how-do-i-connect-to-a-wpa-wifi-network-using-the-command-line)
 - [Ubuntuforums.org netplan post](https://ubuntuforums.org/showthread.php?t=2392154)
+
+If you want to take this further and share that WiFi connection with a rack of
+wired servers, see
+[Creating a Wireless Router for Wired Servers With Ubuntu Server](/ubuntu-wifi-to-wired-router.html).
