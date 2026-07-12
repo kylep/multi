@@ -320,3 +320,22 @@ help. For some reason you have to use apt to install `python-subprocess32`.
 If you want to go the other direction and publish your own pip-installable
 package, see [Upload a Python Package to PyPi](/python-pypi.html). It covers
 setup.py, setup.cfg, and uploading with twine.
+
+
+---
+
+
+# Serve a Directory over HTTP
+
+Need to push a file to another machine quickly? Python's built-in HTTP server
+works without installing anything:
+
+```bash
+cd /path/to/files
+python -m http.server 8000
+```
+
+Files are then accessible at `http://<your-ip>:8000`. For a full walkthrough
+of using this to get files onto locked-down Windows machines (where SCP isn't
+available), see
+[Transferring files with Python's SimpleHTTPServer](/python-http-transfer.html).
