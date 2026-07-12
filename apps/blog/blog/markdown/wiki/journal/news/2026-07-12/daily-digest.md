@@ -69,3 +69,33 @@ last_verified: 2026-07-12
 ## Just for You
 
 - [Kubernetes Blog](https://kubernetes.io/blog/) etcd v3.7.0 released July 8 — the first minor release of the distributed key-value store that underpins Kubernetes. Key addition is RangeStream, which allows clients to stream large range query results instead of receiving them as a single in-memory payload.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [Anthropic](https://www.anthropic.com/news/redeploying-fable-5) Anthropic restored Claude Fable 5 access on July 1 after a 19-day suspension triggered by a June 12 export control directive that gave the company no reliable way to verify user nationality in real time. The reinstatement followed a narrowed Commerce Department directive and the deployment of a new safety classifier — developed in coordination with Amazon, Microsoft, and Google — that blocks the reported jailbreak technique in more than 99% of cases.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-09/meta-starts-charging-for-ai-with-muse-spark-1-1-agentic-model) Meta released Muse Spark 1.1 on July 9, its first paid AI model API. The agentic, multimodal reasoning model carries a 1M-token context window and is priced at $1.25 per million input tokens and $4.25 per million output tokens, with $20 in free credits. This marks the first time Meta has charged businesses for model access.
+
+## AI Tooling
+
+- [OpenAI](https://openai.com/index/how-agents-are-transforming-work/) OpenAI launched ChatGPT Work on July 9, an agentic product that merges Codex into the ChatGPT desktop app under a unified Chat, Work, and Codex interface available on all plans including Free. Work takes a high-level goal, gathers context across connected apps, and executes multi-step tasks over hours. The Atlas browser is deprecated as of July 9 and stops working August 9.
+
+- [VS Code](https://code.visualstudio.com/updates/v1_128) VS Code 1.128 shipped July 8 with multi-chat Claude agent sessions — several related conversations can run in parallel within one session to compare approaches or branch from earlier turns. Copilot Vision (images and PDFs in chat) reached general availability in the same release.
+
+## Geopolitics
+
+- [Euronews](https://www.euronews.com/video/2026/07/12/latest-news-bulletin-july-12th-2026-morning) The US-Iran conflict has escalated further since the July 7–8 strikes: CENTCOM struck more than 90 targets in a second night of operations, Iran subsequently hit military targets in Kuwait, Bahrain, and Qatar, and the US launched a third round of strikes in response. The conflict has now spread beyond the Strait of Hormuz to US installations across the Gulf.
+
+- [Bloomberg](https://www.bloomberg.com/news/articles/2026-07-07/le-pen-faces-french-court-verdict-on-presidential-run-ban) A French appeals court on July 7 cleared Marine Le Pen to run in the April 2027 presidential election after reducing her ineligibility ban from 60 to 45 months (30 suspended). The court upheld her embezzlement conviction and added an ankle bracelet condition for a one-year sentence.
+
+## Local
+
+- [todocanada.ca](https://www.todocanada.ca/things-to-do-in-toronto-this-weekend/) Whitby Ribfest returned this weekend (July 10–12) with more than 50,000 expected attendees, live entertainment, and multiple competitive rib vendors at Iroquois Park.
+
+## Just for You
+
+- [Windows Forum](https://windowsforum.com/threads/dataverse-expands-coding-agent-plugin-to-claude-cursor-and-copilot-with-mcp-governance.435235/) Microsoft Dataverse expanded its coding-agent plugin to Claude, Cursor, and GitHub Copilot on July 6, adding MCP certification, governance controls, and broader MCP support across the Microsoft AI stack.
