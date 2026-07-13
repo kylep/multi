@@ -180,6 +180,25 @@ Reboot, then check `vgdisplay` (if that's your use case). It'll be there.
 
 ---
 
+# Mount an NFS Share on Ubuntu
+
+Quick reference for mounting a remote NFS share from an Ubuntu client.
+
+```bash
+# Install the NFS client tools
+apt-get install nfs-common
+
+# Mount a remote share to a local directory
+mount -t nfs <server-ip>:/exported/path /mnt/local-dir
+
+# Add to /etc/fstab for automatic mount on boot
+# <server-ip>:/exported/path  /mnt/local-dir  nfs  defaults  0  0
+```
+
+For setting up the NFS server side, see [Ubuntu NFS Server Setup](/ubuntu-nfs-server.html).
+
+---
+
 # Test MTU from Ubuntu
 
 You would not believe the strange problems that an MTU issue can be the root cause of.
