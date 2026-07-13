@@ -55,3 +55,25 @@ last_verified: 2026-07-13
 - [Perplexity AI / GitHub](https://github.com/) Bumblebee is a new read-only supply chain scanner from Perplexity AI that checks dependencies, MCP servers, and editor extensions for suspicious packages in seconds. No stars threshold confirmed yet — flagged for relevance to MCP server security.
 
 - [Security Online](https://securityonline.info/weekly-threat-intelligence-july-2026/) IBM Langflow OSS contains a severe vulnerability allowing attackers to read secrets and modify AI workflows without restriction. Langflow is widely used in AI agent pipeline tooling.
+
+---
+
+## Update — 20:00 UTC
+
+## AI Industry
+
+- [CNBC](https://www.cnbc.com/2026/07/10/apple-openai-lawsuit-trade-secrets.html) Apple sued OpenAI in federal court in California, alleging systematic trade secret theft involving more than 400 former Apple employees. The suit names two former Apple engineers and accuses OpenAI of coaching departing employees to bypass security procedures and bring proprietary materials to interviews. Apple is also suing Jony Ive's io Products firm, which is partnering with OpenAI on consumer hardware.
+
+- [Anthropic](https://www.anthropic.com/news/expanding-project-glasswing) Project Glasswing, Anthropic's cybersecurity initiative using the Claude Mythos model to find and fix critical software vulnerabilities, expanded from 50 to 150 partner organizations across 15 countries. The program has found more than 10,000 high- or critical-severity vulnerabilities since launching in April 2026. The first public report is due this month.
+
+- [Bloomberg](https://bworldonline.com/technology/2026/07/08/761961/beijing-is-looking-at-curbing-overseas-access-to-chinas-top-ai-models-sources-say/) China's Ministry of Commerce has held meetings with Alibaba, ByteDance, and others about barring foreign access to the country's most capable AI models, including open-weight models. The talks cover both released and unreleased models and would reverse the broad international availability that made DeepSeek popular abroad.
+
+## AI Tooling
+
+- [Anthropic](https://www.anthropic.com/news/redeploying-fable-5) Anthropic extended Claude Fable 5 access for Pro, Max, Team, and select Enterprise subscribers through July 19 — the second extension in a week. The move follows the release of OpenAI's GPT-5.6 Sol tier and is timed to address capacity constraints before Fable 5 shifts to usage-based credits at $10/$50 per million tokens.
+
+- [Google Workspace Blog](https://workspaceupdates.googleblog.com/2026/07/fill-with-gemini-in-sheets-now-available-in-11-additional-languages.html) Google Workspace rolled out multiple updates this week: Fill with Gemini in Sheets expands to 11 additional languages including Mandarin and Dutch, with higher usage limits starting July 15 for AI Expanded Access license holders. Gmail mobile apps now support delegate access, letting users read and compose on behalf of others from iOS and Android. Gemini in Drive is also coming to Android and iOS apps.
+
+## Local
+
+- [CBC News](https://www.cbc.ca/news/canada/livestory/toronto-shooting-st-clair-9.7267199) Two people were killed and at least five others injured in a shooting at Toronto's Salsa on St. Clair festival on July 12. Police confirmed the two victims were targeted and the others were bystanders caught in crossfire. No arrests have been made. The festival, which drew 13,000 attendees, did not resume on Sunday.
