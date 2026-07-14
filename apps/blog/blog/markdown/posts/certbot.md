@@ -79,3 +79,9 @@ Note that if you want to use these certs for HAProxy, you need to combine
 ```bash
 cat cert.pem privkey.pem > haproxy-$site.pem
 ```
+
+---
+
+LetsEncrypt requires a publicly resolvable domain. If you need certs for an
+internal network or corporate CA instead, see
+[Creating a CSR with a SAN](/openssl-csr-san.html).
