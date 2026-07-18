@@ -1,7 +1,10 @@
 # Infrastructure
 
 Everything here runs on or supports the Rancher Desktop cluster on the
-Mac laptop.
+Mac laptop, except pai-nuc which is its own machine.
+
+## [pai-nuc](pai-nuc/)
+Single-node k3s on the pai Intel NUC (SSH bootstrap, auto-deploy manifests).
 
 ## [local-k8s](local-k8s/)
 Bootstrap for the local cluster (Vault etc.).

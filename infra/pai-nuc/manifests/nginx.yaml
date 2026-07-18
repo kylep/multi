@@ -1,0 +1,50 @@
+# Generic nginx, reachable at http://pai:8080.
+# Deployed via the k3s auto-deploy dir (/var/lib/rancher/k3s/server/manifests):
+# k3s applies files there on startup and whenever they change.
+# servicelb (klipper-lb) binds the LoadBalancer port on the node's WiFi IP
+# and NATs into the pod network.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.29-alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: web
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 80
