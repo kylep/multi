@@ -1,0 +1,6 @@
+# k3s server config for the pai NUC → /etc/rancher/k3s/config.yaml
+# Every key is a k3s CLI flag with the leading dashes dropped.
+# Defaults are deliberate on a single node: sqlite datastore, and the
+# packaged coredns/traefik/servicelb/local-path/metrics-server addons.
+write-kubeconfig-mode: "0644"
+node-name: pai
