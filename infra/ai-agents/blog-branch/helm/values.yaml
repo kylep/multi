@@ -1,6 +1,0 @@
-blog:
-  repo: https://github.com/kylep/multi.git
-  branch: main
-  branchSlug: ""
-
-hostname: pai.pericak.com

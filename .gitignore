@@ -56,5 +56,3 @@ token.json
 # Playwright
 **/.playwright-mcp/
 **/test-results/
-
-infra/ai-agents/pai-responder/.venv/
