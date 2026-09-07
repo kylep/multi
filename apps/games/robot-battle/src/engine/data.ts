@@ -1,6 +1,8 @@
 /** Asset loading from JSON data files. */
 
 import type { Consumable, Enemy, Gear, Item, Robot, Weapon } from "./types";
+import type { StatusEffectSpec, StatusType } from "./status";
+import { DEFAULT_INFLICT_CHANCE } from "./status";
 import { applyAllUpgrades } from "./upgrades";
 
 import configJson from "../data/config.json";
@@ -8,6 +10,13 @@ import itemsJson from "../data/items.json";
 import enemiesJson from "../data/enemies.json";
 
 // ── Loader helpers ──
+
+/** Normalise an item's optional statusEffect block, filling in the default chance. */
+function loadStatusEffect(d: Record<string, unknown>): StatusEffectSpec | null {
+  const raw = d.statusEffect as { type?: string; chance?: number } | undefined;
+  if (!raw?.type) return null;
+  return { type: raw.type as StatusType, chance: raw.chance ?? DEFAULT_INFLICT_CHANCE };
+}
 
 function loadWeapon(name: string, d: Record<string, unknown>): Weapon {
   return {
@@ -21,6 +30,7 @@ function loadWeapon(name: string, d: Record<string, unknown>): Weapon {
     energyCost: (d.energyCost as number) ?? 1,
     accuracy: (d.accuracy as number) ?? 100,
     hands: (d.hands as number) ?? 1,
+    statusEffect: loadStatusEffect(d),
   };
 }
 
@@ -64,6 +74,7 @@ function loadConsumable(name: string, d: Record<string, unknown>): Consumable {
     useText: (d.useText as string) ?? "",
     accuracyBonus: (d.accuracyBonus as number) ?? 0,
     maxStack: (d.maxStack as number) ?? 0,
+    statusEffect: loadStatusEffect(d),
   };
 }
 

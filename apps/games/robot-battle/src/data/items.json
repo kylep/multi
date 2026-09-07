@@ -34,7 +34,8 @@
       "energyCost": 3,
       "accuracy": 95,
       "hands": 1,
-      "description": "An electrified rod that delivers a shocking blow. Zap!"
+      "description": "An electrified rod that delivers a shocking blow. Zap!",
+      "statusEffect": { "type": "shock" }
     },
     "Flame Thrower": {
       "level": 5,
@@ -43,7 +44,8 @@
       "energyCost": 4,
       "accuracy": 85,
       "hands": 2,
-      "description": "Shoots fire. Everything is better with fire."
+      "description": "Shoots fire. Everything is better with fire.",
+      "statusEffect": { "type": "burn", "chance": 0.66 }
     },
     "Sawed-off Shotgun": {
       "level": 5,
@@ -62,7 +64,8 @@
       "energyCost": 10,
       "accuracy": 95,
       "hands": 1,
-      "description": "Pew pew pew! A focused beam of pure energy."
+      "description": "Pew pew pew! A focused beam of pure energy.",
+      "statusEffect": { "type": "dazzle", "chance": 0.1 }
     },
     "Lightsabre": {
       "level": 10,
@@ -89,7 +92,8 @@
       "energyCost": 8,
       "accuracy": 95,
       "hands": 1,
-      "description": "VRRRRRR! A spinning chain of sharp teeth. One-handed destruction."
+      "description": "VRRRRRR! A spinning chain of sharp teeth. One-handed destruction.",
+      "statusEffect": { "type": "corrode" }
     },
     "Plasma Cannon": {
       "level": 20,
@@ -98,7 +102,8 @@
       "energyCost": 20,
       "accuracy": 90,
       "hands": 2,
-      "description": "Fires superheated plasma. Melts through anything."
+      "description": "Fires superheated plasma. Melts through anything.",
+      "statusEffect": { "type": "burn" }
     },
     "Thunder Hammer": {
       "level": 25,
@@ -107,7 +112,8 @@
       "energyCost": 12,
       "accuracy": 95,
       "hands": 1,
-      "description": "A massive hammer crackling with electricity. One hand. Maximum bonk."
+      "description": "A massive hammer crackling with electricity. One hand. Maximum bonk.",
+      "statusEffect": { "type": "shock" }
     },
     "Missile Launcher": {
       "level": 30,
@@ -126,7 +132,8 @@
       "energyCost": 15,
       "accuracy": 100,
       "hands": 1,
-      "description": "A beam of pure destruction. Never misses. Ever."
+      "description": "A beam of pure destruction. Never misses. Ever.",
+      "statusEffect": { "type": "dazzle", "chance": 0.1 }
     },
     "Nuke Launcher": {
       "level": 40,
@@ -135,7 +142,8 @@
       "energyCost": 40,
       "accuracy": 80,
       "hands": 2,
-      "description": "Launches a miniature nuclear warhead. Everything goes BOOM."
+      "description": "Launches a miniature nuclear warhead. Everything goes BOOM.",
+      "statusEffect": { "type": "radiation", "chance": 1 }
     },
     "Antimatter Blade": {
       "level": 45,
@@ -144,7 +152,8 @@
       "energyCost": 25,
       "accuracy": 95,
       "hands": 1,
-      "description": "A sword made of antimatter. Annihilates anything it touches."
+      "description": "A sword made of antimatter. Annihilates anything it touches.",
+      "statusEffect": { "type": "corrode" }
     },
     "Antimatter Missile Launcher": {
       "level": 45,
@@ -154,7 +163,8 @@
       "accuracy": 90,
       "hands": 2,
       "requirements": ["Antimatter Missile"],
-      "description": "Fires antimatter missiles that erase things from existence. Each missile costs a fortune. Worth it."
+      "description": "Fires antimatter missiles that erase things from existence. Each missile costs a fortune. Worth it.",
+      "statusEffect": { "type": "corrode" }
     },
     "Galaxy Destroyer": {
       "level": 50,
@@ -436,6 +446,15 @@
       "useText": "You throw a Grenade! BOOM!",
       "description": "A small bomb you can launch at the enemy. BOOM! Max 10."
     },
+    "Flashbang": {
+      "level": 9,
+      "moneyCost": 120,
+      "damage": 5,
+      "maxStack": 5,
+      "useText": "You toss a Flashbang. FWOOMP! The whole arena goes white!",
+      "description": "A blinding burst of light. Barely scratches them, but they can't aim straight. Max 5.",
+      "statusEffect": { "type": "dazzle", "chance": 1 }
+    },
     "Targeting Lock": {
       "level": 10,
       "moneyCost": 150,
@@ -450,7 +469,17 @@
       "enemyDodgeReduction": 50,
       "maxStack": 3,
       "useText": "You detonate an EMP Bomb, scrambling the enemy's circuits!",
-      "description": "Electromagnetic pulse. Scrambles their dodge circuits. Max 3."
+      "description": "Electromagnetic pulse. Scrambles their dodge circuits. Max 3.",
+      "statusEffect": { "type": "shock" }
+    },
+    "Acid Grenade": {
+      "level": 12,
+      "moneyCost": 200,
+      "damage": 20,
+      "maxStack": 5,
+      "useText": "You lob an Acid Grenade. It splatters and starts eating their armor!",
+      "description": "A bottle of nasty green goo. Melts armor right off the enemy. Max 5.",
+      "statusEffect": { "type": "corrode", "chance": 1 }
     },
     "Mega Repair Kit": {
       "level": 15,
@@ -506,7 +535,8 @@
       "damage": 250,
       "maxStack": 5,
       "useText": "You launch a Plasma Grenade. It melts AND explodes!",
-      "description": "Plasma-coated explosive. Melts and explodes at the same time! Max 5."
+      "description": "Plasma-coated explosive. Melts and explodes at the same time! Max 5.",
+      "statusEffect": { "type": "burn" }
     },
     "Antimatter Shield": {
       "level": 38,
@@ -522,7 +552,8 @@
       "damage": 500,
       "maxStack": 5,
       "useText": "You launch a Nuke. NUCLEAR EXPLOSION! Everything goes white!",
-      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 5."
+      "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 5.",
+      "statusEffect": { "type": "radiation", "chance": 1 }
     }
   }
 }

@@ -40,6 +40,44 @@
 - Both actions resolve in a full turn
 - Random order execution
 
+### Status Effects (tests/unit/status.test.ts)
+- `STATUS_RULES` covers all five types with an icon, label and `t-*` colour
+- Durations: burn 3, shock 2, corrode 3, radiation Infinity, dazzle 3
+- `tryInflict` respects the inflict chance (seeded rng), the item's chance
+  override, and does nothing for a source with no effect
+- God mode robots are immune
+- Re-applying refreshes duration instead of stacking; the higher potency wins
+- Infliction logs `X is BURNED!` into the current turn log
+- Burn tick deals floor(25% of source damage), ignores defence, and can kill
+- God mode robots take no tick damage
+- Radiation escalates 10%, 20%, 30% of source damage and never expires
+- Non-damaging effects deal no tick damage
+- `decrementStatuses` expires at zero and logs `X is no longer burned`
+- Corrode reduces `battleDefence` by 25%
+- Dazzle halves `battleDodge` and sets `battleAccuracyMultiplier` to 0.8
+- `shouldFizzle` is false without shock, true on a roll under 25%
+- `cureStatuses` clears everything, returns the cured list, logs
+  `Repair Kit cured BURN, SHOCK`, and logs nothing when there is nothing to cure
+
+### Status Effects in Battle (tests/unit/battle.test.ts)
+- `executeAttack` with a 100% Burn weapon inflicts burn
+- A blocked hit (Blast Shield) still applies the effect
+- `resolveTurn` ticks burn damage into `currentTurnLog` and decrements duration
+- A burn tick can end the battle
+- A shocked fighter's fizzled attack spends no energy and deals no damage
+- A Repair Kit cures every active effect
+- A damaging consumable that is dodged inflicts nothing
+- A non-damaging consumable (EMP Bomb) still inflicts its effect
+
+### Status Effect Data (tests/unit/data.test.ts)
+- Weapon effects load with chance overrides (Flame Thrower burn 0.66,
+  Nuke Launcher radiation 1, Laser Gun dazzle 0.1) and the 0.2 default
+  (Chainsaw corrode); Stick has none
+- Consumable effects load (Plasma Grenade burn, EMP Bomb shock, Nuke
+  radiation); Repair Kit has none
+- Acid Grenade (level 12, $200, 20 dmg, corrode 100%) and Flashbang
+  (level 9, $120, 5 dmg, dazzle 100%) exist with useText
+
 ## E2E Tests (tests/e2e/combat.spec.ts)
 
 ### Start Battle

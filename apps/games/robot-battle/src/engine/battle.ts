@@ -12,6 +12,7 @@ import type {
   Weapon,
 } from "./types";
 import {
+  battleAccuracyMultiplier,
   battleDefence,
   battleDodge,
   createBattleRobot,
@@ -27,10 +28,18 @@ import {
   getWeaponEnergyCost,
 } from "./robot";
 import { createRng } from "./rng";
+import {
+  cureStatuses,
+  decrementStatuses,
+  shouldFizzle,
+  tickStatuses,
+  tryInflict,
+} from "./status";
 
 // ── Helpers ──
 
-function log(battle: BattleState, message: string): void {
+/** Append a line to both the running battle log and the current turn's log. */
+export function log(battle: BattleState, message: string): void {
   battle.battleLog.push(message);
   battle.currentTurnLog.push(message);
 }
@@ -137,7 +146,8 @@ export function executeAttack(
   for (let i = 0; i < weapons.length; i++) {
     const weapon = weapons[i];
     const accuracyBonus = getEffectiveAccuracy(attacker.robot) + attacker.tempAccuracy;
-    const hitChance = calculateHitChance(weapon.accuracy + accuracyBonus, battleDodge(defender));
+    const accuracy = (weapon.accuracy + accuracyBonus) * battleAccuracyMultiplier(attacker);
+    const hitChance = calculateHitChance(accuracy, battleDodge(defender));
     const roll = rng.random();
 
     if (roll < hitChance) {
@@ -161,6 +171,8 @@ export function executeAttack(
         messages.push(msg);
         log(battle, msg);
       }
+      // The shield stops damage, not fire — a blocked hit still applies the effect.
+      tryInflict(battle, defender, weapon, rng);
     } else {
       const msg = `  ${weapon.name} ${i + 1} misses!`;
       messages.push(msg);
@@ -210,6 +222,9 @@ export function useConsumable(
   if (idx !== -1) attacker.robot.inventory.splice(idx, 1);
 
   const effects: string[] = [];
+  // A consumable with no direct damage always "lands"; a damaging one has to
+  // get past the dodge roll before its effect can be applied.
+  let effectLands = consumable.damage === 0;
 
   if (consumable.healthRestore > 0) {
     const max = getEffectiveMaxHealth(attacker.robot);
@@ -257,6 +272,7 @@ export function useConsumable(
         }
         defender.currentHealth -= dmg;
         effects.push(`${dmg} damage to enemy`);
+        effectLands = true;
       }
     }
   }
@@ -274,6 +290,14 @@ export function useConsumable(
     log(battle, `${attacker.robot.name}: ${consumable.useText}`);
   } else {
     log(battle, `${attacker.robot.name} uses ${consumable.name}: ${effects.join(", ")}`);
+  }
+
+  // Status effects resolve after the use line so the log reads in order.
+  if (consumable.healthRestore > 0) {
+    cureStatuses(battle, attacker, consumable.name);
+  }
+  if (effectLands) {
+    tryInflict(battle, defender, consumable, r);
   }
   checkVictory(battle);
 
@@ -391,6 +415,13 @@ function executePlannedAction(
   const attacker = isPlayer ? battle.player : battle.enemy;
   const defender = isPlayer ? battle.enemy : battle.player;
 
+  // A shocked robot can seize up: the turn is spent, but no energy and no
+  // consumable are.
+  if (shouldFizzle(attacker, rng)) {
+    log(battle, `${attacker.robot.name} seizes up and can't act!`);
+    return ok("Seized up and couldn't act!");
+  }
+
   if (action.actionType === "attack") {
     return executeAttack(battle, attacker, defender, action.weapons, rng);
   }
@@ -428,6 +459,16 @@ export function resolveTurn(
     const result = executePlannedAction(battle, resolved, isPlayer, r);
     const actor = isPlayer ? battle.player.robot.name : battle.enemy.robot.name;
     results.push({ actor, result });
+  }
+
+  if (!battle.winner) {
+    tickStatuses(battle, battle.player);
+    tickStatuses(battle, battle.enemy);
+    checkVictory(battle);
+  }
+  if (!battle.winner) {
+    decrementStatuses(battle, battle.player);
+    decrementStatuses(battle, battle.enemy);
   }
 
   return results;

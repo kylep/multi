@@ -15,6 +15,7 @@ import {
   useConsumable,
 } from "../../src/engine/battle";
 import { createBattleRobot, getEffectiveAccuracy } from "../../src/engine/robot";
+import { hasStatus } from "../../src/engine/status";
 import { loadAssets } from "../../src/engine/data";
 import { createRng } from "../../src/engine/rng";
 import type { Consumable, Robot, Weapon } from "../../src/engine/types";
@@ -65,6 +66,7 @@ function makeWeapon(overrides?: Partial<Weapon>): Weapon {
     energyCost: 1,
     accuracy: 100,
     hands: 1,
+    statusEffect: null,
     ...overrides,
   };
 }
@@ -87,6 +89,7 @@ function makeConsumable(overrides?: Partial<Consumable>): Consumable {
     useText: "",
     accuracyBonus: 0,
     maxStack: 0,
+    statusEffect: null,
     ...overrides,
   };
 }
@@ -488,5 +491,116 @@ describe("shouldShowLootBox", () => {
       if (shouldShowLootBox(100, rng)) { triggered = true; break; }
     }
     expect(triggered).toBe(true);
+  });
+});
+
+describe("status effects in battle", () => {
+  it("executeAttack with a 100% Burn weapon inflicts burn", () => {
+    const flamer = makeWeapon({
+      name: "Flame Thrower",
+      damage: 8,
+      accuracy: 100,
+      statusEffect: { type: "burn", chance: 1 },
+    });
+    const player = makeRobot({ inventory: [flamer] });
+    const battle = createBattle(player, makeRobot({ name: "Enemy" }));
+
+    executeAttack(battle, battle.player, battle.enemy, [flamer], createRng(42));
+    expect(hasStatus(battle.enemy, "burn")).toBe(true);
+    expect(battle.currentTurnLog).toContain("Enemy is BURNED!");
+  });
+
+  it("a blocked hit still applies the effect", () => {
+    const flamer = makeWeapon({
+      name: "Flame Thrower",
+      damage: 5,
+      accuracy: 100,
+      statusEffect: { type: "burn", chance: 1 },
+    });
+    const player = makeRobot({ inventory: [flamer] });
+    const battle = createBattle(player, makeRobot({ name: "Enemy" }));
+    battle.enemy.damageBlock = 100;
+    const startHp = battle.enemy.currentHealth;
+
+    executeAttack(battle, battle.player, battle.enemy, [flamer], createRng(42));
+    expect(battle.enemy.currentHealth).toBe(startHp);
+    expect(hasStatus(battle.enemy, "burn")).toBe(true);
+  });
+
+  it("resolveTurn ticks burn damage into the current turn log", () => {
+    const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy" }));
+    battle.enemy.statuses.push({ type: "burn", turnsLeft: 3, potency: 4, ticks: 0 });
+    planRest(battle, true);
+    planRest(battle, false);
+
+    resolveTurn(battle, createRng(42));
+    expect(battle.currentTurnLog).toContain("Enemy takes 4 burn damage");
+    expect(battle.enemy.statuses[0].turnsLeft).toBe(2);
+  });
+
+  it("a burn tick can end the battle", () => {
+    const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy" }));
+    battle.enemy.statuses.push({ type: "burn", turnsLeft: 3, potency: 20, ticks: 0 });
+    battle.enemy.currentHealth = 5;
+    planRest(battle, true);
+    planRest(battle, false);
+
+    resolveTurn(battle, createRng(42));
+    expect(battle.winner).toBe("player");
+    expect(battle.currentTurnLog).toContain("Enemy takes 20 burn damage");
+  });
+
+  it("a shocked fighter's fizzled attack spends no energy", () => {
+    const weapon = makeWeapon({ damage: 3, energyCost: 5 });
+    const player = makeRobot({ inventory: [weapon] });
+    const battle = createBattle(player, makeRobot({ name: "Enemy" }));
+    battle.player.statuses.push({ type: "shock", turnsLeft: 2, potency: 0, ticks: 0 });
+    planAttack(battle, [weapon], true);
+    planRest(battle, false);
+
+    // Seed 7 rolls 0.0117 (player acts first) then 0.0620 (under the 25% fizzle).
+    resolveTurn(battle, createRng(7));
+    expect(battle.player.currentEnergy).toBe(20);
+    expect(battle.currentTurnLog).toContain("TestBot seizes up and can't act!");
+    expect(battle.enemy.currentHealth).toBe(10);
+  });
+
+  it("a Repair Kit cures every active effect", () => {
+    const kit = makeConsumable({ name: "Repair Kit", healthRestore: 10 });
+    const player = makeRobot({ inventory: [kit] });
+    const battle = createBattle(player, makeRobot({ name: "Enemy" }));
+    battle.player.currentHealth = 5;
+    battle.player.statuses.push({ type: "burn", turnsLeft: 3, potency: 4, ticks: 0 });
+    battle.player.statuses.push({ type: "shock", turnsLeft: 2, potency: 0, ticks: 0 });
+
+    useConsumable(battle, battle.player, battle.enemy, kit, createRng(42));
+    expect(battle.player.statuses).toHaveLength(0);
+    expect(battle.currentTurnLog).toContain("Repair Kit cured BURN, SHOCK");
+  });
+
+  it("a damaging consumable that is dodged inflicts nothing", () => {
+    const flashbang = makeConsumable({
+      name: "Flashbang",
+      damage: 5,
+      statusEffect: { type: "dazzle", chance: 1 },
+    });
+    const player = makeRobot({ inventory: [flashbang] });
+    const battle = createBattle(player, makeRobot({ name: "Dodger", dodge: 200 }));
+
+    useConsumable(battle, battle.player, battle.enemy, flashbang, createRng(42));
+    expect(hasStatus(battle.enemy, "dazzle")).toBe(false);
+  });
+
+  it("a non-damaging consumable still inflicts its effect", () => {
+    const emp = makeConsumable({
+      name: "EMP Bomb",
+      enemyDodgeReduction: 50,
+      statusEffect: { type: "shock", chance: 1 },
+    });
+    const player = makeRobot({ inventory: [emp] });
+    const battle = createBattle(player, makeRobot({ name: "Enemy" }));
+
+    useConsumable(battle, battle.player, battle.enemy, emp, createRng(42));
+    expect(hasStatus(battle.enemy, "shock")).toBe(true);
   });
 });

@@ -1,6 +1,12 @@
 /** Robot helper functions — replaces Python Robot methods. */
 
 import type { BattleRobot, Gear, Item, Robot, Weapon, Consumable } from "./types";
+import {
+  CORRODE_DEFENCE_MULTIPLIER,
+  DAZZLE_ACCURACY_MULTIPLIER,
+  DAZZLE_DODGE_MULTIPLIER,
+  hasStatus,
+} from "./status";
 
 // ── Robot helpers ──
 
@@ -103,15 +109,23 @@ export function createBattleRobot(robot: Robot): BattleRobot {
     damageBlock: 0,
     consumablesUsed: [],
     consumableUsedThisTurn: false,
+    statuses: [],
   };
 }
 
 export function battleDodge(br: BattleRobot): number {
-  return Math.max(0, getEffectiveDodge(br.robot) - br.tempDodgeReduction);
+  const dodge = Math.max(0, getEffectiveDodge(br.robot) - br.tempDodgeReduction);
+  return hasStatus(br, "dazzle") ? Math.floor(dodge * DAZZLE_DODGE_MULTIPLIER) : dodge;
 }
 
 export function battleDefence(br: BattleRobot): number {
-  return getEffectiveDefence(br.robot) + br.tempDefence;
+  const defence = getEffectiveDefence(br.robot) + br.tempDefence;
+  return hasStatus(br, "corrode") ? Math.floor(defence * CORRODE_DEFENCE_MULTIPLIER) : defence;
+}
+
+/** Accuracy multiplier applied to a robot's attacks. Dazzle blunts the aim. */
+export function battleAccuracyMultiplier(br: BattleRobot): number {
+  return hasStatus(br, "dazzle") ? DAZZLE_ACCURACY_MULTIPLIER : 1;
 }
 
 export function isAlive(br: BattleRobot): boolean {

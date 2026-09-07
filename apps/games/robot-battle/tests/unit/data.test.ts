@@ -132,6 +132,39 @@ describe("loadAssets", () => {
     expect(minibot.backstory.length).toBeGreaterThan(0);
   });
 
+  it("loads weapon status effects with chance overrides and defaults", () => {
+    expect(registry.weapons.get("Flame Thrower")!.statusEffect).toEqual({ type: "burn", chance: 0.66 });
+    expect(registry.weapons.get("Chainsaw")!.statusEffect).toEqual({ type: "corrode", chance: 0.2 });
+    expect(registry.weapons.get("Nuke Launcher")!.statusEffect).toEqual({ type: "radiation", chance: 1 });
+    expect(registry.weapons.get("Laser Gun")!.statusEffect).toEqual({ type: "dazzle", chance: 0.1 });
+    expect(registry.weapons.get("Stick")!.statusEffect).toBeNull();
+  });
+
+  it("loads consumable status effects", () => {
+    expect(registry.consumables.get("Plasma Grenade")!.statusEffect).toEqual({ type: "burn", chance: 0.2 });
+    expect(registry.consumables.get("EMP Bomb")!.statusEffect).toEqual({ type: "shock", chance: 0.2 });
+    expect(registry.consumables.get("Nuke")!.statusEffect).toEqual({ type: "radiation", chance: 1 });
+    expect(registry.consumables.get("Repair Kit")!.statusEffect).toBeNull();
+  });
+
+  it("loads the Acid Grenade and Flashbang consumables", () => {
+    const acid = registry.consumables.get("Acid Grenade")!;
+    expect(acid.level).toBe(12);
+    expect(acid.moneyCost).toBe(200);
+    expect(acid.damage).toBe(20);
+    expect(acid.maxStack).toBe(5);
+    expect(acid.statusEffect).toEqual({ type: "corrode", chance: 1 });
+    expect(acid.useText.length).toBeGreaterThan(0);
+
+    const flash = registry.consumables.get("Flashbang")!;
+    expect(flash.level).toBe(9);
+    expect(flash.moneyCost).toBe(120);
+    expect(flash.damage).toBe(5);
+    expect(flash.maxStack).toBe(5);
+    expect(flash.statusEffect).toEqual({ type: "dazzle", chance: 1 });
+    expect(flash.useText.length).toBeGreaterThan(0);
+  });
+
   it("enemies with arm upgrades get correct hands", () => {
     const rustclaw = registry.createEnemyRobot("Rustclaw")!;
     expect(rustclaw.hands).toBe(3); // third-arm upgrade

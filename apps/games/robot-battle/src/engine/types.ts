@@ -1,5 +1,7 @@
 /** Data models for Robot Battle. */
 
+import type { ActiveStatus, StatusEffectSpec } from "./status";
+
 export type ItemType = "weapon" | "gear" | "consumable";
 
 export interface ItemBase {
@@ -17,6 +19,7 @@ export interface Weapon extends ItemBase {
   energyCost: number;
   accuracy: number;
   hands: number;
+  statusEffect: StatusEffectSpec | null;
 }
 
 export interface Gear extends ItemBase {
@@ -46,6 +49,7 @@ export interface Consumable extends ItemBase {
   useText: string;
   accuracyBonus: number;
   maxStack: number;
+  statusEffect: StatusEffectSpec | null;
 }
 
 export type Item = Weapon | Gear | Consumable;
@@ -116,6 +120,7 @@ export interface BattleRobot {
   damageBlock: number;
   consumablesUsed: string[];
   consumableUsedThisTurn: boolean;
+  statuses: ActiveStatus[];
 }
 
 export interface PlannedAction {
