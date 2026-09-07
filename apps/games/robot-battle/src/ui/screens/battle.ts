@@ -2,7 +2,7 @@
 
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
-import type { BattleState, Enemy, Rng, Weapon } from "../../engine/types";
+import type { BattleRobot, BattleState, Enemy, Rng, Weapon } from "../../engine/types";
 import { bossAsEnemy, createBossRobot, generateEndGameBossSpec } from "../../engine/boss";
 import {
   createBattle,
@@ -14,6 +14,7 @@ import {
   useConsumable,
 } from "../../engine/battle";
 import { aiPlanAction } from "../../engine/ai";
+import { STATUS_RULES } from "../../engine/status";
 import { createRng } from "../../engine/rng";
 import {
   getAmmoSummary,
@@ -532,6 +533,18 @@ function animsFromLog(battle: BattleState): BattleAnims {
   return { playerPanel, enemyPanel };
 }
 
+/** Badge row for a robot's active status effects. Empty when it has none. */
+function statusBadgesHtml(br: BattleRobot): string {
+  if (br.statuses.length === 0) return "";
+  const badges = br.statuses.map((s) => {
+    const rule = STATUS_RULES[s.type];
+    // Radiation lasts the rest of the battle, so it shows no turn counter.
+    const counter = Number.isFinite(s.turnsLeft) ? ` (${s.turnsLeft})` : "";
+    return `<span class="status-badge ${rule.colour}">${esc(rule.icon)} ${esc(rule.label)}${counter}</span>`;
+  }).join("");
+  return `<div>${badges}</div>`;
+}
+
 function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: BattleAnims, enemyNameClass?: string): void {
   const p = battle.player;
   const e = battle.enemy;
@@ -550,6 +563,9 @@ function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: Batt
     ? `<div class="t-dim" style="margin-top:6px;font-size:13px">${battle.lastTurnLog.map((m) => esc(m)).join("<br>")}</div>`
     : "";
 
+  const pStatusHtml = statusBadgesHtml(p);
+  const eStatusHtml = statusBadgesHtml(e);
+
   const pAmmo = getAmmoSummary(p.robot);
   const pAmmoHtml = pAmmo.length > 0
     ? `<div class="t-dim" style="font-size:13px">${pAmmo.map((a) => `${a.name}: ${a.count}`).join(" &nbsp; ")}</div>`
@@ -565,12 +581,14 @@ function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: Batt
         <div class="t-magenta t-bold">${esc(p.robot.name)} (You)</div>
         <div class="t-cyan">HP: ${hpBar(p.currentHealth, pMaxHp, barWidth)} ${p.currentHealth}/${pMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(p.currentEnergy, pMaxEn, barWidth)} ${p.currentEnergy}/${pMaxEn}</div>
+        ${pStatusHtml}
         ${pAmmoHtml}
       </div>
       <div class="panel ${eAnim}">
         <div class="${enemyNameClass ?? "t-magenta"} t-bold">${esc(e.robot.name)} (Enemy)</div>
         <div class="t-cyan">HP: ${hpBar(e.currentHealth, eMaxHp, barWidth)} ${e.currentHealth}/${eMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(e.currentEnergy, eMaxEn, barWidth)} ${e.currentEnergy}/${eMaxEn}</div>
+        ${eStatusHtml}
         ${eAmmoHtml}
       </div>
     </div>

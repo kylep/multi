@@ -95,6 +95,26 @@ function loadEnemy(name: string, d: Record<string, unknown>): Enemy {
   };
 }
 
+// ── Save hydration ──
+
+/**
+ * Backfill `statusEffect` on inventory items saved before v0.14.0.
+ *
+ * Saves store whole item copies, so an item bought before status effects
+ * existed has no `statusEffect` field and would never inflict anything.
+ * Only that one field is copied from the registry — every other stat stays
+ * as saved, matching how the game has always treated saved items.
+ */
+export function hydrateStatusEffects(player: Robot, registry: AssetRegistry): void {
+  for (const item of player.inventory) {
+    if (item.itemType === "gear") continue;
+    if (item.statusEffect !== undefined) continue;
+    const def = registry.getItem(item.name);
+    if (!def || def.itemType === "gear") continue;
+    item.statusEffect = def.statusEffect;
+  }
+}
+
 // ── AssetRegistry ──
 
 export interface DefaultRobotStats {

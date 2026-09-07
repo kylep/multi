@@ -3,6 +3,8 @@
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
 import type { Gear, Consumable, Item, Robot, Weapon } from "../../engine/types";
+import type { StatusEffectSpec } from "../../engine/status";
+import { STATUS_RULES } from "../../engine/status";
 import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, sellItem } from "../../engine/shop";
 import {
   getEffectiveMaxEnergy,
@@ -24,6 +26,14 @@ import type { SoundPlayer } from "../sound";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/** "66% Burn" for an item that inflicts a status effect, "" when it has none. */
+function statusEffectSummary(spec: StatusEffectSpec | null): string {
+  if (!spec) return "";
+  const rule = STATUS_RULES[spec.type];
+  const name = rule.label.charAt(0) + rule.label.slice(1).toLowerCase();
+  return `${Math.round(spec.chance * 100)}% ${name}`;
 }
 
 function renderShopHeader(terminal: Terminal, state: GameState): void {
@@ -315,7 +325,9 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
     ? `<div class="t-dim">(none)</div>`
     : [...weaponCounts.values()].map(({ weapon: w, count }) => {
       const countStr = count > 1 ? ` (${count})` : "";
-      return `<div class="t-green">${esc(w.name)}${countStr} — ${w.damage}dmg, ${w.accuracy}%acc</div>`;
+      const fx = statusEffectSummary(w.statusEffect);
+      const fxStr = fx ? `, ${fx}` : "";
+      return `<div class="t-green">${esc(w.name)}${countStr} — ${w.damage}dmg, ${w.accuracy}%acc${fxStr}</div>`;
     }).join("");
 
   const gearCounts = new Map<string, { gear: typeof gear[0]; count: number }>();
@@ -346,13 +358,17 @@ async function renderInventoryTab(terminal: Terminal, state: GameState): Promise
   contentHTML += `<div class="battle-layout"><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Weapons</div>${weaponHtml}</div><div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Gear</div>${gearHtml}</div></div>`;
 
   if (consumables.length > 0) {
-    const conCounts = new Map<string, number>();
+    const conCounts = new Map<string, { consumable: typeof consumables[0]; count: number }>();
     for (const c of consumables) {
-      conCounts.set(c.name, (conCounts.get(c.name) ?? 0) + 1);
+      const existing = conCounts.get(c.name);
+      if (existing) existing.count++;
+      else conCounts.set(c.name, { consumable: c, count: 1 });
     }
-    const conHtml = [...conCounts.entries()].map(([name, count]) => {
+    const conHtml = [...conCounts.values()].map(({ consumable: c, count }) => {
       const countStr = count > 1 ? ` (${count})` : "";
-      return `<div class="t-green">${esc(name)}${countStr}</div>`;
+      const fx = statusEffectSummary(c.statusEffect);
+      const fxStr = fx ? ` — ${fx}` : "";
+      return `<div class="t-green">${esc(c.name)}${countStr}${fxStr}</div>`;
     }).join("");
     contentHTML += `<div class="panel" style="padding:6px 10px"><div class="t-yellow t-bold">Items</div>${conHtml}</div>`;
   }
@@ -483,7 +499,10 @@ async function renderDetailsTab(terminal: Terminal, state: GameState): Promise<s
 function itemSummary(item: Item, player: Robot): string {
   if (item.itemType === "weapon") {
     const w = item as Weapon;
-    return `${w.damage} dmg, ${w.accuracy}% acc, ${getWeaponEnergyCost(w, player)} en, ${w.hands}h`;
+    const parts = [`${w.damage} dmg`, `${w.accuracy}% acc`, `${getWeaponEnergyCost(w, player)} en`, `${w.hands}h`];
+    const fx = statusEffectSummary(w.statusEffect);
+    if (fx) parts.push(fx);
+    return parts.join(", ");
   }
   if (item.itemType === "gear") {
     const g = item as Gear;
@@ -509,6 +528,8 @@ function itemSummary(item: Item, player: Robot): string {
     if (c.damageBlock) parts.push(`Blocks ${c.damageBlock} Dmg`);
     if (c.enemyDodgeReduction) parts.push(`-${c.enemyDodgeReduction} Dodge`);
     if (c.accuracyBonus) parts.push(`+${c.accuracyBonus} Acc`);
+    const fx = statusEffectSummary(c.statusEffect);
+    if (fx) parts.push(fx);
     return parts.length ? parts.join(", ") : item.description;
   }
   return "";

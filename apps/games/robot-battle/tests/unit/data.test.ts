@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { loadAssets } from "../../src/engine/data";
+import { hydrateStatusEffects, loadAssets } from "../../src/engine/data";
+import { createGameState, createPlayer } from "../../src/engine/state";
+import type { Weapon } from "../../src/engine/types";
 
 describe("loadAssets", () => {
   const registry = loadAssets();
@@ -163,6 +165,33 @@ describe("loadAssets", () => {
     expect(flash.maxStack).toBe(5);
     expect(flash.statusEffect).toEqual({ type: "dazzle", chance: 1 });
     expect(flash.useText.length).toBeGreaterThan(0);
+  });
+
+  it("hydrates statusEffect onto pre-0.14.0 saved items", () => {
+    const player = createPlayer(createGameState(registry), "Old Save");
+
+    // A save written before v0.14.0: whole item copies, no statusEffect field.
+    const oldFlameThrower = { ...registry.weapons.get("Flame Thrower")! } as Partial<Weapon>;
+    delete oldFlameThrower.statusEffect;
+    const oldStick = { ...registry.weapons.get("Stick")! } as Partial<Weapon>;
+    delete oldStick.statusEffect;
+    const removedItem = { ...registry.weapons.get("Stick")!, name: "Banana Peel Launcher" };
+    delete (removedItem as Partial<Weapon>).statusEffect;
+
+    player.inventory.push(oldFlameThrower as Weapon, oldStick as Weapon, removedItem as Weapon);
+    hydrateStatusEffects(player, registry);
+
+    expect(oldFlameThrower.statusEffect).toEqual({ type: "burn", chance: 0.66 });
+    expect(oldStick.statusEffect).toBeNull();
+    expect(removedItem.statusEffect).toBeUndefined();
+  });
+
+  it("leaves an already-set statusEffect alone", () => {
+    const player = createPlayer(createGameState(registry), "New Save");
+    const nerfed = { ...registry.weapons.get("Flame Thrower")!, statusEffect: null };
+    player.inventory.push(nerfed);
+    hydrateStatusEffects(player, registry);
+    expect(nerfed.statusEffect).toBeNull();
   });
 
   it("enemies with arm upgrades get correct hands", () => {

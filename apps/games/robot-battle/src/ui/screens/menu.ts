@@ -487,6 +487,29 @@ function esc(s: string): string {
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
+    version: "0.14.0", date: "2026-09-07", notes: [
+      "Status effects: weapons and items can now stick a nasty condition on whoever they hit",
+      "🔥 Burn — Flame Thrower, Plasma Cannon, Plasma Grenade: 25% of the attack's damage every turn for 3 turns, straight through armour",
+      "⚡ Shock — Shock Rod, Thunder Hammer, EMP Bomb: 25% chance each turn you seize up and lose your action, for 2 turns",
+      "🧪 Corrode — Chainsaw, Antimatter Blade, Antimatter Missile Launcher, Acid Grenade: -25% Defence for 3 turns",
+      "☢ Radiation — Nuke Launcher, Nuke: 10% of the attack's damage per turn and growing (10%, 20%, 30%...), and it never wears off",
+      "✨ Dazzle — Laser Gun, Death Ray, Flashbang: -50% Dodge and -20% accuracy for 3 turns",
+      "Every effect has a 20% chance to land unless the item says otherwise",
+      "Flame Thrower burns 66% of the time; Laser Gun and Death Ray dazzle 10% of the time",
+      "Acid Grenade, Flashbang, Nuke and Nuke Launcher land their effect 100% of the time",
+      "New item: Acid Grenade — level 12, $200, 20 damage, always corrodes, stack up to 5",
+      "New item: Flashbang — level 9, $120, 5 damage, always dazzles, stack up to 5",
+      "Any Repair Kit (Repair, Mega or Ultra) cures every effect you have on top of healing you",
+      "The same effect never stacks — hitting again just resets the timer",
+      "Effects are rolled per weapon, so a two-weapon attack gets two rolls",
+      "A hit soaked up by a Blast Shield still applies the effect — the shield stops damage, not fire",
+      "God mode robots shrug off every effect",
+      "Battle panels show a badge row for each robot's active effects with the turns left",
+      "Shop and inventory lines show an item's effect and how often it lands",
+      "Weapons in old saves pick up their new effects the next time you load that slot",
+    ],
+  },
+  {
     version: "0.13.0", date: "2026-04-10", notes: [
       "Level scaling: every level grants +1 Accuracy, +1 Dodge, +1 Defence, +1 Attack, +2 HP",
       "New Game + bonus: +1 to every level bonus (incl. HP) per NG+ round — applies to enemies too",
