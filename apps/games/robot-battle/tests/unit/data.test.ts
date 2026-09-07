@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hydrateStatusEffects, loadAssets } from "../../src/engine/data";
+import { hydrateStatusEffects, loadAssets, loadStatusEffect } from "../../src/engine/data";
 import { createGameState, createPlayer } from "../../src/engine/state";
 import type { Weapon } from "../../src/engine/types";
 
@@ -140,6 +140,14 @@ describe("loadAssets", () => {
     expect(registry.weapons.get("Nuke Launcher")!.statusEffect).toEqual({ type: "radiation", chance: 1 });
     expect(registry.weapons.get("Laser Gun")!.statusEffect).toEqual({ type: "dazzle", chance: 0.1 });
     expect(registry.weapons.get("Stick")!.statusEffect).toBeNull();
+  });
+
+  it("rejects an unknown status effect type at load", () => {
+    expect(() => loadStatusEffect("Typo Blade", { statusEffect: { type: "brun" } }))
+      .toThrow(/Typo Blade.*brun/);
+    expect(loadStatusEffect("Chainsaw", { statusEffect: { type: "corrode" } }))
+      .toEqual({ type: "corrode", chance: 0.2 });
+    expect(loadStatusEffect("Stick", {})).toBeNull();
   });
 
   it("loads consumable status effects", () => {

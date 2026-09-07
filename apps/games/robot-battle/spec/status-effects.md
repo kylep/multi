@@ -8,7 +8,7 @@ panel, and are cured by any Repair Kit.
 
 | Effect | Badge | Sources | What it does | Duration |
 |--------|-------|---------|--------------|----------|
-| Burn | 🔥 BURN | Flame Thrower (66%), Plasma Cannon, Plasma Grenade | 25% of the source's base damage each turn, ignores defence | 3 turns |
+| Burn | 🔥 BURN | Flame Thrower (66%), Plasma Cannon, Plasma Grenade | 15% of the source's base damage each turn, ignores defence | 3 turns |
 | Shock | ⚡ SHOCK | Shock Rod, Thunder Hammer, EMP Bomb | 25% chance each turn the action fizzles ("seizes up") | 2 turns |
 | Corrode | 🧪 CORRODE | Chainsaw, Antimatter Blade, Antimatter Missile Launcher, Acid Grenade (100%) | -25% defence | 3 turns |
 | Radiation | ☢ RADIATION | Nuke Launcher (100%), Nuke (100%) | 10% of the source's base damage per turn, growing each turn (10%, 20%, 30%…), ignores defence | Rest of battle |
@@ -95,7 +95,7 @@ export const STATUS_RULES: Record<StatusType, StatusRule>;
 export function tryInflict(battle, target, source: { statusEffect, damage }, rng): boolean;
 export function tickStatuses(battle, br): void;          // damage + log, one robot
 export function decrementStatuses(battle, br): void;     // expire + log
-export function cureStatuses(battle, br): StatusType[];
+export function cureStatuses(battle, br, sourceName: string): StatusType[];
 export function hasStatus(br, type): boolean;
 export function shouldFizzle(br, rng): boolean;          // shock roll
 ```
@@ -158,3 +158,82 @@ numbers in this spec.
 - Acid Grenade and Flashbang exist with expected effects
 
 `spec/tests/combat.spec.md` gains a Status Effects section mirroring the above.
+
+## 8. Balance results
+
+Method: a throwaway seeded sim (not committed) ran 1000 auto-battles per
+matchup, effects on vs effects stripped from every item, same seeds both
+ways. Both sides plan with `aiPlanAction`; battles are capped at 50 turns
+like the UI's auto-battle. The player is built level-appropriately for each
+enemy: best armour and battery, the best equivalent of every gear class the
+enemy carries, the enemy's own permanent upgrades, hands filled with the best
+damage-per-hand weapons at that level, and 2 of the best repair kit.
+
+Only rows that moved are listed. `delta` is win% with effects minus win%
+without; `fx` counts effects inflicted per battle (by the player / by the
+enemy) after tuning.
+
+| Matchup | Win% off | Win% on (before) | Win% on (after) | delta (after) | fx (after) |
+|---------|---------:|-----------------:|----------------:|--------------:|------------|
+| Sparky (3) | 89.6 | 87.5 | 87.5 | -2.1 | shock 1.11/1.38 |
+| Voltank (7) | 53.7 | 77.3 | 69.5 | +15.8 | burn 1.23/0.00, shock 0.42/0.57 |
+| Warblade (18) | 96.3 | 94.3 | 94.3 | -2.0 | corrode 0.51/0.18 |
+| Thunderbot (20) | 37.1 | 35.8 | 35.8 | -1.3 | burn 0.26/0.24 |
+| Megacrusher (25) | 21.2 | 27.7 | 24.4 | +3.2 | burn 0.20, shock 0.26/0.61, corrode 0.23/0.64 |
+| Doombot (30) | 57.4 | 52.7 | 61.4 | +4.0 | shock 0.32/0.00, burn 0.00/0.18 |
+| Nightmare (35) | 98.4 | 93.0 | 98.0 | -0.4 | burn 0.20/0.09, shock 0.23/0.03 |
+| Apocalypse (40) | 13.9 | 14.2 | 14.2 | +0.3 | radiation 0.65/0.86 |
+| TITAN (50) | 92.9 | 92.3 | 92.3 | -0.6 | radiation 0.00/0.27, corrode 0.18/0.00 |
+| **Max abs delta** | | **23.6** | **15.8** | | |
+| **Mean abs delta** | | **2.5** | **1.6** | | |
+
+Targeted matchups (after tuning):
+
+| Matchup | Win% off | Win% on | delta |
+|---------|---------:|--------:|------:|
+| Flame Thrower vs Firebot (5) | 99.0 | 91.9 | -7.1 |
+| Nuke Launcher + 5 Nukes vs Apocalypse (40) | 14.9 | 14.8 | -0.1 |
+| Nuke Launcher + 5 Nukes vs TITAN (50) | 26.7 | 26.8 | +0.1 |
+| Flashbang + Acid Grenade vs Ironclad (13) | 100.0 | 100.0 | 0.0 |
+
+### Change made
+
+`STATUS_RULES.burn.damageFraction` 0.25 → 0.15. Nothing else changed; every
+per-item `chance` is unchanged.
+
+Burn was the only effect that could move a matchup by more than 10 points on
+its own. It deals a share of the *source's* base damage every turn straight
+through armour, so it scaled violently with big-damage sources: a Plasma
+Grenade (250 damage) burned for 62 a turn, roughly three quarters of the
+grenade itself again over the duration. At 0.15 that drops to 37. Per-effect
+isolation runs (each effect enabled alone) after the change:
+
+| Effect | Largest single-matchup swing |
+|--------|------------------------------|
+| Burn | +18.0 (Voltank), otherwise within ±3 |
+| Shock | -6.0 (Sparky), -5.7 (Megacrusher) |
+| Corrode | -1.7 (Warblade) |
+| Dazzle | +2.7 (Megacrusher) |
+| Radiation | ±0.7 |
+
+Durations were left alone: end-game fights resolve in 1-3 turns, so burn 3 vs
+burn 2 changed no win rate measurably. The fraction is the only lever that
+matters.
+
+### Known residual
+
+Voltank (level 7) still swings +15.8. That matchup is a 53.7% coin flip
+resolved in 3-4 turns, and the sim's player mirrors Voltank's third and
+fourth arms, so it swings a Flame Thrower alongside two other weapons and
+keeps burn refreshed every turn. One point of undefended damage per turn is
+worth ~16 points there: dropping the fraction to 0.10 does not help, because
+`floor(10 * 0.15)` and `floor(10 * 0.10)` are both 1. Shaving it further
+would need the Flame Thrower's 66% chance to come down, which is a fixed
+number. A player who has not bought two extra arms by level 7 (the more
+likely case — the fourth arm costs $5000) does not equip the Flame Thrower at
+all, and that build's worst swing across the whole roster is 7.7 points.
+
+Radiation is deliberately untouched. It never made the Nuke a guaranteed win
+(delta +0.1 against TITAN, -0.1 against Apocalypse) because top-tier fights
+end before the ramp compounds; buffing it is the one change that could break
+the spec's stated target.

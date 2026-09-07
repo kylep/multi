@@ -107,7 +107,9 @@ describe("STATUS_RULES", () => {
     }
   });
 
-  it("uses the spec durations", () => {
+  it("uses the spec durations and damage fractions", () => {
+    expect(STATUS_RULES.burn.damageFraction).toBe(0.15);
+    expect(STATUS_RULES.radiation.damageFraction).toBe(0.1);
     expect(STATUS_RULES.burn.duration).toBe(3);
     expect(STATUS_RULES.shock.duration).toBe(2);
     expect(STATUS_RULES.corrode.duration).toBe(3);
@@ -170,34 +172,57 @@ describe("tryInflict", () => {
   it("keeps the higher potency on refresh", () => {
     const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy" }));
     const strong = makeWeapon({ name: "Big", damage: 100, statusEffect: effect("burn", 1) });
-    const weak = makeWeapon({ name: "Small", damage: 4, statusEffect: effect("burn", 1) });
+    const weak = makeWeapon({ name: "Small", damage: 20, statusEffect: effect("burn", 1) });
     tryInflict(battle, battle.enemy, strong, createRng(7));
-    expect(battle.enemy.statuses[0].potency).toBe(25);
+    expect(battle.enemy.statuses[0].potency).toBe(15);
     tryInflict(battle, battle.enemy, weak, createRng(7));
-    expect(battle.enemy.statuses[0].potency).toBe(25);
+    expect(battle.enemy.statuses[0].potency).toBe(15);
   });
 
   it("raises potency when the new source is stronger", () => {
     const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy" }));
-    const weak = makeWeapon({ name: "Small", damage: 4, statusEffect: effect("burn", 1) });
+    const weak = makeWeapon({ name: "Small", damage: 20, statusEffect: effect("burn", 1) });
     const strong = makeWeapon({ name: "Big", damage: 100, statusEffect: effect("burn", 1) });
     tryInflict(battle, battle.enemy, weak, createRng(7));
-    expect(battle.enemy.statuses[0].potency).toBe(1);
+    expect(battle.enemy.statuses[0].potency).toBe(3);
     tryInflict(battle, battle.enemy, strong, createRng(7));
-    expect(battle.enemy.statuses[0].potency).toBe(25);
+    expect(battle.enemy.statuses[0].potency).toBe(15);
+  });
+
+  it("re-applying radiation ramps potency without restarting the tick count", () => {
+    const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy" }));
+    const small = makeConsumable({ name: "Nuke", damage: 100, statusEffect: effect("radiation", 1) });
+    const big = makeWeapon({ name: "Nuke Launcher", damage: 300, statusEffect: effect("radiation", 1) });
+
+    tryInflict(battle, battle.enemy, small, createRng(7));
+    battle.enemy.currentHealth = 1000;
+    tickStatuses(battle, battle.enemy);
+    tickStatuses(battle, battle.enemy);
+    expect(battle.enemy.statuses[0].ticks).toBe(2);
+
+    // A second, stronger nuke ramps the damage but does not reset the counter:
+    // repeat nukes escalate, they do not start the ramp over.
+    tryInflict(battle, battle.enemy, big, createRng(7));
+    expect(battle.enemy.statuses).toHaveLength(1);
+    expect(battle.enemy.statuses[0].ticks).toBe(2);
+    expect(battle.enemy.statuses[0].potency).toBe(30);
+
+    const before = battle.enemy.currentHealth;
+    tickStatuses(battle, battle.enemy);
+    expect(battle.enemy.currentHealth).toBe(before - 90); // 30 potency x 3 ticks
   });
 });
 
 describe("tickStatuses", () => {
-  it("burn deals floor(25% of source damage) and ignores defence", () => {
+  it("burn deals floor(15% of source damage) and ignores defence", () => {
     const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy", defence: 100 }));
-    const weapon = makeWeapon({ damage: 10, statusEffect: effect("burn", 1) });
+    const weapon = makeWeapon({ damage: 20, statusEffect: effect("burn", 1) });
     tryInflict(battle, battle.enemy, weapon, createRng(7));
 
     const before = battle.enemy.currentHealth;
     tickStatuses(battle, battle.enemy);
-    expect(battle.enemy.currentHealth).toBe(before - 2);
-    expect(battle.currentTurnLog).toContain("Enemy takes 2 burn damage");
+    expect(battle.enemy.currentHealth).toBe(before - 3);
+    expect(battle.currentTurnLog).toContain("Enemy takes 3 burn damage");
   });
 
   it("burn can kill", () => {

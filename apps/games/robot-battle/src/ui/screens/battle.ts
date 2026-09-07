@@ -28,6 +28,7 @@ import {
 } from "../../engine/robot";
 import { awardExp, awardInterest, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
 import { buyItem, canBuy } from "../../engine/shop";
+import { statusEffectSummary } from "./shop";
 import { shouldShowLootBox } from "../../engine/battle";
 import type { SoundPlayer } from "../sound";
 import type { SaveStorage } from "../../engine/save";
@@ -768,10 +769,11 @@ async function playerPlanAttack(
       const check = selected.has(i) ? "[x]" : "[ ]";
       const missingAmmo = w.requirements.length > 0 && !w.requirements.every((req) => hasItem(player.robot, req));
       const ammoStr = w.requirements.length > 0 ? ` [${w.requirements[0]}: ${player.robot.inventory.filter((it) => w.requirements.includes(it.name)).length}]` : "";
+      const fx = statusEffectSummary(w.statusEffect);
       weaponChoices.push({
         label: `${check} ${w.name}${missingAmmo ? " (no ammo)" : ""}`,
         value: `toggle-${i}`,
-        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${ammoStr}`,
+        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${fx ? `, ${fx}` : ""}${ammoStr}`,
         disabled: missingAmmo,
       });
     }

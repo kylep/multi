@@ -68,7 +68,9 @@ export const STATUS_RULES: Record<StatusType, StatusRule> = {
     label: "BURN",
     colour: "t-red",
     duration: 3,
-    damageFraction: 0.25,
+    // 15%, not 25%: the balance pass found a quarter of a big weapon's damage
+    // per turn, undefended, swung several matchups by 10+ points on its own.
+    damageFraction: 0.15,
     escalates: false,
     damageWord: "burn",
     participle: "burned",

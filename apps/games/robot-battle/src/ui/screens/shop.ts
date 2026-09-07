@@ -29,7 +29,7 @@ function esc(s: string): string {
 }
 
 /** "66% Burn" for an item that inflicts a status effect, "" when it has none. */
-function statusEffectSummary(spec: StatusEffectSpec | null): string {
+export function statusEffectSummary(spec: StatusEffectSpec | null): string {
   if (!spec) return "";
   const rule = STATUS_RULES[spec.type];
   const name = rule.label.charAt(0) + rule.label.slice(1).toLowerCase();

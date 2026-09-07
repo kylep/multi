@@ -489,7 +489,7 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
     version: "0.14.0", date: "2026-09-07", notes: [
       "Status effects: weapons and items can now stick a nasty condition on whoever they hit",
-      "🔥 Burn — Flame Thrower, Plasma Cannon, Plasma Grenade: 25% of the attack's damage every turn for 3 turns, straight through armour",
+      "🔥 Burn — Flame Thrower, Plasma Cannon, Plasma Grenade: 15% of the attack's damage every turn for 3 turns, straight through armour",
       "⚡ Shock — Shock Rod, Thunder Hammer, EMP Bomb: 25% chance each turn you seize up and lose your action, for 2 turns",
       "🧪 Corrode — Chainsaw, Antimatter Blade, Antimatter Missile Launcher, Acid Grenade: -25% Defence for 3 turns",
       "☢ Radiation — Nuke Launcher, Nuke: 10% of the attack's damage per turn and growing (10%, 20%, 30%...), and it never wears off",

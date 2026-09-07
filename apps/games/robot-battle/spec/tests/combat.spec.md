@@ -43,12 +43,15 @@
 ### Status Effects (tests/unit/status.test.ts)
 - `STATUS_RULES` covers all five types with an icon, label and `t-*` colour
 - Durations: burn 3, shock 2, corrode 3, radiation Infinity, dazzle 3
+- Damage fractions: burn 15%, radiation 10% per tick
 - `tryInflict` respects the inflict chance (seeded rng), the item's chance
   override, and does nothing for a source with no effect
 - God mode robots are immune
 - Re-applying refreshes duration instead of stacking; the higher potency wins
+- Re-applying radiation keeps the existing tick count and adopts the higher
+  potency, so repeat nukes ramp rather than restarting the ramp
 - Infliction logs `X is BURNED!` into the current turn log
-- Burn tick deals floor(25% of source damage), ignores defence, and can kill
+- Burn tick deals floor(15% of source damage), ignores defence, and can kill
 - God mode robots take no tick damage
 - Radiation escalates 10%, 20%, 30% of source damage and never expires
 - Non-damaging effects deal no tick damage
@@ -73,6 +76,7 @@
 - Weapon effects load with chance overrides (Flame Thrower burn 0.66,
   Nuke Launcher radiation 1, Laser Gun dazzle 0.1) and the 0.2 default
   (Chainsaw corrode); Stick has none
+- An unknown `statusEffect.type` throws at load, naming the item and the type
 - Consumable effects load (Plasma Grenade burn, EMP Bomb shock, Nuke
   radiation); Repair Kit has none
 - Acid Grenade (level 12, $200, 20 dmg, corrode 100%) and Flashbang
