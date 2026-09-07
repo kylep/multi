@@ -30,6 +30,8 @@
 - Returns "player" when enemy HP ≤ 0
 - Returns "enemy" when player HP ≤ 0
 - Returns null when both alive
+- Returns "player" when both are at or below 0 — the enemy is tested first, so
+  a simultaneous knockout goes to the player
 
 ### Turn Management
 - `endTurn` increments turn number
@@ -67,10 +69,29 @@
 - A blocked hit (Blast Shield) still applies the effect
 - `resolveTurn` ticks burn damage into `currentTurnLog` and decrements duration
 - A burn tick can end the battle
+- A tick that drops both robots at once awards the win to the player and logs
+  both destruction lines; a tick that drops only the player still awards the
+  win to the enemy
 - A shocked fighter's fizzled attack spends no energy and deals no damage
+- A shocked fighter's item can seize up: the item stays in the inventory,
+  `consumableUsedThisTurn` stays false, and no damage lands
+- A planned consumable rolls its fizzle inside `useConsumable`, so the log
+  carries the item-specific line and never the generic one
 - A Repair Kit cures every active effect
 - A damaging consumable that is dodged inflicts nothing
 - A non-damaging consumable (EMP Bomb) still inflicts its effect
+
+### Troll Bomb (tests/unit/battle.test.ts, data.test.ts, save.test.ts)
+- An `alwaysHits` consumable ignores dodge, ignores defence, and leaves a
+  Blast Shield's damage block untouched
+- An `alwaysHits` consumable still deals 0 damage to a god-mode defender
+- The Troll Bomb loads at level 0, $1,000,000, 1,000,000 damage, max stack 5,
+  `alwaysHits` true and no status effect; a normal consumable defaults
+  `alwaysHits` to false
+- `isRandomRewardEligible` rejects the Troll Bomb and accepts ordinary items,
+  and the level-1 loot-box pool is empty with it applied — the level filter
+  alone leaves the level-0 bomb as the only pick
+- A save written before the cheat existed defaults `trollMode` to false
 
 ### Status Effect Data (tests/unit/data.test.ts)
 - Weapon effects load with chance overrides (Flame Thrower burn 0.66,

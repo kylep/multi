@@ -30,7 +30,9 @@ Default inflict chance is 20%. Items override with `chance`.
 - Any Repair Kit (Repair, Mega, Ultra) cures every active effect.
 - Effects are battle-only state on `BattleRobot`. `Robot` and the save
   format do not change. `SAVE_VERSION` stays at 3.
-- Damage ticks can kill. `checkVictory` runs after ticks.
+- Damage ticks can kill. `checkVictory` runs after ticks, and checks the
+  enemy first so a tick that drops both robots at once goes to the player.
+  Both destruction lines are logged.
 
 ### Tick timing
 
@@ -41,9 +43,13 @@ Radiation's per-turn damage uses the number of ticks elapsed so far
 (`potency * ticks`), so turn 1 after infliction deals 10%, turn 2 deals
 20%, etc.
 
-Shock's fizzle roll happens in `executePlannedAction` before the action
-runs. A fizzled action still consumes the turn but spends no energy and
-no consumable.
+Shock's fizzle roll happens in `executePlannedAction` for attacks and
+rests, and inside `useConsumable` for items. Consumables roll their own so
+that the player's immediate item use — which never goes through a planned
+action — is rolled the same as the AI's planned one. A fizzled action still
+consumes the turn but spends no energy and no consumable; a fizzled
+consumable leaves `consumableUsedThisTurn` false, and the battle UI retires
+the player's item action for that turn instead.
 
 ## 2. Data shape
 
@@ -107,8 +113,8 @@ Changes to existing engine code:
 - `robot.ts`: `createBattleRobot` initialises `statuses: []`. `battleDefence` applies Corrode (-25%, floor). `battleDodge` applies Dazzle (-50%, floor). New `battleAccuracyMultiplier(br)` returns 0.8 under Dazzle.
 - `battle.ts`:
   - `executeAttack`: hit accuracy = `(weapon.accuracy + bonuses) * battleAccuracyMultiplier(attacker)`. On hit, `tryInflict`.
-  - `useConsumable`: on landed damage, `tryInflict`. Any consumable with `healthRestore > 0` calls `cureStatuses` and logs cures.
-  - `executePlannedAction`: `shouldFizzle` check first.
+  - `useConsumable`: `shouldFizzle` check first (before the item is spent). On landed damage, `tryInflict`. Any consumable with `healthRestore > 0` calls `cureStatuses` and logs cures.
+  - `executePlannedAction`: `shouldFizzle` check first for attacks and rests; consumables are left to `useConsumable`.
   - `resolveTurn`: after actions, tick + decrement for both robots unless the battle is over.
 - `ai.ts`: no change.
 
@@ -138,11 +144,13 @@ numbers in this spec.
 
 `tests/unit/status.test.ts`:
 - tryInflict respects chance (seeded rng), god mode immunity, refresh-not-stack, higher potency wins on refresh
-- burn tick deals floor(25% of source damage), ignores defence, can kill
+- burn tick deals floor(15% of source damage), ignores defence, can kill
 - radiation escalates 10/20/30% and never expires
 - corrode reduces battleDefence by 25%
 - dazzle halves battleDodge and multiplies accuracy by 0.8
 - shock fizzle roll at 25%
+- a fizzled consumable is kept, and `consumableUsedThisTurn` stays false
+- a tick that drops both robots hands the win to the player
 - decrement expires at 0 and logs
 - cureStatuses clears all and returns the cured list
 

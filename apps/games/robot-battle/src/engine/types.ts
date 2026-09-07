@@ -161,6 +161,8 @@ export interface ActionResult {
   damageDealt: number;
   energySpent: number;
   turnEnded: boolean;
+  /** True when shock made the action seize up instead of running. */
+  fizzled: boolean;
 }
 
 export interface ShopResult {

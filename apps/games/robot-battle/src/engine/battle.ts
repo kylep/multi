@@ -45,11 +45,26 @@ export function log(battle: BattleState, message: string): void {
 }
 
 function ok(msg: string, opts?: Partial<ActionResult>): ActionResult {
-  return { success: true, message: msg, damageDealt: 0, energySpent: 0, turnEnded: true, ...opts };
+  return {
+    success: true,
+    message: msg,
+    damageDealt: 0,
+    energySpent: 0,
+    turnEnded: true,
+    fizzled: false,
+    ...opts,
+  };
 }
 
 function fail(msg: string): ActionResult {
-  return { success: false, message: msg, damageDealt: 0, energySpent: 0, turnEnded: false };
+  return {
+    success: false,
+    message: msg,
+    damageDealt: 0,
+    energySpent: 0,
+    turnEnded: false,
+    fizzled: false,
+  };
 }
 
 // ── Create battle ──
@@ -171,8 +186,10 @@ export function executeAttack(
         messages.push(msg);
         log(battle, msg);
       }
-      // The shield stops damage, not fire — a blocked hit still applies the effect.
-      tryInflict(battle, defender, weapon, rng);
+      // The shield stops damage, not fire — a blocked hit still applies the
+      // effect. A wreck cannot catch fire, so a later weapon in the same
+      // attack skips the roll once the defender is down.
+      if (isAlive(defender)) tryInflict(battle, defender, weapon, rng);
     } else {
       const msg = `  ${weapon.name} ${i + 1} misses!`;
       messages.push(msg);
@@ -216,6 +233,16 @@ export function useConsumable(
     return fail("Already used a consumable this turn");
   }
 
+  // The shock roll lives here rather than in executePlannedAction so that the
+  // player's immediate item use is rolled too — that path never plans an
+  // action. A fizzled item is not spent and does not count as this turn's
+  // consumable.
+  if (shouldFizzle(attacker, r)) {
+    const msg = `${attacker.robot.name} seizes up and can't use ${consumable.name}!`;
+    log(battle, msg);
+    return ok(msg, { turnEnded: false, fizzled: true });
+  }
+
   attacker.consumableUsedThisTurn = true;
   attacker.consumablesUsed.push(consumable.name);
   const idx = attacker.robot.inventory.findIndex((i) => i.name === consumable.name);
@@ -254,9 +281,10 @@ export function useConsumable(
     if (defender.robot.godMode) {
       effects.push(`0 damage... BECAUSE YOU ARE A GOD`);
     } else if (consumable.alwaysHits) {
-      // No dodge roll, no defence, no shield — it just lands.
+      // No dodge roll, no defence, no shield — it just lands. The number is
+      // grouped so the log reads like the item's own description.
       defender.currentHealth -= consumable.damage;
-      effects.push(`${consumable.damage} damage to enemy`);
+      effects.push(`${consumable.damage.toLocaleString("en-US")} damage to enemy`);
       effectLands = true;
     } else {
       // 50% dodge chance against consumable damage
@@ -312,17 +340,18 @@ export function useConsumable(
 // ── Victory check ──
 
 export function checkVictory(battle: BattleState): "player" | "enemy" | null {
-  if (!isAlive(battle.player)) {
-    battle.winner = "enemy";
-    log(battle, `${battle.player.robot.name} has been destroyed!`);
-    return "enemy";
-  }
-  if (!isAlive(battle.enemy)) {
-    battle.winner = "player";
-    log(battle, `${battle.enemy.robot.name} has been destroyed!`);
-    return "player";
-  }
-  return null;
+  const enemyDown = !isAlive(battle.enemy);
+  const playerDown = !isAlive(battle.player);
+  if (!enemyDown && !playerDown) return null;
+
+  // Status ticks hit both robots in the same phase, so both can fall at once.
+  // The enemy is checked first, which hands a simultaneous knockout to the
+  // player. Both destruction lines are logged so the turn log tells the truth.
+  if (enemyDown) log(battle, `${battle.enemy.robot.name} has been destroyed!`);
+  if (playerDown) log(battle, `${battle.player.robot.name} has been destroyed!`);
+
+  battle.winner = enemyDown ? "player" : "enemy";
+  return battle.winner;
 }
 
 // ── Turn management ──
@@ -420,11 +449,12 @@ function executePlannedAction(
   const attacker = isPlayer ? battle.player : battle.enemy;
   const defender = isPlayer ? battle.enemy : battle.player;
 
-  // A shocked robot can seize up: the turn is spent, but no energy and no
-  // consumable are.
-  if (shouldFizzle(attacker, rng)) {
+  // A shocked robot can seize up: the turn is spent, but no energy is. The
+  // consumable branch rolls its own fizzle inside useConsumable, so it is left
+  // out here — otherwise a planned consumable would roll twice.
+  if (action.actionType !== "consumable" && shouldFizzle(attacker, rng)) {
     log(battle, `${attacker.robot.name} seizes up and can't act!`);
-    return ok("Seized up and couldn't act!");
+    return ok("Seized up and couldn't act!", { fizzled: true });
   }
 
   if (action.actionType === "attack") {

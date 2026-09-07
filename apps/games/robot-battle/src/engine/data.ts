@@ -12,6 +12,19 @@ import enemiesJson from "../data/enemies.json";
 /** The cheat-only joke consumable, gated behind the "u mad bro?" code. */
 export const TROLL_BOMB_NAME = "Troll Bomb";
 
+/**
+ * Whether an item may be handed out by a loot box, the boss's kit, or any
+ * other random grant.
+ *
+ * A consumable that never misses (today only the Troll Bomb) is a cheat-only
+ * joke: buying one takes the cheat code, so no random pool may hand one over.
+ * The Troll Bomb is level 0, which means a level filter alone lets it through
+ * against every enemy in the game.
+ */
+export function isRandomRewardEligible(item: Item): boolean {
+  return item.itemType !== "consumable" || !(item as Consumable).alwaysHits;
+}
+
 // ── Loader helpers ──
 
 /**

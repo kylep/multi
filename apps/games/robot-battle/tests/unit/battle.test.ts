@@ -8,6 +8,7 @@ import {
   executeAttack,
   executeRest,
   planAttack,
+  planConsumable,
   planRest,
   recordTurnSnapshot,
   resolveTurn,
@@ -584,6 +585,34 @@ describe("status effects in battle", () => {
     expect(battle.currentTurnLog).toContain("Enemy takes 20 burn damage");
   });
 
+  it("hands a double knockout by ticks to the player", () => {
+    const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy" }));
+    battle.player.currentHealth = 1;
+    battle.enemy.currentHealth = 1;
+    battle.player.statuses.push({ type: "burn", turnsLeft: 3, potency: 50, ticks: 0 });
+    battle.enemy.statuses.push({ type: "burn", turnsLeft: 3, potency: 50, ticks: 0 });
+    planRest(battle, true);
+    planRest(battle, false);
+
+    resolveTurn(battle, createRng(42));
+    expect(battle.winner).toBe("player");
+    // Both robots fell, so the log has to say so for both of them.
+    expect(battle.currentTurnLog).toContain("Enemy has been destroyed!");
+    expect(battle.currentTurnLog).toContain("TestBot has been destroyed!");
+  });
+
+  it("still awards the win to the enemy when only the player dies to a tick", () => {
+    const battle = createBattle(makeRobot(), makeRobot({ name: "Enemy" }));
+    battle.player.currentHealth = 1;
+    battle.player.statuses.push({ type: "burn", turnsLeft: 3, potency: 50, ticks: 0 });
+    planRest(battle, true);
+    planRest(battle, false);
+
+    resolveTurn(battle, createRng(42));
+    expect(battle.winner).toBe("enemy");
+    expect(battle.currentTurnLog).not.toContain("Enemy has been destroyed!");
+  });
+
   it("a shocked fighter's fizzled attack spends no energy", () => {
     const weapon = makeWeapon({ damage: 3, energyCost: 5 });
     const player = makeRobot({ inventory: [weapon] });
@@ -607,6 +636,7 @@ describe("status effects in battle", () => {
     battle.player.statuses.push({ type: "burn", turnsLeft: 3, potency: 4, ticks: 0 });
     battle.player.statuses.push({ type: "shock", turnsLeft: 2, potency: 0, ticks: 0 });
 
+    // Seed 42's first roll is over 25%, so the shock does not fizzle the kit.
     useConsumable(battle, battle.player, battle.enemy, kit, createRng(42));
     expect(battle.player.statuses).toHaveLength(0);
     expect(battle.currentTurnLog).toContain("Repair Kit cured BURN, SHOCK");
@@ -623,6 +653,40 @@ describe("status effects in battle", () => {
 
     useConsumable(battle, battle.player, battle.enemy, flashbang, createRng(42));
     expect(hasStatus(battle.enemy, "dazzle")).toBe(false);
+  });
+
+  it("a shocked fighter's item can seize up, keeping the item and the turn's slot", () => {
+    const bomb = makeConsumable({ name: "Bomb", damage: 5 });
+    const player = makeRobot({ inventory: [bomb] });
+    const battle = createBattle(player, makeRobot({ name: "Enemy" }));
+    battle.player.statuses.push({ type: "shock", turnsLeft: 2, potency: 0, ticks: 0 });
+    const startHp = battle.enemy.currentHealth;
+
+    // Seed 7's first roll is ~0.0117, under the 25% fizzle chance.
+    const result = useConsumable(battle, battle.player, battle.enemy, bomb, createRng(7));
+    expect(result.fizzled).toBe(true);
+    expect(battle.currentTurnLog).toContain("TestBot seizes up and can't use Bomb!");
+    expect(battle.player.robot.inventory).toContain(bomb);
+    expect(battle.player.consumableUsedThisTurn).toBe(false);
+    expect(battle.player.consumablesUsed).toEqual([]);
+    expect(battle.enemy.currentHealth).toBe(startHp);
+  });
+
+  it("fizzles a planned consumable in useConsumable, so the roll happens once", () => {
+    const bomb = makeConsumable({ name: "Bomb", damage: 5 });
+    const player = makeRobot({ inventory: [bomb] });
+    const battle = createBattle(player, makeRobot({ name: "Enemy" }));
+    battle.player.statuses.push({ type: "shock", turnsLeft: 2, potency: 0, ticks: 0 });
+    planConsumable(battle, bomb, true);
+    planRest(battle, false);
+
+    // Seed 7 rolls 0.0117 (player acts first) then 0.0620 (under the 25%).
+    resolveTurn(battle, createRng(7));
+    // The consumable-specific line proves the roll came from useConsumable;
+    // the generic line would mean executePlannedAction rolled it as well.
+    expect(battle.currentTurnLog).toContain("TestBot seizes up and can't use Bomb!");
+    expect(battle.currentTurnLog).not.toContain("TestBot seizes up and can't act!");
+    expect(battle.player.robot.inventory).toContain(bomb);
   });
 
   it("a non-damaging consumable still inflicts its effect", () => {

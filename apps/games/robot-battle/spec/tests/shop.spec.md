@@ -22,6 +22,16 @@
 ### Get Sell Price
 - Returns floor(moneyCost / 2)
 
+### Post-Battle Restock
+- Does nothing while the setting is off
+- Buys from the wallet without touching the bank when the wallet covers it
+- Withdraws only the shortfall, never the whole balance
+- Leaves the bank untouched and reports the skip when the item costs more than
+  wallet plus bank
+- Rolls a withdrawal back when the buy fails for a non-money reason (max stack)
+- Skips the Troll Bomb entirely without troll mode
+- Buys what it can afford and reports what it cannot in the same pass
+
 ## E2E Tests (tests/e2e/shop.spec.ts)
 
 ### Open Shop

@@ -8,6 +8,7 @@ import type { SaveStorage } from "../../engine/save";
 import type { GameSettings } from "../../engine/save";
 import { loadLeaderboard } from "../../engine/save";
 import { createRng } from "../../engine/rng";
+import { isRandomRewardEligible } from "../../engine/data";
 import {
   getConsumables,
   getEffectiveDefence,
@@ -202,7 +203,7 @@ async function cheatCodeScreen(
       ], "row");
       const tier = tiers[parseInt(boxChoice, 10)];
       const eligibleConsumables = state.registry.getAllItems()
-        .filter((i) => i.itemType === "consumable" && i.level <= strongest.level);
+        .filter((i) => i.itemType === "consumable" && i.level <= strongest.level && isRandomRewardEligible(i));
       terminal.clear();
       const tierLabels: Record<string, string> = { diamond: "Diamond", gold: "Gold", silver: "Silver" };
       const tierColors: Record<string, string> = { diamond: "t-cyan", gold: "t-yellow", silver: "t-dim" };
@@ -503,10 +504,10 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
   {
     version: "0.14.0", date: "2026-09-07", notes: [
       "Status effects: weapons and items can now stick a nasty condition on whoever they hit",
-      "🔥 Burn — Flame Thrower, Plasma Cannon, Plasma Grenade: 15% of the attack's damage every turn for 3 turns, straight through armour",
-      "⚡ Shock — Shock Rod, Thunder Hammer, EMP Bomb: 25% chance each turn you seize up and lose your action, for 2 turns",
+      "🔥 Burn — Flame Thrower, Plasma Cannon, Plasma Grenade: 15% of the weapon's listed damage every turn for 3 turns, straight through armour",
+      "⚡ Shock — Shock Rod, Thunder Hammer, EMP Bomb: 25% chance each turn you seize up and lose your action — attack, rest or item — for 2 turns",
       "🧪 Corrode — Chainsaw, Antimatter Blade, Antimatter Missile Launcher, Acid Grenade: -25% Defence for 3 turns",
-      "☢ Radiation — Nuke Launcher, Nuke: 10% of the attack's damage per turn and growing (10%, 20%, 30%...), and it never wears off",
+      "☢ Radiation — Nuke Launcher, Nuke: 10% of the weapon's listed damage per turn and growing (10%, 20%, 30%...), and it never wears off",
       "✨ Dazzle — Laser Gun, Death Ray, Flashbang: -50% Dodge and -20% accuracy for 3 turns",
       "Every effect has a 20% chance to land unless the item says otherwise",
       "Flame Thrower burns 66% of the time; Laser Gun and Death Ray dazzle 10% of the time",
@@ -518,7 +519,7 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
       "Effects are rolled per weapon, so a two-weapon attack gets two rolls",
       "A hit soaked up by a Blast Shield still applies the effect — the shield stops damage, not fire",
       "God mode robots shrug off every effect",
-      "Battle panels show a badge row for each robot's active effects with the turns left",
+      "Battle panels show a badge row for each robot's active effects with the turns left (radiation never wears off, so it has no counter)",
       "Shop and inventory lines show an item's effect and how often it lands",
       "Weapons in old saves pick up their new effects the next time you load that slot",
       "New cheat code: 'u mad bro?' toggles the Troll Bomb in the shop",

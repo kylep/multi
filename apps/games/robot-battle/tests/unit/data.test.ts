@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hydrateStatusEffects, loadAssets, loadStatusEffect } from "../../src/engine/data";
+import { hydrateStatusEffects, isRandomRewardEligible, loadAssets, loadStatusEffect } from "../../src/engine/data";
 import { createGameState, createPlayer } from "../../src/engine/state";
 import type { Weapon } from "../../src/engine/types";
 
@@ -188,6 +188,23 @@ describe("loadAssets", () => {
 
   it("defaults alwaysHits to false on a normal consumable", () => {
     expect(registry.consumables.get("Grenade")!.alwaysHits).toBe(false);
+  });
+
+  it("keeps the Troll Bomb out of every random reward pool", () => {
+    expect(isRandomRewardEligible(registry.consumables.get("Troll Bomb")!)).toBe(false);
+    expect(isRandomRewardEligible(registry.consumables.get("Grenade")!)).toBe(true);
+    expect(isRandomRewardEligible(registry.weapons.get("Stick")!)).toBe(true);
+  });
+
+  it("leaves no loot-box consumable at level 1, where the Troll Bomb used to be the only pick", () => {
+    const poolAtLevelOne = registry.getAllItems()
+      .filter((i) => i.itemType === "consumable" && i.level <= 1 && isRandomRewardEligible(i));
+    expect(poolAtLevelOne).toEqual([]);
+
+    // Without the filter the level filter alone lets the level-0 bomb through.
+    const unfiltered = registry.getAllItems()
+      .filter((i) => i.itemType === "consumable" && i.level <= 1);
+    expect(unfiltered.map((i) => i.name)).toEqual(["Troll Bomb"]);
   });
 
   it("hydrates statusEffect onto pre-0.14.0 saved items", () => {

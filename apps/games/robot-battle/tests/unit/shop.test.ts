@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, sellItem } from "../../src/engine/shop";
+import { buyItem, canBuy, countInventorySlots, getSellPrice, listAvailableItems, restockConsumables, sellItem } from "../../src/engine/shop";
+import type { Consumable } from "../../src/engine/types";
 import { createGameState, createPlayer } from "../../src/engine/state";
 import { loadAssets } from "../../src/engine/data";
 
@@ -219,5 +220,108 @@ describe("ammo maxStack", () => {
     buyItem(state, shell);
     // 3 shells + 1 Stick, but shells are ammo so only 1 slot used
     expect(countInventorySlots(state.player!)).toBe(1);
+  });
+});
+
+describe("restockConsumables", () => {
+  function restockSetup() {
+    const state = setup();
+    const player = state.player!;
+    player.settings.restockConsumables = true;
+    player.level = 50;
+    return state;
+  }
+
+  it("does nothing when the setting is off", () => {
+    const state = restockSetup();
+    state.player!.settings.restockConsumables = false;
+    const result = restockConsumables(state, ["Repair Kit"]);
+    expect(result).toEqual({ bought: [], bankWithdraw: 0, skipped: [] });
+  });
+
+  it("rebuys from the wallet without touching the bank", () => {
+    const state = restockSetup();
+    const player = state.player!;
+    const kit = state.registry.getItem("Repair Kit")!;
+    player.money = kit.moneyCost * 2;
+    player.bank = 5000;
+
+    const result = restockConsumables(state, ["Repair Kit"]);
+    expect(result.bought).toEqual(["Repair Kit"]);
+    expect(result.bankWithdraw).toBe(0);
+    expect(result.skipped).toEqual([]);
+    expect(player.bank).toBe(5000);
+    expect(player.money).toBe(kit.moneyCost);
+  });
+
+  it("withdraws only the shortfall, never the whole bank", () => {
+    const state = restockSetup();
+    const player = state.player!;
+    const kit = state.registry.getItem("Repair Kit")!;
+    player.money = 0;
+    player.bank = 5000;
+
+    const result = restockConsumables(state, ["Repair Kit"]);
+    expect(result.bought).toEqual(["Repair Kit"]);
+    expect(result.bankWithdraw).toBe(kit.moneyCost);
+    expect(player.bank).toBe(5000 - kit.moneyCost);
+    expect(player.money).toBe(0);
+  });
+
+  it("leaves the bank alone and reports the skip when the item is unaffordable", () => {
+    const state = restockSetup();
+    const player = state.player!;
+    player.trollMode = true;
+    player.money = 0;
+    player.bank = 500_000;
+
+    const result = restockConsumables(state, ["Troll Bomb"]);
+    expect(result.bought).toEqual([]);
+    expect(result.bankWithdraw).toBe(0);
+    expect(player.bank).toBe(500_000);
+    expect(player.money).toBe(0);
+    expect(result.skipped).toHaveLength(1);
+    expect(result.skipped[0].name).toBe("Troll Bomb");
+    expect(result.skipped[0].reason).toContain("1000000");
+  });
+
+  it("rolls the withdrawal back when the buy fails for a non-money reason", () => {
+    const state = restockSetup();
+    const player = state.player!;
+    const kit = state.registry.getItem("Repair Kit")! as Consumable;
+    player.money = 0;
+    player.bank = 5000;
+    // Already holding the maximum, so canBuy refuses on max stack.
+    for (let i = 0; i < kit.maxStack; i++) player.inventory.push({ ...kit });
+
+    const result = restockConsumables(state, ["Repair Kit"]);
+    expect(result.bought).toEqual([]);
+    expect(result.bankWithdraw).toBe(0);
+    expect(player.bank).toBe(5000);
+    expect(player.money).toBe(0);
+    expect(result.skipped[0].reason).toContain("Max");
+  });
+
+  it("skips the Troll Bomb entirely without troll mode", () => {
+    const state = restockSetup();
+    state.player!.money = 5_000_000;
+    const result = restockConsumables(state, ["Troll Bomb"]);
+    expect(result.bought).toEqual([]);
+    expect(result.skipped).toEqual([]);
+    expect(state.player!.money).toBe(5_000_000);
+  });
+
+  it("buys what it can afford and reports what it cannot", () => {
+    const state = restockSetup();
+    const player = state.player!;
+    player.trollMode = true;
+    const kit = state.registry.getItem("Repair Kit")!;
+    player.money = kit.moneyCost;
+    player.bank = 0;
+
+    const result = restockConsumables(state, ["Troll Bomb", "Repair Kit"]);
+    expect(result.bought).toEqual(["Repair Kit"]);
+    expect(result.skipped.map((s) => s.name)).toEqual(["Troll Bomb"]);
+    expect(player.money).toBe(0);
   });
 });

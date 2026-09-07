@@ -89,6 +89,7 @@ function makeConsumable(overrides?: Partial<Consumable>): Consumable {
     useText: "",
     accuracyBonus: 0,
     maxStack: 0,
+    alwaysHits: false,
     statusEffect: null,
     ...overrides,
   };
