@@ -20,6 +20,7 @@ import {
   getConsumables,
   getWeaponEnergyCost,
 } from "../../engine/robot";
+import { TROLL_BOMB_NAME } from "../../engine/data";
 import { getUpgrade, listRepeatableUpgrades } from "../../engine/upgrades";
 import { getInterestRate } from "../../engine/state";
 import type { SoundPlayer } from "../sound";
@@ -103,8 +104,10 @@ export async function shopScreen(terminal: Terminal, state: GameState, sound?: S
 }
 
 async function renderBuyTab(terminal: Terminal, state: GameState, filterOn: boolean, collapsed: Set<string>, sound?: SoundPlayer): Promise<string> {
-  const allItems = listAvailableItems(state);
   const player = state.player!;
+  // The Troll Bomb is stocked only for players who found the "u mad bro?" cheat.
+  const allItems = listAvailableItems(state)
+    .filter((i) => player.trollMode || i.name !== TROLL_BOMB_NAME);
   const available = filterOn
     ? allItems.filter((i) => i.level <= player.level)
     : allItems;

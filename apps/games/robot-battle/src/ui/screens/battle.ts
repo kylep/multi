@@ -28,6 +28,7 @@ import {
 } from "../../engine/robot";
 import { awardExp, awardInterest, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
 import { buyItem, canBuy } from "../../engine/shop";
+import { TROLL_BOMB_NAME } from "../../engine/data";
 import { statusEffectSummary } from "./shop";
 import { shouldShowLootBox } from "../../engine/battle";
 import type { SoundPlayer } from "../sound";
@@ -41,6 +42,30 @@ function getRandomFact(pool: string[]): string {
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** True when the player's consumable this turn was a Troll Bomb. */
+function usedTrollBombThisTurn(battle: BattleState): boolean {
+  const used = battle.player.consumablesUsed;
+  return battle.player.consumableUsedThisTurn && used[used.length - 1] === TROLL_BOMB_NAME;
+}
+
+/**
+ * The Troll Bomb's whole joke: a "please wait" screen that waits 3-11 seconds
+ * and then, one time in five, decides to wait again (a bit less each round).
+ */
+async function trollBombWait(terminal: Terminal): Promise<void> {
+  let maxSeconds = 11;
+  let text = "please wait";
+  while (true) {
+    terminal.clear();
+    terminal.print(text, "t-dim");
+    const seconds = 3 + Math.floor(Math.random() * (maxSeconds - 3 + 1));
+    await delay(seconds * 1000);
+    if (Math.random() >= 0.2) return;
+    maxSeconds = Math.max(3, maxSeconds - 3);
+    text += " again...";
+  }
 }
 
 interface RestockResult {
@@ -62,6 +87,8 @@ function restockConsumables(state: GameState, usedNames: string[]): RestockResul
   // Resolve to registry items and sort cheapest first
   const toBuy: Array<{ name: string; qty: number; cost: number }> = [];
   for (const [name, qty] of counts) {
+    // The Troll Bomb is only buyable while troll mode is on, restock included.
+    if (name === TROLL_BOMB_NAME && !player.trollMode) continue;
     const item = state.registry.getItem(name);
     if (item && item.itemType === "consumable") toBuy.push({ name, qty, cost: item.moneyCost });
   }
@@ -170,6 +197,10 @@ export async function battleScreen(
     terminal.print("");
 
     const result = await playerTurn(terminal, battle, nameClass);
+
+    if (usedTrollBombThisTurn(battle)) {
+      await trollBombWait(terminal);
+    }
 
     if (result === "auto") {
       await autoBattle(terminal, battle, nameClass);

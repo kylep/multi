@@ -47,6 +47,7 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     challengeDefeatedEnemies: [],
     cheatsUsed: false,
     godMode: false,
+    trollMode: false,
     newGamePlusLevel: 0,
     titanDefeated: false,
     endGameBoss: null,
@@ -89,6 +90,7 @@ function makeConsumable(overrides?: Partial<Consumable>): Consumable {
     useText: "",
     accuracyBonus: 0,
     maxStack: 0,
+    alwaysHits: false,
     statusEffect: null,
     ...overrides,
   };
@@ -253,6 +255,38 @@ describe("useConsumable", () => {
     endTurn(battle);
     const r4 = useConsumable(battle, battle.player, battle.enemy, makeConsumable({ healthRestore: 5 }));
     expect(r4.success).toBe(false);
+  });
+});
+
+describe("alwaysHits consumables", () => {
+  function makeBomb(): Consumable {
+    return makeConsumable({ name: "Troll Bomb", damage: 20, alwaysHits: true });
+  }
+
+  it("ignores the defender's dodge", () => {
+    const bomb = makeBomb();
+    const battle = createBattle(makeRobot({ inventory: [bomb] }), makeRobot({ dodge: 500 }));
+
+    useConsumable(battle, battle.player, battle.enemy, bomb);
+    expect(battle.enemy.currentHealth).toBe(-10); // 10 HP - 20 dmg
+  });
+
+  it("ignores defence and damageBlock", () => {
+    const bomb = makeBomb();
+    const battle = createBattle(makeRobot({ inventory: [bomb] }), makeRobot({ defence: 15 }));
+    battle.enemy.damageBlock = 100;
+
+    useConsumable(battle, battle.player, battle.enemy, bomb);
+    expect(battle.enemy.currentHealth).toBe(-10);
+    expect(battle.enemy.damageBlock).toBe(100); // shield untouched
+  });
+
+  it("still deals 0 damage to a god-mode defender", () => {
+    const bomb = makeBomb();
+    const battle = createBattle(makeRobot({ inventory: [bomb] }), makeRobot({ godMode: true }));
+
+    useConsumable(battle, battle.player, battle.enemy, bomb);
+    expect(battle.enemy.currentHealth).toBe(10);
   });
 });
 

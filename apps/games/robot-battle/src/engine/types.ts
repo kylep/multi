@@ -49,6 +49,8 @@ export interface Consumable extends ItemBase {
   useText: string;
   accuracyBonus: number;
   maxStack: number;
+  /** Skips the dodge roll and ignores defence and shields. Joke items only. */
+  alwaysHits: boolean;
   statusEffect: StatusEffectSpec | null;
 }
 
@@ -80,6 +82,7 @@ export interface Robot {
   challengeDefeatedEnemies: string[];
   cheatsUsed: boolean;
   godMode: boolean;
+  trollMode: boolean;
   newGamePlusLevel: number;
   titanDefeated: boolean;
   endGameBoss: EndGameBossSpec | null;

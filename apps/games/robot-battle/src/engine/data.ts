@@ -9,6 +9,9 @@ import configJson from "../data/config.json";
 import itemsJson from "../data/items.json";
 import enemiesJson from "../data/enemies.json";
 
+/** The cheat-only joke consumable, gated behind the "u mad bro?" code. */
+export const TROLL_BOMB_NAME = "Troll Bomb";
+
 // ── Loader helpers ──
 
 /**
@@ -89,6 +92,7 @@ function loadConsumable(name: string, d: Record<string, unknown>): Consumable {
     useText: (d.useText as string) ?? "",
     accuracyBonus: (d.accuracyBonus as number) ?? 0,
     maxStack: (d.maxStack as number) ?? 0,
+    alwaysHits: (d.alwaysHits as boolean) ?? false,
     statusEffect: loadStatusEffect(name, d),
   };
 }
@@ -242,6 +246,7 @@ export function loadAssets(): AssetRegistry {
         challengeDefeatedEnemies: [],
         cheatsUsed: false,
         godMode: false,
+        trollMode: false,
         newGamePlusLevel: 0,
         titanDefeated: false,
         endGameBoss: null,

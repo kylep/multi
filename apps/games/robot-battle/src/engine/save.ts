@@ -52,6 +52,7 @@ function parseSave(raw: string | null): SaveData | null {
     // Soft migration for v3→v4 fields
     if (data.player.cheatsUsed === undefined) data.player.cheatsUsed = false;
     if (data.player.godMode === undefined) data.player.godMode = false;
+    if (data.player.trollMode === undefined) data.player.trollMode = false;
     if (data.player.newGamePlusLevel === undefined) data.player.newGamePlusLevel = 0;
     if (data.player.titanDefeated === undefined) data.player.titanDefeated = false;
     if (data.player.endGameBoss === undefined) data.player.endGameBoss = null;

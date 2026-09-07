@@ -47,6 +47,7 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     challengeDefeatedEnemies: [],
     cheatsUsed: false,
     godMode: false,
+    trollMode: false,
     newGamePlusLevel: 0,
     titanDefeated: false,
     endGameBoss: null,
@@ -215,6 +216,15 @@ describe("v2 to v3 migration", () => {
     expect(loaded.player.bank).toBe(0);
     expect(loaded.player.repeatableUpgrades).toEqual({});
     expect(loaded.player.accuracy).toBe(0);
+  });
+
+  it("defaults trollMode to false on a save that predates it", () => {
+    const storage = createMockStorage();
+    const player: Partial<Robot> = makeRobot({ name: "PreTrollBot" });
+    delete player.trollMode;
+    storage.setItem("robot-battle-save-1", JSON.stringify({ version: 3, player }));
+    const loaded = loadSlot(storage, 1)!;
+    expect(loaded.player.trollMode).toBe(false);
   });
 
   it("migrates arm gear items to arm upgrades", () => {

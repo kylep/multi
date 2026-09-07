@@ -554,6 +554,15 @@
       "useText": "You launch a Nuke. NUCLEAR EXPLOSION! Everything goes white!",
       "description": "A miniature nuclear warhead. For when you absolutely need something destroyed. Max 5.",
       "statusEffect": { "type": "radiation", "chance": 1 }
+    },
+    "Troll Bomb": {
+      "level": 0,
+      "moneyCost": 1000000,
+      "damage": 1000000,
+      "maxStack": 5,
+      "alwaysHits": true,
+      "useText": "You pull the pin on a Troll Bomb and roll it across the arena...",
+      "description": "Deals 1,000,000 damage and never, ever misses. Costs exactly one whole treasure. U mad? Max 5."
     }
   }
 }

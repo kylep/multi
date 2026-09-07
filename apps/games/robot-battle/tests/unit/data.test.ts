@@ -175,6 +175,21 @@ describe("loadAssets", () => {
     expect(flash.useText.length).toBeGreaterThan(0);
   });
 
+  it("loads the Troll Bomb consumable", () => {
+    const bomb = registry.consumables.get("Troll Bomb")!;
+    expect(bomb.level).toBe(0);
+    expect(bomb.moneyCost).toBe(1_000_000);
+    expect(bomb.damage).toBe(1_000_000);
+    expect(bomb.maxStack).toBe(5);
+    expect(bomb.alwaysHits).toBe(true);
+    expect(bomb.statusEffect).toBeNull();
+    expect(bomb.useText.length).toBeGreaterThan(0);
+  });
+
+  it("defaults alwaysHits to false on a normal consumable", () => {
+    expect(registry.consumables.get("Grenade")!.alwaysHits).toBe(false);
+  });
+
   it("hydrates statusEffect onto pre-0.14.0 saved items", () => {
     const player = createPlayer(createGameState(registry), "Old Save");
 

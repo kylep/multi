@@ -253,6 +253,11 @@ export function useConsumable(
   if (consumable.damage > 0) {
     if (defender.robot.godMode) {
       effects.push(`0 damage... BECAUSE YOU ARE A GOD`);
+    } else if (consumable.alwaysHits) {
+      // No dodge roll, no defence, no shield — it just lands.
+      defender.currentHealth -= consumable.damage;
+      effects.push(`${consumable.damage} damage to enemy`);
+      effectLands = true;
     } else {
       // 50% dodge chance against consumable damage
       const dodge = battleDodge(defender);

@@ -274,6 +274,20 @@ async function cheatCodeScreen(
       const fact = factsData.cheat_nuke[Math.floor(Math.random() * factsData.cheat_nuke.length)];
       terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Nuclear Science:</span> <span class="t-dim">${esc(fact)}</span></div>`);
       await terminal.promptContinue(0);
+    } else if (trimmed === "u mad bro?" || trimmed === "u mad bro") {
+      player.cheatsUsed = true;
+      player.trollMode = !player.trollMode;
+      terminal.clear();
+      if (player.trollMode) {
+        terminal.printHTML(`<div class="t-green t-bold" style="font-size:20px;margin:16px 0">TROLL MODE ON</div>`);
+        terminal.printHTML(`<div class="t-dim">Troll Bomb is now available in the shop.</div>`);
+      } else {
+        terminal.printHTML(`<div class="t-yellow t-bold" style="font-size:20px;margin:16px 0">TROLL MODE OFF</div>`);
+        terminal.printHTML(`<div class="t-dim">Troll Bomb is removed from the shop.</div>`);
+      }
+      const fact = factsData.cheat_trollbomb[Math.floor(Math.random() * factsData.cheat_trollbomb.length)];
+      terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Troll Lore:</span> <span class="t-dim">${esc(fact)}</span></div>`);
+      await terminal.promptContinue(0);
     } else {
       terminal.print("Invalid cheat code!", "t-red");
       await terminal.promptContinue(0);
@@ -507,6 +521,8 @@ const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
       "Battle panels show a badge row for each robot's active effects with the turns left",
       "Shop and inventory lines show an item's effect and how often it lands",
       "Weapons in old saves pick up their new effects the next time you load that slot",
+      "New cheat code: 'u mad bro?' toggles the Troll Bomb in the shop",
+      "New item: Troll Bomb — $1,000,000 for 1,000,000 damage that never misses, then a 'please wait' screen. Cheat code only, stack up to 5",
     ],
   },
   {
