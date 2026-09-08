@@ -1,0 +1,5 @@
+opinion_modifiers = {
+	loves_australia = {
+		value = 100
+	}
+}

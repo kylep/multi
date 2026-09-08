@@ -19,7 +19,7 @@ this repo's git history).
 | [kytrade](apps/kytrade/) | Personal trading tools: API + CLI, Claude-integrated | Python 3.14/uv, FastAPI, Typer, PostgreSQL |
 | [robot-battle](apps/games/robot-battle/) | Web robot-battle game built with Oliver | TypeScript, Vite, Vitest |
 | [llm-client](apps/llm-client/) | Browser chat UI for llama-server / OpenRouter, live at kyle.pericak.com/apps/llm-client | Next.js 16, Tailwind v4, pnpm |
-| [mods](apps/mods/) | Stellaris mods (3x Bigger Worlds, Multi-Megastructures) and a HOI4 mod, published on Steam Workshop | Paradox script, Python build tooling |
+| [mods](apps/mods/) | Stellaris mods (3x Bigger Worlds, Multi-Megastructures) and HOI4 mods (Canada Overpowered, Australia Overpowered), published on Steam Workshop | Paradox script, Python build tooling |
 | [xmasblocks](apps/xmasblocks/) | Find funny word combos from scrambled Christmas letter blocks | Python, OpenAI API |
 | [mcp-servers](apps/mcp-servers/) | 8 MCP servers wired into local Claude Code config (bitwarden, cc-usage, discord, google-news, google-search-console, openobserve, openrouter, screenshot) | TypeScript + Python |
 | [pai](apps/pai/) | Docs, backup and Terraform for the Pai agent system | Terraform, Markdown |

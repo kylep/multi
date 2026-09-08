@@ -1,0 +1,41 @@
+state={
+	id=725
+	name="STATE_725"
+	manpower = 10000000
+	state_category = gigalopolis
+
+	resources = {
+		oil = 500
+		aluminium = 500
+		rubber = 500
+		tungsten = 500
+		steel = 500
+		chromium = 500
+		coal = 500
+	}
+
+	history={
+
+		owner = AST 
+		add_core_of = FIJ
+		add_core_of = AST
+
+		buildings = {
+			infrastructure = 2
+			13038 = {
+				naval_base = 1
+			}
+		}
+
+		victory_points = {
+			13038 1 # Nauru
+		}
+
+	}
+	
+	provinces={
+		13038 
+	}
+
+	local_supplies=0.0 
+}

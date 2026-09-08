@@ -5,7 +5,7 @@ keywords:
   - games
   - browser-games
 scope: "Index of games hosted on the blog and game mods."
-last_verified: 2026-07-04
+last_verified: 2026-09-05
 ---
 
 ## Games
@@ -19,6 +19,7 @@ Maintained mods, published on Steam Workshop (source: `apps/mods/`):
 - [Stellaris: 3x Bigger Worlds](/wiki/games/stellaris-3x-bigger-worlds.html) — Stellaris mod.
 - [Stellaris: Multi-Megastructures + Free Tech](/wiki/games/stellaris-multi-megastructures.html) — Stellaris mod.
 - [HOI4: Canada Overpowered](/wiki/games/hoi4-canada-overpowered.html) — Hearts of Iron 4 mod.
+- [HOI4: Australia Overpowered](/wiki/games/hoi4-australia-overpowered.html) — Hearts of Iron 4 mod.
 
 An old Minecraft mod moved to
 [kylep/multi-sandbox](https://github.com/kylep/multi-sandbox) (unmaintained).

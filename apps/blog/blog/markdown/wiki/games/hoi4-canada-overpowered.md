@@ -25,12 +25,12 @@ last_verified: 2026-03-25
 ## Links
 
 - [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3691970032)
-- Repo: `apps/mods/hoi4/`
+- Repo: `apps/mods/hoi4/canada-overpowered/`
 
 ## Deploy
 
 ```bash
-apps/mods/hoi4/scripts/deploy.sh
+apps/mods/hoi4/canada-overpowered/scripts/deploy.sh
 ```
 
 Copies the mod into `~/Documents/Paradox Interactive/Hearts of Iron IV/mod/`. Launch HOI4 and enable "Canada Overpowered" in the launcher.
@@ -40,8 +40,8 @@ Copies the mod into `~/Documents/Paradox Interactive/Hearts of Iron IV/mod/`. La
 If vanilla game files update:
 
 ```bash
-python3 apps/mods/hoi4/scripts/build.py
-python3 apps/mods/hoi4/scripts/validate.py
+python3 apps/mods/hoi4/canada-overpowered/scripts/build.py
+python3 apps/mods/hoi4/canada-overpowered/scripts/validate.py
 ```
 
 ## Steam Workshop upload

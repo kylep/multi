@@ -1,0 +1,52 @@
+state = {
+	id = 1070
+	name = "STATE_1070"
+	manpower = 10000000
+
+	history = {
+
+		owner = AST
+		add_core_of = PNG 
+		add_core_of = BOU  
+		add_core_of = SOL   
+		add_core_of = AST
+
+		buildings = {
+			infrastructure = 1
+			4226 = {
+				naval_base = 1
+			}
+			10234 = {
+				naval_base = 1
+			}
+		}
+
+		victory_points = {
+			10234 2 # Buka 
+		}
+
+		victory_points = {
+			4226 1 # Buin 
+		}
+
+	}
+
+	provinces = {
+		1358 4226 4378 10234 
+	}
+	
+	buildings_max_level_factor = 1
+	state_category = gigalopolis
+
+	resources = {
+		oil = 500
+		aluminium = 500
+		rubber = 500
+		tungsten = 500
+		steel = 500
+		chromium = 500
+		coal = 500
+	}
+
+	local_supplies = 0.0 
+}
