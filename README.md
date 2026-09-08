@@ -32,8 +32,11 @@ agent system. `infra/` holds what deploys to it, plus supporting images:
 | Directory | What it is |
 |-----------|------------|
 | [infra/local-k8s](infra/local-k8s/) | Local cluster bootstrap (Vault etc.) |
-| [infra/ai-agents](infra/ai-agents/) | Agent workloads: ai-agent-runtime image, cronjob Helm charts (journalist, pai-morning), agent-controller (Go) |
 | [infra/ai-security-toolkit-1](infra/ai-security-toolkit-1/) | semgrep + trivy + gitleaks scan image used by this repo's pre-PR checks |
+
+The retired pai-m1 `ai-agents` stack (its agent workloads superseded by
+the agent-platform project) moved to
+[kylep/multi-sandbox](https://github.com/kylep/multi-sandbox).
 
 Also: `bin/` (scripts used by agents, e.g. `github-trending.py` for the
 journalist cronjob), `.claude/agents/` (the Claude Code agent team),
