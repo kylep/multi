@@ -1,5 +1,7 @@
 /** Data models for Robot Battle. */
 
+import type { ActiveStatus, StatusEffectSpec } from "./status";
+
 export type ItemType = "weapon" | "gear" | "consumable";
 
 export interface ItemBase {
@@ -17,6 +19,7 @@ export interface Weapon extends ItemBase {
   energyCost: number;
   accuracy: number;
   hands: number;
+  statusEffect: StatusEffectSpec | null;
 }
 
 export interface Gear extends ItemBase {
@@ -46,6 +49,9 @@ export interface Consumable extends ItemBase {
   useText: string;
   accuracyBonus: number;
   maxStack: number;
+  /** Skips the dodge roll and ignores defence and shields. Joke items only. */
+  alwaysHits: boolean;
+  statusEffect: StatusEffectSpec | null;
 }
 
 export type Item = Weapon | Gear | Consumable;
@@ -76,6 +82,7 @@ export interface Robot {
   challengeDefeatedEnemies: string[];
   cheatsUsed: boolean;
   godMode: boolean;
+  trollMode: boolean;
   newGamePlusLevel: number;
   titanDefeated: boolean;
   endGameBoss: EndGameBossSpec | null;
@@ -116,6 +123,7 @@ export interface BattleRobot {
   damageBlock: number;
   consumablesUsed: string[];
   consumableUsedThisTurn: boolean;
+  statuses: ActiveStatus[];
 }
 
 export interface PlannedAction {
@@ -153,6 +161,8 @@ export interface ActionResult {
   damageDealt: number;
   energySpent: number;
   turnEnded: boolean;
+  /** True when shock made the action seize up instead of running. */
+  fizzled: boolean;
 }
 
 export interface ShopResult {

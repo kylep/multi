@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { loadAssets } from "../../src/engine/data";
+import { hydrateStatusEffects, isRandomRewardEligible, loadAssets, loadStatusEffect } from "../../src/engine/data";
+import { createGameState, createPlayer } from "../../src/engine/state";
+import type { Weapon } from "../../src/engine/types";
 
 describe("loadAssets", () => {
   const registry = loadAssets();
@@ -130,6 +132,106 @@ describe("loadAssets", () => {
     const minibot = registry.enemies.get("MiniBot")!;
     expect(minibot.appearance.length).toBeGreaterThan(0);
     expect(minibot.backstory.length).toBeGreaterThan(0);
+  });
+
+  it("loads weapon status effects with chance overrides and defaults", () => {
+    expect(registry.weapons.get("Flame Thrower")!.statusEffect).toEqual({ type: "burn", chance: 0.66 });
+    expect(registry.weapons.get("Chainsaw")!.statusEffect).toEqual({ type: "corrode", chance: 0.2 });
+    expect(registry.weapons.get("Nuke Launcher")!.statusEffect).toEqual({ type: "radiation", chance: 1 });
+    expect(registry.weapons.get("Laser Gun")!.statusEffect).toEqual({ type: "dazzle", chance: 0.1 });
+    expect(registry.weapons.get("Stick")!.statusEffect).toBeNull();
+  });
+
+  it("rejects an unknown status effect type at load", () => {
+    expect(() => loadStatusEffect("Typo Blade", { statusEffect: { type: "brun" } }))
+      .toThrow(/Typo Blade.*brun/);
+    expect(loadStatusEffect("Chainsaw", { statusEffect: { type: "corrode" } }))
+      .toEqual({ type: "corrode", chance: 0.2 });
+    expect(loadStatusEffect("Stick", {})).toBeNull();
+  });
+
+  it("loads consumable status effects", () => {
+    expect(registry.consumables.get("Plasma Grenade")!.statusEffect).toEqual({ type: "burn", chance: 0.2 });
+    expect(registry.consumables.get("EMP Bomb")!.statusEffect).toEqual({ type: "shock", chance: 0.2 });
+    expect(registry.consumables.get("Nuke")!.statusEffect).toEqual({ type: "radiation", chance: 1 });
+    expect(registry.consumables.get("Repair Kit")!.statusEffect).toBeNull();
+  });
+
+  it("loads the Acid Grenade and Flashbang consumables", () => {
+    const acid = registry.consumables.get("Acid Grenade")!;
+    expect(acid.level).toBe(12);
+    expect(acid.moneyCost).toBe(200);
+    expect(acid.damage).toBe(20);
+    expect(acid.maxStack).toBe(5);
+    expect(acid.statusEffect).toEqual({ type: "corrode", chance: 1 });
+    expect(acid.useText.length).toBeGreaterThan(0);
+
+    const flash = registry.consumables.get("Flashbang")!;
+    expect(flash.level).toBe(9);
+    expect(flash.moneyCost).toBe(120);
+    expect(flash.damage).toBe(5);
+    expect(flash.maxStack).toBe(5);
+    expect(flash.statusEffect).toEqual({ type: "dazzle", chance: 1 });
+    expect(flash.useText.length).toBeGreaterThan(0);
+  });
+
+  it("loads the Troll Bomb consumable", () => {
+    const bomb = registry.consumables.get("Troll Bomb")!;
+    expect(bomb.level).toBe(0);
+    expect(bomb.moneyCost).toBe(1_000_000);
+    expect(bomb.damage).toBe(1_000_000);
+    expect(bomb.maxStack).toBe(5);
+    expect(bomb.alwaysHits).toBe(true);
+    expect(bomb.statusEffect).toBeNull();
+    expect(bomb.useText.length).toBeGreaterThan(0);
+  });
+
+  it("defaults alwaysHits to false on a normal consumable", () => {
+    expect(registry.consumables.get("Grenade")!.alwaysHits).toBe(false);
+  });
+
+  it("keeps the Troll Bomb out of every random reward pool", () => {
+    expect(isRandomRewardEligible(registry.consumables.get("Troll Bomb")!)).toBe(false);
+    expect(isRandomRewardEligible(registry.consumables.get("Grenade")!)).toBe(true);
+    expect(isRandomRewardEligible(registry.weapons.get("Stick")!)).toBe(true);
+  });
+
+  it("leaves no loot-box consumable at level 1, where the Troll Bomb used to be the only pick", () => {
+    const poolAtLevelOne = registry.getAllItems()
+      .filter((i) => i.itemType === "consumable" && i.level <= 1 && isRandomRewardEligible(i));
+    expect(poolAtLevelOne).toEqual([]);
+
+    // Without the filter the level filter alone lets the level-0 bomb through.
+    const unfiltered = registry.getAllItems()
+      .filter((i) => i.itemType === "consumable" && i.level <= 1);
+    expect(unfiltered.map((i) => i.name)).toEqual(["Troll Bomb"]);
+  });
+
+  it("hydrates statusEffect onto pre-0.14.0 saved items", () => {
+    const player = createPlayer(createGameState(registry), "Old Save");
+
+    // A save written before v0.14.0: whole item copies, no statusEffect field.
+    const oldFlameThrower = { ...registry.weapons.get("Flame Thrower")! } as Partial<Weapon>;
+    delete oldFlameThrower.statusEffect;
+    const oldStick = { ...registry.weapons.get("Stick")! } as Partial<Weapon>;
+    delete oldStick.statusEffect;
+    const removedItem = { ...registry.weapons.get("Stick")!, name: "Banana Peel Launcher" };
+    delete (removedItem as Partial<Weapon>).statusEffect;
+
+    player.inventory.push(oldFlameThrower as Weapon, oldStick as Weapon, removedItem as Weapon);
+    hydrateStatusEffects(player, registry);
+
+    expect(oldFlameThrower.statusEffect).toEqual({ type: "burn", chance: 0.66 });
+    expect(oldStick.statusEffect).toBeNull();
+    expect(removedItem.statusEffect).toBeUndefined();
+  });
+
+  it("leaves an already-set statusEffect alone", () => {
+    const player = createPlayer(createGameState(registry), "New Save");
+    const nerfed = { ...registry.weapons.get("Flame Thrower")!, statusEffect: null };
+    player.inventory.push(nerfed);
+    hydrateStatusEffects(player, registry);
+    expect(nerfed.statusEffect).toBeNull();
   });
 
   it("enemies with arm upgrades get correct hands", () => {

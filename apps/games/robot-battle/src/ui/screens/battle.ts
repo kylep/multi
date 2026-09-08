@@ -2,7 +2,7 @@
 
 import type { Terminal, Choice } from "../terminal";
 import type { GameState } from "../../engine/state";
-import type { BattleState, Enemy, Rng, Weapon } from "../../engine/types";
+import type { BattleRobot, BattleState, Enemy, Rng, Weapon } from "../../engine/types";
 import { bossAsEnemy, createBossRobot, generateEndGameBossSpec } from "../../engine/boss";
 import {
   createBattle,
@@ -14,6 +14,7 @@ import {
   useConsumable,
 } from "../../engine/battle";
 import { aiPlanAction } from "../../engine/ai";
+import { STATUS_RULES } from "../../engine/status";
 import { createRng } from "../../engine/rng";
 import {
   getAmmoSummary,
@@ -26,7 +27,10 @@ import {
   hasItem,
 } from "../../engine/robot";
 import { awardExp, awardInterest, awardMoney, getXpToLevel, recordFight } from "../../engine/state";
-import { buyItem, canBuy } from "../../engine/shop";
+import { restockConsumables } from "../../engine/shop";
+import type { RestockResult } from "../../engine/shop";
+import { isRandomRewardEligible, TROLL_BOMB_NAME } from "../../engine/data";
+import { statusEffectSummary } from "./shop";
 import { shouldShowLootBox } from "../../engine/battle";
 import type { SoundPlayer } from "../sound";
 import type { SaveStorage } from "../../engine/save";
@@ -41,68 +45,62 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-interface RestockResult {
-  bought: string[];
-  bankWithdraw: number;
+/** True when the player's consumable this turn was a Troll Bomb. */
+function usedTrollBombThisTurn(battle: BattleState): boolean {
+  const used = battle.player.consumablesUsed;
+  return battle.player.consumableUsedThisTurn && used[used.length - 1] === TROLL_BOMB_NAME;
 }
 
-/** Try to rebuy consumed consumables, cheapest first. Withdraws from bank if needed. */
-function restockConsumables(state: GameState, usedNames: string[]): RestockResult {
-  const player = state.player!;
-  if (!player.settings.restockConsumables || usedNames.length === 0) return { bought: [], bankWithdraw: 0 };
+/**
+ * Ceiling on the "wait again" rounds. Four rounds happen about 0.8% of the
+ * time and the screen cannot be skipped, so the tail is bounded rather than
+ * left to chance.
+ */
+const TROLL_BOMB_MAX_WAITS = 4;
 
-  // Count how many of each consumable were used
-  const counts = new Map<string, number>();
-  for (const name of usedNames) {
-    counts.set(name, (counts.get(name) ?? 0) + 1);
+/**
+ * The Troll Bomb's whole joke: a "please wait" screen that waits 3-11 seconds
+ * and then, one time in five, decides to wait again (a bit less each round).
+ */
+async function trollBombWait(terminal: Terminal): Promise<void> {
+  let maxSeconds = 11;
+  let text = "please wait";
+  for (let i = 0; i < TROLL_BOMB_MAX_WAITS; i++) {
+    terminal.clear();
+    terminal.print(text, "t-dim");
+    const seconds = 3 + Math.floor(Math.random() * (maxSeconds - 3 + 1));
+    await delay(seconds * 1000);
+    if (Math.random() >= 0.2) return;
+    maxSeconds = Math.max(3, maxSeconds - 3);
+    text += " again...";
   }
-
-  // Resolve to registry items and sort cheapest first
-  const toBuy: Array<{ name: string; qty: number; cost: number }> = [];
-  for (const [name, qty] of counts) {
-    const item = state.registry.getItem(name);
-    if (item && item.itemType === "consumable") toBuy.push({ name, qty, cost: item.moneyCost });
-  }
-  toBuy.sort((a, b) => a.cost - b.cost);
-
-  let bankWithdraw = 0;
-  const bought: string[] = [];
-  for (const { name, qty } of toBuy) {
-    const item = state.registry.getItem(name);
-    if (!item) continue;
-    for (let i = 0; i < qty; i++) {
-      // If we can't afford it but bank has funds, withdraw the difference
-      const sandbox = player.settings.mode === "sandbox";
-      if (!sandbox && player.money < item.moneyCost && player.bank > 0) {
-        const shortfall = item.moneyCost - player.money;
-        const withdraw = Math.min(shortfall, player.bank);
-        player.bank -= withdraw;
-        player.money += withdraw;
-        bankWithdraw += withdraw;
-      }
-      const check = canBuy(state, item);
-      if (!check.ok) break;
-      buyItem(state, item);
-      bought.push(item.name);
-    }
-  }
-  return { bought, bankWithdraw };
 }
 
 function restockSummaryHtml(state: GameState, result: RestockResult): string {
-  const restockCounts = new Map<string, number>();
-  let restockTotal = 0;
-  for (const name of result.bought) {
-    restockCounts.set(name, (restockCounts.get(name) ?? 0) + 1);
-    const item = state.registry.getItem(name);
-    if (item) restockTotal += item.moneyCost;
+  let html = "";
+
+  if (result.bought.length > 0) {
+    const restockCounts = new Map<string, number>();
+    let restockTotal = 0;
+    for (const name of result.bought) {
+      restockCounts.set(name, (restockCounts.get(name) ?? 0) + 1);
+      const item = state.registry.getItem(name);
+      if (item) restockTotal += item.moneyCost;
+    }
+    const restockList = [...restockCounts.entries()].map(([name, count]) => count > 1 ? `${name} ×${count}` : name).join(", ");
+    html += `<div><span class="t-dim">Restocked: ${esc(restockList)} (-$${restockTotal})</span>`;
+    if (result.bankWithdraw > 0) {
+      html += ` <span class="t-cyan">($${result.bankWithdraw} withdrawn from bank)</span>`;
+    }
+    html += `</div>`;
   }
-  const restockList = [...restockCounts.entries()].map(([name, count]) => count > 1 ? `${name} ×${count}` : name).join(", ");
-  let html = `<div><span class="t-dim">Restocked: ${esc(restockList)} (-$${restockTotal})</span>`;
-  if (result.bankWithdraw > 0) {
-    html += ` <span class="t-cyan">($${result.bankWithdraw} withdrawn from bank)</span>`;
+
+  // Say what could not be rebought and why, so money that stayed put is never
+  // a mystery. The engine reports one skip per item, whatever the quantity.
+  for (const skip of result.skipped) {
+    html += `<div><span class="t-yellow">Couldn't restock ${esc(skip.name)}: ${esc(skip.reason)}</span></div>`;
   }
-  html += `</div>`;
+
   return html;
 }
 
@@ -168,6 +166,13 @@ export async function battleScreen(
     terminal.print("");
 
     const result = await playerTurn(terminal, battle, nameClass);
+
+    if (usedTrollBombThisTurn(battle)) {
+      // trollBombWait clears the screen, so give the player a beat to read the
+      // damage line playerUseItem just printed.
+      await terminal.promptContinue(0);
+      await trollBombWait(terminal);
+    }
 
     if (result === "auto") {
       await autoBattle(terminal, battle, nameClass);
@@ -330,7 +335,7 @@ export async function battleScreen(
       if (interest > 0) {
         rewardsHtml += `<div><span class="t-green">+ $${interest} bank interest</span></div>`;
       }
-      if (restocked.bought.length > 0) {
+      if (restocked.bought.length > 0 || restocked.skipped.length > 0) {
         rewardsHtml += restockSummaryHtml(state, restocked);
       }
       if (leveled) {
@@ -382,7 +387,7 @@ export async function battleScreen(
         : `<div>Destroyed by <span class="${nameClass} t-bold">${esc(displayName)}</span> after <span class="t-cyan">${turns}</span> ${turns === 1 ? "turn" : "turns"}</div>`;
       if (!surrendered) infoHtml += `<div style="margin-top:4px"><span class="t-green">+$10 consolation</span></div>`;
       if (defeatInterest > 0) infoHtml += `<div><span class="t-green">+ $${defeatInterest} bank interest</span></div>`;
-      if (defeatRestocked.bought.length > 0) {
+      if (defeatRestocked.bought.length > 0 || defeatRestocked.skipped.length > 0) {
         infoHtml += restockSummaryHtml(state, defeatRestocked);
       }
       infoHtml += `<div style="margin-top:8px" class="t-cyan">$${player.money} &nbsp; Lv.${player.level} &nbsp; XP ${player.exp}/${getXpToLevel(player.level)} &nbsp; ${player.wins}W / ${player.fights}F</div>`;
@@ -532,6 +537,18 @@ function animsFromLog(battle: BattleState): BattleAnims {
   return { playerPanel, enemyPanel };
 }
 
+/** Badge row for a robot's active status effects. Empty when it has none. */
+function statusBadgesHtml(br: BattleRobot): string {
+  if (br.statuses.length === 0) return "";
+  const badges = br.statuses.map((s) => {
+    const rule = STATUS_RULES[s.type];
+    // Radiation lasts the rest of the battle, so it shows no turn counter.
+    const counter = Number.isFinite(s.turnsLeft) ? ` (${s.turnsLeft})` : "";
+    return `<span class="status-badge ${rule.colour}">${esc(rule.icon)} ${esc(rule.label)}${counter}</span>`;
+  }).join("");
+  return `<div>${badges}</div>`;
+}
+
 function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: BattleAnims, enemyNameClass?: string): void {
   const p = battle.player;
   const e = battle.enemy;
@@ -550,6 +567,9 @@ function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: Batt
     ? `<div class="t-dim" style="margin-top:6px;font-size:13px">${battle.lastTurnLog.map((m) => esc(m)).join("<br>")}</div>`
     : "";
 
+  const pStatusHtml = statusBadgesHtml(p);
+  const eStatusHtml = statusBadgesHtml(e);
+
   const pAmmo = getAmmoSummary(p.robot);
   const pAmmoHtml = pAmmo.length > 0
     ? `<div class="t-dim" style="font-size:13px">${pAmmo.map((a) => `${a.name}: ${a.count}`).join(" &nbsp; ")}</div>`
@@ -565,12 +585,14 @@ function printBattleStatus(terminal: Terminal, battle: BattleState, anims?: Batt
         <div class="t-magenta t-bold">${esc(p.robot.name)} (You)</div>
         <div class="t-cyan">HP: ${hpBar(p.currentHealth, pMaxHp, barWidth)} ${p.currentHealth}/${pMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(p.currentEnergy, pMaxEn, barWidth)} ${p.currentEnergy}/${pMaxEn}</div>
+        ${pStatusHtml}
         ${pAmmoHtml}
       </div>
       <div class="panel ${eAnim}">
         <div class="${enemyNameClass ?? "t-magenta"} t-bold">${esc(e.robot.name)} (Enemy)</div>
         <div class="t-cyan">HP: ${hpBar(e.currentHealth, eMaxHp, barWidth)} ${e.currentHealth}/${eMaxHp}</div>
         <div class="t-yellow">EN: ${hpBar(e.currentEnergy, eMaxEn, barWidth)} ${e.currentEnergy}/${eMaxEn}</div>
+        ${eStatusHtml}
         ${eAmmoHtml}
       </div>
     </div>
@@ -598,6 +620,9 @@ async function playerTurn(
 ): Promise<"continue" | "surrendered" | "auto"> {
   const player = battle.player;
   const suggested = aiPlanAction(battle, true);
+  // Set when shock makes an item seize up: the item survives, the item action
+  // for this turn does not, so the menu stops offering it.
+  let itemSeizedUp = false;
 
   function redrawBattle(): void {
     terminal.clear();
@@ -615,7 +640,7 @@ async function playerTurn(
     );
     const usedCounts = new Map<string, number>();
     for (const n of player.consumablesUsed) usedCounts.set(n, (usedCounts.get(n) ?? 0) + 1);
-    const hasConsumables = !player.consumableUsedThisTurn && getConsumables(player.robot).some((c) => {
+    const hasConsumables = !player.consumableUsedThisTurn && !itemSeizedUp && getConsumables(player.robot).some((c) => {
       const owned = player.robot.inventory.filter((i) => i.name === c.name).length;
       const used = usedCounts.get(c.name) ?? 0;
       return used < owned;
@@ -630,7 +655,11 @@ async function playerTurn(
     const choices: Choice[] = [];
     choices.push({ label: "Auto", value: "auto" });
     choices.push({ label: attackLabel, value: "attack" });
-    const itemLabel = player.consumableUsedThisTurn ? "Item (used)" : hasConsumables ? "Item" : "Item (none)";
+    const itemLabel = player.consumableUsedThisTurn
+      ? "Item (used)"
+      : itemSeizedUp
+        ? "Item (seized up!)"
+        : hasConsumables ? "Item" : "Item (none)";
     choices.push({ label: itemLabel, value: "item" });
     choices.push({ label: "Rest", value: "rest" });
     choices.push({ label: "Surrender", value: "surrender" });
@@ -679,8 +708,12 @@ async function playerTurn(
         terminal.print("No usable items!", "t-red");
         continue;
       }
-      await playerUseItem(terminal, battle);
+      const seizedUp = await playerUseItem(terminal, battle);
       if (battle.winner) return "continue";
+      if (seizedUp) {
+        itemSeizedUp = true;
+        await terminal.promptContinue(0);
+      }
       redrawBattle();
     } else if (choice === "rest") {
       planRest(battle, true);
@@ -750,10 +783,11 @@ async function playerPlanAttack(
       const check = selected.has(i) ? "[x]" : "[ ]";
       const missingAmmo = w.requirements.length > 0 && !w.requirements.every((req) => hasItem(player.robot, req));
       const ammoStr = w.requirements.length > 0 ? ` [${w.requirements[0]}: ${player.robot.inventory.filter((it) => w.requirements.includes(it.name)).length}]` : "";
+      const fx = statusEffectSummary(w.statusEffect);
       weaponChoices.push({
         label: `${check} ${w.name}${missingAmmo ? " (no ammo)" : ""}`,
         value: `toggle-${i}`,
-        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${ammoStr}`,
+        subtitle: `${w.damage} dmg, ${w.hands}h, ${getWeaponEnergyCost(w, player.robot)} en${fx ? `, ${fx}` : ""}${ammoStr}`,
         disabled: missingAmmo,
       });
     }
@@ -794,7 +828,12 @@ async function playerPlanAttack(
   }
 }
 
-async function playerUseItem(terminal: Terminal, battle: BattleState): Promise<void> {
+/**
+ * Let the player pick and use a consumable. Returns true when shock made the
+ * item seize up — the item is kept, but the player's item action for this turn
+ * is gone, the same as a shocked attack losing its turn.
+ */
+async function playerUseItem(terminal: Terminal, battle: BattleState): Promise<boolean> {
   const player = battle.player;
   const allConsumables = getConsumables(player.robot);
 
@@ -815,7 +854,7 @@ async function playerUseItem(terminal: Terminal, battle: BattleState): Promise<v
 
   if (usable.length === 0) {
     terminal.print("You have no usable consumables!", "t-red");
-    return;
+    return false;
   }
 
   terminal.print("");
@@ -830,17 +869,22 @@ async function playerUseItem(terminal: Terminal, battle: BattleState): Promise<v
   }
 
   const choice = await terminal.promptChoice("Select a consumable:", choices);
-  if (choice === "back") return;
+  if (choice === "back") return false;
 
   const idx = parseInt(choice, 10);
   if (idx >= 0 && idx < usable.length) {
     const result = useConsumable(battle, battle.player, battle.enemy, usable[idx].consumable, createRng());
+    if (result.fizzled) {
+      terminal.print(result.message, "t-yellow");
+      return true;
+    }
     if (result.success) {
       terminal.print(result.message, "t-green");
     } else {
       terminal.print(result.message, "t-red");
     }
   }
+  return false;
 }
 
 // ── Loot Box ──
@@ -883,9 +927,10 @@ async function showLootBox(
 
   const tier = tiers[parseInt(choice, 10)];
 
-  // Get level-appropriate consumables based on enemy level
+  // Get level-appropriate consumables based on enemy level. Cheat-only
+  // consumables never enter the pool, whatever their level says.
   const eligibleConsumables = state.registry.getAllItems()
-    .filter((i) => i.itemType === "consumable" && i.level <= enemyDef.level);
+    .filter((i) => i.itemType === "consumable" && i.level <= enemyDef.level && isRandomRewardEligible(i));
 
   terminal.clear();
 

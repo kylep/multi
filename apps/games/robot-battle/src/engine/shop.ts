@@ -3,6 +3,7 @@
 import type { Consumable, Gear, Item, Robot, ShopResult } from "./types";
 import type { GameState } from "./state";
 import { getGear, hasItem } from "./robot";
+import { TROLL_BOMB_NAME } from "./data";
 
 /** Count inventory slots used. Consumables and ammo are free, other stackable gear groups count as 1 slot. */
 export function countInventorySlots(player: Robot): number {
@@ -127,4 +128,91 @@ export function sellItem(state: GameState, item: Item): ShopResult {
     moneySpent: 0,
     moneyGained: sellPrice,
   };
+}
+
+// ── Post-battle restock ──
+
+export interface RestockSkip {
+  name: string;
+  reason: string;
+}
+
+export interface RestockResult {
+  bought: string[];
+  bankWithdraw: number;
+  skipped: RestockSkip[];
+}
+
+/**
+ * Rebuy the consumables a fight used up, cheapest first, topping the wallet up
+ * from the bank when it falls short.
+ *
+ * The bank is only ever drawn on for a purchase that then goes through: money
+ * moved for a buy that fails is put straight back, and the item is reported in
+ * `skipped` so the post-battle screen can say why nothing happened. Silently
+ * emptying a savings account and buying nothing is the bug this shape exists
+ * to prevent.
+ */
+export function restockConsumables(state: GameState, usedNames: string[]): RestockResult {
+  const player = state.player!;
+  if (!player.settings.restockConsumables || usedNames.length === 0) {
+    return { bought: [], bankWithdraw: 0, skipped: [] };
+  }
+
+  // Count how many of each consumable were used
+  const counts = new Map<string, number>();
+  for (const name of usedNames) {
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+
+  // Resolve to registry items and sort cheapest first
+  const toBuy: Array<{ item: Consumable; qty: number }> = [];
+  for (const [name, qty] of counts) {
+    // The Troll Bomb is only buyable while troll mode is on, restock included.
+    if (name === TROLL_BOMB_NAME && !player.trollMode) continue;
+    const item = state.registry.getItem(name);
+    if (item && item.itemType === "consumable") toBuy.push({ item: item as Consumable, qty });
+  }
+  toBuy.sort((a, b) => a.item.moneyCost - b.item.moneyCost);
+
+  const sandbox = player.settings.mode === "sandbox";
+  const bought: string[] = [];
+  const skipped: RestockSkip[] = [];
+  let bankWithdraw = 0;
+
+  for (const { item, qty } of toBuy) {
+    for (let i = 0; i < qty; i++) {
+      if (!sandbox && player.money + player.bank < item.moneyCost) {
+        skipped.push({
+          name: item.name,
+          reason: `costs $${item.moneyCost}, you have $${player.money + player.bank}`,
+        });
+        break;
+      }
+
+      // Top the wallet up to the price, then let canBuy rule on everything
+      // else (level, requirements, max stack).
+      const withdrawal = !sandbox && player.money < item.moneyCost ? item.moneyCost - player.money : 0;
+      if (withdrawal > 0) {
+        player.bank -= withdrawal;
+        player.money += withdrawal;
+      }
+
+      const check = canBuy(state, item);
+      if (!check.ok) {
+        if (withdrawal > 0) {
+          player.money -= withdrawal;
+          player.bank += withdrawal;
+        }
+        skipped.push({ name: item.name, reason: check.reason });
+        break;
+      }
+
+      bankWithdraw += withdrawal;
+      buyItem(state, item);
+      bought.push(item.name);
+    }
+  }
+
+  return { bought, bankWithdraw, skipped };
 }

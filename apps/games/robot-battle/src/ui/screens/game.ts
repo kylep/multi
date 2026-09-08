@@ -1,7 +1,7 @@
 /** Game entry point — title screen + save slots + main loop. */
 
 import type { Terminal, Choice } from "../terminal";
-import { loadAssets } from "../../engine/data";
+import { hydrateStatusEffects, loadAssets } from "../../engine/data";
 import { createGameState, createPlayer } from "../../engine/state";
 import {
   deleteSlot,
@@ -100,6 +100,8 @@ export async function startGame(
       if (loaded) {
         state.player = loaded.player;
         settings = loaded.settings;
+        // Pre-0.14.0 saves store items without statusEffect — backfill it.
+        hydrateStatusEffects(state.player, registry);
         state.player.health = getEffectiveMaxHealth(state.player);
         state.player.energy = getEffectiveMaxEnergy(state.player);
       } else {

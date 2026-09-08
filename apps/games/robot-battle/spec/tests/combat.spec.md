@@ -30,6 +30,8 @@
 - Returns "player" when enemy HP ≤ 0
 - Returns "enemy" when player HP ≤ 0
 - Returns null when both alive
+- Returns "player" when both are at or below 0 — the enemy is tested first, so
+  a simultaneous knockout goes to the player
 
 ### Turn Management
 - `endTurn` increments turn number
@@ -39,6 +41,67 @@
 ### Plan + Resolve
 - Both actions resolve in a full turn
 - Random order execution
+
+### Status Effects (tests/unit/status.test.ts)
+- `STATUS_RULES` covers all five types with an icon, label and `t-*` colour
+- Durations: burn 3, shock 2, corrode 3, radiation Infinity, dazzle 3
+- Damage fractions: burn 15%, radiation 10% per tick
+- `tryInflict` respects the inflict chance (seeded rng), the item's chance
+  override, and does nothing for a source with no effect
+- God mode robots are immune
+- Re-applying refreshes duration instead of stacking; the higher potency wins
+- Re-applying radiation keeps the existing tick count and adopts the higher
+  potency, so repeat nukes ramp rather than restarting the ramp
+- Infliction logs `X is BURNED!` into the current turn log
+- Burn tick deals floor(15% of source damage), ignores defence, and can kill
+- God mode robots take no tick damage
+- Radiation escalates 10%, 20%, 30% of source damage and never expires
+- Non-damaging effects deal no tick damage
+- `decrementStatuses` expires at zero and logs `X is no longer burned`
+- Corrode reduces `battleDefence` by 25%
+- Dazzle halves `battleDodge` and sets `battleAccuracyMultiplier` to 0.8
+- `shouldFizzle` is false without shock, true on a roll under 25%
+- `cureStatuses` clears everything, returns the cured list, logs
+  `Repair Kit cured BURN, SHOCK`, and logs nothing when there is nothing to cure
+
+### Status Effects in Battle (tests/unit/battle.test.ts)
+- `executeAttack` with a 100% Burn weapon inflicts burn
+- A blocked hit (Blast Shield) still applies the effect
+- `resolveTurn` ticks burn damage into `currentTurnLog` and decrements duration
+- A burn tick can end the battle
+- A tick that drops both robots at once awards the win to the player and logs
+  both destruction lines; a tick that drops only the player still awards the
+  win to the enemy
+- A shocked fighter's fizzled attack spends no energy and deals no damage
+- A shocked fighter's item can seize up: the item stays in the inventory,
+  `consumableUsedThisTurn` stays false, and no damage lands
+- A planned consumable rolls its fizzle inside `useConsumable`, so the log
+  carries the item-specific line and never the generic one
+- A Repair Kit cures every active effect
+- A damaging consumable that is dodged inflicts nothing
+- A non-damaging consumable (EMP Bomb) still inflicts its effect
+
+### Troll Bomb (tests/unit/battle.test.ts, data.test.ts, save.test.ts)
+- An `alwaysHits` consumable ignores dodge, ignores defence, and leaves a
+  Blast Shield's damage block untouched
+- An `alwaysHits` consumable still deals 0 damage to a god-mode defender
+- The Troll Bomb loads at level 0, $1,000,000, 1,000,000 damage, max stack 5,
+  `alwaysHits` true and no status effect; a normal consumable defaults
+  `alwaysHits` to false
+- `isRandomRewardEligible` rejects the Troll Bomb and accepts ordinary items,
+  and the level-1 loot-box pool is empty with it applied — the level filter
+  alone leaves the level-0 bomb as the only pick
+- A save written before the cheat existed defaults `trollMode` to false
+
+### Status Effect Data (tests/unit/data.test.ts)
+- Weapon effects load with chance overrides (Flame Thrower burn 0.66,
+  Nuke Launcher radiation 1, Laser Gun dazzle 0.1) and the 0.2 default
+  (Chainsaw corrode); Stick has none
+- An unknown `statusEffect.type` throws at load, naming the item and the type
+- Consumable effects load (Plasma Grenade burn, EMP Bomb shock, Nuke
+  radiation); Repair Kit has none
+- Acid Grenade (level 12, $200, 20 dmg, corrode 100%) and Flashbang
+  (level 9, $120, 5 dmg, dazzle 100%) exist with useText
 
 ## E2E Tests (tests/e2e/combat.spec.ts)
 

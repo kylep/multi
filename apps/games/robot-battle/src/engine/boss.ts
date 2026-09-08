@@ -1,6 +1,7 @@
 /** End-game boss: randomly generated opponent that appears after winning a round. */
 
 import type { AssetRegistry } from "./data";
+import { isRandomRewardEligible } from "./data";
 import type { EndGameBossSpec, Enemy, Item, Robot, Weapon, Gear, Consumable } from "./types";
 import {
   listRepeatableUpgrades,
@@ -82,8 +83,10 @@ function pickBestGear(registry: AssetRegistry, count: number): string[] {
 }
 
 function pickBestConsumables(registry: AssetRegistry): string[] {
-  // Give a spread of top-tier consumables
+  // Give a spread of top-tier consumables. Cheat-only items are filtered out,
+  // so the boss never gets one however expensive it looks to the sort.
   const cons = Array.from(registry.consumables.values())
+    .filter((c) => isRandomRewardEligible(c))
     .sort((a, b) => b.level - a.level || b.moneyCost - a.moneyCost);
   const names: string[] = [];
   for (const c of cons.slice(0, 5)) {
@@ -190,6 +193,7 @@ export function createBossRobot(
     challengeDefeatedEnemies: [],
     cheatsUsed: false,
     godMode: false,
+    trollMode: false,
     newGamePlusLevel: playerNewGamePlusLevel,
     titanDefeated: false,
     endGameBoss: null,

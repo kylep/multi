@@ -285,6 +285,13 @@ body {
   margin: 4px 0;
 }
 
+/* === Status effect badges — battle panel === */
+.status-badge {
+  display: inline-block;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
 /* === Text input (name entry) === */
 .terminal-input-line {
   display: flex;

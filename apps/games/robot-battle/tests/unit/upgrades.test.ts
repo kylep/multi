@@ -39,6 +39,7 @@ function makeRobot(overrides?: Partial<Robot>): Robot {
     challengeDefeatedEnemies: [],
     cheatsUsed: false,
     godMode: false,
+    trollMode: false,
     newGamePlusLevel: 0,
     titanDefeated: false,
     endGameBoss: null,

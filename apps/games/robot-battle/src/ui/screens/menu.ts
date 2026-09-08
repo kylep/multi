@@ -8,6 +8,7 @@ import type { SaveStorage } from "../../engine/save";
 import type { GameSettings } from "../../engine/save";
 import { loadLeaderboard } from "../../engine/save";
 import { createRng } from "../../engine/rng";
+import { isRandomRewardEligible } from "../../engine/data";
 import {
   getConsumables,
   getEffectiveDefence,
@@ -202,7 +203,7 @@ async function cheatCodeScreen(
       ], "row");
       const tier = tiers[parseInt(boxChoice, 10)];
       const eligibleConsumables = state.registry.getAllItems()
-        .filter((i) => i.itemType === "consumable" && i.level <= strongest.level);
+        .filter((i) => i.itemType === "consumable" && i.level <= strongest.level && isRandomRewardEligible(i));
       terminal.clear();
       const tierLabels: Record<string, string> = { diamond: "Diamond", gold: "Gold", silver: "Silver" };
       const tierColors: Record<string, string> = { diamond: "t-cyan", gold: "t-yellow", silver: "t-dim" };
@@ -273,6 +274,20 @@ async function cheatCodeScreen(
       }
       const fact = factsData.cheat_nuke[Math.floor(Math.random() * factsData.cheat_nuke.length)];
       terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Nuclear Science:</span> <span class="t-dim">${esc(fact)}</span></div>`);
+      await terminal.promptContinue(0);
+    } else if (trimmed === "u mad bro?" || trimmed === "u mad bro") {
+      player.cheatsUsed = true;
+      player.trollMode = !player.trollMode;
+      terminal.clear();
+      if (player.trollMode) {
+        terminal.printHTML(`<div class="t-green t-bold" style="font-size:20px;margin:16px 0">TROLL MODE ON</div>`);
+        terminal.printHTML(`<div class="t-dim">Troll Bomb is now available in the shop.</div>`);
+      } else {
+        terminal.printHTML(`<div class="t-yellow t-bold" style="font-size:20px;margin:16px 0">TROLL MODE OFF</div>`);
+        terminal.printHTML(`<div class="t-dim">Troll Bomb is removed from the shop.</div>`);
+      }
+      const fact = factsData.cheat_trollbomb[Math.floor(Math.random() * factsData.cheat_trollbomb.length)];
+      terminal.printHTML(`<div class="panel" style="padding:8px 12px;margin-top:8px"><span class="t-cyan t-bold">Troll Lore:</span> <span class="t-dim">${esc(fact)}</span></div>`);
       await terminal.promptContinue(0);
     } else {
       terminal.print("Invalid cheat code!", "t-red");
@@ -486,6 +501,31 @@ function esc(s: string): string {
 }
 
 const CHANGELOG: { version: string; date: string; notes: string[] }[] = [
+  {
+    version: "0.14.0", date: "2026-09-07", notes: [
+      "Status effects: weapons and items can now stick a nasty condition on whoever they hit",
+      "🔥 Burn — Flame Thrower, Plasma Cannon, Plasma Grenade: 15% of the weapon's listed damage every turn for 3 turns, straight through armour",
+      "⚡ Shock — Shock Rod, Thunder Hammer, EMP Bomb: 25% chance each turn you seize up and lose your action — attack, rest or item — for 2 turns",
+      "🧪 Corrode — Chainsaw, Antimatter Blade, Antimatter Missile Launcher, Acid Grenade: -25% Defence for 3 turns",
+      "☢ Radiation — Nuke Launcher, Nuke: 10% of the weapon's listed damage per turn and growing (10%, 20%, 30%...), and it never wears off",
+      "✨ Dazzle — Laser Gun, Death Ray, Flashbang: -50% Dodge and -20% accuracy for 3 turns",
+      "Every effect has a 20% chance to land unless the item says otherwise",
+      "Flame Thrower burns 66% of the time; Laser Gun and Death Ray dazzle 10% of the time",
+      "Acid Grenade, Flashbang, Nuke and Nuke Launcher land their effect 100% of the time",
+      "New item: Acid Grenade — level 12, $200, 20 damage, always corrodes, stack up to 5",
+      "New item: Flashbang — level 9, $120, 5 damage, always dazzles, stack up to 5",
+      "Any Repair Kit (Repair, Mega or Ultra) cures every effect you have on top of healing you",
+      "The same effect never stacks — hitting again just resets the timer",
+      "Effects are rolled per weapon, so a two-weapon attack gets two rolls",
+      "A hit soaked up by a Blast Shield still applies the effect — the shield stops damage, not fire",
+      "God mode robots shrug off every effect",
+      "Battle panels show a badge row for each robot's active effects with the turns left (radiation never wears off, so it has no counter)",
+      "Shop and inventory lines show an item's effect and how often it lands",
+      "Weapons in old saves pick up their new effects the next time you load that slot",
+      "New cheat code: 'u mad bro?' toggles the Troll Bomb in the shop",
+      "New item: Troll Bomb — $1,000,000 for 1,000,000 damage that never misses, then a 'please wait' screen. Cheat code only, stack up to 5",
+    ],
+  },
   {
     version: "0.13.0", date: "2026-04-10", notes: [
       "Level scaling: every level grants +1 Accuracy, +1 Dodge, +1 Defence, +1 Attack, +2 HP",

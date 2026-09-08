@@ -1,13 +1,53 @@
 /** Asset loading from JSON data files. */
 
 import type { Consumable, Enemy, Gear, Item, Robot, Weapon } from "./types";
+import type { StatusEffectSpec, StatusType } from "./status";
+import { DEFAULT_INFLICT_CHANCE, STATUS_RULES } from "./status";
 import { applyAllUpgrades } from "./upgrades";
 
 import configJson from "../data/config.json";
 import itemsJson from "../data/items.json";
 import enemiesJson from "../data/enemies.json";
 
+/** The cheat-only joke consumable, gated behind the "u mad bro?" code. */
+export const TROLL_BOMB_NAME = "Troll Bomb";
+
+/**
+ * Whether an item may be handed out by a loot box, the boss's kit, or any
+ * other random grant.
+ *
+ * A consumable that never misses (today only the Troll Bomb) is a cheat-only
+ * joke: buying one takes the cheat code, so no random pool may hand one over.
+ * The Troll Bomb is level 0, which means a level filter alone lets it through
+ * against every enemy in the game.
+ */
+export function isRandomRewardEligible(item: Item): boolean {
+  return item.itemType !== "consumable" || !(item as Consumable).alwaysHits;
+}
+
 // ── Loader helpers ──
+
+/**
+ * Normalise an item's optional statusEffect block, filling in the default chance.
+ *
+ * Exported so the unit tests can hit the validation path without a fake
+ * items.json. A typo'd type has to fail at load, not at the first hit in a
+ * battle, so an unknown type throws rather than riding along as `undefined`.
+ */
+export function loadStatusEffect(
+  itemName: string,
+  d: Record<string, unknown>,
+): StatusEffectSpec | null {
+  const raw = d.statusEffect as { type?: string; chance?: number } | undefined;
+  if (!raw?.type) return null;
+  if (!(raw.type in STATUS_RULES)) {
+    throw new Error(
+      `${itemName}: unknown status effect type "${raw.type}" ` +
+        `(expected one of ${Object.keys(STATUS_RULES).join(", ")})`,
+    );
+  }
+  return { type: raw.type as StatusType, chance: raw.chance ?? DEFAULT_INFLICT_CHANCE };
+}
 
 function loadWeapon(name: string, d: Record<string, unknown>): Weapon {
   return {
@@ -21,6 +61,7 @@ function loadWeapon(name: string, d: Record<string, unknown>): Weapon {
     energyCost: (d.energyCost as number) ?? 1,
     accuracy: (d.accuracy as number) ?? 100,
     hands: (d.hands as number) ?? 1,
+    statusEffect: loadStatusEffect(name, d),
   };
 }
 
@@ -64,6 +105,8 @@ function loadConsumable(name: string, d: Record<string, unknown>): Consumable {
     useText: (d.useText as string) ?? "",
     accuracyBonus: (d.accuracyBonus as number) ?? 0,
     maxStack: (d.maxStack as number) ?? 0,
+    alwaysHits: (d.alwaysHits as boolean) ?? false,
+    statusEffect: loadStatusEffect(name, d),
   };
 }
 
@@ -82,6 +125,26 @@ function loadEnemy(name: string, d: Record<string, unknown>): Enemy {
     backstory: (d.backstory as string) ?? "",
     challengeName: (d.challengeName as string) ?? "",
   };
+}
+
+// ── Save hydration ──
+
+/**
+ * Backfill `statusEffect` on inventory items saved before v0.14.0.
+ *
+ * Saves store whole item copies, so an item bought before status effects
+ * existed has no `statusEffect` field and would never inflict anything.
+ * Only that one field is copied from the registry — every other stat stays
+ * as saved, matching how the game has always treated saved items.
+ */
+export function hydrateStatusEffects(player: Robot, registry: AssetRegistry): void {
+  for (const item of player.inventory) {
+    if (item.itemType === "gear") continue;
+    if (item.statusEffect !== undefined) continue;
+    const def = registry.getItem(item.name);
+    if (!def || def.itemType === "gear") continue;
+    item.statusEffect = def.statusEffect;
+  }
 }
 
 // ── AssetRegistry ──
@@ -196,6 +259,7 @@ export function loadAssets(): AssetRegistry {
         challengeDefeatedEnemies: [],
         cheatsUsed: false,
         godMode: false,
+        trollMode: false,
         newGamePlusLevel: 0,
         titanDefeated: false,
         endGameBoss: null,
