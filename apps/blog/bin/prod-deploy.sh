@@ -18,15 +18,22 @@ fi
 src_url="blog/out"
 dst_url="gs://kyle.pericak.com"
 
-# Dry run first to find which files will change
+# gsutil forks worker processes, and on macOS a forked child can segfault
+# ("crashed on child side of fork pre-exec"), leaving the parent hung.
+# One process with -m's thread pool is plenty for this upload.
+gsutil_opts=(-o "GSUtil:parallel_process_count=1")
+
+# Dry run first to find which files will change.
+# gsutil logs "Would copy ..." lines to stderr, so capture both streams.
 echo "Checking for changes..."
-dry_run_output=$(gsutil -m rsync -r -c -d -n $src_url $dst_url)
+dry_run_output=$(gsutil "${gsutil_opts[@]}" -m rsync -r -c -d -n $src_url $dst_url 2>&1)
 if [ $? -ne 0 ]; then
   echo "Dry-run failed, aborting."
+  echo "$dry_run_output" | tail -5
   exit 1
 fi
 
-gsutil -m rsync -r -c -d $src_url $dst_url
+gsutil "${gsutil_opts[@]}" -m rsync -r -c -d $src_url $dst_url
 
 # Build array of changed GCS URLs (array handles spaces in names safely)
 # Note: mapfile requires bash 4+, macOS ships bash 3.2 — use while-read instead
@@ -39,7 +46,7 @@ done < <(echo "$dry_run_output" \
 
 if [ ${#changed_urls[@]} -gt 0 ]; then
   echo "Disabling cache headers on ${#changed_urls[@]} changed file(s)..."
-  gsutil -m setmeta -h "Cache-Control:no-cache,no-store,must-revalidate" \
+  gsutil "${gsutil_opts[@]}" -m setmeta -h "Cache-Control:no-cache,no-store,must-revalidate" \
     "${changed_urls[@]}"
 else
   echo "No files changed, skipping metadata update."
